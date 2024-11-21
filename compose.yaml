@@ -1,5 +1,0 @@
-name: gs-main
-include:
-  - path:
-      - gs-track-service/compose.yaml
-      - gs-price-service/compose.yaml
