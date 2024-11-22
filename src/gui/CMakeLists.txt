@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(LLVM_INSTALL_DIR /opt/homebrew/opt/llvm)
 
 
-list(APPEND CMAKE_PREFIX_PATH "/Users/ns/code/qt6-build/qtbase/lib/cmake")
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
 qt_standard_project_setup()
 

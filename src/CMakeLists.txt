@@ -4,12 +4,12 @@ project(GrooveSprings VERSION 0.0.0)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
-#set (JAVA_HOME "/usr/local/Cellar/openjdk/23")
 set (VST3SDK_HOME "/Users/ns/code/vst3sdk")
 set (C_LIBS_HOME "/opt/homebrew/Cellar")
 
 #set(QT_NO_STANDARD_PROJECT_SETUP TRUE)
 
+list(APPEND CMAKE_PREFIX_PATH "/Users/ns/code/qt6-build/qtbase/lib/cmake")
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets gui)
 if (Qt6_FOUND)
     message(INFO " --Qt6--FOUND--")
@@ -34,10 +34,10 @@ find_package (CAF
         REQUIRED)
 
 add_subdirectory(
-    /Users/ns/code/GrooveSprings/gs_desktop_application/src/main/cpp/audio
+    /Users/ns/code/GrooveJr/src/audio
 )
 add_subdirectory(
-        /Users/ns/code/GrooveSprings/gs_desktop_application/src/main/cpp/gui
+        /Users/ns/code/GrooveJr/src/gui
 )
 
 add_executable(groovesprings
