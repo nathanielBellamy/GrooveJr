@@ -21,7 +21,7 @@
 
 using namespace caf;
 
-namespace Gs {
+namespace Gj {
 namespace Act {
 
 struct SupervisorTrait {
@@ -37,11 +37,11 @@ struct SupervisorState {
      strong_actor_ptr playbackActorPtr;
      strong_actor_ptr appStateManagerPtr;
      strong_actor_ptr displayPtr;
-     Gs::Gui::MainWindow* mainWindowPtr;
+     Gj::Gui::MainWindow* mainWindowPtr;
 
      Supervisor::pointer self;
 
-     SupervisorState(Supervisor::pointer self, Gs::Gui::MainWindow* mainWindowPtr) :
+     SupervisorState(Supervisor::pointer self, Gj::Gui::MainWindow* mainWindowPtr) :
          self(self)
        , mainWindowPtr(mainWindowPtr)
        , running(false)
@@ -82,6 +82,6 @@ struct SupervisorState {
 };
 
 } // Act
-} // Gs
+} // Gj
 
 #endif //SUPERVISOR_H

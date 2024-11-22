@@ -19,7 +19,7 @@
 
 using namespace caf;
 
-namespace Gs {
+namespace Gj {
 namespace Act {
 
 struct PlaybackTrait {
@@ -109,6 +109,6 @@ struct PlaybackState {
 };
 
 } // Act
-} // Gs
+} // Gj
 
 #endif //PLAYBACK_H

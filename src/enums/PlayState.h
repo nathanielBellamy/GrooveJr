@@ -6,7 +6,7 @@
 #define PLAYSTATE_H
 
 
-namespace Gs {
+namespace Gj {
 
     enum PlayState {
       STOP,
@@ -33,5 +33,5 @@ namespace Gs {
       }
     };
 
-} // Gs
+} // Gj
 #endif //PLAYSTATE_H

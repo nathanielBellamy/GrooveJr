@@ -33,24 +33,24 @@
 
 using namespace caf;
 
-namespace Gs {
+namespace Gj {
 namespace Gui {
 
 class MainWindow : public QMainWindow {
   public:
     MainWindow(actor_system& sys);
-    int hydrateState(const Gs::AppStatePacket& appStatePacket);
+    int hydrateState(const Gj::AppStatePacket& appStatePacket);
 
   private:
     QFrame frame;
     QLabel label {&frame};
     TransportControl transportControl;
     actor_system& sys;
-    Gs::PlayState playState;
+    Gj::PlayState playState;
 };
 
 } // Gui
-} // Gs
+} // Gj
 
 
 

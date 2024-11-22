@@ -40,7 +40,7 @@ add_subdirectory(
         /Users/ns/code/GrooveJr/src/gui
 )
 
-add_executable(groovesprings
+add_executable(groovejr
         main.h
         main.cpp
         AppState.h
@@ -56,7 +56,7 @@ add_executable(groovesprings
         gui/TransportControl.h
         actors/Display.h
 )
-target_link_libraries(groovesprings
+target_link_libraries(groovejr
         PUBLIC
         CAF::core
         gsAudio
@@ -65,5 +65,5 @@ target_link_libraries(groovesprings
         Qt6::Widgets
         Qt6::Gui
 )
-target_compile_options(groovesprings PRIVATE ${INCLUDE_FLAGS})
-set_target_properties(groovesprings PROPERTIES LINKER_LANGUAGE CXX)
+target_compile_options(groovejr PRIVATE ${INCLUDE_FLAGS})
+set_target_properties(groovejr PROPERTIES LINKER_LANGUAGE CXX)

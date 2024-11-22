@@ -4,25 +4,25 @@
 
 #include "AppState.h"
 
-namespace Gs {
+namespace Gj {
 
-AppState::AppState(Gs::PlayState playState)
+AppState::AppState(Gj::PlayState playState)
     : playState(playState)
       {}
 
-AppState AppState::setPlayState(AppState appState, Gs::PlayState playState) {
+AppState AppState::setPlayState(AppState appState, Gj::PlayState playState) {
   AppState newState { playState };
   return newState;
 };
 
 AppStatePacket AppState::toPacket() {
-    AppStatePacket packet { Gs::psToInt(playState) };
+    AppStatePacket packet { Gj::psToInt(playState) };
     return packet;
 }
 
 AppState AppState::fromPacket(const AppStatePacket& packet) {
-    AppState appState { Gs::intToPs(packet.playState) };
+    AppState appState { Gj::intToPs(packet.playState) };
     return appState;
 };
 
-} // Gs
+} // Gj

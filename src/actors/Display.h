@@ -29,14 +29,14 @@
 
 using namespace caf;
 
-namespace Gs {
+namespace Gj {
 namespace Act {
 
 struct DisplayTrait {
 
     using signatures = type_list<
                                   result<void>(strong_actor_ptr, hydrate_display_a),
-                                  result<void>(strong_actor_ptr, Gs::AppStatePacket, current_state_a)
+                                  result<void>(strong_actor_ptr, Gj::AppStatePacket, current_state_a)
                                 >;
 
 };
@@ -44,11 +44,11 @@ struct DisplayTrait {
 using Display = typed_actor<DisplayTrait>;
 
 struct DisplayState {
-     Gs::Gui::MainWindow* mainWindow;
+     Gj::Gui::MainWindow* mainWindow;
 
      Display::pointer self;
 
-     DisplayState(Display::pointer self, strong_actor_ptr supervisor, Gs::Gui::MainWindow* mainWindow) :
+     DisplayState(Display::pointer self, strong_actor_ptr supervisor, Gj::Gui::MainWindow* mainWindow) :
          self(self)
        , mainWindow(mainWindow)
        {
@@ -67,7 +67,7 @@ struct DisplayState {
                  read_state_a_v
              );
            },
-           [this](strong_actor_ptr replyToPtr, Gs::AppStatePacket appStatePacket, current_state_a) {
+           [this](strong_actor_ptr replyToPtr, Gj::AppStatePacket appStatePacket, current_state_a) {
              std::cout << "Display : current_state_a " << std::endl;
              if ( mainWindow->hydrateState(appStatePacket) )
                std::cout << "Display : Error : unable to hydrate state " << std::endl;
@@ -77,6 +77,6 @@ struct DisplayState {
 };
 
 } // Act
-} // Gs
+} // Gj
 
 #endif //DISPLAY_H

@@ -6,7 +6,7 @@
 
 using namespace caf;
 
-namespace Gs {
+namespace Gj {
 namespace Gui {
 
 TransportControl::TransportControl(QWidget* parent, actor_system& sys)
@@ -25,7 +25,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
 
   connect(&playTrigAction, &QAction::triggered, [&] {
     std::cout << "MainWindow : playTrigAction" << std::endl;
-    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gs::Act::ActorIds::APP_STATE_MANAGER);
+    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
     self->anon_send(
@@ -36,7 +36,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
 
   connect(&pauseTrigAction, &QAction::triggered, [&] {
     std::cout << "MainWindow : pauseTrigAction" << std::endl;
-    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gs::Act::ActorIds::APP_STATE_MANAGER);
+    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
     self->anon_send(
@@ -47,7 +47,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
 
   connect(&stopTrigAction, &QAction::triggered, [&] {
     std::cout << "MainWindow : stopTrigAction" << std::endl;
-    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gs::Act::ActorIds::APP_STATE_MANAGER);
+    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
     self->anon_send(
@@ -58,7 +58,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
 
   connect(&rwTrigAction, &QAction::triggered, [&] {
     std::cout << "MainWindow : rwTrigAction" << std::endl;
-    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gs::Act::ActorIds::APP_STATE_MANAGER);
+    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
     self->anon_send(
@@ -69,7 +69,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
 
   connect(&ffTrigAction, &QAction::triggered, [&] {
     std::cout << "MainWindow : ffTrigAction" << std::endl;
-    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gs::Act::ActorIds::APP_STATE_MANAGER);
+    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
     self->anon_send(
@@ -81,18 +81,18 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
 } // constructor
 
 
-int TransportControl::hydrateState(const Gs::AppStatePacket& appStatePacket) {
+int TransportControl::hydrateState(const Gj::AppStatePacket& appStatePacket) {
     std::cout << "TransportControl : hydrateState: " << std::endl;
     AppState appState = AppState::fromPacket(appStatePacket);
     setPlayState(appState.playState);
     return 0;
 }
 
-void TransportControl::setPlayState(Gs::PlayState newState) {
+void TransportControl::setPlayState(Gj::PlayState newState) {
   playState = newState;
   std::cout << "New State :" << newState << std::endl;
 }
 
 
 } // Gui
-} // Gs
+} // Gj

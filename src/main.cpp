@@ -7,13 +7,13 @@
 using namespace caf;
 using namespace std::literals;
 
-namespace Gs {
+namespace Gj {
 
 void caf_main(int argc, char *argv[], actor_system& sys, Steinberg::Vst::AudioHost::App* vst3AudioHost) {
 
   // init Qt App
   auto qtApp = QApplication {argc, argv};
-  auto mainWindow = Gs::Gui::MainWindow { sys };
+  auto mainWindow = Gj::Gui::MainWindow { sys };
   // init ActorSystem
   auto supervisor = sys.spawn(actor_from_state<Act::SupervisorState>, &mainWindow);
 
@@ -53,7 +53,7 @@ extern "C" {
         editorApp.init (cmdArgs);
 
         // Initialize the global type information before anything else.
-        init_global_meta_objects<id_block::groovesprings>();
+        init_global_meta_objects<id_block::groovejr>();
         core::init_global_meta_objects();
         // Create the config.
         actor_system_config cfg;
@@ -66,4 +66,4 @@ extern "C" {
     }
 }
 
-} // Gs
+} // Gj

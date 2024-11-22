@@ -24,12 +24,12 @@
 #include "./audio/effects/vst3/host/hostclasses.hpp"
 #include "./audio/effects/vst3/host/editorhost/source/editorhost.h"
 
-namespace Gs {
+namespace Gj {
 
 extern "C" {
     int main(int argc, char *argv[]);
 }
 
-} // Gs
+} // Gj
 
 #endif //MAIN_H

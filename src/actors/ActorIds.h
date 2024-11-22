@@ -5,7 +5,7 @@
 #ifndef ACTOR_IDS_H
 #define ACTOR_IDS_H
 
-namespace Gs {
+namespace Gj {
 namespace Act {
 
     enum ActorIds {

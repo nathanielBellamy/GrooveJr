@@ -22,7 +22,7 @@
 
 using namespace caf;
 
-namespace Gs {
+namespace Gj {
 namespace Act {
 
 struct AppStateManagerTrait {
@@ -48,13 +48,13 @@ using AppStateManager = typed_actor<AppStateManagerTrait>;
 struct AppStateManagerState {
 
      AppStateManager::pointer self;
-     Gs::AppState appState;
+     Gj::AppState appState;
      strong_actor_ptr playback;
      strong_actor_ptr display;
 
      AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor) :
           self(self)
-        , appState(Gs::AppState { Gs::PlayState::STOP } )
+        , appState(Gj::AppState { Gj::PlayState::STOP } )
         {
            self->link_to(supervisor);
            self->system().registry().put(ActorIds::APP_STATE_MANAGER, actor_cast<strong_actor_ptr>(self));
@@ -87,9 +87,9 @@ struct AppStateManagerState {
              std::cout << "AppStateManager : tc_trig_play_ar : " << std::endl;
 
              if (success) {
-               appState = Gs::AppState::setPlayState(appState, Gs::PlayState::PLAY);
+               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::PLAY);
              } else {
-               appState = Gs::AppState::setPlayState(appState, Gs::PlayState::STOP);
+               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }
              strong_actor_ptr displayPtr = self->system().registry().get(ActorIds::DISPLAY);
              this->self->anon_send(
@@ -99,7 +99,7 @@ struct AppStateManagerState {
              );
            },
            [this](tc_trig_pause_a) {
-             std::cout << "Gs::AppStateManager : tc_trig_pause_a : " << std::endl;
+             std::cout << "Gj::AppStateManager : tc_trig_pause_a : " << std::endl;
 
              this->self->anon_send(
                  actor_cast<actor>(playback),
@@ -108,16 +108,16 @@ struct AppStateManagerState {
              );
            },
            [this](strong_actor_ptr, bool success, tc_trig_pause_ar) {
-             std::cout << "Gs::AppStateManager : tc_trig_pause_ar : " << std::endl;
+             std::cout << "Gj::AppStateManager : tc_trig_pause_ar : " << std::endl;
 
              if (success) {
-               appState = Gs::AppState::setPlayState(appState, Gs::PlayState::PAUSE);
+               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::PAUSE);
              } else {
-               appState = Gs::AppState::setPlayState(appState, Gs::PlayState::STOP);
+               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }
            },
            [this](tc_trig_stop_a) {
-             std::cout << "Gs::AppStateManager : tc_trig_stop_a : " << std::endl;
+             std::cout << "Gj::AppStateManager : tc_trig_stop_a : " << std::endl;
 
              this->self->anon_send(
                  actor_cast<actor>(playback),
@@ -126,11 +126,11 @@ struct AppStateManagerState {
              );
            },
            [this](strong_actor_ptr, bool success, tc_trig_stop_ar) {
-             std::cout << "Gs::AppStateManager : tc_trig_stop_ar : " << std::endl;
-             appState = Gs::AppState::setPlayState(appState, Gs::PlayState::STOP);
+             std::cout << "Gj::AppStateManager : tc_trig_stop_ar : " << std::endl;
+             appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
            },
            [this](tc_trig_rw_a) {
-             std::cout << "Gs::AppStateManager : tc_trig_rw_a : " << std::endl;
+             std::cout << "Gj::AppStateManager : tc_trig_rw_a : " << std::endl;
 
              this->self->anon_send(
                  actor_cast<actor>(playback),
@@ -139,16 +139,16 @@ struct AppStateManagerState {
              );
            },
            [this](strong_actor_ptr, bool success, tc_trig_rw_ar) {
-             std::cout << "Gs::AppStateManager : tc_trig_rw_ar : " << std::endl;
+             std::cout << "Gj::AppStateManager : tc_trig_rw_ar : " << std::endl;
 
              if (success) {
-               appState = Gs::AppState::setPlayState(appState, Gs::PlayState::RW);
+               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::RW);
              } else {
-               appState = Gs::AppState::setPlayState(appState, Gs::PlayState::STOP);
+               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }
            },
            [this](tc_trig_ff_a) {
-             std::cout << "Gs::AppStateManager : tc_trig_ff_a : " << std::endl;
+             std::cout << "Gj::AppStateManager : tc_trig_ff_a : " << std::endl;
 
              this->self->anon_send(
                  actor_cast<actor>(playback),
@@ -157,12 +157,12 @@ struct AppStateManagerState {
              );
            },
            [this](strong_actor_ptr, bool success, tc_trig_ff_ar) {
-             std::cout << "Gs::AppStateManager : tc_trig_ff_ar : " << std::endl;
+             std::cout << "Gj::AppStateManager : tc_trig_ff_ar : " << std::endl;
 
              if (success) {
-               appState = Gs::AppState::setPlayState(appState, Gs::PlayState::FF);
+               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::FF);
              } else {
-               appState = Gs::AppState::setPlayState(appState, Gs::PlayState::STOP);
+               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }
            }
        };
@@ -170,6 +170,6 @@ struct AppStateManagerState {
 };
 
 } // Act
-} // Gs
+} // Gj
 
 #endif //APPSTATEMANAGER_H

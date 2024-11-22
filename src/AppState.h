@@ -7,7 +7,7 @@
 
 #include "./enums/PlayState.h"
 
-namespace Gs {
+namespace Gj {
 
 struct AppStatePacket {
     int playState;
@@ -21,17 +21,17 @@ bool inspect(Inspector& f, AppStatePacket& x) {
 class AppState {
 
   public:
-    AppState(Gs::PlayState playState);
-    Gs::PlayState playState;
+    AppState(Gj::PlayState playState);
+    Gj::PlayState playState;
 
     AppStatePacket toPacket();
      // TODO?
     static AppState fromPacket(const AppStatePacket& packet);
 
     // mutations
-    static AppState setPlayState(AppState appState, Gs::PlayState playState);
+    static AppState setPlayState(AppState appState, Gj::PlayState playState);
 };
 
-} // Gs
+} // Gj
 
 #endif //APPSTATE_H

@@ -29,7 +29,7 @@
 
 using namespace caf;
 
-namespace Gs {
+namespace Gj {
 namespace Gui {
 
 class TransportControl : public QToolBar {
@@ -37,12 +37,12 @@ class TransportControl : public QToolBar {
 
   public:
     TransportControl(QWidget* parent, actor_system& sys);
-    int hydrateState(const Gs::AppStatePacket& appStatePacket);
-    void setPlayState(Gs::PlayState state);
+    int hydrateState(const Gj::AppStatePacket& appStatePacket);
+    void setPlayState(Gj::PlayState state);
 
   private:
     actor_system& sys;
-    Gs::PlayState playState;
+    Gj::PlayState playState;
     QAction playTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay), "", this};
     QAction pauseTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause), "", this};
     QAction stopTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop), "", this};
@@ -52,6 +52,6 @@ class TransportControl : public QToolBar {
 
 
 } // Gui
-} // Gs
+} // Gj
 
 #endif //TRANSPORTCONTROL_H

@@ -6,7 +6,7 @@
 
 using namespace caf;
 
-namespace Gs {
+namespace Gj {
 namespace Gui {
 
 MainWindow::MainWindow(actor_system& sys)
@@ -14,22 +14,22 @@ MainWindow::MainWindow(actor_system& sys)
     , transportControl(this, sys)
     {
 
-  label.setText("Welcome to\nGrooveSprings.");
+  label.setText("GrooveJr");
   label.setFont({label.font().family(), 36});
 
 
   addToolBar(Qt::BottomToolBarArea, &transportControl);
   setCentralWidget(&frame);
   setUnifiedTitleAndToolBarOnMac(true);
-  setWindowTitle("GrooveSprings");
+  setWindowTitle("GrooveJr");
   resize(640, 480);
 }
 
-int MainWindow::hydrateState(const Gs::AppStatePacket& appStatePacket) {
+int MainWindow::hydrateState(const Gj::AppStatePacket& appStatePacket) {
     std::cout << "MainWindow : hydrateState: " << std::endl;
     transportControl.hydrateState(appStatePacket);
     return 0;
 }
 
 } // Gui
-} // Gs
+} // Gj

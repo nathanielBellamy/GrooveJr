@@ -5,7 +5,7 @@
 #ifndef ENVELOPEQTPTR_H
 #define ENVELOPEQTPTR_H
 
-namespace Gs {
+namespace Gj {
 
 struct EnvelopeQtPtr { long ptr; };
 
@@ -14,6 +14,6 @@ bool inspect(Inspector& f, EnvelopeQtPtr& x) {
     return f.object(x).fields(f.field("ptr", x.ptr));
 }
 
-} // Gs
+} // Gj
 
 #endif //ENVELOPEQTPTR_H
