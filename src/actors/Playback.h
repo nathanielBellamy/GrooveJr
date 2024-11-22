@@ -14,6 +14,7 @@
 #include "./ActorIds.h"
 #include "../messaging/atoms.h"
 #include "../messaging/EnvelopeQtPtr.h"
+#include "./AudioThread.h"
 
 #include "../enums/PlayState.h"
 
@@ -51,6 +52,12 @@ struct PlaybackState {
        return {
            [this](strong_actor_ptr reply_to, tc_trig_play_a) {
              std::cout << "Playback : tc_trig_play_a : " << std::endl;
+
+             auto audioThread = self->system().spawn(actor_from_state<AudioThreadState>, actor_cast<strong_actor_ptr>(self));
+             self->anon_send(
+                 audioThread,
+                 audio_thread_init_a_v
+             );
 
              actor replyToActor = actor_cast<actor>(reply_to);
              self->anon_send(

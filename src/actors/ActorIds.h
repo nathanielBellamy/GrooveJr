@@ -9,10 +9,11 @@ namespace Gj {
 namespace Act {
 
     enum ActorIds {
-      SUPERVISOR,
       APP_STATE_MANAGER,
+      AUDIO_THREAD,
       DISPLAY,
       PLAYBACK,
+      SUPERVISOR,
     };
 
 }
