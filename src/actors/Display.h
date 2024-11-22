@@ -61,7 +61,7 @@ struct DisplayState {
            [this](strong_actor_ptr replyToPtr, hydrate_display_a) {
              std::cout << "Display : hydrate_display_a " << std::endl;
              strong_actor_ptr appStateManager = self->system().registry().get(ActorIds::APP_STATE_MANAGER);
-             this->self->anon_send(
+             self->anon_send(
                  actor_cast<actor>(appStateManager),
                  actor_cast<strong_actor_ptr>(self),
                  read_state_a_v

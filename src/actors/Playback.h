@@ -53,7 +53,7 @@ struct PlaybackState {
              std::cout << "Playback : tc_trig_play_a : " << std::endl;
 
              actor replyToActor = actor_cast<actor>(reply_to);
-             this->self->anon_send(
+             self->anon_send(
                  replyToActor,
                  actor_cast<strong_actor_ptr>(self),
                  true, // TODO: manage AudioThread and pass in result here
@@ -64,7 +64,7 @@ struct PlaybackState {
              std::cout << "Playback : tc_trig_pause_a : " << std::endl;
 
              actor replyToActor = actor_cast<actor>(reply_to);
-             this->self->anon_send(
+             self->anon_send(
                  replyToActor,
                  actor_cast<strong_actor_ptr>(self),
                  true, // TODO: manage AudioThread and pass in result here
@@ -75,7 +75,7 @@ struct PlaybackState {
              std::cout << "Playback : tc_trig_stop_a : " << std::endl;
 
              actor replyToActor = actor_cast<actor>(reply_to);
-             this->self->anon_send(
+             self->anon_send(
                  replyToActor,
                  actor_cast<strong_actor_ptr>(self),
                  true, // TODO: manage AudioThread and pass in result here
@@ -86,7 +86,7 @@ struct PlaybackState {
              std::cout << "Playback : tc_trig_rw_a : " << std::endl;
 
              actor replyToActor = actor_cast<actor>(reply_to);
-             this->self->anon_send(
+             self->anon_send(
                  replyToActor,
                  actor_cast<strong_actor_ptr>(self),
                  true, // TODO: manage AudioThread and pass in result here
@@ -97,7 +97,7 @@ struct PlaybackState {
              std::cout << "Playback : tc_trig_ff_a : " << std::endl;
 
              actor replyToActor = actor_cast<actor>(reply_to);
-             this->self->anon_send(
+             self->anon_send(
                  replyToActor,
                  actor_cast<strong_actor_ptr>(self),
                  true, // TODO: manage AudioThread and pass in result here

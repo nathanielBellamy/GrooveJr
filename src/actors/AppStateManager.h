@@ -51,6 +51,15 @@ struct AppStateManagerState {
      Gj::AppState appState;
      strong_actor_ptr playback;
      strong_actor_ptr display;
+     void hydrateStateToDisplay() {
+         strong_actor_ptr displayPtr = self->system().registry().get(ActorIds::DISPLAY);
+         self->anon_send(
+           actor_cast<actor>(displayPtr),
+           actor_cast<strong_actor_ptr>(self),
+           appState.toPacket(),
+           current_state_a_v
+         );
+     };
 
      AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor) :
           self(self)
@@ -67,7 +76,7 @@ struct AppStateManagerState {
        return {
            [this](strong_actor_ptr replyTo, read_state_a) {
              std::cout << "AppStateManager : read_state_a : " << std::endl;
-             this->self->anon_send(
+             self->anon_send(
                  actor_cast<actor>(replyTo),
                  actor_cast<strong_actor_ptr>(self),
                  appState.toPacket(),
@@ -77,7 +86,7 @@ struct AppStateManagerState {
            [this](tc_trig_play_a) {
              std::cout << "AppStateManager : tc_trig_play_a : " << std::endl;
 
-             this->self->anon_send(
+             self->anon_send(
                  actor_cast<actor>(playback),
                  actor_cast<strong_actor_ptr>(self),
                  tc_trig_play_a_v
@@ -91,17 +100,12 @@ struct AppStateManagerState {
              } else {
                appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }
-             strong_actor_ptr displayPtr = self->system().registry().get(ActorIds::DISPLAY);
-             this->self->anon_send(
-               actor_cast<actor>(displayPtr),
-               actor_cast<strong_actor_ptr>(self),
-               hydrate_display_a_v
-             );
+             hydrateStateToDisplay();
            },
            [this](tc_trig_pause_a) {
              std::cout << "Gj::AppStateManager : tc_trig_pause_a : " << std::endl;
 
-             this->self->anon_send(
+             self->anon_send(
                  actor_cast<actor>(playback),
                  actor_cast<strong_actor_ptr>(self),
                  tc_trig_pause_a_v
@@ -115,11 +119,12 @@ struct AppStateManagerState {
              } else {
                appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }
+             hydrateStateToDisplay();
            },
            [this](tc_trig_stop_a) {
              std::cout << "Gj::AppStateManager : tc_trig_stop_a : " << std::endl;
 
-             this->self->anon_send(
+             self->anon_send(
                  actor_cast<actor>(playback),
                  actor_cast<strong_actor_ptr>(self),
                  tc_trig_stop_a_v
@@ -128,11 +133,12 @@ struct AppStateManagerState {
            [this](strong_actor_ptr, bool success, tc_trig_stop_ar) {
              std::cout << "Gj::AppStateManager : tc_trig_stop_ar : " << std::endl;
              appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
+             hydrateStateToDisplay();
            },
            [this](tc_trig_rw_a) {
              std::cout << "Gj::AppStateManager : tc_trig_rw_a : " << std::endl;
 
-             this->self->anon_send(
+             self->anon_send(
                  actor_cast<actor>(playback),
                  actor_cast<strong_actor_ptr>(self),
                  tc_trig_rw_a_v
@@ -146,11 +152,12 @@ struct AppStateManagerState {
              } else {
                appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }
+             hydrateStateToDisplay();
            },
            [this](tc_trig_ff_a) {
              std::cout << "Gj::AppStateManager : tc_trig_ff_a : " << std::endl;
 
-             this->self->anon_send(
+             self->anon_send(
                  actor_cast<actor>(playback),
                  actor_cast<strong_actor_ptr>(self),
                  tc_trig_ff_a_v
@@ -164,6 +171,7 @@ struct AppStateManagerState {
              } else {
                appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }
+             hydrateStateToDisplay();
            }
        };
      };

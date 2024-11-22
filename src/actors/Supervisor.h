@@ -72,7 +72,7 @@ struct SupervisorState {
        return {
            [this](strong_actor_ptr replyToPtr, supervisor_status_a) {
              std::cout << "Supervisor running : " << this->running << std::endl;
-//             this->self->anon_send(
+//             self->anon_send(
 //                 actor_cast<strong_actor_ptr>(replyToPtr),
 //                 this->running
 //             );
