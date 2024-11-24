@@ -11,11 +11,13 @@
 #include "caf/caf_main.hpp"
 #include "caf/event_based_actor.hpp"
 
-#include "./ActorIds.h"
 #include "../messaging/atoms.h"
 #include "./AppStateManager.h"
 #include "./Playback.h"
 #include "../AppState.h"
+#include "./AudioThreadId.h"
+
+#include "../audio/audio.h"
 
 using namespace caf;
 
@@ -34,19 +36,31 @@ using AudioThread = typed_actor<AudioThreadTrait>;
 
 struct AudioThreadState {
 
-     AudioThread::pointer self;
+     static long id;
 
-     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor) :
+     AudioThread::pointer self;
+     Steinberg::Vst::AudioHost::App* vst3Host;
+
+     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor, Steinberg::Vst::AudioHost::App* vst3Host) :
          self(self)
+       , vst3Host(vst3Host)
        {
            self->link_to(supervisor);
-           self->system().registry().put(ActorIds::AUDIO_THREAD, actor_cast<strong_actor_ptr>(self));
+           AudioThreadId::curr += 1;
        }
 
      AudioThread::behavior_type make_behavior() {
        return {
            [this](audio_thread_init_a) {
              std::cout << "AudioThread : audio_thread_init_a " << std::endl;
+             Audio audio (
+                self->system(),
+                AudioThreadId::curr,
+                "/Users/ns/GrooveSprings_MusicLibrary/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac",
+                0l,
+                vst3Host
+             );
+             audio.run();
            },
        };
      };

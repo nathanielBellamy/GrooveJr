@@ -40,9 +40,11 @@ using Playback = typed_actor<PlaybackTrait>;
 struct PlaybackState {
 
      Playback::pointer self;
+     Steinberg::Vst::AudioHost::App* vst3Host;
 
-     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor) :
+     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, Steinberg::Vst::AudioHost::App* vst3Host) :
           self(self)
+        , vst3Host(vst3Host)
         {
            self->link_to(supervisor);
            self->system().registry().put(ActorIds::PLAYBACK, actor_cast<strong_actor_ptr>(self));
@@ -53,7 +55,7 @@ struct PlaybackState {
            [this](strong_actor_ptr reply_to, tc_trig_play_a) {
              std::cout << "Playback : tc_trig_play_a : " << std::endl;
 
-             auto audioThread = self->system().spawn(actor_from_state<AudioThreadState>, actor_cast<strong_actor_ptr>(self));
+             auto audioThread = self->system().spawn(actor_from_state<AudioThreadState>, actor_cast<strong_actor_ptr>(self), vst3Host);
              self->anon_send(
                  audioThread,
                  audio_thread_init_a_v
