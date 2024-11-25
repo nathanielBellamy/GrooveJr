@@ -15,7 +15,7 @@
 #include "./AppStateManager.h"
 #include "./Playback.h"
 #include "../AppState.h"
-#include "./AudioThreadId.h"
+#include "./AudioThreadStatics.h"
 
 #include "../audio/audio.h"
 
@@ -46,7 +46,7 @@ struct AudioThreadState {
        , vst3Host(vst3Host)
        {
            self->link_to(supervisor);
-           AudioThreadId::curr += 1;
+           AudioThreadStatics::threadIdIncr();
        }
 
      AudioThread::behavior_type make_behavior() {
@@ -55,7 +55,7 @@ struct AudioThreadState {
              std::cout << "AudioThread : audio_thread_init_a " << std::endl;
              Audio audio (
                 self->system(),
-                AudioThreadId::curr,
+                AudioThreadStatics::threadId,
                 "/Users/ns/GrooveSprings_MusicLibrary/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac",
                 0l,
                 vst3Host

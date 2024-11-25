@@ -1,14 +1,4 @@
-#include <string>
-#include <unistd.h>
-#include <iostream>
-#include <sndfile.hh>
-#include <portaudio.h>
-#include "caf/actor_system.hpp"
 #include "./audio.h"
-#include "./audio_data.h"
-#include "./constants.h"
-#include "./caf_data.h"
-#include "./effects/vst3/host/audiohost/source/audiohost.h"
 
 #define PA_SAMPLE_TYPE      paFloat32
 
@@ -179,7 +169,7 @@ int Audio::run()
   SNDFILE *file;
 
 //  if (! (file = sf_open("gs_music_library/Unknown Artist/Unknown Album/test.mp3", SFM_READ, &sfinfo)))
-  if (! (file = sf_open(Audio::fileName, SFM_READ, &sfinfo)))
+  if (! (file = sf_open(fileName, SFM_READ, &sfinfo)))
   {
     printf ("Not able to open input file.\n") ;
     /* Print the error message from libsndfile. */
@@ -202,7 +192,7 @@ int Audio::run()
       return 1;
   }
 
-  sf_count_t initialFrameId = (sf_count_t) Audio::initialFrameId;
+  sf_count_t initialFrameId = (sf_count_t) initialFrameId;
   AUDIO_DATA audioData(buffer, file, sfinfo, initialFrameId, readcount, 1, vst3Host);
 
   // init cafData
@@ -264,22 +254,16 @@ int Audio::run()
     // make it accessible to our running audio callback through the audioData obj
 
     if (audioData.readComplete) { // reached end of input file
-        Audio::jSetPlayState(&cafData, 0); // stop
+//        Gj::Act::AudioThreadStatics::setPlayState(0);
         break;
     }
-
-    // check if this is still the current audio thread
-//    threadId = cafData.env->CallStaticLongMethod(
-//        cafData.gsPlayback,
-//        cafData.getThreadId
-//    );
 
     if (audioData.fadeIn > 0.001) {
         audioData.fadeIn -= 0.001;
         audioData.volume += 0.001;
     }
 
-    if (threadId != Audio::threadId) { // fadeout, break + cleanup
+    if (threadId != Gj::Act::AudioThreadStatics::threadId) { // fadeout, break + cleanup
         if (audioData.fadeOut < 0.001) { // break + cleanup
             break;
         } else { // continue fading out
@@ -287,32 +271,24 @@ int Audio::run()
             audioData.fadeOut -= 0.0001;
         }
     } else {
-//        audioData.playbackSpeed = cafData.env->CallStaticFloatMethod(
-//            cafData.gsPlayback,
-//            cafData.getPlaybackSpeedFloat
-//        );
-//
-//        audioData.playState = cafData.env->CallStaticIntMethod(
-//            cafData.gsPlayback,
-//            cafData.getPlayStateInt
-//        );
+        audioData.playbackSpeed = Gj::Act::AudioThreadStatics::playbackSpeed;
+        audioData.playState = Gj::Act::AudioThreadStatics::playState;
+        Gj::Act::AudioThreadStatics::setFrameId( (long) audioData.index );
 
         //    std::cout << "\n =========== \n";
         //    std::cout << "\n audioData.playState: " << audioData.playState << "\n";
         //    std::cout << "\n audioData.index " << audioData.index << "\n";
         //    std::cout << "\n =========== \n";
-
-        Audio::jSetCurrFrameId(&cafData, (int) audioData.index);
     }
   }
 
-  if (threadId == Audio::threadId) { // current audio thread has reached natural end of file
+  if (threadId == Gj::Act::AudioThreadStatics::threadId) { // current audio thread has reached natural end of file
       if (audioData.playState == 1) {
-          Audio::jSetPlayState(&cafData, 0);
+//          Gj::Act::AudioThreadStatics::setPlayState(0);
       } else {
-          Audio::jSetPlayState(&cafData, audioData.playState);
+//          Gj::Act::AudioThreadStatics::setPlayState(audioData.playState);
       }
-      Audio::jSetReadComplete(&cafData);
+      Gj::Act::AudioThreadStatics::setReadComplete(true);
   }
 
   err = Pa_StopStream( stream );
@@ -321,53 +297,16 @@ int Audio::run()
   err = Pa_CloseStream( stream );
   if( err != paNoError ) goto error;
   Pa_Terminate();
-  Audio::freeAudioData(&audioData);
+  freeAudioData(&audioData);
   return 0;
 
 
   error:
     Pa_Terminate();
-    Audio::jSetPlayState(&cafData, 0);
-    Audio::freeAudioData(&audioData);
+//    Gj::Act::AudioThreadStatics::setPlayState(0);
+    freeAudioData(&audioData);
     fprintf( stderr, "\nAn error occurred while using the portaudio stream" );
     fprintf( stderr, "\nError number: %d", err );
     fprintf( stderr, "\nError message: %s", Pa_GetErrorText( err ) );
     return 1;
 };
-
-void Audio::jSetCurrFrameId(
-    CAF_DATA* cafData,
-    int currFrameId
-){
-//   jobject jCurrFrameId = cafData->env->NewObject(
-//        cafData->jLong,
-//        cafData->jLongInit,
-//        currFrameId
-//   );
-//   cafData->env->CallVoidMethod(
-//        cafData->gsPlayback,
-//        cafData->setCurrFrameId,
-//        jCurrFrameId
-//   );
-}
-
-void Audio::jSetPlayState(
-    CAF_DATA* cafData,
-    int newPlayState
-){
-//   cafData->env->CallVoidMethod(
-//        cafData->gsPlayback,
-//        cafData->setPlayStateInt,
-//        newPlayState
-//   );
-}
-
-void Audio::jSetReadComplete(
-    CAF_DATA* cafData
-){
-//   cafData->env->CallVoidMethod(
-//        cafData->gsPlayback,
-//        cafData->setReadComplete,
-//        true
-//   );
-}
