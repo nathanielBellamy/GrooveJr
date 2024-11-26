@@ -29,8 +29,13 @@ void AudioThreadStatics::setReadComplete(bool readComplete) {
   AudioThreadStatics::readComplete = readComplete;
 }
 
-void AudioThreadStatics::threadIdIncr() {
-  AudioThreadStatics::threadId++;
+long AudioThreadStatics::threadIdIncr() {
+  AudioThreadStatics::threadId += 1;
+  return AudioThreadStatics::threadId;
+}
+
+long AudioThreadStatics::getThreadId() {
+  return AudioThreadStatics::threadId;
 }
 
 } // Act

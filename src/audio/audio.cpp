@@ -192,8 +192,12 @@ int Audio::run()
       return 1;
   }
 
-  sf_count_t initialFrameId = (sf_count_t) initialFrameId;
+//  sf_count_t initialFrameId = (sf_count_t) initialFrameId;
   AUDIO_DATA audioData(buffer, file, sfinfo, initialFrameId, readcount, 1, vst3Host);
+  std::cout << "initial frame id: " << initialFrameId << std::endl;
+  std::cout << "thread id: " << threadId << std::endl;
+  std::cout << "sfinfo sampleRate: " << sfinfo.samplerate << std::endl;
+  std::cout << "readcount: " << readcount << std::endl;
 
   // init cafData
   CAF_DATA cafData(Audio::actorSystem);
@@ -237,24 +241,29 @@ int Audio::run()
             &audioData );
   if( err != paNoError ) goto error;
 
+  std::cout << "wowza 000 --" <<  audioData.index << std::endl;
   err = Pa_StartStream( stream );
   if( err != paNoError ) goto error;
 
   long threadId;
-  while( audioData.playState != 0
-            && audioData.playState != 2
-            && audioData.index > -1
-            && audioData.index < audioData.sfinfo.frames * audioData.sfinfo.channels - 1
+  while(
+      true
+//          audioData.playState != 0
+//            && audioData.playState != 2
+//            && audioData.index > -1
+//            && audioData.index < audioData.sfinfo.frames * audioData.sfinfo.channels - 1
   ) // 0: STOP, 1: PLAY, 2: PAUSE, 3: RW, 4: FF
   {
     // hold thread open until stopped
+
+    std::cout << "start loop -- thread id: " <<  Gj::Act::AudioThreadStatics::getThreadId() << std::endl;
 
     // here is our chance to pull data out of the actor_system through the cafData obj
     // and
     // make it accessible to our running audio callback through the audioData obj
 
     if (audioData.readComplete) { // reached end of input file
-//        Gj::Act::AudioThreadStatics::setPlayState(0);
+        Gj::Act::AudioThreadStatics::setPlayState(0);
         break;
     }
 
@@ -263,7 +272,9 @@ int Audio::run()
         audioData.volume += 0.001;
     }
 
-    if (threadId != Gj::Act::AudioThreadStatics::threadId) { // fadeout, break + cleanup
+    if ( false ) {
+        // TODO: synchronize threadId
+        // threadId != Gj::Act::AudioThreadStatics::threadId) { // fadeout, break + cleanup
         if (audioData.fadeOut < 0.001) { // break + cleanup
             break;
         } else { // continue fading out
@@ -284,9 +295,9 @@ int Audio::run()
 
   if (threadId == Gj::Act::AudioThreadStatics::threadId) { // current audio thread has reached natural end of file
       if (audioData.playState == 1) {
-//          Gj::Act::AudioThreadStatics::setPlayState(0);
+          Gj::Act::AudioThreadStatics::setPlayState(0);
       } else {
-//          Gj::Act::AudioThreadStatics::setPlayState(audioData.playState);
+          Gj::Act::AudioThreadStatics::setPlayState(audioData.playState);
       }
       Gj::Act::AudioThreadStatics::setReadComplete(true);
   }
@@ -300,10 +311,9 @@ int Audio::run()
   freeAudioData(&audioData);
   return 0;
 
-
   error:
     Pa_Terminate();
-//    Gj::Act::AudioThreadStatics::setPlayState(0);
+    Gj::Act::AudioThreadStatics::setPlayState(0);
     freeAudioData(&audioData);
     fprintf( stderr, "\nAn error occurred while using the portaudio stream" );
     fprintf( stderr, "\nError number: %d", err );

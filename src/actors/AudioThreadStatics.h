@@ -21,7 +21,8 @@ class AudioThreadStatics {
     static void setPlaybackSpeed(float playbackSpeed);
     static void setReadComplete(bool readComplete);
 
-    static void threadIdIncr();
+    static long threadIdIncr();
+    static long getThreadId();
 };
 
 } // Act

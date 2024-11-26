@@ -70,6 +70,8 @@ find_package (CAF
 add_library(gsAudio SHARED
         audio.h
         audio.cpp
+        ../actors/AudioThreadStatics.h
+        ../actors/AudioThreadStatics.cpp
 )
 target_compile_options(gsAudio PRIVATE ${INCLUDE_FLAGS})
 set(LINK_LIBRARIES
