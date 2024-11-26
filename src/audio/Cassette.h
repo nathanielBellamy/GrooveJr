@@ -1,5 +1,5 @@
-#ifndef AUDIO_H
-#define AUDIO_H
+#ifndef CASSETTE_H
+#define CASSETTE_H
 
 #include <string>
 #include <unistd.h>
@@ -11,12 +11,15 @@
 #include "./audio_data.h"
 #include "./caf_data.h"
 #include "./effects/vst3/host/audiohost/source/audiohost.h"
-#include "../actors/AudioThreadStatics.h"
+#include "./ThreadStatics.h"
 #include "./constants.h"
 
 using namespace caf;
 
-class Audio
+namespace Gj {
+namespace Audio {
+
+class Cassette
 {
         actor_system& actorSystem;
         long threadId;
@@ -25,7 +28,7 @@ class Audio
         Steinberg::Vst::AudioHost::App* vst3Host;
 
       public:
-        Audio(
+        Cassette(
             actor_system& actorSystem,
             long threadId,
             const char* fileName,
@@ -43,5 +46,8 @@ class Audio
                             PaStreamCallbackFlags statusFlags,
                             void *userData );
 };
+
+} // Audio
+} // Gj
 
 #endif

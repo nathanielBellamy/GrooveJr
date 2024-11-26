@@ -14,21 +14,12 @@ void caf_main(int argc, char *argv[], actor_system& sys, Steinberg::Vst::AudioHo
   // init Qt App
   auto qtApp = QApplication {argc, argv};
   auto mainWindow = Gj::Gui::MainWindow { sys };
+
   // init ActorSystem
   auto supervisor = sys.spawn(actor_from_state<Act::SupervisorState>, &mainWindow, vst3AudioHost);
 
   mainWindow.show();
   qtApp.exec();
-
-  Audio audio(
-      sys,
-      1l,
-      "/Users/ns/GrooveSprings_MusicLibrary/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac",
-      0l,
-      vst3AudioHost
-  );
-
-//  audio.run();
 }
 
 extern "C" {

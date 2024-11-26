@@ -2,15 +2,21 @@
 // Created by ns on 11/24/24.
 //
 
-#ifndef AUDIOTHREADSTATICS_H
-#define AUDIOTHREADSTATICS_H
+#ifndef THREADSTATICS_H
+#define THREADSTATICS_H
+
+#include <iostream>
+#include <mutex>
+#include <thread>
 
 namespace Gj {
-namespace Act {
+namespace Audio {
 
-class AudioThreadStatics {
-  public:
+class ThreadStatics {
+  private:
     static long threadId;
+
+  public:
     static long frameId;
     static int playState;
     static float playbackSpeed;
@@ -21,7 +27,8 @@ class AudioThreadStatics {
     static void setPlaybackSpeed(float playbackSpeed);
     static void setReadComplete(bool readComplete);
 
-    static long threadIdIncr();
+    static std::mutex threadIdMutex;
+    static long incrThreadId();
     static long getThreadId();
 };
 

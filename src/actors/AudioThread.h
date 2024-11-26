@@ -15,9 +15,9 @@
 #include "./AppStateManager.h"
 #include "./Playback.h"
 #include "../AppState.h"
-#include "./AudioThreadStatics.h"
+#include "../audio/ThreadStatics.h"
 
-#include "../audio/audio.h"
+#include "../audio/Cassette.h"
 
 using namespace caf;
 
@@ -52,14 +52,16 @@ struct AudioThreadState {
        return {
            [this](audio_thread_init_a) {
              std::cout << "AudioThread : audio_thread_init_a " << std::endl;
-             Audio audio (
+             long threadId = Gj::Audio::ThreadStatics::incrThreadId();
+             std::cout << "AudioThread : audio_thread_init_a - " << threadId << std::endl;
+             Gj::Audio::Cassette cassette (
                 self->system(),
-                AudioThreadStatics::threadIdIncr(),
+                threadId,
                 "/Users/ns/GrooveSprings_MusicLibrary/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac",
                 0l,
                 vst3Host
              );
-             audio.run();
+             cassette.run();
            },
        };
      };

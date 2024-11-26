@@ -50,8 +50,6 @@ add_executable(groovejr
         actors/ActorIds.h
         actors/AppStateManager.h
         actors/AudioThread.h
-        actors/AudioThreadStatics.h
-        actors/AudioThreadStatics.cpp
         enums/PlayState.h
         messaging/atoms.h
         messaging/EnvelopeQtPtr.h

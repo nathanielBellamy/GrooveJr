@@ -68,10 +68,10 @@ find_package (CAF
 
 # compile library
 add_library(gsAudio SHARED
-        audio.h
-        audio.cpp
-        ../actors/AudioThreadStatics.h
-        ../actors/AudioThreadStatics.cpp
+        Cassette.h
+        Cassette.cpp
+        ThreadStatics.h
+        ThreadStatics.cpp
 )
 target_compile_options(gsAudio PRIVATE ${INCLUDE_FLAGS})
 set(LINK_LIBRARIES
