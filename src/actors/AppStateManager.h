@@ -104,6 +104,7 @@ struct AppStateManagerState {
            },
            [this](tc_trig_pause_a) {
              std::cout << "Gj::AppStateManager : tc_trig_pause_a : " << std::endl;
+             appState = Gj::AppState::setPlayState(appState, Gj::PlayState::PAUSE);
 
              self->anon_send(
                  actor_cast<actor>(playback),
@@ -116,7 +117,6 @@ struct AppStateManagerState {
 
              if (success) {
                appState = Gj::AppState::setPlayState(appState, Gj::PlayState::PAUSE);
-
              } else {
                appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }

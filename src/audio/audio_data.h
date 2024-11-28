@@ -2,6 +2,7 @@
 #define AUDIO_DATA_H
 #include <sndfile.hh>
 #include "./effects/vst3/host/audiohost/source/audiohost.h"
+#include "../enums/PlayState.h"
 
 struct AUDIO_DATA {
     sf_count_t                       index;
@@ -9,7 +10,7 @@ struct AUDIO_DATA {
     SNDFILE                          *file;
     SF_INFO                          sfinfo;
     long                             readcount;
-    int                              playState;
+    Gj::PlayState                    playState;
     float                            playbackSpeed;
     bool                             readComplete;
     float                            volume;
@@ -17,7 +18,7 @@ struct AUDIO_DATA {
     float                            fadeOut;
     Steinberg::Vst::AudioHost::App*  vst3AudioHost;
 
-    AUDIO_DATA(float* buffer, SNDFILE* file, SF_INFO sfinfo, sf_count_t index, long readcount, int playState, Steinberg::Vst::AudioHost::App* vst3AudioHost) :
+    AUDIO_DATA(float* buffer, SNDFILE* file, SF_INFO sfinfo, sf_count_t index, long readcount, Gj::PlayState playState, Steinberg::Vst::AudioHost::App* vst3AudioHost) :
           buffer(buffer)
         , file(file)
         , sfinfo(sfinfo)

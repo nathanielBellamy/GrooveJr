@@ -196,7 +196,7 @@ int Cassette::run()
   }
 
 //  sf_count_t initialFrameId = (sf_count_t) initialFrameId;
-  AUDIO_DATA audioData(buffer, file, sfinfo, initialFrameId, readcount, 1, vst3Host);
+  AUDIO_DATA audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, vst3Host);
   std::cout << "initial frame id: " << initialFrameId << std::endl;
   std::cout << "thread id: " << threadId << std::endl;
   std::cout << "sfinfo sampleRate: " << sfinfo.samplerate << std::endl;
@@ -248,18 +248,17 @@ int Cassette::run()
   if( err != paNoError ) goto error;
 
   while(
-      true
-//          audioData.playState != 0
-//            && audioData.playState != 2
-//            && audioData.index > -1
-//            && audioData.index < audioData.sfinfo.frames * audioData.sfinfo.channels - 1
+          audioData.playState != Gj::PlayState::STOP
+            && audioData.playState != Gj::PlayState::PAUSE
+            && audioData.index > -1
+            && audioData.index < audioData.sfinfo.frames * audioData.sfinfo.channels - 1
   ) // 0: STOP, 1: PLAY, 2: PAUSE, 3: RW, 4: FF
   {
     // hold thread open until stopped
 
     std::cout << "start loop -- thread id: " <<  Gj::Audio::ThreadStatics::getThreadId() << std::endl;
 
-    // here is our chance to pull data out of the actor_system through the cafData obj
+    // here is our chance to pull data out of the application
     // and
     // make it accessible to our running audio callback through the audioData obj
 
@@ -288,16 +287,16 @@ int Cassette::run()
         audioData.playState = Gj::Audio::ThreadStatics::getPlayState();
         Gj::Audio::ThreadStatics::setFrameId( (long) audioData.index );
 
-        //    std::cout << "\n =========== \n";
-        //    std::cout << "\n audioData.playState: " << audioData.playState << "\n";
-        //    std::cout << "\n audioData.index " << audioData.index << "\n";
-        //    std::cout << "\n =========== \n";
+            std::cout << "\n =========== \n";
+            std::cout << "\n audioData.playState: " << audioData.playState << "\n";
+            std::cout << "\n audioData.index " << audioData.index << "\n";
+            std::cout << "\n =========== \n";
     }
   }
 
   if ( threadId == Gj::Audio::ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
       if (audioData.playState == 1) {
-          Gj::Audio::ThreadStatics::setPlayState(0);
+          Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::STOP);
       } else {
           Gj::Audio::ThreadStatics::setPlayState(audioData.playState);
       }

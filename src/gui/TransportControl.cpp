@@ -24,7 +24,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   this->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
   connect(&playTrigAction, &QAction::triggered, [&] {
-    std::cout << "MainWindow : playTrigAction" << std::endl;
+    std::cout << "TransportControl : playTrigAction" << std::endl;
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
@@ -35,7 +35,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   });
 
   connect(&pauseTrigAction, &QAction::triggered, [&] {
-    std::cout << "MainWindow : pauseTrigAction" << std::endl;
+    std::cout << "TransportControl : pauseTrigAction" << std::endl;
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
@@ -46,7 +46,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   });
 
   connect(&stopTrigAction, &QAction::triggered, [&] {
-    std::cout << "MainWindow : stopTrigAction" << std::endl;
+    std::cout << "TransportControl : stopTrigAction" << std::endl;
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
@@ -57,7 +57,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   });
 
   connect(&rwTrigAction, &QAction::triggered, [&] {
-    std::cout << "MainWindow : rwTrigAction" << std::endl;
+    std::cout << "TransportControl : rwTrigAction" << std::endl;
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
@@ -68,7 +68,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   });
 
   connect(&ffTrigAction, &QAction::triggered, [&] {
-    std::cout << "MainWindow : ffTrigAction" << std::endl;
+    std::cout << "TransportControl : ffTrigAction" << std::endl;
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};

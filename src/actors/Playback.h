@@ -55,24 +55,30 @@ struct PlaybackState {
            [this](strong_actor_ptr reply_to, tc_trig_play_a) {
              std::cout << "Playback : tc_trig_play_a : " << std::endl;
 
-             auto audioThread = self->system().spawn(actor_from_state<AudioThreadState>, actor_cast<strong_actor_ptr>(self), vst3Host);
-             self->anon_send(
-                 audioThread,
-                 audio_thread_init_a_v
-             );
+             Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::PLAY);
+             bool success = true;
+             try {
+                 auto audioThread = self->system().spawn(actor_from_state<AudioThreadState>, actor_cast<strong_actor_ptr>(self), vst3Host);
+                 self->anon_send(
+                     audioThread,
+                     audio_thread_init_a_v
+                 );
+             } catch (...) {
+               success = false;
+             }
 
              actor replyToActor = actor_cast<actor>(reply_to);
              self->anon_send(
                  replyToActor,
                  actor_cast<strong_actor_ptr>(self),
-                 true,
+                 success,
                  tc_trig_play_ar_v
              );
            },
            [this](strong_actor_ptr reply_to, tc_trig_pause_a) {
              std::cout << "Playback : tc_trig_pause_a : " << std::endl;
+             Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::PAUSE);
 
-             Gj::Audio::ThreadStatics::setPlayState(2);
              actor replyToActor = actor_cast<actor>(reply_to);
              self->anon_send(
                  replyToActor,
