@@ -53,7 +53,6 @@ struct AudioThreadState {
            [this](audio_thread_init_a) {
              std::cout << "AudioThread : audio_thread_init_a " << std::endl;
              long threadId = Gj::Audio::ThreadStatics::incrThreadId();
-             std::cout << "AudioThread : audio_thread_init_a - " << threadId << std::endl;
              Gj::Audio::Cassette cassette (
                 self->system(),
                 threadId,

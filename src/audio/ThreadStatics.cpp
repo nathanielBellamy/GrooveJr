@@ -10,7 +10,7 @@ namespace Audio {
 long ThreadStatics::frameId = 0;
 std::mutex ThreadStatics::frameIdMutex;
 
-int ThreadStatics::playState = 0;
+Gj::PlayState ThreadStatics::playState = Gj::PlayState::STOP;
 std::mutex ThreadStatics::playStateMutex;
 
 float ThreadStatics::playbackSpeed = 0.f;
@@ -42,14 +42,18 @@ float ThreadStatics::getPlaybackSpeed() {
   return playbackSpeed;
 }
 
-int ThreadStatics::getPlayState() {
+Gj::PlayState ThreadStatics::getPlayState() {
   std::lock_guard<std::mutex> guard(playStateMutex);
   return playState;
 }
 
-void ThreadStatics::setPlayState(int newState) {
+void ThreadStatics::setPlayState(Gj::PlayState newState) {
   std::lock_guard<std::mutex> guard(playStateMutex);
   playState = newState;
+}
+void ThreadStatics::setPlayState(int newState) {
+  std::lock_guard<std::mutex> guard(playStateMutex);
+  playState = Gj::intToPs(newState);
 }
 
 bool ThreadStatics::getReadComplete() {

@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <mutex>
-#include <thread>
+#include "../enums/PlayState.h"
 
 namespace Gj {
 namespace Audio {
@@ -15,13 +15,12 @@ namespace Audio {
 class ThreadStatics {
   private:
     static long frameId;
-    static int playState;
+    static Gj::PlayState playState;
     static float playbackSpeed;
     static bool readComplete;
     static long threadId;
 
   public:
-
     static std::mutex frameIdMutex;
     static void setFrameId(long frameId);
     static long getFrameId();
@@ -31,7 +30,8 @@ class ThreadStatics {
     static void setPlaybackSpeed(float playbackSpeed);
 
     static std::mutex playStateMutex;
-    static int getPlayState();
+    static Gj::PlayState getPlayState();
+    static void setPlayState(Gj::PlayState playState);
     static void setPlayState(int playState);
 
     static std::mutex readCompleteMutex;

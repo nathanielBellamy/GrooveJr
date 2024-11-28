@@ -116,6 +116,7 @@ struct AppStateManagerState {
 
              if (success) {
                appState = Gj::AppState::setPlayState(appState, Gj::PlayState::PAUSE);
+
              } else {
                appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }
