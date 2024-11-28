@@ -14,17 +14,28 @@ namespace Audio {
 
 class ThreadStatics {
   private:
-    static long threadId;
-
-  public:
     static long frameId;
     static int playState;
     static float playbackSpeed;
     static bool readComplete;
+    static long threadId;
 
+  public:
+
+    static std::mutex frameIdMutex;
     static void setFrameId(long frameId);
-    static void setPlayState(int playState);
+    static long getFrameId();
+
+    static std::mutex playbackSpeedMutex;
+    static float getPlaybackSpeed();
     static void setPlaybackSpeed(float playbackSpeed);
+
+    static std::mutex playStateMutex;
+    static int getPlayState();
+    static void setPlayState(int playState);
+
+    static std::mutex readCompleteMutex;
+    static bool getReadComplete();
     static void setReadComplete(bool readComplete);
 
     static std::mutex threadIdMutex;

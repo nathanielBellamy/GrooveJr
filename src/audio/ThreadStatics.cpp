@@ -7,33 +7,64 @@
 namespace Gj {
 namespace Audio {
 
-long ThreadStatics::threadId = 0;
 long ThreadStatics::frameId = 0;
+std::mutex ThreadStatics::frameIdMutex;
+
 int ThreadStatics::playState = 0;
+std::mutex ThreadStatics::playStateMutex;
+
 float ThreadStatics::playbackSpeed = 0.f;
+std::mutex ThreadStatics::playbackSpeedMutex;
+
 bool ThreadStatics::readComplete = false;
+std::mutex ThreadStatics::readCompleteMutex;
+
+long ThreadStatics::threadId = 0;
 std::mutex ThreadStatics::threadIdMutex;
 
+long ThreadStatics::getFrameId() {
+  std::lock_guard<std::mutex> guard(frameIdMutex);
+  return frameId;
+}
+
 void ThreadStatics::setFrameId(long newId) {
+  std::lock_guard<std::mutex> guard(frameIdMutex);
   frameId = newId;
 }
 
-void ThreadStatics::setPlayState(int newState) {
-  playState = newState;
-}
-
 void ThreadStatics::setPlaybackSpeed(float newSpeed) {
+  std::lock_guard<std::mutex> guard(playbackSpeedMutex);
   playbackSpeed = newSpeed;
 }
 
+float ThreadStatics::getPlaybackSpeed() {
+  std::lock_guard<std::mutex> guard(playbackSpeedMutex);
+  return playbackSpeed;
+}
+
+int ThreadStatics::getPlayState() {
+  std::lock_guard<std::mutex> guard(playStateMutex);
+  return playState;
+}
+
+void ThreadStatics::setPlayState(int newState) {
+  std::lock_guard<std::mutex> guard(playStateMutex);
+  playState = newState;
+}
+
+bool ThreadStatics::getReadComplete() {
+  std::lock_guard<std::mutex> guard(readCompleteMutex);
+  return readComplete;
+}
+
 void ThreadStatics::setReadComplete(bool val) {
+  std::lock_guard<std::mutex> guard(readCompleteMutex);
   readComplete = val;
 }
 
 long ThreadStatics::incrThreadId() {
   std::lock_guard<std::mutex> guard(threadIdMutex);
   threadId += 1;
-  std::cout << "Thread ID: " << threadId << std::endl;
   return threadId;
 }
 

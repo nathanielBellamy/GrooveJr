@@ -284,8 +284,8 @@ int Cassette::run()
             audioData.fadeOut -= 0.0001;
         }
     } else {
-        audioData.playbackSpeed = Gj::Audio::ThreadStatics::playbackSpeed;
-        audioData.playState = Gj::Audio::ThreadStatics::playState;
+        audioData.playbackSpeed = Gj::Audio::ThreadStatics::getPlaybackSpeed();
+        audioData.playState = Gj::Audio::ThreadStatics::getPlayState();
         Gj::Audio::ThreadStatics::setFrameId( (long) audioData.index );
 
         //    std::cout << "\n =========== \n";
