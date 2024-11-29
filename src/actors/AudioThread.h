@@ -55,7 +55,7 @@ struct AudioThreadState {
              Gj::Audio::Cassette cassette (
                 self->system(),
                 Gj::Audio::ThreadStatics::incrThreadId(),
-                "/Users/ns/GrooveSprings_MusicLibrary/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac",
+                Gj::Audio::ThreadStatics::getFilePath(),
                 Gj::Audio::ThreadStatics::getFrameId(),
                 vst3Host
              );

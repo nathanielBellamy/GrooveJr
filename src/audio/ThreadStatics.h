@@ -14,6 +14,7 @@ namespace Audio {
 
 class ThreadStatics {
   private:
+    static const char* filePath;
     static long frameId;
     static Gj::PlayState playState;
     static float playbackSpeed;
@@ -21,6 +22,10 @@ class ThreadStatics {
     static long threadId;
 
   public:
+    static std::mutex filePathMutex;
+    static void setFilePath(const char* path);
+    static const char* getFilePath();
+
     static std::mutex frameIdMutex;
     static void setFrameId(long frameId);
     static long getFrameId();
