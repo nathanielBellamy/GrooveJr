@@ -162,6 +162,8 @@ int Cassette::callback(const void *inputBuffer, void *outputBuffer,
 
 int Cassette::run()
 {
+  std::cout << "Running Cassette..." << std::endl;
+
   // intialize data needed for audio playback
   sf_count_t index = 0;
 
@@ -171,26 +173,24 @@ int Cassette::run()
   sfinfo.format = 0;
   SNDFILE *file;
 
-//  if (! (file = sf_open("gs_music_library/Unknown Artist/Unknown Album/test.mp3", SFM_READ, &sfinfo)))
   if (! (file = sf_open(fileName, SFM_READ, &sfinfo))) {
-    printf ("Not able to open input file.\n") ;
-    /* Print the error message from libsndfile. */
-    puts (sf_strerror (NULL)) ;
+    std::cout << "Unable to open input file : sf : " << sf_strerror (NULL) << std::endl;
     return 1 ;
   };
+  std::cout << "Running Cassette... 2" << std::endl;
 
   // Allocate memory for data
   float *buffer;
   buffer = (float *) malloc(sfinfo.frames * sfinfo.channels * sizeof(float));
   if (!buffer) {
-      printf("\nCannot allocate memory");
+      std::cout << "Cannot allocate memory" << std::endl;
       return 1;
   }
 
   // Read the audio data into buffer
   long readcount = sf_read_float(file, buffer, sfinfo.frames * sfinfo.channels);
   if (readcount == 0) {
-      printf("\nCannot read file");
+      std::cout << "Cannot read file" << std::endl;
       return 1;
   }
 
@@ -213,7 +213,7 @@ int Cassette::run()
 
   inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
   if (inputParameters.device == paNoDevice) {
-      fprintf(stderr,"\nError: No default input device.");
+      std::cout << "Error: No default input device." << std::endl;
       goto error;
   }
   // TODO: handle live input audio
@@ -223,7 +223,7 @@ int Cassette::run()
 
   outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
   if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"\nError: No default output device.");
+      std::cout << "Error: No default output device." << std::endl;
       goto error;
   }
   outputParameters.channelCount = audioData.sfinfo.channels;
@@ -314,9 +314,9 @@ int Cassette::run()
     Pa_Terminate();
     Gj::Audio::ThreadStatics::setPlayState(0);
     freeAudioData(&audioData);
-    fprintf( stderr, "\nAn error occurred while using the portaudio stream" );
-    fprintf( stderr, "\nError number: %d", err );
-    fprintf( stderr, "\nError message: %s", Pa_GetErrorText( err ) );
+    std::cout << "An error occurred while using the portaudio stream" << std::endl;
+    std::cout << "Error number: " << err << std::endl;
+    std::cout << "Error message: " << Pa_GetErrorText( err ) << std::endl;
     return 1;
 };
 

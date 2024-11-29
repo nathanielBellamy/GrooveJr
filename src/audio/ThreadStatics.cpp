@@ -23,6 +23,7 @@ long ThreadStatics::threadId = 0;
 std::mutex ThreadStatics::threadIdMutex;
 
 long ThreadStatics::getFrameId() {
+  std::cout << "ThreadStatics : getFrameId" << std::endl;
   std::lock_guard<std::mutex> guard(frameIdMutex);
   return frameId;
 }
@@ -49,8 +50,10 @@ Gj::PlayState ThreadStatics::getPlayState() {
 
 void ThreadStatics::setPlayState(Gj::PlayState newState) {
   std::lock_guard<std::mutex> guard(playStateMutex);
+  std::cout << "ThreadStatics : setPlayState : " << newState << std::endl;
   playState = newState;
 }
+
 void ThreadStatics::setPlayState(int newState) {
   std::lock_guard<std::mutex> guard(playStateMutex);
   playState = Gj::intToPs(newState);
@@ -67,6 +70,7 @@ void ThreadStatics::setReadComplete(bool val) {
 }
 
 long ThreadStatics::incrThreadId() {
+  std::cout << "ThreadStatics : incrThreadId" << std::endl;
   std::lock_guard<std::mutex> guard(threadIdMutex);
   threadId += 1;
   return threadId;

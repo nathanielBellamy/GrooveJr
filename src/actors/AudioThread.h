@@ -59,6 +59,7 @@ struct AudioThreadState {
                 Gj::Audio::ThreadStatics::getFrameId(),
                 vst3Host
              );
+             std::cout << "AudioThread :  cassette initiated " << std::endl;
              cassette.run();
            },
        };
