@@ -172,8 +172,7 @@ int Cassette::run()
   SNDFILE *file;
 
 //  if (! (file = sf_open("gs_music_library/Unknown Artist/Unknown Album/test.mp3", SFM_READ, &sfinfo)))
-  if (! (file = sf_open(fileName, SFM_READ, &sfinfo)))
-  {
+  if (! (file = sf_open(fileName, SFM_READ, &sfinfo))) {
     printf ("Not able to open input file.\n") ;
     /* Print the error message from libsndfile. */
     puts (sf_strerror (NULL)) ;
@@ -195,7 +194,6 @@ int Cassette::run()
       return 1;
   }
 
-//  sf_count_t initialFrameId = (sf_count_t) initialFrameId;
   AUDIO_DATA audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, vst3Host);
   std::cout << "initial frame id: " << initialFrameId << std::endl;
   std::cout << "thread id: " << threadId << std::endl;
@@ -256,7 +254,7 @@ int Cassette::run()
   {
     // hold thread open until stopped
 
-    std::cout << "start loop -- thread id: " <<  Gj::Audio::ThreadStatics::getThreadId() << std::endl;
+//    std::cout << "start loop -- thread id: " <<  Gj::Audio::ThreadStatics::getThreadId() << std::endl;
 
     // here is our chance to pull data out of the application
     // and
@@ -272,8 +270,8 @@ int Cassette::run()
         audioData.volume += 0.001;
     }
 
-    std::cout << " my theradId: " << threadId << std::endl;
-    std::cout << " global threadId: " << Gj::Audio::ThreadStatics::getThreadId() << std::endl;
+//    std::cout << " my theradId: " << threadId << std::endl;
+//    std::cout << " global threadId: " << Gj::Audio::ThreadStatics::getThreadId() << std::endl;
 
     if ( threadId != Gj::Audio::ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
         if (audioData.fadeOut < 0.001) { // break + cleanup
@@ -287,15 +285,15 @@ int Cassette::run()
         audioData.playState = Gj::Audio::ThreadStatics::getPlayState();
         Gj::Audio::ThreadStatics::setFrameId( (long) audioData.index );
 
-            std::cout << "\n =========== \n";
-            std::cout << "\n audioData.playState: " << audioData.playState << "\n";
-            std::cout << "\n audioData.index " << audioData.index << "\n";
-            std::cout << "\n =========== \n";
+//            std::cout << "\n =========== \n";
+//            std::cout << "\n audioData.playState: " << audioData.playState << "\n";
+//            std::cout << "\n audioData.index " << audioData.index << "\n";
+//            std::cout << "\n =========== \n";
     }
   }
 
   if ( threadId == Gj::Audio::ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
-      if (audioData.playState == 1) {
+      if (audioData.playState == Gj::PlayState::PLAY) {
           Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::STOP);
       } else {
           Gj::Audio::ThreadStatics::setPlayState(audioData.playState);

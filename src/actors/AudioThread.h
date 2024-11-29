@@ -52,10 +52,9 @@ struct AudioThreadState {
        return {
            [this](audio_thread_init_a) {
              std::cout << "AudioThread : audio_thread_init_a " << std::endl;
-             long threadId = Gj::Audio::ThreadStatics::incrThreadId();
              Gj::Audio::Cassette cassette (
                 self->system(),
-                threadId,
+                Gj::Audio::ThreadStatics::incrThreadId(),
                 "/Users/ns/GrooveSprings_MusicLibrary/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac",
                 Gj::Audio::ThreadStatics::getFrameId(),
                 vst3Host

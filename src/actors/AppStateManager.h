@@ -51,6 +51,7 @@ struct AppStateManagerState {
      Gj::AppState appState;
      strong_actor_ptr playback;
      strong_actor_ptr display;
+
      void hydrateStateToDisplay() {
          strong_actor_ptr displayPtr = self->system().registry().get(ActorIds::DISPLAY);
          self->anon_send(
@@ -100,7 +101,10 @@ struct AppStateManagerState {
              } else {
                appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
              }
+
+             std::cout << "AppStateManager : tc_trig_play_ar : 2 " << std::endl;
              hydrateStateToDisplay();
+             std::cout << "AppStateManager : tc_trig_play_ar : 3 " << std::endl;
            },
            [this](tc_trig_pause_a) {
              std::cout << "Gj::AppStateManager : tc_trig_pause_a : " << std::endl;
