@@ -38,7 +38,7 @@ class Cassette
             Steinberg::Vst::AudioHost::App* vst3HostPtr
         );
 
-        int run();
+        int play();
 
         void freeAudioData(AUDIO_DATA *audioData);
 

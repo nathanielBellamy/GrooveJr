@@ -27,6 +27,10 @@ extern "C" {
         // vst3host needs to be instantiated on the main thread
 
         // alloc vst3AudioHostApp
+        Steinberg::Vst::IComponent* processorComponent;
+        Steinberg::IPluginFactory* factory;
+        Steinberg::tresult result = factory->createInstance ("audioProcessorComponent", Steinberg::Vst::IComponent::iid, (void**)&processorComponent);
+
         Steinberg::Vst::AudioHost::App* vst3AudioHost;
         vst3AudioHost = new Steinberg::Vst::AudioHost::App;
 

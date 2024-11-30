@@ -160,9 +160,9 @@ int Cassette::callback(const void *inputBuffer, void *outputBuffer,
   }
 };
 
-int Cassette::run()
+int Cassette::play()
 {
-  std::cout << "Running Cassette..." << std::endl;
+  std::cout << "Playing Cassette..." << std::endl;
 
   // intialize data needed for audio playback
   sf_count_t index = 0;
@@ -177,7 +177,6 @@ int Cassette::run()
     std::cout << "Unable to open input file : sf : " << sf_strerror (NULL) << std::endl;
     return 1 ;
   };
-  std::cout << "Running Cassette... 2" << std::endl;
 
   // Allocate memory for data
   float *buffer;

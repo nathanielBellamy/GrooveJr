@@ -60,7 +60,7 @@ struct AudioThreadState {
                 vst3Host
              );
              std::cout << "AudioThread :  cassette initiated " << std::endl;
-             cassette.run();
+             cassette.play();
            },
        };
      };
