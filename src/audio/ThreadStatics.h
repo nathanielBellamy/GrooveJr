@@ -37,7 +37,6 @@ class ThreadStatics {
     static std::mutex playStateMutex;
     static Gj::PlayState getPlayState();
     static void setPlayState(Gj::PlayState playState);
-    static void setPlayState(int playState);
 
     static std::mutex readCompleteMutex;
     static bool getReadComplete();

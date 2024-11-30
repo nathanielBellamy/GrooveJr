@@ -64,12 +64,11 @@ Gj::PlayState ThreadStatics::getPlayState() {
 void ThreadStatics::setPlayState(Gj::PlayState newState) {
   std::lock_guard<std::mutex> guard(playStateMutex);
   std::cout << "ThreadStatics : setPlayState : " << newState << std::endl;
+  if (playState == Gj::PlayState::STOP)
+    setFrameId(0);
+  if (playState == Gj::PlayState::PLAY)
+    setReadComplete(false);
   playState = newState;
-}
-
-void ThreadStatics::setPlayState(int newState) {
-  std::lock_guard<std::mutex> guard(playStateMutex);
-  playState = Gj::intToPs(newState);
 }
 
 bool ThreadStatics::getReadComplete() {

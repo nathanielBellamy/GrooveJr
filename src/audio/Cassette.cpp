@@ -261,7 +261,8 @@ int Cassette::run()
     // make it accessible to our running audio callback through the audioData obj
 
     if (audioData.readComplete) { // reached end of input file
-        Gj::Audio::ThreadStatics::setPlayState(0);
+        Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::STOP);
+        Gj::Audio::ThreadStatics::setReadComplete(true);
         break;
     }
 
@@ -312,7 +313,7 @@ int Cassette::run()
 
   error:
     Pa_Terminate();
-    Gj::Audio::ThreadStatics::setPlayState(0);
+    Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::STOP);
     freeAudioData(&audioData);
     std::cout << "An error occurred while using the portaudio stream" << std::endl;
     std::cout << "Error number: " << err << std::endl;
