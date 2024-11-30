@@ -40,7 +40,7 @@ using Playback = typed_actor<PlaybackTrait>;
 struct PlaybackState {
 
      Playback::pointer self;
-     strong_actor_ptr audioThread;
+     AudioThread::pointer audioThread;
      Steinberg::Vst::AudioHost::App* vst3Host;
 
      PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, Steinberg::Vst::AudioHost::App* vst3Host) :
@@ -55,8 +55,7 @@ struct PlaybackState {
     void clearAudioThread() {
         if (audioThread != nullptr) {
             std::cout << "Playback : non-null audioThread : " << std::endl;
-            AudioThread::pointer ptr = actor_cast<AudioThread::pointer>(audioThread);
-            ptr->quit();
+            audioThread->quit();
             audioThread = nullptr;
         }
     }
@@ -81,7 +80,7 @@ struct PlaybackState {
              if ( filePath != nullptr ) {
                if ( audioThread == nullptr ) {
                    auto audioThreadActor = self->system().spawn(actor_from_state<AudioThreadState>, actor_cast<strong_actor_ptr>(self), vst3Host);
-                   audioThread = actor_cast<strong_actor_ptr>(audioThreadActor);
+                   audioThread = actor_cast<AudioThread::pointer>(audioThreadActor);
                    self->anon_send(
                        audioThreadActor,
                        audio_thread_init_a_v
