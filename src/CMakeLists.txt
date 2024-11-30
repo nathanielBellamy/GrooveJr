@@ -1,6 +1,6 @@
 
 cmake_minimum_required(VERSION 3.29.6)
-project(GrooveSprings VERSION 0.0.0)
+project(GrooveJr VERSION 0.0.0)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -40,7 +40,7 @@ add_subdirectory(
         /Users/ns/code/GrooveJr/src/gui
 )
 
-add_executable(groovejr
+add_executable(GrooveJr
         main.h
         main.cpp
         AppState.h
@@ -57,7 +57,7 @@ add_executable(groovejr
         gui/TransportControl.h
         actors/Display.h
 )
-target_link_libraries(groovejr
+target_link_libraries(GrooveJr
         PUBLIC
         CAF::core
         gsAudio
@@ -66,5 +66,5 @@ target_link_libraries(groovejr
         Qt6::Widgets
         Qt6::Gui
 )
-target_compile_options(groovejr PRIVATE ${INCLUDE_FLAGS})
-set_target_properties(groovejr PROPERTIES LINKER_LANGUAGE CXX)
+target_compile_options(GrooveJr PRIVATE ${INCLUDE_FLAGS})
+set_target_properties(GrooveJr PROPERTIES LINKER_LANGUAGE CXX)

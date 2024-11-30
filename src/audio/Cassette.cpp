@@ -266,20 +266,20 @@ int Cassette::run()
         break;
     }
 
-    if (audioData.fadeIn > 0.001) {
-        audioData.fadeIn -= 0.001;
-        audioData.volume += 0.001;
+    if (audioData.fadeIn > 0.01) {
+        audioData.fadeIn -= 0.01;
+        audioData.volume += 0.01;
     }
 
 //    std::cout << " my theradId: " << threadId << std::endl;
 //    std::cout << " global threadId: " << Gj::Audio::ThreadStatics::getThreadId() << std::endl;
 
     if ( threadId != Gj::Audio::ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
-        if (audioData.fadeOut < 0.001) { // break + cleanup
+        if (audioData.fadeOut < 0.01) { // break + cleanup
             break;
         } else { // continue fading out
-            audioData.volume -= 0.0001;
-            audioData.fadeOut -= 0.0001;
+            audioData.volume -= 0.001;
+            audioData.fadeOut -= 0.001;
         }
     } else {
         audioData.playbackSpeed = Gj::Audio::ThreadStatics::getPlaybackSpeed();
@@ -291,7 +291,9 @@ int Cassette::run()
 //            std::cout << "\n audioData.index " << audioData.index << "\n";
 //            std::cout << "\n =========== \n";
     }
-  }
+
+    std::this_thread::sleep_for( std::chrono::milliseconds(10) );
+  } // end of while loop
 
   if ( threadId == Gj::Audio::ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
       if (audioData.playState == Gj::PlayState::PLAY) {

@@ -4,6 +4,8 @@
 #include <string>
 #include <unistd.h>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include <sndfile.hh>
 #include <portaudio.h>

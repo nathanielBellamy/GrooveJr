@@ -6,6 +6,7 @@
 #define MAINWINDOW_H
 
 #include <iostream>
+#include <format>
 
 #include "caf/actor_from_state.hpp"
 #include "caf/actor_ostream.hpp"
