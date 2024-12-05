@@ -121,32 +121,6 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
 	name = plugProvider->getClassInfo().name();
 	vst3Processor = AudioClient::create (name, component, midiMapping);
 //	vst3Processor->setParameter (ParamID id, ParamValue value, int32 sampleOffset) override;
-    vst3Processor->setParameter(0, 0.0, 0); // "chew_depth"
-    // vst3Processor->setParameter(1, 0.0, 0); // "chew_freq"
-    // vst3Processor->setParameter(2, 0.0, 0); // "chew_var"
-    // vst3Processor->setParameter(3, 0.0, 0); // "deg_amt"
-    // vst3Processor->setParameter(4, 0.0, 0); // "deg_depth"
-    // vst3Processor->setParameter(5, 0.0, 0); // "deg_var"
-    // vst3Processor->setParameter(6, 0.0, 0); // "depth"
-    // vst3Processor->setParameter(7, 1.0, 0); // "drive"
-    // vst3Processor->setParameter(8, 100.0, 0); // "drywet"
-    // vst3Processor->setParameter(9, 9.999999974752427e-7, 0); // "gap"
-    // vst3Processor->setParameter(10, 0.0, 0); // "h_bass"
-    // vst3Processor->setParameter(11, 0.0, 0); // "h_treble"
-    // vst3Processor->setParameter(12, 0.0, 0); // "ingain"
-    // vst3Processor->setParameter(13, 2, 0);   // "mode"
-    // vst3Processor->setParameter(14, 2, 0);   // "os"
-    // vst3Processor->setParameter(15, -3.5, 0);  // "outgain"
-    // vst3Processor->setParameter(16, 0.2999999821186066, 0); // "rate"
-    // vst3Processor->setParameter(17, 1.0, 0); // "sat"
-    // vst3Processor->setParameter(18, 2.999998396262527, 0); // "spacing"
-    // vst3Processor->setParameter(19, 7.500000476837158, 0); // "speed"
-    // vst3Processor->setParameter(20, 4.999995231628418, 0); // "thick"
-    // vst3Processor->setParameter(21, 0.5999999642372131, 0); // "width"
-    // vst3Processor->setParameter(22, 0.0, 0); // "wow_depth"
-    vst3Processor->setParameter(23, 0.25, 0); // "wow_rate"
-    // vst3Processor->setParameter(24, 3, 0); // "preset"
-    std::cout << "\n Finished setting parameters - which may or may not be id-ed correctly :shrug:" << std::endl;
 }
 
 //------------------------------------------------------------------------
@@ -172,27 +146,27 @@ void App::allocateBuffers()
 {
 	int channelCount = 2; // TODO: access info from libsndfile
 	// std::cout << "\n HERE \n";
-	auto chowTapeModelInputs = static_cast<float**>(
+	auto buffersIn = static_cast<float**>(
 		malloc(2 * AUDIO_BUFFER_FRAMES * sizeof(float*))
 	);
-    auto chowTapeModelOutputs = static_cast<float**>(
+    auto buffersOut = static_cast<float**>(
 		malloc(2 * AUDIO_BUFFER_FRAMES * sizeof(float*))
 	);
 
-	if (chowTapeModelInputs == NULL || chowTapeModelOutputs == NULL) {
-		std::cout << "Unable to allocate memory for chowTapeModelInputs or chowTapeModelOutputs." << std::endl;
-		throw std::runtime_error ("Unable to allocate memory for chowTapeModelInputs.");
+	if (buffersIn == NULL || buffersOut == NULL) {
+		std::cout << "Unable to allocate memory for buffersIn or buffersOut." << std::endl;
+		throw std::runtime_error ("Unable to allocate memory for buffersIn.");
 	}
 
 	for (int c = 0; c < channelCount; c++) {
-		chowTapeModelInputs[c] = new float[AUDIO_BUFFER_FRAMES];
-		chowTapeModelOutputs[c] = new float[AUDIO_BUFFER_FRAMES];
+		buffersIn[c] = new float[AUDIO_BUFFER_FRAMES];
+		buffersOut[c] = new float[AUDIO_BUFFER_FRAMES];
 	}
 
-    chowTapeModelBuffers = { // Steinberg::Vst::IAudioClient::Buffers
-         chowTapeModelInputs,
+    buffers = { // Steinberg::Vst::IAudioClient::Buffers
+         buffersIn,
         2,
-        chowTapeModelOutputs,
+        buffersOut,
         2,
         AUDIO_BUFFER_FRAMES
     };
@@ -201,8 +175,8 @@ void App::allocateBuffers()
 //------------------------------------------------------------------------
 void App::terminate ()
 {
-    delete chowTapeModelBuffers.inputs;
-    delete chowTapeModelBuffers.outputs;
+    delete buffers.inputs;
+    delete buffers.outputs;
     delete this;
 }
 

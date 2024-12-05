@@ -344,7 +344,7 @@ void WindowController::onShow (IWindow& w)
 
 	plugView->setFrame (this);
 
-    	std::cout << "set frame called" << std::endl;
+//	std::cout << "set frame called" << std::endl;
 	if (plugView->attached (platformWindow.ptr, platformWindow.type) != kResultTrue)
 	{
     	std::cout << "attaching plugin failed" << std::endl;

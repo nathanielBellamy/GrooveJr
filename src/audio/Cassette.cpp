@@ -41,29 +41,29 @@ int Cassette::callback(const void *inputBuffer, void *outputBuffer,
   AUDIO_DATA *audioData = (AUDIO_DATA*) userData;
 
   // >> VST PROCESSING
-//  Steinberg::Vst::AudioHost::App* vst3Host;
-//  vst3Host = reinterpret_cast<Steinberg::Vst::AudioHost::App*>(audioData->vst3AudioHost);
-//
-//  // populate input buffers
-//  for (c = 0; c < audioData->sfinfo.channels; c++) {
-//      for (i = 0; i < framesPerBuffer; i++) {
-//        vst3Host->chowTapeModelBuffers.inputs[c][i] = audioData->buffer[audioData->index + i + (framesPerBuffer * c)] * audioData->volume;
-//      }
-//  }
-//
-//  // process
-//  vst3Host->vst3Processor->process(vst3Host->chowTapeModelBuffers, (int64_t) framesPerBuffer);
-//
-//  // write output buffers to output
-//  for (i = 0; i < framesPerBuffer ; i++) {
-//      for (c = 0; c < audioData->sfinfo.channels; c++) {
-//          *out++ = vst3Host->chowTapeModelBuffers.outputs[c][i] * audioData->volume;
-//      }
-//  }
-//
-//  // TODO: early return here for testing
-//  audioData->index += framesPerBuffer * audioData->sfinfo.channels;
-//  return paContinue;
+  Steinberg::Vst::AudioHost::App* vst3Host;
+  vst3Host = reinterpret_cast<Steinberg::Vst::AudioHost::App*>(audioData->vst3AudioHost);
+
+  // populate input buffers
+  for (c = 0; c < audioData->sfinfo.channels; c++) {
+      for (i = 0; i < framesPerBuffer; i++) {
+        vst3Host->buffers.inputs[c][i] = audioData->buffer[audioData->index + i + (framesPerBuffer * c)] * audioData->volume;
+      }
+  }
+
+  // process
+  vst3Host->vst3Processor->process(vst3Host->buffers, (int64_t) framesPerBuffer);
+
+  // write output buffers to output
+  for (i = 0; i < framesPerBuffer ; i++) {
+      for (c = 0; c < audioData->sfinfo.channels; c++) {
+          *out++ = vst3Host->buffers.outputs[c][i] * audioData->volume;
+      }
+  }
+
+  // TODO: early return here for testing
+  audioData->index += framesPerBuffer * audioData->sfinfo.channels;
+  return paContinue;
   // << VST PROCESSING
 
   if( audioData->buffer == NULL )
