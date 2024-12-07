@@ -6,6 +6,7 @@
 #include <chrono>
 #include <string>
 #include <thread>
+#include <signal.h>
 
 #include "caf/actor_from_state.hpp"
 #include "caf/actor_ostream.hpp"

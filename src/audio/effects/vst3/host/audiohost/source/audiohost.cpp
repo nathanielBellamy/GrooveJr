@@ -63,6 +63,10 @@ namespace Vst {
 namespace AudioHost {
 static AudioHost::AppInit gInit (std::make_unique<App> ());
 
+void App::setModule (VST3::Hosting::Module::Ptr module_) {
+  module = module_;
+}
+
 //------------------------------------------------------------------------
 App::~App () noexcept
 {
@@ -72,18 +76,8 @@ App::~App () noexcept
 void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> effectID,
                             uint32 flags)
 {
-	std::string error;
-	module = VST3::Hosting::Module::create (path, error);
-	if (!module)
-	{
-        std::cout << "\n !module starAudioClient!";
-		std::string reason = "Could not create Module for file:";
-		reason += path;
-		reason += "\nError: ";
-		reason += error;
-		// EditorHost::IPlatform::instance ().kill (-1, reason);
-        return;
-	}
+  	std::string error;
+
 	auto factory = module->getFactory ();
 	for (auto& classInfo : factory.classInfos ())
 	{
@@ -98,10 +92,8 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
 			break;
 		}
 	}
-    std::cout << "\n plugProviders init starAudioClient!";
 	if (!plugProvider)
 	{
-        std::cout << "\n !plugProvider starAudioClient!";
 		std::string error;
 		if (effectID)
 			error =

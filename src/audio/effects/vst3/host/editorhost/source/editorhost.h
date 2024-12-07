@@ -58,6 +58,7 @@ public:
 	~App () noexcept override;
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;
+    void setModule(VST3::Hosting::Module::Ptr module);
 
 private:
 	enum OpenFlags

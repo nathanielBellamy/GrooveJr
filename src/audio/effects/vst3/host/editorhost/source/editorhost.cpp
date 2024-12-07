@@ -154,21 +154,16 @@ App::~App () noexcept
 	terminate ();
 }
 
+void App::setModule (VST3::Hosting::Module::Ptr module_) {
+  module = module_;
+}
+
 //------------------------------------------------------------------------
 void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectID, uint32 flags)
 {
 	std::string error;
-	module = VST3::Hosting::Module::create (path, error);
-	if (!module)
-	{
-		std::string reason = "Could not create Module for file:";
-		reason += path;
-		reason += "\nError: ";
-		reason += error;
-		IPlatform::instance ().kill (-1, reason);
-	}
 
-	auto factory = module->getFactory ();
+    auto factory = module->getFactory ();
 	if (auto factoryHostContext = IPlatform::instance ().getPluginFactoryContext ())
 		factory.setHostContext (factoryHostContext);
 	for (auto& classInfo : factory.classInfos ())

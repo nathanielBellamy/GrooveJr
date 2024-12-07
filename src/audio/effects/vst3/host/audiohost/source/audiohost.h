@@ -59,6 +59,7 @@ public:
 	AudioClientPtr vst3Processor;
 	IPtr<PlugProvider> plugProvider {nullptr};
 	Steinberg::Vst::IAudioClient::Buffers buffers;
+    void setModule(VST3::Hosting::Module::Ptr module);
 
 private:
 	enum OpenFlags
