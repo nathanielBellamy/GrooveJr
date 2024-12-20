@@ -51,6 +51,7 @@ void initVst3Host() {
     std::string error;
     PluginContext = new Effects::Vst3::Host::App();
     PluginContextFactory::instance().setPluginContext (PluginContext);
+
     VST3::Hosting::Module::Ptr module;
 	module = VST3::Hosting::Module::create (path, error);
 	if (!module)
@@ -74,7 +75,6 @@ void initVst3Host() {
         "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3"
     };
 
-//    vst3EditorHost->setPluginContext(*PluginContext);
     vst3EditorHost->init (cmdArgs);
 }
 
