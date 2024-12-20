@@ -20,7 +20,6 @@
 //     this list of conditions and the following disclaimer in the documentation
 //     and/or other materials provided with the distribution.
 //   * Neither the name of the Steinberg Media Technologies nor the names of its
-//     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
@@ -208,7 +207,7 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 
 	SMTG_DBPRT1 ("Open Editor for %s...\n", path.c_str ());
 	createViewAndShow (editController);
-                std::cout << "createViewAndShowed" << std::endl;
+	std::cout << "createViewAndShowed" << std::endl;
 
 	if (flags & kSecondWindow)
 	{
@@ -290,20 +289,18 @@ options:
 		IPlatform::instance ().kill (0, helpText);
 	}
 
-	PluginContextFactory::instance ().setPluginContext (&pluginContext);
-
 	openEditor (cmdArgs.back (), std::move (uid), flags);
 }
 
 //------------------------------------------------------------------------
 void App::terminate ()
 {
+    PluginContextFactory::instance ().setPluginContext (nullptr);
 	if (windowController)
 		windowController->closePlugView ();
 	windowController.reset ();
 	plugProvider.reset ();
 	module.reset ();
-	PluginContextFactory::instance ().setPluginContext (nullptr);
 }
 
 //------------------------------------------------------------------------

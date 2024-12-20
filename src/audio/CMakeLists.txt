@@ -77,6 +77,7 @@ target_compile_options(gsAudio PRIVATE ${INCLUDE_FLAGS})
 set(LINK_LIBRARIES
         -L${VST3SDK_HOME}/build/lib/Release
         -lsdk_common
+        vst3host
         audiohost
         editorhost
         CAF::core

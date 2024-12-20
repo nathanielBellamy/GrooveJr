@@ -42,7 +42,6 @@
 #include "public.sdk/source/vst/hosting/module.h"
 #include "public.sdk/source/vst/hosting/plugprovider.h"
 #include "public.sdk/source/vst/utility/optional.h"
-#include "../../hostclasses.hpp"
 
 //------------------------------------------------------------------------
 namespace Steinberg {
@@ -71,7 +70,6 @@ private:
 
 	VST3::Hosting::Module::Ptr module {nullptr};
 	IPtr<PlugProvider> plugProvider {nullptr};
-	Vst::HostApplication pluginContext;
 	WindowPtr window;
 	std::shared_ptr<WindowController> windowController;
 };

@@ -10,8 +10,12 @@ add_subdirectory(editorhost)
 
 add_library(vst3host
         SHARED
-        hostclasses.hpp
-        hostclasses.cpp
+        App.cpp
+        App.h
+        AttributeList.cpp
+        AttributeList.h
+        HostMessage.cpp
+        HostMessage.h
 )
 target_compile_options(vst3host
         PUBLIC

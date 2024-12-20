@@ -20,8 +20,8 @@
 #include <QApplication>
 #include "./gui/MainWindow.h"
 
+#include "./audio/effects/vst3/host/App.h"
 #include "./audio/effects/vst3/host/audiohost/source/audiohost.h"
-#include "./audio/effects/vst3/host/hostclasses.hpp"
 #include "./audio/effects/vst3/host/editorhost/source/editorhost.h"
 
 namespace Gj {
