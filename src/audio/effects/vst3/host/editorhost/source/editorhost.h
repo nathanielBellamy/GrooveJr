@@ -43,12 +43,13 @@
 #include "public.sdk/source/vst/hosting/plugprovider.h"
 #include "public.sdk/source/vst/utility/optional.h"
 
+#include "ComponentHandler.h"
+#include "WindowController.h"
+
 //------------------------------------------------------------------------
 namespace Steinberg {
 namespace Vst {
 namespace EditorHost {
-
-class WindowController;
 
 //------------------------------------------------------------------------
 class App : public IApplication

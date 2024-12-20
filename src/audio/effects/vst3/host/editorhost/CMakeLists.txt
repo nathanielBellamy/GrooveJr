@@ -6,6 +6,10 @@
         ${VST3SDK_HOME}/public.sdk/source/vst/hosting/plugprovider.h
             source/editorhost.cpp
             source/editorhost.h
+            source/ComponentHandler.cpp
+            source/ComponentHandler.h
+            source/WindowController.cpp
+            source/WindowController.h
             source/platform/appinit.h
             source/platform/iapplication.h
             source/platform/iplatform.h
