@@ -76,7 +76,7 @@ void initVst3Host() {
     };
 
     vst3EditorHost->plugProvider = vst3AudioHost->plugProvider;
-    vst3EditorHost->editController = vst3AudioHost->controller;
+    vst3EditorHost->editController = vst3AudioHost->editController;
 
     vst3EditorHost->init (cmdArgs);
 }

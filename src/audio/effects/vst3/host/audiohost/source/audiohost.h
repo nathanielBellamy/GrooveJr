@@ -60,7 +60,7 @@ public:
 	Steinberg::Vst::IAudioClient::Buffers buffers;
     void setModule(VST3::Hosting::Module::Ptr module);
     OPtr<IComponent> component;
-    OPtr<IEditController> controller;
+    OPtr<IEditController> editController;
 	AudioClientPtr vst3Processor;
 
 private:
