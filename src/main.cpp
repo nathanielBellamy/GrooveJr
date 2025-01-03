@@ -62,14 +62,14 @@ void initVst3Host() {
 		reason += error;
 //		Steinberg::IPlatform::instance ().kill (-1, reason);
 	}
-    AudioHost::App* vst3AudioHost = new AudioHost::App;
+    vst3AudioHost = new AudioHost::App;
     vst3AudioHost->setModule(module);
     const auto& vst3AudioHostCmdArgs = std::vector<std::string> {
         "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3"
     };
     vst3AudioHost->init(vst3AudioHostCmdArgs);
 
-    EditorHost::App* vst3EditorHost = new EditorHost::App;
+    vst3EditorHost = new EditorHost::App;
     vst3EditorHost->setModule(module);
     const auto& cmdArgs = std::vector<std::string> {
         "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3"

@@ -36,7 +36,7 @@
 
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/appinit.h"
 #include "base/source/fcommandline.h"
-#include "base/source/fdebug.h"
+// #include "base/source/fdebug.h"
 #include "pluginterfaces/base/funknown.h"
 #include "pluginterfaces/gui/iplugview.h"
 #include "pluginterfaces/gui/iplugviewcontentscalesupport.h"
@@ -121,17 +121,17 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 
 	if (flags & kSetComponentHandler)
 	{
-		SMTG_DBPRT0 ("setComponentHandler is used\n");
+		// SMTG_DBPRT0 ("setComponentHandler is used\n");
 		editController->setComponentHandler (&gComponentHandler);
 	}
 
-	SMTG_DBPRT1 ("Open Editor for %s...\n", path.c_str ());
+	// SMTG_DBPRT1 ("Open Editor for %s...\n", path.c_str ());
 	createViewAndShow (editController);
 	std::cout << "createViewAndShowed" << std::endl;
 
 	if (flags & kSecondWindow)
 	{
-		SMTG_DBPRT0 ("Open 2cd Editor...\n");
+		// SMTG_DBPRT0 ("Open 2cd Editor...\n");
 		createViewAndShow (editController);
 	}
 }
@@ -236,7 +236,7 @@ WindowController::~WindowController () noexcept
 //------------------------------------------------------------------------
 void WindowController::onShow (IWindow& w)
 {
-	SMTG_DBPRT1 ("onShow called (%p)\n", (void*)&w);
+	// SMTG_DBPRT1 ("onShow called (%p)\n", (void*)&w);
 
     std::cout << "onShow called" << std::endl;
 
@@ -282,7 +282,7 @@ void WindowController::closePlugView ()
 //------------------------------------------------------------------------
 void WindowController::onClose (IWindow& w)
 {
-	SMTG_DBPRT1 ("onClose called (%p)\n", (void*)&w);
+	// SMTG_DBPRT1 ("onClose called (%p)\n", (void*)&w);
 
 	closePlugView ();
 
@@ -293,7 +293,7 @@ void WindowController::onClose (IWindow& w)
 //------------------------------------------------------------------------
 void WindowController::onResize (IWindow& w, Size newSize)
 {
-	SMTG_DBPRT1 ("onResize called (%p)\n", (void*)&w);
+	// SMTG_DBPRT1 ("onResize called (%p)\n", (void*)&w);
 
 	if (plugView)
 	{
@@ -309,7 +309,7 @@ void WindowController::onResize (IWindow& w, Size newSize)
 //------------------------------------------------------------------------
 Size WindowController::constrainSize (IWindow& w, Size requestedSize)
 {
-	SMTG_DBPRT1 ("constrainSize called (%p)\n", (void*)&w);
+	// SMTG_DBPRT1 ("constrainSize called (%p)\n", (void*)&w);
 
 	ViewRect r {};
 	r.right = requestedSize.width;
@@ -326,7 +326,7 @@ Size WindowController::constrainSize (IWindow& w, Size requestedSize)
 //------------------------------------------------------------------------
 void WindowController::onContentScaleFactorChanged (IWindow& w, float newScaleFactor)
 {
-	SMTG_DBPRT1 ("onContentScaleFactorChanged called (%p)\n", (void*)&w);
+	// SMTG_DBPRT1 ("onContentScaleFactorChanged called (%p)\n", (void*)&w);
 
 	if (auto css = U::cast<IPlugViewContentScaleSupport> (plugView))
 	{
@@ -337,7 +337,7 @@ void WindowController::onContentScaleFactorChanged (IWindow& w, float newScaleFa
 //------------------------------------------------------------------------
 tresult PLUGIN_API WindowController::resizeView (IPlugView* view, ViewRect* newSize)
 {
-	SMTG_DBPRT1 ("resizeView called (%p)\n", (void*)view);
+	// SMTG_DBPRT1 ("resizeView called (%p)\n", (void*)view);
 
 	if (newSize == nullptr || view == nullptr || view != plugView)
 		return kInvalidArgument;

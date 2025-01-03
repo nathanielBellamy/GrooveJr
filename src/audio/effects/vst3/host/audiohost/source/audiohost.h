@@ -56,10 +56,12 @@ public:
 	~App () noexcept override;
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;
-	AudioClientPtr vst3Processor;
 	IPtr<PlugProvider> plugProvider {nullptr};
 	Steinberg::Vst::IAudioClient::Buffers buffers;
     void setModule(VST3::Hosting::Module::Ptr module);
+    OPtr<IComponent> component;
+    OPtr<IEditController> controller;
+	AudioClientPtr vst3Processor;
 
 private:
 	enum OpenFlags

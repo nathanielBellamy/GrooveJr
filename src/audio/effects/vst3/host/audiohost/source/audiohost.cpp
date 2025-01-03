@@ -104,8 +104,8 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
         return;
 	}
 
-	OPtr<IComponent> component = plugProvider->getComponent ();
-	OPtr<IEditController> controller = plugProvider->getController ();
+	component = plugProvider->getComponent ();
+	controller = plugProvider->getController ();
 	auto midiMapping = U::cast<IMidiMapping> (controller);
 
 	std::string name;
