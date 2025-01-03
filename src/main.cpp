@@ -75,6 +75,9 @@ void initVst3Host() {
         "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3"
     };
 
+    vst3EditorHost->plugProvider = vst3AudioHost->plugProvider;
+    vst3EditorHost->editController = vst3AudioHost->controller;
+
     vst3EditorHost->init (cmdArgs);
 }
 

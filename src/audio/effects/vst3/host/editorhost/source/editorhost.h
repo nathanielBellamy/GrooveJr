@@ -59,6 +59,8 @@ public:
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;
     void setModule(VST3::Hosting::Module::Ptr module);
+	OPtr<IEditController> editController {nullptr};
+	IPtr<PlugProvider> plugProvider {nullptr};
 
 private:
 	enum OpenFlags
@@ -70,7 +72,6 @@ private:
 	void createViewAndShow (IEditController* controller);
 
 	VST3::Hosting::Module::Ptr module {nullptr};
-	IPtr<PlugProvider> plugProvider {nullptr};
 	WindowPtr window;
 	std::shared_ptr<WindowController> windowController;
 };

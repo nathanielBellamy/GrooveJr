@@ -85,21 +85,7 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
     auto factory = module->getFactory ();
 	if (auto factoryHostContext = IPlatform::instance ().getPluginFactoryContext ())
 		factory.setHostContext (factoryHostContext);
-	for (auto& classInfo : factory.classInfos ())
-	{
-		if (classInfo.category () == kVstAudioEffectClass)
-		{
-			if (effectID)
-			{
-				if (*effectID != classInfo.ID ())
-					continue;
-			}
-			plugProvider = owned (new PlugProvider (factory, classInfo, true));
-			if (plugProvider->initialize () == false)
-				plugProvider = nullptr;
-			break;
-		}
-	}
+
 	if (!plugProvider)
 	{
 		if (effectID)
@@ -111,7 +97,6 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 		IPlatform::instance ().kill (-1, error);
 	}
 
-	auto editController = plugProvider->getController ();
 	if (!editController)
 	{
 		error = "No EditController found (needed for allowing editor) in file " + path;
