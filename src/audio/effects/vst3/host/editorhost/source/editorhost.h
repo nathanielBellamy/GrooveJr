@@ -42,6 +42,8 @@
 #include "public.sdk/source/vst/hosting/module.h"
 #include "public.sdk/source/vst/hosting/plugprovider.h"
 #include "public.sdk/source/vst/utility/optional.h"
+#include "public.sdk/source/common/memorystream.h"
+#include "pluginterfaces/vst/ivstmessage.h"
 
 #include "ComponentHandler.h"
 #include "WindowController.h"
@@ -60,6 +62,7 @@ public:
 	void terminate () override;
     void setModule(VST3::Hosting::Module::Ptr module);
 	OPtr<IEditController> editController {nullptr};
+    OPtr<IComponent> processorComponent;
 	IPtr<PlugProvider> plugProvider {nullptr};
 
 private:

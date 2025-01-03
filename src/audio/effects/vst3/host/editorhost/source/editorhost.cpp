@@ -104,10 +104,35 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 	}
 	editController->release (); // plugProvider does an addRef
 
-	if (flags & kSetComponentHandler)
+	// if (flags & kSetComponentHandler)
+	if (true)
 	{
 		// SMTG_DBPRT0 ("setComponentHandler is used\n");
+		std::cout << "setComponentHandler is used" << std::endl;
 		editController->setComponentHandler (&gComponentHandler);
+
+		// connect the 2 components
+		Vst::IConnectionPoint* iConnectionPointComponent = nullptr;
+		Vst::IConnectionPoint* iConnectionPointController = nullptr;
+
+		processorComponent->queryInterface (Vst::IConnectionPoint::iid, (void**)&iConnectionPointComponent);
+		editController->queryInterface (Vst::IConnectionPoint::iid, (void**)&iConnectionPointController);
+
+		if (iConnectionPointComponent && iConnectionPointController)
+		{
+			iConnectionPointComponent->connect (iConnectionPointController);
+			iConnectionPointController->connect (iConnectionPointComponent);
+		}
+
+		// TODO: debug undefined MemoryStream ctor + dtor
+		// synchronize controller to component by using setComponentState
+		// Steinberg::MemoryStream stream; // defined in "public.sdk/source/common/memorystream.h"
+		// // stream.setByteOrder (kLittleEndian);
+		// if (processorComponent->getState (&stream) == kResultTrue)
+		// {
+		// 	// stream.rewind ();
+		// 	editController->setComponentState (&stream);
+		// }
 	}
 
 	// SMTG_DBPRT1 ("Open Editor for %s...\n", path.c_str ());
