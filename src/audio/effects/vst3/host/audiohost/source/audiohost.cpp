@@ -150,10 +150,10 @@ void App::allocateBuffers()
 	int channelCount = 2; // TODO: access info from libsndfile
 	// std::cout << "\n HERE \n";
 	auto buffersIn = static_cast<float**>(
-		malloc(2 * AUDIO_BUFFER_FRAMES * sizeof(float*))
+		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float*))
 	);
     auto buffersOut = static_cast<float**>(
-		malloc(2 * AUDIO_BUFFER_FRAMES * sizeof(float*))
+		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float*))
 	);
 
 	if (buffersIn == NULL || buffersOut == NULL) {
@@ -168,9 +168,9 @@ void App::allocateBuffers()
 
     buffers = { // Steinberg::Vst::IAudioClient::Buffers
          buffersIn,
-        2,
+        channelCount,
         buffersOut,
-        2,
+        channelCount,
         AUDIO_BUFFER_FRAMES
     };
 }

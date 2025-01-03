@@ -47,7 +47,7 @@ int Cassette::callback(const void *inputBuffer, void *outputBuffer,
   // populate input buffers
   for (c = 0; c < audioData->sfinfo.channels; c++) {
       for (i = 0; i < framesPerBuffer; i++) {
-        vst3Host->buffers.inputs[c][i] = audioData->buffer[audioData->index + i + (framesPerBuffer * c)] * audioData->volume;
+        vst3Host->buffers.inputs[c][i] = audioData->buffer[audioData->index + 2 * i + c] * audioData->volume;
       }
   }
 
