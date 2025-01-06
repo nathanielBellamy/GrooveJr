@@ -21,10 +21,10 @@ void shutdown_handler(int sig) {
   std::cout << "Freeing resources..." << std::endl;
 
   for (auto &plugin : vst3Plugins) {
-      plugin.audioHost->terminate();
-      plugin.editorHost->terminate();
-      delete plugin.audioHost;
-      delete plugin.editorHost;
+      plugin->audioHost->terminate();
+      plugin->editorHost->terminate();
+      delete plugin->audioHost;
+      delete plugin->editorHost;
   }
   PluginContext->terminate();
 
