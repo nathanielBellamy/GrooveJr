@@ -1,7 +1,7 @@
 #ifndef AUDIO_DATA_H
 #define AUDIO_DATA_H
 #include <sndfile.hh>
-#include "./effects/vst3/host/audiohost/source/audiohost.h"
+#include "./effects/vst3/Plugin.h"
 #include "../enums/PlayState.h"
 
 struct AUDIO_DATA {
@@ -16,9 +16,9 @@ struct AUDIO_DATA {
     float                            volume;
     float                            fadeIn;
     float                            fadeOut;
-    Steinberg::Vst::AudioHost::App*  vst3AudioHost;
+    std::vector<Gj::Effects::Vst3::Plugin*>& vst3Plugins;
 
-    AUDIO_DATA(float* buffer, SNDFILE* file, SF_INFO sfinfo, sf_count_t index, long readcount, Gj::PlayState playState, Steinberg::Vst::AudioHost::App* vst3AudioHost) :
+    AUDIO_DATA(float* buffer, SNDFILE* file, SF_INFO sfinfo, sf_count_t index, long readcount, Gj::PlayState playState, std::vector<Gj::Effects::Vst3::Plugin*>& vst3Plugins) :
           buffer(buffer)
         , file(file)
         , sfinfo(sfinfo)
@@ -29,7 +29,7 @@ struct AUDIO_DATA {
         , volume(0.0)
         , fadeIn(1.0)
         , fadeOut(1.0)
-        , vst3AudioHost(vst3AudioHost)
+        , vst3Plugins(vst3Plugins)
         {}
 };
 

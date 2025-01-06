@@ -36,14 +36,14 @@ void shutdown_handler(int sig) {
   exit(1);
 }
 
-void caf_main(int argc, char *argv[], actor_system& sys, Steinberg::Vst::AudioHost::App* vst3AudioHost) {
+void caf_main(int argc, char *argv[], actor_system& sys, std::vector<Effects::Vst3::Plugin*>& vst3Plugins) {
 
   // init Qt App
   auto qtApp = QApplication {argc, argv};
   auto mainWindow = Gj::Gui::MainWindow { sys };
 
   // init ActorSystem
-  auto supervisor = sys.spawn(actor_from_state<Act::SupervisorState>, &mainWindow, vst3AudioHost);
+  auto supervisor = sys.spawn(actor_from_state<Act::SupervisorState>, &mainWindow, vst3Plugins);
 
   mainWindow.show();
   qtApp.exec();
@@ -65,6 +65,10 @@ extern "C" {
         sigIntHandler.sa_flags = 0;
         sigaction(SIGINT, &sigIntHandler, NULL);
 
+        initVst3PluginContext();
+        vst3Plugins.push_back(
+            new Effects::Vst3::Plugin("/Library/Audio/Plug-Ins/VST3/TDR Nova.vst3" )
+        );
         vst3Plugins.push_back(
             new Effects::Vst3::Plugin("/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3" )
         );
@@ -78,7 +82,7 @@ extern "C" {
         // Create the actor system.
         actor_system sys{cfg};
         // Run user-defined code.
-        caf_main(argc, argv, sys, vst3AudioHost);
+        caf_main(argc, argv, sys, &vst3Plugins);
 
         return 0;
     }

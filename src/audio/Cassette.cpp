@@ -9,12 +9,12 @@ using namespace caf;
 namespace Gj {
 namespace Audio {
 
-Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileName, long initialFrameId, Steinberg::Vst::AudioHost::App* vst3Host) :
+Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileName, long initialFrameId, std::vector<Effects::Vst3::Plugin*>& vst3Plugins) :
   actorSystem(actorSystem)
   , threadId(threadId)
   , fileName(fileName)
   , initialFrameId(initialFrameId)
-  , vst3Host(vst3Host)
+  , vst3Plugins(vst3Plugins)
   {}
 
 void Cassette::freeAudioData(AUDIO_DATA *audioData) {
@@ -38,26 +38,29 @@ int Cassette::callback(const void *inputBuffer, void *outputBuffer,
   (void) inputBuffer;
   (void) timeInfo; /* Prevent unused variable warnings. */
   (void) statusFlags;
-  AUDIO_DATA *audioData = (AUDIO_DATA*) userData;
+  AUDIO_DATA *audioData = static_cast<AUDIO_DATA*>(userData);
 
   // >> VST PROCESSING
-  Steinberg::Vst::AudioHost::App* vst3Host;
-  vst3Host = reinterpret_cast<Steinberg::Vst::AudioHost::App*>(audioData->vst3AudioHost);
 
   // populate input buffers
   for (c = 0; c < audioData->sfinfo.channels; c++) {
       for (i = 0; i < framesPerBuffer; i++) {
-        vst3Host->buffers.inputs[c][i] = audioData->buffer[audioData->index + 2 * i + c] * audioData->volume;
+          for (auto vst3Plugin : audioData->vst3Plugins) {
+            vst3Plugin->buffers.inputs[c][i] = audioData->buffer[audioData->index + 2 * i + c] * audioData->volume;
+          }
       }
   }
 
   // process
-  vst3Host->vst3Processor->process(vst3Host->buffers, (int64_t) framesPerBuffer);
+  for (auto vst3Plugin : audioData->vst3Plugins) {
+      // TODO: chain processing
+      vst3Plugin->audioHost->vst3Processor->process(vst3Plugin->audioHost->buffers, (int64_t) framesPerBuffer);
+  }
 
   // write output buffers to output
   for (i = 0; i < framesPerBuffer ; i++) {
       for (c = 0; c < audioData->sfinfo.channels; c++) {
-          *out++ = vst3Host->buffers.outputs[c][i] * audioData->volume;
+          *out++ = audioData->vst3Plugins.front()->audioHost->buffers.outputs[c][i] * audioData->volume;
       }
   }
 

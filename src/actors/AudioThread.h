@@ -17,6 +17,7 @@
 #include "../AppState.h"
 #include "../audio/ThreadStatics.h"
 
+#include "../audio/effects/vst3/Plugin.h"
 #include "../audio/Cassette.h"
 
 using namespace caf;
@@ -39,11 +40,11 @@ struct AudioThreadState {
      static long id;
 
      AudioThread::pointer self;
-     Steinberg::Vst::AudioHost::App* vst3Host;
+     std::vector<Effects::Vst3::Plugin*>& vst3Plugins;
 
-     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor, Steinberg::Vst::AudioHost::App* vst3Host) :
+     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor, std::vector<Effects::Vst3::Plugin*>& vst3Plugins) :
          self(self)
-       , vst3Host(vst3Host)
+       , vst3Plugins(vst3Plugins)
        {
            self->link_to(supervisor);
        }
@@ -57,7 +58,7 @@ struct AudioThreadState {
                 Gj::Audio::ThreadStatics::incrThreadId(),
                 Gj::Audio::ThreadStatics::getFilePath(),
                 Gj::Audio::ThreadStatics::getFrameId(),
-                vst3Host
+                vst3Plugins
              );
              std::cout << "AudioThread :  cassette instantiated " << std::endl;
              cassette.play();

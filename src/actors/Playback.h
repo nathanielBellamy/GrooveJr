@@ -16,6 +16,7 @@
 #include "../messaging/EnvelopeQtPtr.h"
 #include "./AudioThread.h"
 
+#include "../audio/effects/vst3/Plugin.h"
 #include "../enums/PlayState.h"
 
 using namespace caf;
@@ -41,11 +42,11 @@ struct PlaybackState {
 
      Playback::pointer self;
      AudioThread::pointer audioThread;
-     Steinberg::Vst::AudioHost::App* vst3Host;
+     std::vector<Effects::Vst3::Plugin*>& vst3Plugins;
 
-     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, Steinberg::Vst::AudioHost::App* vst3Host) :
+     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, std::vector<Effects::Vst3::Plugin*>& vst3Plugins) :
           self(self)
-        , vst3Host(vst3Host)
+        , vst3Plugins(vst3Plugins)
         , audioThread(nullptr)
         {
            self->link_to(supervisor);
@@ -79,7 +80,7 @@ struct PlaybackState {
              const char* filePath = Gj::Audio::ThreadStatics::getFilePath();
              if ( filePath != nullptr ) {
                if ( audioThread == nullptr ) {
-                   auto audioThreadActor = self->system().spawn(actor_from_state<AudioThreadState>, actor_cast<strong_actor_ptr>(self), vst3Host);
+                   auto audioThreadActor = self->system().spawn(actor_from_state<AudioThreadState>, actor_cast<strong_actor_ptr>(self), vst3Plugins);
                    audioThread = actor_cast<AudioThread::pointer>(audioThreadActor);
                    self->anon_send(
                        audioThreadActor,
