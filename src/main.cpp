@@ -11,21 +11,24 @@ using namespace Steinberg::Vst;
 
 namespace Gj {
 
+typedef vst3Plugin std::tuple<const std::string& /*path*/, AudioHost::App*, EditorHost::App*>;
+
 Effects::Vst3::Host::App* PluginContext = new Effects::Vst3::Host::App();
-Steinberg::Vst::AudioHost::App* vst3AudioHost;
-Steinberg::Vst::EditorHost::App* vst3EditorHost;
+std::vector<Effects::Vst3::Plugin*> vst3Plugins;
 
 void shutdown_handler(int sig) {
   std::cout << "Caught signal: " << sig << std::endl;
   std::cout << "Freeing resources..." << std::endl;
 
-  vst3AudioHost->terminate();
-  vst3EditorHost->terminate();
+  for (auto &plugin : vst3Plugins) {
+      plugin.audioHost->terminate();
+      plugin.editorHost->terminate();
+      delete plugin.audioHost;
+      delete plugin.editorHost;
+  }
   PluginContext->terminate();
 
   PluginContextFactory::instance().setPluginContext (nullptr);
-  delete vst3AudioHost;
-  delete vst3EditorHost;
   delete PluginContext;
 
   std::cout << "Done Freeing resources." << std::endl;
@@ -46,43 +49,11 @@ void caf_main(int argc, char *argv[], actor_system& sys, Steinberg::Vst::AudioHo
   qtApp.exec();
 }
 
-void initVst3Host() {
-    const std::string& path = "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3";
-    std::string error;
+void initVst3PluginContext() {
     PluginContext = new Effects::Vst3::Host::App();
     PluginContextFactory::instance().setPluginContext (PluginContext);
-
-    VST3::Hosting::Module::Ptr module;
-	module = VST3::Hosting::Module::create (path, error);
-	if (!module)
-	{
-		std::string reason = "Could not create Module for file:";
-		reason += path;
-		reason += "\nError: ";
-		reason += error;
-//		Steinberg::IPlatform::instance ().kill (-1, reason);
-	}
-    vst3AudioHost = new AudioHost::App;
-    vst3AudioHost->setModule(module);
-    const auto& vst3AudioHostCmdArgs = std::vector<std::string> {
-        "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3"
-    };
-    vst3AudioHost->init(vst3AudioHostCmdArgs);
-
-    vst3EditorHost = new EditorHost::App;
-    vst3EditorHost->setModule(module);
-    const auto& cmdArgs = std::vector<std::string> {
-        "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3"
-    };
-
-    vst3EditorHost->plugProvider = vst3AudioHost->plugProvider;
-    vst3EditorHost->editController = vst3AudioHost->editController;
-    vst3EditorHost->processorComponent = vst3AudioHost->component;
-
-    vst3EditorHost->init (cmdArgs);
-
-
 }
+
 
 extern "C" {
     int main(int argc, char *argv[]) {
@@ -94,7 +65,9 @@ extern "C" {
         sigIntHandler.sa_flags = 0;
         sigaction(SIGINT, &sigIntHandler, NULL);
 
-        initVst3Host();
+        vst3Plugins.push_back(
+            new Effects::Vst3::Plugin("/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3" )
+        );
 
         // init actor system
         // Initialize the global type information before anything else.

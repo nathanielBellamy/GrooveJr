@@ -7,6 +7,7 @@
 #include <string>
 #include <thread>
 #include <signal.h>
+#include <unordered_map>
 
 #include "caf/actor_from_state.hpp"
 #include "caf/actor_ostream.hpp"
@@ -21,8 +22,7 @@
 #include "./gui/MainWindow.h"
 
 #include "./audio/effects/vst3/host/App.h"
-#include "./audio/effects/vst3/host/audiohost/source/audiohost.h"
-#include "./audio/effects/vst3/host/editorhost/source/editorhost.h"
+#include "./audio/effects/vst3/Plugin.h"
 
 namespace Gj {
 

@@ -72,6 +72,8 @@ add_library(gsAudio SHARED
         Cassette.cpp
         ThreadStatics.h
         ThreadStatics.cpp
+        effects/vst3/Plugin.h
+        effects/vst3/Plugin.cpp
 )
 target_compile_options(gsAudio PRIVATE ${INCLUDE_FLAGS})
 set(LINK_LIBRARIES
