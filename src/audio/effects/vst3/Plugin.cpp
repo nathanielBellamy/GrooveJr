@@ -23,14 +23,13 @@ Plugin::Plugin(const std::string& path) :
 		reason += error;
 //		Steinberg::IPlatform::instance ().kill (-1, reason);
 	}
-    audioHost = new AudioHost::App;
+    audioHost = new Steinberg::Vst::AudioHost::App;
     audioHost->setModule(module);
-    const auto& audioHostCmdArgs = std::vector<std::string> { path };
-    audioHost->init(vst3AudioHostCmdArgs);
-
-    editorHost = new EditorHost::App;
-    editorHost->setModule(module);
     const auto& cmdArgs = std::vector<std::string> { path };
+    audioHost->init(cmdArgs);
+
+    editorHost = new Steinberg::Vst::EditorHost::App;
+    editorHost->setModule(module);
 
     editorHost->plugProvider = audioHost->plugProvider;
     editorHost->editController = audioHost->editController;

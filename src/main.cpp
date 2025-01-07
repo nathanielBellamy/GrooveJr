@@ -11,8 +11,6 @@ using namespace Steinberg::Vst;
 
 namespace Gj {
 
-typedef vst3Plugin std::tuple<const std::string& /*path*/, AudioHost::App*, EditorHost::App*>;
-
 Effects::Vst3::Host::App* PluginContext = new Effects::Vst3::Host::App();
 std::vector<Effects::Vst3::Plugin*> vst3Plugins;
 
@@ -82,7 +80,7 @@ extern "C" {
         // Create the actor system.
         actor_system sys{cfg};
         // Run user-defined code.
-        caf_main(argc, argv, sys, &vst3Plugins);
+        caf_main(argc, argv, sys, vst3Plugins);
 
         return 0;
     }

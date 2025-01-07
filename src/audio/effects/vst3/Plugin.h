@@ -19,7 +19,7 @@ struct Plugin {
     Steinberg::Vst::EditorHost::App*    editorHost;
 
     Plugin(const std::string& path);
-}
+};
 
 } // Vst3
 } // Effects
