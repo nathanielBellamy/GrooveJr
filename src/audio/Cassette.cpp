@@ -47,26 +47,28 @@ int Cassette::callback(const void *inputBuffer, void *outputBuffer,
       // populate firstPlugin's input buffers from dry audio signal
       for (c = 0; c < audioData->sfinfo.channels; c++) {
           for (i = 0; i < framesPerBuffer; i++) {
-              firstPlugin->audioHost->buffers.inputs[c][i] = audioData->buffer[audioData->index + 2 * i + c] * audioData->volume;
+              firstPlugin->audioHost->buffers.inputs[c][i] = audioData->buffer[audioData->index + 2 * i + c];
           }
       }
       // process firstPlugin
       firstPlugin->audioHost->vst3Processor->process(firstPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
 
       // process audio through remaining plugins
-      for (int j = 1; j < audioData->vst3Plugins.size() + 1; j++) {
-          auto currPlugin = audioData->vst3Plugins.at(j);
-          auto prevPlugin = audioData->vst3Plugins.at(j - 1);
+      if (pluginCount > 1) {
+          for (int j = 1; j < audioData->vst3Plugins.size(); j++) {
+              const auto currPlugin = audioData->vst3Plugins.at(j);
+              const auto prevPlugin = audioData->vst3Plugins.at(j - 1);
 
-          for (c = 0; c < audioData->sfinfo.channels; c++) {
-              for (i = 0; i < framesPerBuffer; i++) {
-                  firstPlugin->audioHost->buffers.inputs[c][i] = prevPlugin->audioHost->buffers.outputs[c][i];
+              for (c = 0; c < audioData->sfinfo.channels; c++) {
+                  for (i = 0; i < framesPerBuffer; i++) {
+                      currPlugin->audioHost->buffers.inputs[c][i] = prevPlugin->audioHost->buffers.outputs[c][i];
+                  }
               }
+              currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
           }
-          currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
       }
 
-      auto lastPlugin = audioData->vst3Plugins.back();
+      const auto lastPlugin = audioData->vst3Plugins.back();
       // write lastPlugin output buffers to audio out
       for (i = 0; i < framesPerBuffer ; i++) {
           for (c = 0; c < audioData->sfinfo.channels; c++) {
