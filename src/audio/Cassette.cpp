@@ -54,18 +54,16 @@ int Cassette::callback(const void *inputBuffer, void *outputBuffer,
       firstPlugin->audioHost->vst3Processor->process(firstPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
 
       // process audio through remaining plugins
-      if (pluginCount > 1) {
-          for (int j = 1; j < audioData->vst3Plugins.size(); j++) {
-              const auto currPlugin = audioData->vst3Plugins.at(j);
-              const auto prevPlugin = audioData->vst3Plugins.at(j - 1);
+      for (int j = 1; j < audioData->vst3Plugins.size(); j++) {
+          const auto currPlugin = audioData->vst3Plugins.at(j);
+          const auto prevPlugin = audioData->vst3Plugins.at(j - 1);
 
-              for (c = 0; c < audioData->sfinfo.channels; c++) {
-                  for (i = 0; i < framesPerBuffer; i++) {
-                      currPlugin->audioHost->buffers.inputs[c][i] = prevPlugin->audioHost->buffers.outputs[c][i];
-                  }
+          for (c = 0; c < audioData->sfinfo.channels; c++) {
+              for (i = 0; i < framesPerBuffer; i++) {
+                  currPlugin->audioHost->buffers.inputs[c][i] = prevPlugin->audioHost->buffers.outputs[c][i];
               }
-              currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
           }
+          currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
       }
 
       const auto lastPlugin = audioData->vst3Plugins.back();
