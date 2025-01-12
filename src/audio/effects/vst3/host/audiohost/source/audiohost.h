@@ -62,11 +62,13 @@ public:
     OPtr<IComponent> component;
     OPtr<IEditController> editController;
 	AudioClientPtr vst3Processor;
+	int channelCount = {2}; // TODO: access info from libsndfile
+	void allocateInputBuffers (); // used during unchaining of plugin buffers
 
 private:
 	enum OpenFlags
-	{
-	};
+	{};
+
 	void allocateBuffers ();
 
 	void startAudioClient (const std::string& path, VST3::Optional<VST3::UID> effectID,

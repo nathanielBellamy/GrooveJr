@@ -38,6 +38,29 @@ Plugin::Plugin(const std::string& path) :
     editorHost->init (cmdArgs);
 }
 
+bool Plugin::chainBuffers(std::vector<Plugin*>& plugins) {
+  for (int i = 1; i < plugins.size(); ++i) {
+    auto currentPlugin = plugins.at(i);
+    auto previousPlugin = plugins.at(i-1);
+    auto toFree = currentPlugin->audioHost->buffers.inputs;
+    currentPlugin->audioHost->buffers.inputs = previousPlugin->audioHost->buffers.outputs;
+    for (int i = 0; i < 2; i++) {
+    	free(toFree[i]);
+    }
+    free(toFree);
+  }
+
+  return true;
+}
+
+bool Plugin::unchainBuffers(std::vector<Plugin*>& plugins) {
+  for (int i = 1; i < plugins.size(); ++i) {
+  	plugins.at(i)->audioHost->allocateInputBuffers();
+  }
+
+  return true;
+}
+
 } // Vst3
 } // Effects
 } // Gj

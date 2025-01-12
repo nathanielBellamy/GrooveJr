@@ -147,8 +147,6 @@ void App::init (const std::vector<std::string>& cmdArgs)
 
 void App::allocateBuffers()
 {
-	int channelCount = 2; // TODO: access info from libsndfile
-	// std::cout << "\n HERE \n";
 	auto buffersIn = static_cast<float**>(
 		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float*))
 	);
@@ -173,6 +171,25 @@ void App::allocateBuffers()
         channelCount,
         AUDIO_BUFFER_FRAMES
     };
+}
+
+void App::allocateInputBuffers()
+{
+	// must be called after allocateBuffers
+	auto buffersIn = static_cast<float**>(
+		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float*))
+	);
+
+	if (buffersIn == NULL) {
+		std::cout << "Unable to allocate memory for buffersIn." << std::endl;
+		throw std::runtime_error ("Unable to allocate memory for buffersIn.");
+	}
+
+	for (int c = 0; c < channelCount; c++) {
+		buffersIn[c] = new float[AUDIO_BUFFER_FRAMES];
+	}
+
+	buffers.inputs = buffersIn;
 }
 
 //------------------------------------------------------------------------

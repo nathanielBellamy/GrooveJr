@@ -70,7 +70,9 @@ extern "C" {
         vst3Plugins.push_back(
             new Effects::Vst3::Plugin("/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3" )
         );
-        
+
+        Effects::Vst3::Plugin::chainBuffers(vst3Plugins);
+
         // init actor system
         // Initialize the global type information before anything else.
         init_global_meta_objects<id_block::groovejr>();
