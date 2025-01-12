@@ -55,14 +55,8 @@ int Cassette::callback(const void *inputBuffer, void *outputBuffer,
 
       // process audio through remaining plugins
       for (int j = 1; j < audioData->vst3Plugins.size(); j++) {
+          // note: buffers have been chained
           const auto currPlugin = audioData->vst3Plugins.at(j);
-          // const auto prevPlugin = audioData->vst3Plugins.at(j - 1);
-
-          // for (c = 0; c < audioData->sfinfo.channels; c++) {
-          //     for (i = 0; i < framesPerBuffer; i++) {
-          //         currPlugin->audioHost->buffers.inputs[c][i] = prevPlugin->audioHost->buffers.outputs[c][i];
-          //     }
-          // }
           currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
       }
 
