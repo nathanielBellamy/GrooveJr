@@ -42,7 +42,7 @@ struct SupervisorState {
 
      Supervisor::pointer self;
 
-     SupervisorState(Supervisor::pointer self, Gj::Gui::MainWindow* mainWindowPtr, std::vector<Effects::Vst3::Plugin*>& vst3Plugins) :
+     SupervisorState(Supervisor::pointer self, Gj::Gui::MainWindow* mainWindowPtr, std::vector<Audio::Effects::Vst3::Plugin*>& vst3Plugins) :
          self(self)
        , mainWindowPtr(mainWindowPtr)
        , running(false)

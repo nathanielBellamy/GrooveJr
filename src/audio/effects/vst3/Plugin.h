@@ -9,6 +9,7 @@
 #include "./host/editorhost/source/editorhost.h"
 
 namespace Gj {
+namespace Audio {
 namespace Effects {
 namespace Vst3 {
 
@@ -26,6 +27,7 @@ struct Plugin {
 
 } // Vst3
 } // Effects
+} // Audio
 } // Gj
 
 #endif //VST3PLUGIN_H

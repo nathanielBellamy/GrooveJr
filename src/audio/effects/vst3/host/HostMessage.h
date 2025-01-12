@@ -11,6 +11,7 @@
 #include "./AttributeList.h"
 
 namespace Gj {
+namespace Audio {
 namespace Effects {
 namespace Vst3 {
 namespace Host {
@@ -35,10 +36,10 @@ private:
 };
 
 
-
-#endif //HOSTMESSAGE_H
-
 } // Host
 } // Vst3
 } // Effects
+} // Audio
 } // Gj
+
+#endif //HOSTMESSAGE_H

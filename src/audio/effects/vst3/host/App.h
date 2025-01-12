@@ -19,6 +19,7 @@
 
 
 namespace Gj {
+namespace Audio {
 namespace Effects {
 namespace Vst3 {
 namespace Host {
@@ -28,27 +29,28 @@ using namespace Steinberg::Vst;
 
 class App : public IHostApplication
 {
-public:
-	App ();
-	virtual ~App () noexcept {FUNKNOWN_DTOR}
+	public:
+		App ();
+		virtual ~App () noexcept {FUNKNOWN_DTOR}
 
-	tresult terminate();
+		tresult terminate();
 
-	//--- IHostApplication ---------------
-	tresult PLUGIN_API getName (String128 name) override;
-	tresult PLUGIN_API createInstance (TUID cid, TUID _iid, void** obj) override;
+		//--- IHostApplication ---------------
+		tresult PLUGIN_API getName (String128 name) override;
+		tresult PLUGIN_API createInstance (TUID cid, TUID _iid, void** obj) override;
 
-	DECLARE_FUNKNOWN_METHODS
+		DECLARE_FUNKNOWN_METHODS
 
-	PlugInterfaceSupport* getPlugInterfaceSupport () const { return mPlugInterfaceSupport; }
+		PlugInterfaceSupport* getPlugInterfaceSupport () const { return mPlugInterfaceSupport; }
 
-private:
-	IPtr<PlugInterfaceSupport> mPlugInterfaceSupport;
+	private:
+		IPtr<PlugInterfaceSupport> mPlugInterfaceSupport;
 };
 
 } // Host
 } // Vst3
 } // Effects
+} // Audio
 } // Gj
 
 #endif //APP_H

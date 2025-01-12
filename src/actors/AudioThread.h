@@ -40,9 +40,9 @@ struct AudioThreadState {
      static long id;
 
      AudioThread::pointer self;
-     std::vector<Effects::Vst3::Plugin*>& vst3Plugins;
+     std::vector<Audio::Effects::Vst3::Plugin*>& vst3Plugins;
 
-     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor, std::vector<Effects::Vst3::Plugin*>& vst3Plugins) :
+     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor, std::vector<Audio::Effects::Vst3::Plugin*>& vst3Plugins) :
          self(self)
        , vst3Plugins(vst3Plugins)
        {

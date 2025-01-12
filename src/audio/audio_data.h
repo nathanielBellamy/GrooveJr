@@ -16,9 +16,9 @@ struct AUDIO_DATA {
     float                            volume;
     float                            fadeIn;
     float                            fadeOut;
-    std::vector<Gj::Effects::Vst3::Plugin*>& vst3Plugins;
+    std::vector<Gj::Audio::Effects::Vst3::Plugin*>& vst3Plugins;
 
-    AUDIO_DATA(float* buffer, SNDFILE* file, SF_INFO sfinfo, sf_count_t index, long readcount, Gj::PlayState playState, std::vector<Gj::Effects::Vst3::Plugin*>& vst3Plugins) :
+    AUDIO_DATA(float* buffer, SNDFILE* file, SF_INFO sfinfo, sf_count_t index, long readcount, Gj::PlayState playState, std::vector<Gj::Audio::Effects::Vst3::Plugin*>& vst3Plugins) :
           buffer(buffer)
         , file(file)
         , sfinfo(sfinfo)

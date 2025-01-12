@@ -12,6 +12,7 @@
 #include <string>
 
 namespace Gj {
+namespace Audio {
 namespace Effects {
 namespace Vst3 {
 namespace Host {
@@ -46,6 +47,7 @@ private:
 } // Host
 } // Vst3
 } // Effects
+} // Audio
 } // Gj
 
 #endif //ATTRIBUTELIST_H

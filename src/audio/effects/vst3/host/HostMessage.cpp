@@ -8,6 +8,7 @@
 #include <algorithm>
 
 namespace Gj {
+namespace Audio {
 namespace Effects {
 namespace Vst3 {
 namespace Host {
@@ -60,4 +61,5 @@ IAttributeList* PLUGIN_API HostMessage::getAttributes ()
 } // Host
 } // Vst3
 } // Effects
+} // Audio
 } // Gj

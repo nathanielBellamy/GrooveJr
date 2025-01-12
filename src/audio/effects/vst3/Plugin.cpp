@@ -5,6 +5,7 @@
 #include "Plugin.h"
 
 namespace Gj {
+namespace Audio {
 namespace Effects {
 namespace Vst3 {
 
@@ -63,4 +64,5 @@ bool Plugin::unchainBuffers(std::vector<Plugin*>& plugins) {
 
 } // Vst3
 } // Effects
+} // Audio
 } // Gj

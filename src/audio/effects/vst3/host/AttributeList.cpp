@@ -5,6 +5,7 @@
 #include "AttributeList.h"
 
 namespace Gj {
+namespace Audio {
 namespace Effects {
 namespace Vst3 {
 namespace Host {
@@ -204,4 +205,5 @@ tresult PLUGIN_API AttributeList::getBinary (AttrID aid, const void*& data, uint
 } // Host
 } // Vst3
 } // Effects
+} // Audio
 } // Gj

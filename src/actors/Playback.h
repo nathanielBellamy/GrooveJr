@@ -42,9 +42,9 @@ struct PlaybackState {
 
      Playback::pointer self;
      AudioThread::pointer audioThread;
-     std::vector<Effects::Vst3::Plugin*>& vst3Plugins;
+     std::vector<Audio::Effects::Vst3::Plugin*>& vst3Plugins;
 
-     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, std::vector<Effects::Vst3::Plugin*>& vst3Plugins) :
+     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, std::vector<Audio::Effects::Vst3::Plugin*>& vst3Plugins) :
           self(self)
         , vst3Plugins(vst3Plugins)
         , audioThread(nullptr)
