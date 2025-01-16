@@ -39,6 +39,11 @@ Plugin::Plugin(const std::string& path) :
     editorHost->init (cmdArgs);
 }
 
+Plugin::~Plugin() {
+  audioHost->terminate();
+  delete this;
+}
+
 bool Plugin::chainBuffers(std::vector<Plugin*>& plugins) {
   for (int i = 1; i < plugins.size(); ++i) {
     auto currentPlugin = plugins.at(i);

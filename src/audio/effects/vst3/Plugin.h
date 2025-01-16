@@ -20,6 +20,7 @@ struct Plugin {
     Steinberg::Vst::EditorHost::App*    editorHost;
 
     Plugin(const std::string& path);
+    ~Plugin();
 
     static bool chainBuffers(std::vector<Plugin*>& plugins);
     static bool unchainBuffers(std::vector<Plugin*>& plugins);

@@ -14,6 +14,9 @@ namespace Gj {
 Audio::Effects::Vst3::Host::App* PluginContext = new Audio::Effects::Vst3::Host::App();
 std::vector<Audio::Effects::Vst3::Plugin*> vst3Plugins;
 
+Audio::Effects::EffectMixer* EffectMixer = new Audio::Effects::EffectMixer();
+
+
 void shutdown_handler(int sig) {
   std::cout << "Caught signal: " << sig << std::endl;
   std::cout << "Freeing resources..." << std::endl;

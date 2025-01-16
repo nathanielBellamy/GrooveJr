@@ -6,20 +6,19 @@
 #define EFFECTCHANNEL_H
 
 #include "./vst3/Plugin.h"
+#include "./Channel.h"
 
 namespace Gj {
 namespace Audio {
 namespace Effects {
 
-class EffectChannel {
+class EffectChannel : public Channel {
 
   std::vector<Vst3::Plugin*> vst3Plugins;
-  float gain;
-  float pan;
 
   public:
-
     EffectChannel();
+    ~EffectChannel();
 
     bool addPlugin();
     bool removePlugin();
@@ -29,6 +28,9 @@ class EffectChannel {
 
     float getPan();
     void setPan(float pan);
+
+    bool chainBuffers();
+    bool unchainBuffers();
 
 };
 

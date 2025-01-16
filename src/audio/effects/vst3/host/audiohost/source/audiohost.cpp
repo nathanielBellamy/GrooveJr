@@ -195,8 +195,10 @@ void App::allocateInputBuffers()
 //------------------------------------------------------------------------
 void App::terminate ()
 {
-    delete buffers.inputs;
-    delete buffers.outputs;
+	for (int i = 0; i < 2; i++) {
+		free(buffers.inputs[i]);
+		free(buffers.outputs[i]);
+	}
     delete this;
 }
 

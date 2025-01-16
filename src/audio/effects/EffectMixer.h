@@ -5,6 +5,7 @@
 #ifndef EFFECTMIXER_H
 #define EFFECTMIXER_H
 
+#include "./Channel.h"
 #include "./EffectChannel.h"
 
 namespace Gj {
@@ -15,10 +16,11 @@ namespace Effects {
 class EffectMixer {
 
   public:
-    EffectChannel* dryChannel;
+    Channel* dryChannel;
     std::vector<EffectChannel*> wetChannels;
 
     EffectMixer();
+    ~EffectMixer();
 
     bool addChannel();
     bool removeChannel();
