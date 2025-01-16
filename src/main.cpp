@@ -14,7 +14,7 @@ namespace Gj {
 Audio::Effects::Vst3::Host::App* PluginContext = new Audio::Effects::Vst3::Host::App();
 std::vector<Audio::Effects::Vst3::Plugin*> vst3Plugins;
 
-Audio::Effects::EffectMixer* EffectMixer = new Audio::Effects::EffectMixer();
+Audio::Mixer* Mixer = new Audio::Mixer();
 
 
 void shutdown_handler(int sig) {

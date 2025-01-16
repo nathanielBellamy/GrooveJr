@@ -22,6 +22,7 @@ struct Plugin {
     Plugin(const std::string& path);
     ~Plugin();
 
+    // TODO: remove once these responsibilities are handed off to EffectsChannel
     static bool chainBuffers(std::vector<Plugin*>& plugins);
     static bool unchainBuffers(std::vector<Plugin*>& plugins);
 };

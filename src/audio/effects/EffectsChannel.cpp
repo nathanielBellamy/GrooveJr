@@ -2,21 +2,26 @@
 // Created by ns on 1/12/25.
 //
 
-#include "EffectChannel.h"
+#include "EffectsChannel.h"
 
 
 namespace Gj {
 namespace Audio {
 namespace Effects {
 
-EffectChannel::~EffectChannel() {
+EffectsChannel::EffectsChannel()
+  : gain(1.0f)
+  , pan(0.0f)
+{}
+
+EffectsChannel::~EffectsChannel() {
   for (auto plugin : vst3Plugins) {
     delete plugin;
   }
   delete this;
 }
 
-bool EffectChannel::chainBuffers() {
+bool EffectsChannel::chainBuffers() {
   for (int i = 1; i < vst3Plugins.size(); ++i) {
     auto currentPlugin = vst3Plugins.at(i);
     auto previousPlugin = vst3Plugins.at(i-1);
@@ -31,7 +36,7 @@ bool EffectChannel::chainBuffers() {
   return true;
 }
 
-bool EffectChannel::unchainBuffers() {
+bool EffectsChannel::unchainBuffers() {
   for (int i = 1; i < vst3Plugins.size(); ++i) {
   	vst3Plugins.at(i)->audioHost->allocateInputBuffers();
   }

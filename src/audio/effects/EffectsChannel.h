@@ -2,23 +2,25 @@
 // Created by ns on 1/12/25.
 //
 
-#ifndef EFFECTCHANNEL_H
-#define EFFECTCHANNEL_H
+#ifndef EFFECTSCHANNEL_H
+#define EFFECTSCHANNEL_H
 
 #include "./vst3/Plugin.h"
-#include "./Channel.h"
+#include "../Channel.h"
 
 namespace Gj {
 namespace Audio {
 namespace Effects {
 
-class EffectChannel : public Channel {
+class EffectsChannel {
 
+  float gain;
+  float pan;
   std::vector<Vst3::Plugin*> vst3Plugins;
 
   public:
-    EffectChannel();
-    ~EffectChannel();
+    EffectsChannel();
+    ~EffectsChannel();
 
     bool addPlugin();
     bool removePlugin();

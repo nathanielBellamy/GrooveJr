@@ -23,7 +23,7 @@
 
 #include "./audio/effects/vst3/host/App.h"
 #include "./audio/effects/vst3/Plugin.h"
-#include "./audio/effects/EffectMixer.h"
+#include "./audio/Mixer.h"
 
 namespace Gj {
 

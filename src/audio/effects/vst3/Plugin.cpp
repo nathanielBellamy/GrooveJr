@@ -45,6 +45,7 @@ Plugin::~Plugin() {
 }
 
 bool Plugin::chainBuffers(std::vector<Plugin*>& plugins) {
+  // TODO: remove once this responsibility is handed off to EffectsChannel
   for (int i = 1; i < plugins.size(); ++i) {
     auto currentPlugin = plugins.at(i);
     auto previousPlugin = plugins.at(i-1);
@@ -60,6 +61,7 @@ bool Plugin::chainBuffers(std::vector<Plugin*>& plugins) {
 }
 
 bool Plugin::unchainBuffers(std::vector<Plugin*>& plugins) {
+  // TODO: remove once this responsibility is handed off to EffectsChannel
   for (int i = 1; i < plugins.size(); ++i) {
   	plugins.at(i)->audioHost->allocateInputBuffers();
   }

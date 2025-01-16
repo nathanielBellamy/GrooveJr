@@ -72,12 +72,13 @@ add_library(gsAudio SHARED
         Cassette.cpp
         ThreadStatics.h
         ThreadStatics.cpp
+        Mixer.h
+        Mixer.cpp
+        Channel.h
         effects/vst3/Plugin.h
         effects/vst3/Plugin.cpp
-        effects/EffectMixer.h
-        effects/EffectMixer.cpp
-        effects/EffectChannel.h
-        effects/EffectChannel.cpp
+        effects/EffectsChannel.h
+        effects/EffectsChannel.cpp
 )
 target_compile_options(gsAudio PRIVATE ${INCLUDE_FLAGS})
 set(LINK_LIBRARIES
