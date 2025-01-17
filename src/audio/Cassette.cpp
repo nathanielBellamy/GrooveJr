@@ -9,12 +9,12 @@ using namespace caf;
 namespace Gj {
 namespace Audio {
 
-Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileName, long initialFrameId, std::vector<Effects::Vst3::Plugin*>& vst3Plugins) :
-  actorSystem(actorSystem)
+Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileName, long initialFrameId, Mixer& mixer)
+  : actorSystem(actorSystem)
   , threadId(threadId)
   , fileName(fileName)
   , initialFrameId(initialFrameId)
-  , vst3Plugins(vst3Plugins)
+  , mixer(mixer)
   {}
 
 void Cassette::freeAudioData(AUDIO_DATA *audioData) {
@@ -40,40 +40,18 @@ int Cassette::callback(const void *inputBuffer, void *outputBuffer,
   (void) statusFlags;
   AUDIO_DATA *audioData = static_cast<AUDIO_DATA*>(userData);
 
-  // >> VST PROCESSING
-  int pluginCount = audioData->vst3Plugins.size();
-  if (pluginCount > 0) {
-      auto firstPlugin = audioData->vst3Plugins.front();
-      // populate firstPlugin's input buffers from dry audio signal
-      for (c = 0; c < audioData->sfinfo.channels; c++) {
-          for (i = 0; i < framesPerBuffer; i++) {
-              firstPlugin->audioHost->buffers.inputs[c][i] = audioData->buffer[audioData->index + 2 * i + c];
-          }
-      }
-      // process firstPlugin
-      firstPlugin->audioHost->vst3Processor->process(firstPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
+  // >> MIXER
+  audioData->mixer.mixDown(audioData, framesPerBuffer);
 
-      // process audio through remaining plugins
-      for (int j = 1; j < audioData->vst3Plugins.size(); j++) {
-          // note: buffers have been chained
-          const auto currPlugin = audioData->vst3Plugins.at(j);
-          currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
-      }
+  for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
+      *out++ = audioData->mixer.outputBuffer[i];
+  }
 
-      const auto lastPlugin = audioData->vst3Plugins.back();
-      // write lastPlugin output buffers to audio out
-      for (i = 0; i < framesPerBuffer ; i++) {
-          for (c = 0; c < audioData->sfinfo.channels; c++) {
-              *out++ = lastPlugin->audioHost->buffers.outputs[c][i] * audioData->volume;
-          }
-      }
+  // TODO: early return here for testing
+  audioData->index += framesPerBuffer * audioData->sfinfo.channels;
+  return paContinue;
 
-      // TODO: early return here for testing
-      audioData->index += framesPerBuffer * audioData->sfinfo.channels;
-      return paContinue;
-
-  } // end VST3 Processing
-  // << VST PROCESSING
+  // << MIXER
 
   if( audioData->buffer == NULL )
   {
@@ -202,7 +180,7 @@ int Cassette::play()
       return 1;
   }
 
-  AUDIO_DATA audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, vst3Plugins);
+  AUDIO_DATA audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
   std::cout << "initial frame id: " << initialFrameId << std::endl;
   std::cout << "thread id: " << threadId << std::endl;
   std::cout << "sfinfo sampleRate: " << sfinfo.samplerate << std::endl;

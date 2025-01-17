@@ -33,6 +33,8 @@ class EffectsChannel {
     bool chainBuffers();
     bool unchainBuffers();
 
+    bool addEffect(Vst3::Plugin *plugin);
+
 };
 
 } // Effects

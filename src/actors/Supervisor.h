@@ -18,7 +18,7 @@
 #include "./Display.h"
 
 #include "../gui/MainWindow.h"
-#include "../audio/effects/vst3/Plugin.h"
+#include "../audio/Mixer.h"
 
 using namespace caf;
 
@@ -42,7 +42,7 @@ struct SupervisorState {
 
      Supervisor::pointer self;
 
-     SupervisorState(Supervisor::pointer self, Gj::Gui::MainWindow* mainWindowPtr, std::vector<Audio::Effects::Vst3::Plugin*>& vst3Plugins) :
+     SupervisorState(Supervisor::pointer self, Gj::Gui::MainWindow* mainWindowPtr, Gj::Audio::Mixer& mixer) :
          self(self)
        , mainWindowPtr(mainWindowPtr)
        , running(false)
@@ -50,7 +50,7 @@ struct SupervisorState {
            self->system().registry().put(ActorIds::SUPERVISOR, actor_cast<strong_actor_ptr>(self));
 //           auto gs_app_state_manager = sys.spawn(actor_from_state<gs_app_state_manager_state>);
 //           auto gs_controller = sys.spawn(actor_from_state<gs_controller_state
-           auto playback = self->system().spawn(actor_from_state<PlaybackState>, actor_cast<strong_actor_ptr>(self), vst3Plugins);
+           auto playback = self->system().spawn(actor_from_state<PlaybackState>, actor_cast<strong_actor_ptr>(self), mixer);
            playbackActorPtr = actor_cast<strong_actor_ptr>(playback);
 
            auto appStateManager = self->system().spawn(

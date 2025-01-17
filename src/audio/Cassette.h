@@ -12,7 +12,7 @@
 #include "caf/actor_system.hpp"
 #include "./audio_data.h"
 #include "./caf_data.h"
-#include "./effects/vst3/Plugin.h"
+#include "./Mixer.h"
 #include "./ThreadStatics.h"
 #include "./constants.h"
 
@@ -27,7 +27,7 @@ class Cassette
         long threadId;
         char const* fileName;
         long initialFrameId;
-        std::vector<Effects::Vst3::Plugin*>& vst3Plugins;
+        Mixer& mixer;
 
       public:
         Cassette(
@@ -35,7 +35,7 @@ class Cassette
             long threadId,
             const char* fileName,
             long initialFrameId,
-            std::vector<Effects::Vst3::Plugin*>& vst3Plugins
+            Mixer& mixer
         );
 
         int play();

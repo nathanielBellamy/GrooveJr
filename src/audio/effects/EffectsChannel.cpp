@@ -20,14 +20,19 @@ EffectsChannel::~EffectsChannel() {
   delete this;
 }
 
+bool EffectsChannel::addEffect(Vst3::Plugin* plugin) {
+  vst3Plugins.push_back(plugin);
+  return chainBuffers();
+}
+
 bool EffectsChannel::chainBuffers() {
   for (int i = 1; i < vst3Plugins.size(); ++i) {
     auto currentPlugin = vst3Plugins.at(i);
     auto previousPlugin = vst3Plugins.at(i-1);
     auto toFree = currentPlugin->audioHost->buffers.inputs;
     currentPlugin->audioHost->buffers.inputs = previousPlugin->audioHost->buffers.outputs;
-    for (int i = 0; i < 2; i++) {
-    	free(toFree[i]);
+    for (int j = 0; j < 2; j++) {
+    	free(toFree[j]);
     }
     free(toFree);
   }
