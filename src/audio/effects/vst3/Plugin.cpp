@@ -41,6 +41,9 @@ Plugin::Plugin(const std::string& path) :
 
 Plugin::~Plugin() {
   audioHost->terminate();
+  editorHost->terminate();
+  delete audioHost;
+  delete editorHost;
   delete this;
 }
 

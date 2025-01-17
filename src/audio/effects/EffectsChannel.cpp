@@ -10,8 +10,7 @@ namespace Audio {
 namespace Effects {
 
 EffectsChannel::EffectsChannel()
-  : gain(1.0f)
-  , pan(0.0f)
+  : channel({ 1.0f, 0.0f })
 {}
 
 EffectsChannel::~EffectsChannel() {

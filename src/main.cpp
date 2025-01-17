@@ -16,19 +16,13 @@ std::vector<Audio::Effects::Vst3::Plugin*> vst3Plugins;
 
 Audio::Mixer* Mixer = new Audio::Mixer();
 
-
 void shutdown_handler(int sig) {
   std::cout << "Caught signal: " << sig << std::endl;
   std::cout << "Freeing resources..." << std::endl;
 
-  for (auto &plugin : vst3Plugins) {
-      plugin->audioHost->terminate();
-      plugin->editorHost->terminate();
-      delete plugin->audioHost;
-      delete plugin->editorHost;
-  }
-  PluginContext->terminate();
+  delete Mixer;
 
+  PluginContext->terminate();
   PluginContextFactory::instance().setPluginContext (nullptr);
   delete PluginContext;
 
@@ -41,7 +35,7 @@ void caf_main(int argc, char *argv[], actor_system& sys, std::vector<Audio::Effe
 
   // init Qt App
   auto qtApp = QApplication {argc, argv};
-  auto mainWindow = Gj::Gui::MainWindow { sys };
+  auto mainWindow = Gui::MainWindow { sys };
 
   // init ActorSystem
   auto supervisor = sys.spawn(actor_from_state<Act::SupervisorState>, &mainWindow, vst3Plugins);

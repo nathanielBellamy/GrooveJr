@@ -14,8 +14,7 @@ namespace Effects {
 
 class EffectsChannel {
 
-  float gain;
-  float pan;
+  Channel channel;
   std::vector<Vst3::Plugin*> vst3Plugins;
 
   public:
