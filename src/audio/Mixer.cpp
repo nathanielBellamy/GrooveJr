@@ -44,8 +44,17 @@ bool Mixer::mixDown(int audioDataIndex, float* audioDataBuffer, int audioDataSfC
 
   // TODO: handle pan/gain
   // TODO: identify all first plugin input buffers?
+  // TODO: rethink buffer chaining
+  //   - is possibly causing clipping
+  //   - copying may not affect performance
 
   std::vector<Effects::Vst3::Plugin*> lastPlugins;
+  // clear output buffer
+  for (int i = 0; i < framesPerBuffer; i++) {
+    for (int c = 0; c < audioDataSfChannels; c++) {
+      outputBuffer[2 * i + c] = 0.0f;
+    }
+  }
 
   for (auto effectsChannel : effectsChannels) {
     if (effectsChannel->vst3Plugins.size() == 0)
@@ -68,19 +77,13 @@ bool Mixer::mixDown(int audioDataIndex, float* audioDataBuffer, int audioDataSfC
       currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
     }
 
-    lastPlugins.push_back( effectsChannel->vst3Plugins.back() );
+    for (int i = 0; i < framesPerBuffer; i++) {
+      for (int c = 0; c < audioDataSfChannels; c++) {
+        outputBuffer[2 * i + c] += effectsChannel->vst3Plugins.back()->audioHost->buffers.outputs[c][i] / effectsChannels.size();
+      }
+    }
   }
 
-  // write lastPlugins outputs to outputBuffer
-  for (int i = 0; i < framesPerBuffer; i++) {
-      for (int c = 0; c < audioDataSfChannels; c++) {
-          float val;
-          for (auto plugin : lastPlugins) {
-            val += plugin->audioHost->buffers.outputs[c][i];
-          }
-          outputBuffer[2 * i + c] = val / lastPlugins.size();
-      }
-  }
 
   return true;
 }
