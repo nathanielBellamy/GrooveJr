@@ -1,24 +1,28 @@
-#ifndef AUDIO_DATA_H
-#define AUDIO_DATA_H
+#ifndef GJAUDIOAUDIODATA_H
+#define GJAUDIOAUDIODATA_H
 #include <sndfile.hh>
 #include "./Mixer.h"
 #include "../enums/PlayState.h"
 
-struct AUDIO_DATA {
+namespace Gj {
+namespace Audio {
+
+class AudioData {
+  public:
     sf_count_t                       index;
     float                            *buffer;
     SNDFILE                          *file;
     SF_INFO                          sfinfo;
     long                             readcount;
-    Gj::PlayState                    playState;
+    PlayState                        playState;
     float                            playbackSpeed;
     bool                             readComplete;
     float                            volume;
     float                            fadeIn;
     float                            fadeOut;
-    Gj::Audio::Mixer&                mixer;
+    Mixer*                           mixer;
 
-    AUDIO_DATA(float* buffer, SNDFILE* file, SF_INFO sfinfo, sf_count_t index, long readcount, Gj::PlayState playState, Gj::Audio::Mixer& mixer)
+    AudioData(float* buffer, SNDFILE* file, SF_INFO sfinfo, sf_count_t index, long readcount, PlayState playState, Mixer* mixer)
         : index(index)
         , buffer(buffer)
         , file(file)
@@ -30,7 +34,10 @@ struct AUDIO_DATA {
         , fadeIn(1.0)
         , fadeOut(1.0)
         , mixer(mixer)
-        {}
+    {}
 };
 
-#endif
+} // Audio
+} // Gj
+
+#endif // GJAUDIOAUDIODATA_H

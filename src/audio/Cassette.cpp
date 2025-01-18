@@ -9,7 +9,7 @@ using namespace caf;
 namespace Gj {
 namespace Audio {
 
-Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileName, long initialFrameId, Mixer& mixer)
+Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileName, long initialFrameId, Mixer* mixer)
   : actorSystem(actorSystem)
   , threadId(threadId)
   , fileName(fileName)
@@ -17,7 +17,7 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
   , mixer(mixer)
   {}
 
-void Cassette::freeAudioData(AUDIO_DATA *audioData) {
+void Cassette::freeAudioData(AudioData *audioData) {
   free(audioData->buffer);
   sf_close(audioData->file);
   std::cout << "\nDone freeing resources for file: " << fileName;
@@ -38,13 +38,13 @@ int Cassette::callback(const void *inputBuffer, void *outputBuffer,
   (void) inputBuffer;
   (void) timeInfo; /* Prevent unused variable warnings. */
   (void) statusFlags;
-  AUDIO_DATA *audioData = static_cast<AUDIO_DATA*>(userData);
+  AudioData *audioData = static_cast<AudioData*>(userData);
 
   // >> MIXER
-  audioData->mixer.mixDown(audioData, framesPerBuffer);
+  audioData->mixer->mixDown(audioData->index, audioData->buffer, audioData->sfinfo.channels, framesPerBuffer);
 
   for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
-      *out++ = audioData->mixer.outputBuffer[i];
+      *out++ = audioData->mixer->outputBuffer[i] * audioData->volume;
   }
 
   // TODO: early return here for testing
@@ -180,7 +180,7 @@ int Cassette::play()
       return 1;
   }
 
-  AUDIO_DATA audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
+  AudioData audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
   std::cout << "initial frame id: " << initialFrameId << std::endl;
   std::cout << "thread id: " << threadId << std::endl;
   std::cout << "sfinfo sampleRate: " << sfinfo.samplerate << std::endl;

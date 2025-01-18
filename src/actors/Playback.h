@@ -43,9 +43,9 @@ struct PlaybackState {
      Playback::pointer self;
      AudioThread::pointer audioThread;
 
-     Audio::Mixer& mixer;
+     Audio::Mixer* mixer;
 
-     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, Audio::Mixer& mixer) :
+     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, Audio::Mixer* mixer) :
           self(self)
         , mixer(mixer)
         , audioThread(nullptr)

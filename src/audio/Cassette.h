@@ -10,7 +10,7 @@
 #include <sndfile.hh>
 #include <portaudio.h>
 #include "caf/actor_system.hpp"
-#include "./audio_data.h"
+#include "./AudioData.h"
 #include "./caf_data.h"
 #include "./Mixer.h"
 #include "./ThreadStatics.h"
@@ -27,7 +27,7 @@ class Cassette
         long threadId;
         char const* fileName;
         long initialFrameId;
-        Mixer& mixer;
+        Mixer* mixer;
 
       public:
         Cassette(
@@ -35,12 +35,12 @@ class Cassette
             long threadId,
             const char* fileName,
             long initialFrameId,
-            Mixer& mixer
+            Mixer* mixer
         );
 
         int play();
 
-        void freeAudioData(AUDIO_DATA *audioData);
+        void freeAudioData(AudioData *audioData);
 
         static int callback(const void *inputBuffer, void *outputBuffer,
                             unsigned long framesPerBuffer,

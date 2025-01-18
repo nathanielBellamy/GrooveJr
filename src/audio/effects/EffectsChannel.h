@@ -14,10 +14,10 @@ namespace Effects {
 
 class EffectsChannel {
 
-  Channel channel;
-  std::vector<Vst3::Plugin*> vst3Plugins;
-
   public:
+    Channel channel;
+    std::vector<Vst3::Plugin*> vst3Plugins;
+
     EffectsChannel();
     ~EffectsChannel();
 

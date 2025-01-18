@@ -40,9 +40,9 @@ struct AudioThreadState {
      static long id;
 
      AudioThread::pointer self;
-     Audio::Mixer& mixer;
+     Audio::Mixer* mixer;
 
-     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor, Audio::Mixer& mixer) :
+     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor, Audio::Mixer* mixer) :
          self(self)
        , mixer(mixer)
        {

@@ -31,7 +31,7 @@ void shutdown_handler(int sig) {
   exit(1);
 }
 
-void caf_main(int argc, char *argv[], actor_system& sys, Audio::Mixer& mixer) {
+void caf_main(int argc, char *argv[], actor_system& sys, Audio::Mixer* mixer) {
 
   // init Qt App
   auto qtApp = QApplication {argc, argv};
@@ -81,7 +81,7 @@ extern "C" {
         // Create the actor system.
         actor_system sys{cfg};
         // Run user-defined code.
-        caf_main(argc, argv, sys, &Mixer);
+        caf_main(argc, argv, sys, Mixer);
 
         return 0;
     }

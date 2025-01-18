@@ -38,33 +38,50 @@ bool Mixer::addEffectToChannel(int idx, Effects::Vst3::Plugin* effect) {
   return effectsChannels.at(idx)->addEffect(effect);
 }
 
-bool Mixer::mixDown(AUDIO_DATA* audioData, int framesPerBuffer) {
+bool Mixer::mixDown(int audioDataIndex, float* audioDataBuffer, int audioDataSfChannels, int framesPerBuffer) {
+  // called from audio thread
+  // do not allocate/free memory!
 
-  // TODO: fix and organize logic into appropriate classes
-      auto firstPlugin = audioData->vst3Plugins.front();
-      // populate firstPlugin's input buffers from dry audio signal
-      for (c = 0; c < audioData->sfinfo.channels; c++) {
-          for (i = 0; i < framesPerBuffer; i++) {
-              firstPlugin->audioHost->buffers.inputs[c][i] = audioData->buffer[audioData->index + 2 * i + c];
+  // TODO: handle pan/gain
+  // TODO: identify all first plugin input buffers?
+
+  std::vector<Effects::Vst3::Plugin*> lastPlugins;
+
+  for (auto effectsChannel : effectsChannels) {
+    if (effectsChannel->vst3Plugins.size() == 0)
+      break;
+    auto firstPlugin = effectsChannel->vst3Plugins.front();
+    // populate firstPlugin's input buffers from dry audio signal
+    for (int c = 0; c < audioDataSfChannels; c++) {
+      for (int i = 0; i < framesPerBuffer; i++) {
+        firstPlugin->audioHost->buffers.inputs[c][i] = audioDataBuffer[audioDataIndex + 2 * i + c];
+      }
+    }
+
+    // process firstPlugin
+    firstPlugin->audioHost->vst3Processor->process(firstPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
+
+    // process audio through remaining plugins
+    for (int j = 1; j < effectsChannel->vst3Plugins.size(); j++) {
+      // note: buffers have been chained
+      const auto currPlugin = effectsChannel->vst3Plugins.at(j);
+      currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
+    }
+
+    lastPlugins.push_back( effectsChannel->vst3Plugins.back() );
+  }
+
+  // write lastPlugins outputs to outputBuffer
+  for (int i = 0; i < framesPerBuffer; i++) {
+      for (int c = 0; c < audioDataSfChannels; c++) {
+          float val;
+          for (auto plugin : lastPlugins) {
+            val += plugin->audioHost->buffers.outputs[c][i];
           }
+          outputBuffer[2 * i + c] = val / lastPlugins.size();
       }
-      // process firstPlugin
-      firstPlugin->audioHost->vst3Processor->process(firstPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
+  }
 
-      // process audio through remaining plugins
-      for (int j = 1; j < audioData->vst3Plugins.size(); j++) {
-          // note: buffers have been chained
-          const auto currPlugin = audioData->vst3Plugins.at(j);
-          currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
-      }
-
-      const auto lastPlugin = audioData->vst3Plugins.back();
-      // write lastPlugin output buffers to audio out
-      for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
-          for (c = 0; c < audioData->sfinfo.channels; c++) {
-              *out++ = lastPlugin->audioHost->buffers.outputs[c][i] * audioData->volume;
-          }
-      }
   return true;
 }
 

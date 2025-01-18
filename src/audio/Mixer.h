@@ -6,7 +6,6 @@
 #define GJAUDIOMIXER_H
 
 #include "./Channel.h"
-#include "audio_data.h"
 #include "./constants.h"
 #include "./effects/EffectsChannel.h"
 
@@ -29,7 +28,7 @@ class Mixer {
 
     bool addEffectToChannel(int idx, Effects::Vst3::Plugin* effect);
 
-    bool mixDown(AUDIO_DATA* audioData, int framesPerBuffer);
+    bool mixDown(int audioDataIndex, float* audioDataBuffer, int audioDataSfChannels, int framesPerBuffer);
 
     // TODO
     bool removeEffectFromChannel(int channelIdx, int effectIdx);

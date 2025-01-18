@@ -42,8 +42,8 @@ struct SupervisorState {
 
      Supervisor::pointer self;
 
-     SupervisorState(Supervisor::pointer self, Gj::Gui::MainWindow* mainWindowPtr, Gj::Audio::Mixer& mixer) :
-         self(self)
+     SupervisorState(Supervisor::pointer self, Gj::Gui::MainWindow* mainWindowPtr, Audio::Mixer* mixer)
+       : self(self)
        , mainWindowPtr(mainWindowPtr)
        , running(false)
          {
