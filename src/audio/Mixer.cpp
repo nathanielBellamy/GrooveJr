@@ -10,8 +10,8 @@ namespace Audio {
 Mixer::Mixer()
     : mainChannel({ 1.0f, 0.0f })
     , dryChannel({ 1.0f, 0.0f })
-    , effectsChannels(std::vector<Effects::EffectsChannel*>())
     , channelCount(1)
+    , effectsChannels(std::vector<Effects::EffectsChannel*>())
     {
       // TODO: don't assume stereo
       outputBuffer = new float[AUDIO_BUFFER_FRAMES * 2];
@@ -41,7 +41,12 @@ bool Mixer::addEffectToChannel(const int idx, Effects::Vst3::Plugin* effect) con
   return effectsChannels.at(idx)->addEffect(effect);
 }
 
-bool Mixer::mixDown(const int audioDataIndex, const float* audioDataBuffer, const int audioDataSfChannels, const int framesPerBuffer) const {
+bool Mixer::mixDown(
+  const int audioDataIndex,
+  const float* audioDataBuffer,
+  const int audioDataSfChannels,
+  const int framesPerBuffer
+  ) const {
   // called from audio thread
   // do not allocate/free memory!
 
@@ -58,7 +63,7 @@ bool Mixer::mixDown(const int audioDataIndex, const float* audioDataBuffer, cons
   for (const auto effectsChannel : effectsChannels) {
     if (channelCount == 1) // dry channel only
       break;
-    auto firstPlugin = effectsChannel->vst3Plugins.front();
+    const auto firstPlugin = effectsChannel->vst3Plugins.front();
     // populate firstPlugin's input buffers from dry audio signal
     for (int c = 0; c < audioDataSfChannels; c++) {
       for (int i = 0; i < framesPerBuffer; i++) {

@@ -14,7 +14,7 @@ EffectsChannel::EffectsChannel()
 {}
 
 EffectsChannel::~EffectsChannel() {
-  for (auto plugin : vst3Plugins) {
+  for (const auto plugin : vst3Plugins) {
     delete plugin;
   }
   delete this;
@@ -27,12 +27,12 @@ bool EffectsChannel::addEffect(Vst3::Plugin* plugin) {
 
 bool EffectsChannel::chainBuffers() const {
   for (int i = 1; i < vst3Plugins.size(); ++i) {
-    auto currentPlugin = vst3Plugins.at(i);
-    auto previousPlugin = vst3Plugins.at(i-1);
-    auto toFree = currentPlugin->audioHost->buffers.inputs;
+    const auto currentPlugin = vst3Plugins.at(i);
+    const auto previousPlugin = vst3Plugins.at(i-1);
+    const auto toFree = currentPlugin->audioHost->buffers.inputs;
     currentPlugin->audioHost->buffers.inputs = previousPlugin->audioHost->buffers.outputs;
     for (int j = 0; j < 2; j++) {
-    	free(toFree[j]);
+    	delete toFree[j];
     }
     free(toFree);
   }

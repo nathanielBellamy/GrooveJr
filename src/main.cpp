@@ -58,16 +58,16 @@ extern "C" {
         sigIntHandler.sa_handler = shutdown_handler;
         sigemptyset(&sigIntHandler.sa_mask);
         sigIntHandler.sa_flags = 0;
-        sigaction(SIGINT, &sigIntHandler, NULL);
+        sigaction(SIGINT, &sigIntHandler, nullptr);
 
         initVst3PluginContext();
 
         Mixer->addEffectsChannel();
         // Mixer->addEffectsChannel();
-        //Mixer->addEffectToChannel(
-        //    0,
-        //    new Audio::Effects::Vst3::Plugin("/Library/Audio/Plug-Ins/VST3/TDR Nova.vst3" )
-        //);
+        Mixer->addEffectToChannel(
+            0,
+            new Audio::Effects::Vst3::Plugin("/Library/Audio/Plug-Ins/VST3/TDR Nova.vst3" )
+        );
         Mixer->addEffectToChannel(
             0,
             new Audio::Effects::Vst3::Plugin("/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3" )

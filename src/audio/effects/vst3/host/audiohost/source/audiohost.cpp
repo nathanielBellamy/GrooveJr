@@ -147,14 +147,14 @@ void App::init (const std::vector<std::string>& cmdArgs)
 
 void App::allocateBuffers()
 {
-	auto buffersIn = static_cast<float**>(
+	const auto buffersIn = static_cast<float**>(
 		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float))
 	);
-    auto buffersOut = static_cast<float**>(
+	const auto buffersOut = static_cast<float**>(
 		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float))
 	);
 
-	if (buffersIn == NULL || buffersOut == NULL) {
+	if (buffersIn == nullptr || buffersOut == nullptr) {
 		std::cout << "Unable to allocate memory for buffersIn or buffersOut." << std::endl;
 		throw std::runtime_error ("Unable to allocate memory for buffersIn.");
 	}
@@ -176,11 +176,11 @@ void App::allocateBuffers()
 void App::allocateInputBuffers()
 {
 	// must be called after allocateBuffers
-	auto buffersIn = static_cast<float**>(
-		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float*))
+	const auto buffersIn = static_cast<float**>(
+		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float))
 	);
 
-	if (buffersIn == NULL) {
+	if (buffersIn == nullptr) {
 		std::cout << "Unable to allocate memory for buffersIn." << std::endl;
 		throw std::runtime_error ("Unable to allocate memory for buffersIn.");
 	}
