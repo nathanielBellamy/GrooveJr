@@ -1,2 +1,2 @@
 
-#define AUDIO_BUFFER_FRAMES           1024
+#define AUDIO_BUFFER_FRAMES           256 // 1024

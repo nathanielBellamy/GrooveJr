@@ -11,13 +11,14 @@ Mixer::Mixer()
     : mainChannel({ 1.0f, 0.0f })
     , dryChannel({ 1.0f, 0.0f })
     , effectsChannels(std::vector<Effects::EffectsChannel*>())
+    , channelCount(1)
     {
       // TODO: don't assume stereo
       outputBuffer = new float[AUDIO_BUFFER_FRAMES * 2];
     }
 
 Mixer::~Mixer() {
-  for (auto channel : effectsChannels) {
+  for (const auto channel : effectsChannels) {
     delete channel;
   }
   delete outputBuffer;
@@ -26,38 +27,36 @@ Mixer::~Mixer() {
 
 bool Mixer::addEffectsChannel() {
     effectsChannels.push_back(new Effects::EffectsChannel());
+    channelCount++;
     return true;
 }
 
-bool Mixer::removeEffectsChannel(int index) {
-  effectsChannels.erase(effectsChannels.begin() + index);
+bool Mixer::removeEffectsChannel(const int idx) {
+  effectsChannels.erase(effectsChannels.begin() + idx);
+  channelCount--;
   return true;
 }
 
-bool Mixer::addEffectToChannel(int idx, Effects::Vst3::Plugin* effect) {
+bool Mixer::addEffectToChannel(const int idx, Effects::Vst3::Plugin* effect) const {
   return effectsChannels.at(idx)->addEffect(effect);
 }
 
-bool Mixer::mixDown(int audioDataIndex, float* audioDataBuffer, int audioDataSfChannels, int framesPerBuffer) {
+bool Mixer::mixDown(const int audioDataIndex, const float* audioDataBuffer, const int audioDataSfChannels, const int framesPerBuffer) const {
   // called from audio thread
   // do not allocate/free memory!
 
   // TODO: handle pan/gain
-  // TODO: identify all first plugin input buffers?
-  // TODO: rethink buffer chaining
-  //   - is possibly causing clipping
-  //   - copying may not affect performance
+  // TODO: identify all first plugin input buffers
 
-  std::vector<Effects::Vst3::Plugin*> lastPlugins;
-  // clear output buffer
-  for (int i = 0; i < framesPerBuffer; i++) {
-    for (int c = 0; c < audioDataSfChannels; c++) {
-      outputBuffer[2 * i + c] = 0.0f;
+  // write dry channel output buffer
+  for (int c = 0; c < audioDataSfChannels; c++) {
+    for (int i = 0; i < framesPerBuffer; i++) {
+      outputBuffer[2 * i + c] = audioDataBuffer[audioDataIndex + 2 * i + c] / channelCount;
     }
   }
 
-  for (auto effectsChannel : effectsChannels) {
-    if (effectsChannel->vst3Plugins.size() == 0)
+  for (const auto effectsChannel : effectsChannels) {
+    if (channelCount == 1) // dry channel only
       break;
     auto firstPlugin = effectsChannel->vst3Plugins.front();
     // populate firstPlugin's input buffers from dry audio signal
@@ -67,23 +66,19 @@ bool Mixer::mixDown(int audioDataIndex, float* audioDataBuffer, int audioDataSfC
       }
     }
 
-    // process firstPlugin
-    firstPlugin->audioHost->vst3Processor->process(firstPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
-
-    // process audio through remaining plugins
-    for (int j = 1; j < effectsChannel->vst3Plugins.size(); j++) {
+    // process audio plugins
+    for (int j = 0; j < effectsChannel->vst3Plugins.size(); j++) {
       // note: buffers have been chained
       const auto currPlugin = effectsChannel->vst3Plugins.at(j);
       currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
     }
 
-    for (int i = 0; i < framesPerBuffer; i++) {
-      for (int c = 0; c < audioDataSfChannels; c++) {
-        outputBuffer[2 * i + c] += effectsChannel->vst3Plugins.back()->audioHost->buffers.outputs[c][i] / effectsChannels.size();
+    for (int c = 0; c < audioDataSfChannels; c++) {
+      for (int i = 0; i < framesPerBuffer; i++) {
+        outputBuffer[2 * i + c] += effectsChannel->vst3Plugins.back()->audioHost->buffers.outputs[c][i] / channelCount;
       }
     }
   }
-
 
   return true;
 }

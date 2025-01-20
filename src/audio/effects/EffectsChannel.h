@@ -30,8 +30,8 @@ class EffectsChannel {
     float getPan();
     void setPan(float pan);
 
-    bool chainBuffers();
-    bool unchainBuffers();
+    bool chainBuffers() const;
+    bool unchainBuffers() const;
 
     bool addEffect(Vst3::Plugin *plugin);
 

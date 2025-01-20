@@ -148,10 +148,10 @@ void App::init (const std::vector<std::string>& cmdArgs)
 void App::allocateBuffers()
 {
 	auto buffersIn = static_cast<float**>(
-		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float*))
+		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float))
 	);
     auto buffersOut = static_cast<float**>(
-		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float*))
+		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float))
 	);
 
 	if (buffersIn == NULL || buffersOut == NULL) {

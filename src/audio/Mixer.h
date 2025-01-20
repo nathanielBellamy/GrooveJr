@@ -15,6 +15,7 @@ namespace Audio {
 class Mixer {
     Channel mainChannel;
     Channel dryChannel;
+    int channelCount;
     std::vector<Effects::EffectsChannel*> effectsChannels;
 
   public:
@@ -26,9 +27,9 @@ class Mixer {
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);
 
-    bool addEffectToChannel(int idx, Effects::Vst3::Plugin* effect);
+    bool addEffectToChannel(int idx, Effects::Vst3::Plugin* effect) const;
 
-    bool mixDown(int audioDataIndex, float* audioDataBuffer, int audioDataSfChannels, int framesPerBuffer);
+    bool mixDown(int audioDataIndex, const float* audioDataBuffer, int audioDataSfChannels, int framesPerBuffer) const;
 
     // TODO
     bool removeEffectFromChannel(int channelIdx, int effectIdx);

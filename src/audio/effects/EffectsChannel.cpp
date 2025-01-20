@@ -25,7 +25,7 @@ bool EffectsChannel::addEffect(Vst3::Plugin* plugin) {
   return chainBuffers();
 }
 
-bool EffectsChannel::chainBuffers() {
+bool EffectsChannel::chainBuffers() const {
   for (int i = 1; i < vst3Plugins.size(); ++i) {
     auto currentPlugin = vst3Plugins.at(i);
     auto previousPlugin = vst3Plugins.at(i-1);
@@ -40,7 +40,7 @@ bool EffectsChannel::chainBuffers() {
   return true;
 }
 
-bool EffectsChannel::unchainBuffers() {
+bool EffectsChannel::unchainBuffers() const {
   for (int i = 1; i < vst3Plugins.size(); ++i) {
   	vst3Plugins.at(i)->audioHost->allocateInputBuffers();
   }
