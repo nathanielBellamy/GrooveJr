@@ -19,6 +19,7 @@ class Mixer {
     std::vector<Effects::EffectsChannel*> effectsChannels;
 
   public:
+    float** inputBuffers;
     float* outputBuffer;
 
     Mixer();

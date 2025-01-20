@@ -14,6 +14,12 @@ Mixer::Mixer()
     , effectsChannels(std::vector<Effects::EffectsChannel*>())
     {
       // TODO: don't assume stereo
+      const auto inputBuffers = static_cast<float**>(
+          malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float))
+      );
+      for (auto i = 0; i < 2; i++) {
+        inputBuffers[i] = new float[AUDIO_BUFFER_FRAMES];
+      }
       outputBuffer = new float[AUDIO_BUFFER_FRAMES * 2];
     }
 
@@ -21,12 +27,18 @@ Mixer::~Mixer() {
   for (const auto channel : effectsChannels) {
     delete channel;
   }
+
+  for (auto i =0; i < 2; i++) {
+    delete inputBuffers[i];
+  }
+  free(inputBuffers);
+
   delete outputBuffer;
   delete this;
 }
 
 bool Mixer::addEffectsChannel() {
-    effectsChannels.push_back(new Effects::EffectsChannel());
+    effectsChannels.push_back(new Effects::EffectsChannel(inputBuffers));
     channelCount++;
     return true;
 }
@@ -51,7 +63,6 @@ bool Mixer::mixDown(
   // do not allocate/free memory!
 
   // TODO: handle pan/gain
-  // TODO: identify all first plugin input buffers
 
   // write dry channel output buffer
   for (int c = 0; c < audioDataSfChannels; c++) {
@@ -60,16 +71,16 @@ bool Mixer::mixDown(
     }
   }
 
+  // de-interlace audio into shared effects input buffer
+  for (int c = 0; c < audioDataSfChannels; c++) {
+    for (int i = 0; i < framesPerBuffer; i++) {
+      inputBuffers[c][i] = audioDataBuffer[audioDataIndex + 2 * i + c];
+    }
+  }
+
   for (const auto effectsChannel : effectsChannels) {
     if (channelCount == 1) // dry channel only
       break;
-    const auto firstPlugin = effectsChannel->vst3Plugins.front();
-    // populate firstPlugin's input buffers from dry audio signal
-    for (int c = 0; c < audioDataSfChannels; c++) {
-      for (int i = 0; i < framesPerBuffer; i++) {
-        firstPlugin->audioHost->buffers.inputs[c][i] = audioDataBuffer[audioDataIndex + 2 * i + c];
-      }
-    }
 
     // process audio plugins
     for (int j = 0; j < effectsChannel->vst3Plugins.size(); j++) {
@@ -78,6 +89,7 @@ bool Mixer::mixDown(
       currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
     }
 
+    // write processed audio to outputBuffer
     for (int c = 0; c < audioDataSfChannels; c++) {
       for (int i = 0; i < framesPerBuffer; i++) {
         outputBuffer[2 * i + c] += effectsChannel->vst3Plugins.back()->audioHost->buffers.outputs[c][i] / channelCount;

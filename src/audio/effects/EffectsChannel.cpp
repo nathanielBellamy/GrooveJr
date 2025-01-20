@@ -9,8 +9,9 @@ namespace Gj {
 namespace Audio {
 namespace Effects {
 
-EffectsChannel::EffectsChannel()
-  : channel({ 1.0f, 0.0f })
+EffectsChannel::EffectsChannel(float** inputBuffers)
+  : inputBuffers(inputBuffers)
+  , channel({ 1.0f, 0.0f })
 {}
 
 EffectsChannel::~EffectsChannel() {
@@ -26,6 +27,9 @@ bool EffectsChannel::addEffect(Vst3::Plugin* plugin) {
 }
 
 bool EffectsChannel::chainBuffers() const {
+  const auto firstPlugin = vst3Plugins.front();
+  firstPlugin->audioHost->buffers.inputs = inputBuffers;
+
   for (int i = 1; i < vst3Plugins.size(); ++i) {
     const auto currentPlugin = vst3Plugins.at(i);
     const auto previousPlugin = vst3Plugins.at(i-1);

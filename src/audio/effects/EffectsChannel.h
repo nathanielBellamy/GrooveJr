@@ -13,12 +13,13 @@ namespace Audio {
 namespace Effects {
 
 class EffectsChannel {
+  float** inputBuffers;
 
   public:
     Channel channel;
     std::vector<Vst3::Plugin*> vst3Plugins;
 
-    EffectsChannel();
+    EffectsChannel(float** inputBuffers);
     ~EffectsChannel();
 
     bool addPlugin();
