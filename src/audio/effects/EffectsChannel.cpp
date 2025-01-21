@@ -27,8 +27,7 @@ bool EffectsChannel::addEffect(Vst3::Plugin* plugin) {
 }
 
 bool EffectsChannel::chainBuffers() const {
-  const auto firstPlugin = vst3Plugins.front();
-  firstPlugin->audioHost->buffers.inputs = inputBuffers;
+  vst3Plugins.front()->audioHost->buffers.inputs = inputBuffers;
 
   for (int i = 1; i < vst3Plugins.size(); ++i) {
     const auto currentPlugin = vst3Plugins.at(i);

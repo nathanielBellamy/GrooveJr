@@ -14,12 +14,17 @@ Mixer::Mixer()
     , effectsChannels(std::vector<Effects::EffectsChannel*>())
     {
       // TODO: don't assume stereo
-      const auto inputBuffers = static_cast<float**>(
-          malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float))
+      inputBuffers = static_cast<float**>(
+          malloc(2 * AUDIO_BUFFER_FRAMES * sizeof(float))
       );
-      for (auto i = 0; i < 2; i++) {
-        inputBuffers[i] = new float[AUDIO_BUFFER_FRAMES];
+
+      if (inputBuffers == nullptr)
+        std::cout << "Unable to allocate memory for Mixer.inputBuffers" << std::endl;
+
+      for (int c = 0; c < 2; c++) {
+        inputBuffers[c] = new float[AUDIO_BUFFER_FRAMES];
       }
+
       outputBuffer = new float[AUDIO_BUFFER_FRAMES * 2];
     }
 
@@ -28,7 +33,7 @@ Mixer::~Mixer() {
     delete channel;
   }
 
-  for (auto i =0; i < 2; i++) {
+  for (auto i = 0; i < 2; i++) {
     delete inputBuffers[i];
   }
   free(inputBuffers);
@@ -67,12 +72,12 @@ bool Mixer::mixDown(
   // write dry channel output buffer
   for (int c = 0; c < audioDataSfChannels; c++) {
     for (int i = 0; i < framesPerBuffer; i++) {
-      outputBuffer[2 * i + c] = audioDataBuffer[audioDataIndex + 2 * i + c] / channelCount;
+      outputBuffer[2 * i + c] = 0.0;// audioDataBuffer[audioDataIndex + 2 * i + c] / channelCount;
     }
   }
 
-  // de-interlace audio into shared effects input buffer
-  for (int c = 0; c < audioDataSfChannels; c++) {
+  // de-interlace audio into shared effects input buffers
+  for (int c = 0; c < 2; c++) {
     for (int i = 0; i < framesPerBuffer; i++) {
       inputBuffers[c][i] = audioDataBuffer[audioDataIndex + 2 * i + c];
     }
