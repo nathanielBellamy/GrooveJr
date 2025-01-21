@@ -111,19 +111,6 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
 	std::string name;
 	name = plugProvider->getClassInfo().name();
 	vst3Processor = AudioClient::create (name, component, midiMapping);
-
-//	vst3Processor->setParameter (ParamID id, ParamValue value, int32 sampleOffset) override;
-//        vst3Processor->setParameter(0, 100.f, 0);
-//        vst3Processor->setParameter(1, 100.f, 0);
-//        vst3Processor->setParameter(2, 100.f, 0);
-//        vst3Processor->setParameter(3, 100.f, 0);
-//        vst3Processor->setParameter(4, 100.f, 0);
-//        vst3Processor->setParameter(5, 100.f, 0);
-//        vst3Processor->setParameter(6, 100.f, 0);
-//        vst3Processor->setParameter(7, 100.f, 0);
-//        vst3Processor->setParameter(8, 100.f, 0);
-//        vst3Processor->setParameter(9, 100.f, 0);
-//        vst3Processor->setParameter(10, 100.f, 0);
 }
 
 //------------------------------------------------------------------------
