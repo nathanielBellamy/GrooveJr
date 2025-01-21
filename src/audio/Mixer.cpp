@@ -72,7 +72,7 @@ bool Mixer::mixDown(
   // write dry channel output buffer
   for (int c = 0; c < audioDataSfChannels; c++) {
     for (int i = 0; i < framesPerBuffer; i++) {
-      outputBuffer[2 * i + c] = 0.0;// audioDataBuffer[audioDataIndex + 2 * i + c] / channelCount;
+      outputBuffer[2 * i + c] = dryChannel.gain * audioDataBuffer[audioDataIndex + 2 * i + c] / channelCount;
     }
   }
 
@@ -97,7 +97,8 @@ bool Mixer::mixDown(
     // write processed audio to outputBuffer
     for (int c = 0; c < audioDataSfChannels; c++) {
       for (int i = 0; i < framesPerBuffer; i++) {
-        outputBuffer[2 * i + c] += effectsChannel->vst3Plugins.back()->audioHost->buffers.outputs[c][i] / channelCount;
+        outputBuffer[2 * i + c] +=
+          ( effectsChannel->channel.gain * effectsChannel->vst3Plugins.back()->audioHost->buffers.outputs[c][i] )/ channelCount;
       }
     }
   }
