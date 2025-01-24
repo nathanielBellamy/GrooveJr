@@ -30,6 +30,8 @@ class Mixer {
 
     bool addEffectToChannel(int idx, Effects::Vst3::Plugin* effect) const;
 
+    bool setSampleRate(int sampleRate) const;
+
     bool mixDown(int audioDataIndex, const float* audioDataBuffer, int audioDataSfChannels, int framesPerBuffer) const;
 
     // TODO

@@ -169,7 +169,7 @@ int Cassette::play()
   float *buffer;
   buffer = (float *) malloc(sfinfo.frames * sfinfo.channels * sizeof(float));
   if (!buffer) {
-      std::cout << "Cannot allocate memory" << std::endl;
+      std::cout << "Cannot allocate memory for audioDataBuffer" << std::endl;
       return 1;
   }
 
@@ -179,6 +179,9 @@ int Cassette::play()
       std::cout << "Cannot read file" << std::endl;
       return 1;
   }
+
+  // update plugin effects with info about audio to be processed
+  mixer->setSampleRate(sfinfo.samplerate);
 
   AudioData audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
   std::cout << "initial frame id: " << initialFrameId << std::endl;

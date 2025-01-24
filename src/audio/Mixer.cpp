@@ -54,7 +54,17 @@ bool Mixer::removeEffectsChannel(const int idx) {
   return true;
 }
 
+bool Mixer::setSampleRate(const int sampleRate) const {
+  for (auto effectsChannel : effectsChannels) {
+    for (auto effect : effectsChannel->vst3Plugins) {
+      effect->audioHost->vst3Processor->setSamplerate(44100);
+    }
+  }
+  return true;
+}
+
 bool Mixer::addEffectToChannel(const int idx, Effects::Vst3::Plugin* effect) const {
+  effect->audioHost->vst3Processor->setBlockSize(AUDIO_BUFFER_FRAMES);
   return effectsChannels.at(idx)->addEffect(effect);
 }
 
