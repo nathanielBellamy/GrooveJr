@@ -57,14 +57,14 @@ bool Mixer::removeEffectsChannel(const int idx) {
 bool Mixer::setSampleRate(const int sampleRate) const {
   for (auto effectsChannel : effectsChannels) {
     for (auto effect : effectsChannel->vst3Plugins) {
-      effect->audioHost->vst3Processor->setSamplerate(44100);
+      effect->audioHost->audioClient->setSamplerate(44100);
+      effect->audioHost->audioClient->setBlockSize(AUDIO_BUFFER_FRAMES);
     }
   }
   return true;
 }
 
 bool Mixer::addEffectToChannel(const int idx, Effects::Vst3::Plugin* effect) const {
-  effect->audioHost->vst3Processor->setBlockSize(AUDIO_BUFFER_FRAMES);
   return effectsChannels.at(idx)->addEffect(effect);
 }
 
@@ -98,14 +98,14 @@ bool Mixer::mixDown(
     for (int j = 0; j < effectsChannel->vst3Plugins.size(); j++) {
       // note: buffers have been chained
       const auto currPlugin = effectsChannel->vst3Plugins.at(j);
-      currPlugin->audioHost->vst3Processor->process(currPlugin->audioHost->buffers, (int64_t) framesPerBuffer);
+      currPlugin->audioHost->audioClient->process(currPlugin->audioHost->buffers, framesPerBuffer);
     }
 
     // write processed audio to outputBuffer
     for (int c = 0; c < audioDataSfChannels; c++) {
       for (int i = 0; i < framesPerBuffer; i++) {
         outputBuffer[2 * i + c] +=
-          ( effectsChannel->channel.gain * effectsChannel->vst3Plugins.back()->audioHost->buffers.outputs[c][i] )/ channelCount;
+          ( effectsChannel->channel.gain * effectsChannel->vst3Plugins.back()->audioHost->buffers.outputs[c][i] ) / channelCount;
       }
     }
   }

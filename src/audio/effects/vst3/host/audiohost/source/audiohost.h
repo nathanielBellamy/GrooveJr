@@ -61,7 +61,7 @@ public:
     void setModule(VST3::Hosting::Module::Ptr module);
     OPtr<IComponent> component;
     OPtr<IEditController> editController;
-	AudioClientPtr vst3Processor;
+	AudioClientPtr audioClient;
 	int channelCount = {2}; // TODO: access info from libsndfile
 	void allocateInputBuffers (); // used during unchaining of plugin buffers
 

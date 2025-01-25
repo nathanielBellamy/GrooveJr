@@ -183,6 +183,7 @@ int Cassette::play()
   // update plugin effects with info about audio to be processed
   mixer->setSampleRate(sfinfo.samplerate);
 
+
   AudioData audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
   std::cout << "initial frame id: " << initialFrameId << std::endl;
   std::cout << "thread id: " << threadId << std::endl;

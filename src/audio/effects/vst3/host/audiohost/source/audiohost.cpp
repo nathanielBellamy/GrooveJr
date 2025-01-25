@@ -110,7 +110,7 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
 
 	std::string name;
 	name = plugProvider->getClassInfo().name();
-	vst3Processor = AudioClient::create (name, component, midiMapping);
+	audioClient = AudioClient::create (name, component, midiMapping);
 }
 
 //------------------------------------------------------------------------
