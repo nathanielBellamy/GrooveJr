@@ -16,13 +16,19 @@
   - [CAF](https://www.actor-framework.org/)
   - [Qt](https://www.qt.io/)
   - [Vst3](https://github.com/steinbergmedia/vst3sdk)
+    - On macOS:
+      - after installing XCode from the app store, if cmake has trouble finding it while
+        building vst3sdk, run
+        ```bash 
+        sudo xcode-select --reset
+        ```
 
 - ```
   git clone git@github.com:nathanielBellamy/GrooveJr.git
   cd GrooveJr/src
-  mkdir cmake-build-debug
-  cd cmake-build-debug
-  cmake -DCMAKE_BUILD_TYPE=RELEASE ../
+  mkdir build
+  cd build
+  cmake -DCMAKE_BUILD_TYPE=Release ../
   cmake --build .
 
 ___
