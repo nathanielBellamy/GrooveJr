@@ -4,12 +4,24 @@ project(GrooveJr VERSION 0.0.0)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
-set (VST3SDK_HOME "/Users/ns/code/vst3sdk")
+
+# TODO: detect OS and set
+# - for linux: -shared
+# - for macOS: -dynamicLib
+set (OS_LIB_FLAG "-dynamicLib")
+
+# TODO: detect OS and set
+# - for linux:
+# - for macO_sonoma: /opt/homebrew/Cellar
+# NOTE:
+#  - on MacOS it may be helpful to use `brew info portaudio` to view home directory
 set (C_LIBS_HOME "/opt/homebrew/Cellar")
 
-#set(QT_NO_STANDARD_PROJECT_SETUP TRUE)
+set (GJ_BASE_DIR "/Users/ns/code/")
+set (VST3SDK_HOME "${GJ_BASE_DIR}/vst3sdk")
 
-list(APPEND CMAKE_PREFIX_PATH "/Users/ns/code/qt6-build/qtbase/lib/cmake")
+# setup Qt
+list(APPEND CMAKE_PREFIX_PATH "${GJ_BASE_DIR}/qt6-build/qtbase/lib/cmake")
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets gui)
 if (Qt6_FOUND)
     message(INFO " --Qt6--FOUND--")
@@ -17,8 +29,8 @@ endif()
 
 qt_standard_project_setup()
 set (INCLUDE_FLAGS
-        -I/Users/ns/code/actor-framework/libcaf_core
-        -I/Users/ns/code/actor-framework/libcaf_io
+        -I${GJ_BASE_DIR}/actor-framework/libcaf_core
+        -I${GJ_BASE_DIR}/actor-framework/libcaf_io
         -I${VST3SDK_HOME}
         -I${C_LIBS_HOME}/libsndfile/1.2.2/include
         -I${C_LIBS_HOME}/portaudio/19.7.0/include
@@ -27,12 +39,14 @@ set (INCLUDE_FLAGS
 list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
 
+# setup CAF
 set (CAF_ROOT
-        /Users/ns/code/actor-framework/build
+        ${GJ_BASE_DIR}/actor-framework/build
 )
 find_package (CAF
         REQUIRED)
 
+# setup local libraries
 add_subdirectory(
     /Users/ns/code/GrooveJr/src/audio
 )
@@ -60,8 +74,8 @@ add_executable(GrooveJr
 target_link_libraries(GrooveJr
         PUBLIC
         CAF::core
-        gsAudio
-        gsGui
+        GjAudio
+        GjGui
         Qt6::Core
         Qt6::Widgets
         Qt6::Gui
