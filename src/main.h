@@ -25,6 +25,9 @@
 #include "./audio/effects/vst3/Plugin.h"
 #include "./audio/Mixer.h"
 
+#include "./AppState.h"
+#include "./enums/PlayState.h"
+
 namespace Gj {
 
 extern "C" {

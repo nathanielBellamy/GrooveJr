@@ -7,25 +7,16 @@
 namespace Gj {
 namespace Audio {
 
-Mixer::Mixer()
-    : mainChannel({ 1.0f, 0.0f })
+Mixer::Mixer(AppState* gAppState)
+    : gAppState(gAppState)
+    , mainChannel({ 1.0f, 0.0f })
     , dryChannel({ 1.0f, 0.0f })
     , channelCount(1)
     , effectsChannels(std::vector<Effects::EffectsChannel*>())
     {
-      // TODO: don't assume stereo
-      inputBuffers = static_cast<float**>(
-          malloc(2 * AUDIO_BUFFER_FRAMES * sizeof(float))
-      );
+      allocateInputBuffers();
 
-      if (inputBuffers == nullptr)
-        std::cout << "Unable to allocate memory for Mixer.inputBuffers" << std::endl;
-
-      for (int c = 0; c < 2; c++) {
-        inputBuffers[c] = new float[AUDIO_BUFFER_FRAMES];
-      }
-
-      outputBuffer = new float[AUDIO_BUFFER_FRAMES * 2];
+      outputBuffer = new float[gAppState->audioFramesPerBuffer * 2];
     }
 
 Mixer::~Mixer() {
@@ -33,13 +24,35 @@ Mixer::~Mixer() {
     delete channel;
   }
 
+  freeInputBuffers();
+
+  delete outputBuffer;
+  delete this;
+}
+
+bool Mixer::allocateInputBuffers() {
+    // TODO: don't assume stereo
+    inputBuffers = static_cast<float**>(
+        malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
+    );
+
+    if (inputBuffers == nullptr)
+      std::cout << "Unable to allocate memory for Mixer.inputBuffers" << std::endl;
+
+    for (int c = 0; c < 2; c++) {
+      inputBuffers[c] = new float[gAppState->audioFramesPerBuffer];
+    }
+
+    return true;
+}
+
+bool Mixer::freeInputBuffers() const {
   for (auto i = 0; i < 2; i++) {
     delete inputBuffers[i];
   }
   free(inputBuffers);
 
-  delete outputBuffer;
-  delete this;
+  return true;
 }
 
 bool Mixer::addEffectsChannel() {

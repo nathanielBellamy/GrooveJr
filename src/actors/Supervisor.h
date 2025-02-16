@@ -34,15 +34,15 @@ struct SupervisorTrait {
 using Supervisor = typed_actor<SupervisorTrait>;
 
 struct SupervisorState {
-     bool running;
      strong_actor_ptr playbackActorPtr;
      strong_actor_ptr appStateManagerPtr;
      strong_actor_ptr displayPtr;
-     Gj::Gui::MainWindow* mainWindowPtr;
 
      Supervisor::pointer self;
+     Gj::Gui::MainWindow* mainWindowPtr;
+     bool running;
 
-     SupervisorState(Supervisor::pointer self, Gj::Gui::MainWindow* mainWindowPtr, Audio::Mixer* mixer)
+     SupervisorState(Supervisor::pointer self, Gj::AppState* gAppState, Gj::Gui::MainWindow* mainWindowPtr, Audio::Mixer* mixer)
        : self(self)
        , mainWindowPtr(mainWindowPtr)
        , running(false)
@@ -55,7 +55,8 @@ struct SupervisorState {
 
            auto appStateManager = self->system().spawn(
                actor_from_state<AppStateManagerState>,
-               actor_cast<strong_actor_ptr>(self)
+               actor_cast<strong_actor_ptr>(self),
+               gAppState
            );
            appStateManagerPtr = actor_cast<strong_actor_ptr>(appStateManager);
 

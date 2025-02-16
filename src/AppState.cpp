@@ -6,22 +6,37 @@
 
 namespace Gj {
 
-AppState::AppState(Gj::PlayState playState)
-    : playState(playState)
-      {}
+AppState::AppState(int audioFramesPerBuffer, Gj::PlayState playState)
+  : audioFramesPerBuffer(audioFramesPerBuffer)
+  , playState(playState)
+  {}
 
-AppState AppState::setPlayState(AppState appState, Gj::PlayState playState) {
-  AppState newState { playState };
+AppState AppState::setAudioFramesPerBuffer(const AppState appState, int audioFramesPerBuffer) {
+  const AppState newState = {
+    audioFramesPerBuffer,
+    appState.playState
+  };
+  return newState;
+}
+
+AppState AppState::setPlayState(const AppState appState, Gj::PlayState playState) {
+  const AppState newState { appState.audioFramesPerBuffer, playState };
   return newState;
 };
 
-AppStatePacket AppState::toPacket() {
-    AppStatePacket packet { Gj::psToInt(playState) };
+AppStatePacket AppState::toPacket() const {
+    AppStatePacket packet {
+      audioFramesPerBuffer,
+      Gj::psToInt(playState)
+    };
     return packet;
 }
 
 AppState AppState::fromPacket(const AppStatePacket& packet) {
-    AppState appState { Gj::intToPs(packet.playState) };
+  const AppState appState {
+      packet.audioFramesPerBuffer,
+      Gj::intToPs(packet.playState)
+    };
     return appState;
 };
 

@@ -5,6 +5,7 @@
 #ifndef GJAUDIOMIXER_H
 #define GJAUDIOMIXER_H
 
+#include "../AppState.h"
 #include "./Channel.h"
 #include "./constants.h"
 #include "./effects/EffectsChannel.h"
@@ -13,6 +14,7 @@ namespace Gj {
 namespace Audio {
 
 class Mixer {
+    AppState* gAppState;
     Channel mainChannel;
     Channel dryChannel;
     int channelCount;
@@ -22,8 +24,11 @@ class Mixer {
     float** inputBuffers;
     float* outputBuffer;
 
-    Mixer();
+    Mixer(AppState*);
     ~Mixer();
+
+    bool allocateInputBuffers();
+    bool freeInputBuffers() const;
 
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);

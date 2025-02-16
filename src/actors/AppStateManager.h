@@ -48,6 +48,7 @@ using AppStateManager = typed_actor<AppStateManagerTrait>;
 struct AppStateManagerState {
 
      AppStateManager::pointer self;
+     Gj::AppState* gAppState;
      Gj::AppState appState;
      strong_actor_ptr playback;
      strong_actor_ptr display;
@@ -62,9 +63,10 @@ struct AppStateManagerState {
          );
      };
 
-     AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor) :
-          self(self)
-        , appState(Gj::AppState { Gj::PlayState::STOP } )
+     AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor, Gj::AppState* gAppState)
+        : self(self)
+        , gAppState(gAppState)
+        , appState(Gj::AppState { gAppState->audioFramesPerBuffer, gAppState->playState } )
         {
            self->link_to(supervisor);
            self->system().registry().put(ActorIds::APP_STATE_MANAGER, actor_cast<strong_actor_ptr>(self));

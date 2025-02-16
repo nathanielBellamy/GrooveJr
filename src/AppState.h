@@ -10,12 +10,8 @@
 namespace Gj {
 
 struct AppStatePacket {
-    int playState;
-    // TODO:
-    // - this cannot be constant as it must change depending on Effects buffers
-    // - user should be able to set it too
-    // - we'll need to pass this down and around
     int audioFramesPerBuffer;
+    int playState;
 };
 
 template <class Inspector>
@@ -26,14 +22,16 @@ bool inspect(Inspector& f, AppStatePacket& x) {
 class AppState {
 
   public:
-    AppState(Gj::PlayState playState);
+    AppState(int audioFramesPerBuffer, Gj::PlayState playState);
+    int audioFramesPerBuffer;
     Gj::PlayState playState;
 
-    AppStatePacket toPacket();
+    AppStatePacket toPacket() const;
      // TODO?
     static AppState fromPacket(const AppStatePacket& packet);
 
     // mutations
+    static AppState setAudioFramesPerBuffer(AppState appState, int audioFramesPerBuffer);
     static AppState setPlayState(AppState appState, Gj::PlayState playState);
 };
 
