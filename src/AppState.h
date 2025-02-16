@@ -11,6 +11,11 @@ namespace Gj {
 
 struct AppStatePacket {
     int playState;
+    // TODO:
+    // - this cannot be constant as it must change depending on Effects buffers
+    // - user should be able to set it too
+    // - we'll need to pass this down and around
+    int audioFramesPerBuffer;
 };
 
 template <class Inspector>
