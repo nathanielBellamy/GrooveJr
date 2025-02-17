@@ -42,7 +42,6 @@
 #include "public.sdk/source/vst/hosting/module.h"
 #include "public.sdk/source/vst/hosting/plugprovider.h"
 #include "public.sdk/source/vst/utility/optional.h"
-#include "../../../../../constants.h"
 
 //------------------------------------------------------------------------
 namespace Steinberg {
@@ -52,15 +51,18 @@ namespace AudioHost {
 //------------------------------------------------------------------------
 class App : public EditorHost::IApplication
 {
+	int audioFramesPerBuffer;
+
 public:
+	App(int audioFramesPerBuffer);
 	~App () noexcept override;
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;
 	IPtr<PlugProvider> plugProvider {nullptr};
 	Steinberg::Vst::IAudioClient::Buffers buffers;
-    void setModule(VST3::Hosting::Module::Ptr module);
-    OPtr<IComponent> component;
-    OPtr<IEditController> editController;
+	void setModule(VST3::Hosting::Module::Ptr module);
+	OPtr<IComponent> component;
+	OPtr<IEditController> editController;
 	AudioClientPtr audioClient;
 	int channelCount = {2}; // TODO: access info from libsndfile
 	void allocateInputBuffers (); // used during unchaining of plugin buffers
@@ -70,9 +72,12 @@ private:
 	{};
 
 	void allocateBuffers ();
+	void freeBuffers () const;
 
 	void startAudioClient (const std::string& path, VST3::Optional<VST3::UID> effectID,
 	                       uint32 flags);
+
+	void setAudioFramesPerBuffer (const int framesPerBuffer);
 
 	VST3::Hosting::Module::Ptr module {nullptr};
 

@@ -226,7 +226,7 @@ int Cassette::play()
             &inputParameters,
             &outputParameters,
             audioData.sfinfo.samplerate,
-            AUDIO_BUFFER_FRAMES,
+            mixer->getAudioFramesPerBuffer(),
             paNoFlag, /* paClipOn, */
             callback,
             &audioData );

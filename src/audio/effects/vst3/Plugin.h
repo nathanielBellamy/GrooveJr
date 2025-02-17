@@ -19,7 +19,7 @@ struct Plugin {
     Steinberg::Vst::AudioHost::App*     audioHost;
     Steinberg::Vst::EditorHost::App*    editorHost;
 
-    Plugin(const std::string& path);
+    Plugin(const std::string& path, int audioFramesPerBuffer);
     ~Plugin();
 };
 

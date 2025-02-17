@@ -46,7 +46,6 @@
 #include "pluginterfaces/vst/ivstaudioprocessor.h"
 #include "pluginterfaces/vst/ivsteditcontroller.h"
 #include "pluginterfaces/vst/vsttypes.h"
-#include "../../../../../constants.h"
 #include <cstdio>
 #include <iostream>
 
@@ -60,11 +59,15 @@ namespace Steinberg {
 
 namespace Vst {
 namespace AudioHost {
-static AudioHost::AppInit gInit (std::make_unique<App> ());
+static AudioHost::AppInit gInit (std::make_unique<App> (128));
 
 void App::setModule (VST3::Hosting::Module::Ptr module_) {
   module = module_;
 }
+
+App::App(const int audioFramesPerBuffer)
+	: audioFramesPerBuffer(audioFramesPerBuffer)
+	{}
 
 //------------------------------------------------------------------------
 App::~App () noexcept
@@ -75,9 +78,9 @@ App::~App () noexcept
 void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> effectID,
                             uint32 flags)
 {
-  	std::string error;
 
-	auto factory = module->getFactory ();
+	std::string error;
+	const auto factory = module->getFactory ();
 	for (auto& classInfo : factory.classInfos ())
 	{
 		if (classInfo.category () == kVstAudioEffectClass)
@@ -100,6 +103,7 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
 		else
 			error = "No VST3 Audio Module Class found in file ";
 		error += path;
+		std::cout << error << std::endl;
 		// EditorHost::IPlatform::instance ().kill (-1, error);
         return;
 	}
@@ -110,7 +114,9 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
 
 	std::string name;
 	name = plugProvider->getClassInfo().name();
+	std::cout << "Audio Client " << name << " will be created" << std::endl;
 	audioClient = AudioClient::create (name, component, midiMapping);
+	std::cout << "Audio Client " << name << " created" << std::endl;
 }
 
 //------------------------------------------------------------------------
@@ -129,16 +135,24 @@ void App::init (const std::vector<std::string>& cmdArgs)
 	uint32 flags {};
 
 	allocateBuffers ();
+	std::cout << "Allocating audiohost buffers done" << std::endl;
 	startAudioClient (cmdArgs.back (), std::move (uid), flags);
 }
+
+void App::setAudioFramesPerBuffer(const int framesPerBuffer) {
+	audioFramesPerBuffer = framesPerBuffer;
+	freeBuffers();
+	allocateBuffers();
+}
+
 
 void App::allocateBuffers()
 {
 	const auto buffersIn = static_cast<float**>(
-		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float))
+		malloc(channelCount * audioFramesPerBuffer * sizeof(float))
 	);
 	const auto buffersOut = static_cast<float**>(
-		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float))
+		malloc(channelCount * audioFramesPerBuffer * sizeof(float))
 	);
 
 	if (buffersIn == nullptr || buffersOut == nullptr) {
@@ -147,8 +161,8 @@ void App::allocateBuffers()
 	}
 
 	for (int c = 0; c < channelCount; c++) {
-		buffersIn[c] = new float[AUDIO_BUFFER_FRAMES];
-		buffersOut[c] = new float[AUDIO_BUFFER_FRAMES];
+		buffersIn[c] = new float[audioFramesPerBuffer];
+		buffersOut[c] = new float[audioFramesPerBuffer];
 	}
 
     buffers = { // Steinberg::Vst::IAudioClient::Buffers
@@ -156,7 +170,7 @@ void App::allocateBuffers()
         channelCount,
         buffersOut,
         channelCount,
-        AUDIO_BUFFER_FRAMES
+        audioFramesPerBuffer
     };
 }
 
@@ -164,7 +178,7 @@ void App::allocateInputBuffers()
 {
 	// must be called after allocateBuffers
 	const auto buffersIn = static_cast<float**>(
-		malloc(channelCount * AUDIO_BUFFER_FRAMES * sizeof(float))
+		malloc(channelCount * audioFramesPerBuffer * sizeof(float))
 	);
 
 	if (buffersIn == nullptr) {
@@ -173,20 +187,28 @@ void App::allocateInputBuffers()
 	}
 
 	for (int c = 0; c < channelCount; c++) {
-		buffersIn[c] = new float[AUDIO_BUFFER_FRAMES];
+		buffersIn[c] = new float[audioFramesPerBuffer];
 	}
 
 	buffers.inputs = buffersIn;
 }
 
+void App::freeBuffers() const {
+	for (int i = 0; i < 2; i++) {
+		delete buffers.inputs[i];
+		delete buffers.outputs[i];
+	}
+
+	free(buffers.inputs);
+	free(buffers.outputs);
+}
+
+
 //------------------------------------------------------------------------
 void App::terminate ()
 {
-	for (int i = 0; i < 2; i++) {
-		free(buffers.inputs[i]);
-		free(buffers.outputs[i]);
-	}
-    delete this;
+	freeBuffers ();
+	delete this;
 }
 
 //------------------------------------------------------------------------

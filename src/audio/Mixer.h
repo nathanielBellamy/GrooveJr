@@ -5,9 +5,9 @@
 #ifndef GJAUDIOMIXER_H
 #define GJAUDIOMIXER_H
 
+#include <iostream>
 #include "../AppState.h"
 #include "./Channel.h"
-#include "./constants.h"
 #include "./effects/EffectsChannel.h"
 
 namespace Gj {
@@ -33,7 +33,7 @@ class Mixer {
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);
 
-    bool addEffectToChannel(int idx, Effects::Vst3::Plugin* effect) const;
+    bool addEffectToChannel(int idx, const std::string& effectPath) const;
 
     bool setSampleRate(int sampleRate) const;
 
@@ -41,6 +41,8 @@ class Mixer {
 
     // TODO
     bool removeEffectFromChannel(int channelIdx, int effectIdx);
+
+    int getAudioFramesPerBuffer() const { return gAppState->audioFramesPerBuffer; };
 
 };
 

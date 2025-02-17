@@ -14,7 +14,6 @@
 #include "./caf_data.h"
 #include "./Mixer.h"
 #include "./ThreadStatics.h"
-#include "./constants.h"
 
 using namespace caf;
 
