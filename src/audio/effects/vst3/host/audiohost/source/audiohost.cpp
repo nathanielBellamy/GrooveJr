@@ -114,9 +114,7 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
 
 	std::string name;
 	name = plugProvider->getClassInfo().name();
-	std::cout << "Audio Client " << name << " will be created" << std::endl;
 	audioClient = AudioClient::create (name, component, midiMapping);
-	std::cout << "Audio Client " << name << " created" << std::endl;
 }
 
 //------------------------------------------------------------------------

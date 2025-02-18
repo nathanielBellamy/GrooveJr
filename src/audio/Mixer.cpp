@@ -79,9 +79,10 @@ bool Mixer::setSampleRate(const int sampleRate) const {
 
 bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) const {
   const auto effect = new Audio::Effects::Vst3::Plugin(effectPath, gAppState->audioFramesPerBuffer);
-  // Steinberg::FUnknownPtr<Steinberg::Vst::IAudioProcessor> processor = effect->audioHost->component;
-  // int latencySamples = processor->getLatencySamples();
-  // std::cout << "Adding effect " << effect << " latency " << latencySamples << std::endl;
+  Steinberg::FUnknownPtr<Steinberg::Vst::IAudioProcessor> processor = effect->audioHost->audioClient->getComponent();
+  int latencySamples = processor->getLatencySamples();
+  std::cout << "Adding effect " << effect << " latency " << latencySamples << std::endl;
+  // TODO
   return effectsChannels.at(idx)->addEffect(effect);
 }
 

@@ -78,6 +78,8 @@ public:
 	static AudioClientPtr create (const Name& name, IComponent* component,
 	                              IMidiMapping* midiMapping);
 
+	IComponent* getComponent() const { return component; }
+
 	// IAudioClient
 	bool process (Buffers& buffers, int64_t continousFrames) override;
 	bool setSamplerate (SampleRate value) override;
