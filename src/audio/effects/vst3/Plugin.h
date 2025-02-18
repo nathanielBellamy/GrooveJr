@@ -14,6 +14,7 @@ namespace Effects {
 namespace Vst3 {
 
 struct Plugin {
+    int                                 audioFramesPerBuffer;
     const std::string&                  name;
     const std::string&                  path;
     Steinberg::Vst::AudioHost::App*     audioHost;
@@ -21,7 +22,21 @@ struct Plugin {
 
     Plugin(const std::string& path, int audioFramesPerBuffer);
     ~Plugin();
+
+    void setAudioFramesPerBuffer(int framesPerBuffer) {
+        audioFramesPerBuffer = framesPerBuffer;
+        audioHost->setAudioFramesPerBuffer(framesPerBuffer);
+    };
+
+    void allocateBuffers() {
+        audioHost->allocateBuffers();
+    }
+
+    Steinberg::FUnknownPtr<Steinberg::Vst::IAudioProcessor> getProcesser() {
+        return audioHost->audioClient->getComponent();
+    }
 };
+
 
 } // Vst3
 } // Effects

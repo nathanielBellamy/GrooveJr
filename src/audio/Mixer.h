@@ -43,6 +43,7 @@ class Mixer {
     bool removeEffectFromChannel(int channelIdx, int effectIdx);
 
     int getAudioFramesPerBuffer() const { return gAppState->audioFramesPerBuffer; };
+    void setAudioFramesPerBuffer(int framesPerBuffer) const { gAppState->audioFramesPerBuffer = framesPerBuffer; };
 
 };
 

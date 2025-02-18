@@ -66,19 +66,18 @@ public:
 	OPtr<IEditController> editController;
 	AudioClientPtr audioClient;
 	int channelCount = {2}; // TODO: access info from libsndfile
+	void setAudioFramesPerBuffer(int framesPerBuffer) {  audioFramesPerBuffer = framesPerBuffer; }
+	void allocateBuffers ();
 	void allocateInputBuffers (); // used during unchaining of plugin buffers
 
 private:
 	enum OpenFlags
 	{};
 
-	void allocateBuffers ();
 	void freeBuffers () const;
 
 	void startAudioClient (const std::string& path, VST3::Optional<VST3::UID> effectID,
 	                       uint32 flags);
-
-	void setAudioFramesPerBuffer (const int framesPerBuffer);
 
 	VST3::Hosting::Module::Ptr module {nullptr};
 
