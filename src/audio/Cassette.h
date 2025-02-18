@@ -22,30 +22,30 @@ namespace Audio {
 
 class Cassette
 {
-        actor_system& actorSystem;
-        long threadId;
-        char const* fileName;
-        long initialFrameId;
-        Mixer* mixer;
+  actor_system& actorSystem;
+  long threadId;
+  char const* fileName;
+  long initialFrameId;
+  Mixer* mixer;
 
-      public:
-        Cassette(
-            actor_system& actorSystem,
-            long threadId,
-            const char* fileName,
-            long initialFrameId,
-            Mixer* mixer
-        );
+  public:
+    Cassette(
+        actor_system& actorSystem,
+        long threadId,
+        const char* fileName,
+        long initialFrameId,
+        Mixer* mixer
+    );
 
-        int play();
+    int play();
 
-        void freeAudioData(AudioData *audioData);
+    void freeAudioData(AudioData *audioData);
 
-        static int callback(const void *inputBuffer, void *outputBuffer,
-                            unsigned long framesPerBuffer,
-                            const PaStreamCallbackTimeInfo* timeInfo,
-                            PaStreamCallbackFlags statusFlags,
-                            void *userData );
+    static int callback(const void *inputBuffer, void *outputBuffer,
+                        unsigned long framesPerBuffer,
+                        const PaStreamCallbackTimeInfo* timeInfo,
+                        PaStreamCallbackFlags statusFlags,
+                        void *userData );
 };
 
 } // Audio
