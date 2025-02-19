@@ -7,6 +7,8 @@
 namespace Gj {
 namespace Audio {
 
+  using namespace Steinberg;
+
 Mixer::Mixer(AppState* gAppState)
     : gAppState(gAppState)
     , mainChannel({ 1.0f, 0.0f })
@@ -79,13 +81,22 @@ bool Mixer::setSampleRate(const int sampleRate) const {
 
 bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) const {
   const auto effect = new Audio::Effects::Vst3::Plugin(effectPath, gAppState->audioFramesPerBuffer);
-  Steinberg::FUnknownPtr<Steinberg::Vst::IAudioProcessor> processor = effect->getProcesser();
-  int latencySamples = processor->getLatencySamples();
-  std::cout << "Adding effect " << effect << " latency " << latencySamples << std::endl;
-  // WIP
-  const int bufferSize = latencySamples + 128;
-  setAudioFramesPerBuffer(bufferSize);
-  effect->setAudioFramesPerBuffer(bufferSize);
+  FUnknownPtr<Vst::IAudioProcessor> processor = effect->getProcesser();
+  // int latencySamples = processor->getLatencySamples();
+  // effect->audioHost->component->setState();
+
+  bool canProcessSampleSize = processor->canProcessSampleSize(gAppState->audioFramesPerBuffer);
+  std::cout << "Plugin can process sample size : " << canProcessSampleSize << std::endl;
+  const int32 maxSamplesPerBlock = gAppState->audioFramesPerBuffer;
+  Vst::ProcessSetup setup = {
+    Vst::kRealtime,
+    Vst::kSample64,
+    maxSamplesPerBlock,
+    44100.0
+  };
+  processor->setupProcessing(setup);
+  // const int bufferSize = latencySamples + 128;
+  effect->setAudioFramesPerBuffer(gAppState->audioFramesPerBuffer);
   effect->allocateBuffers();
   return effectsChannels.at(idx)->addEffect(effect);
 }
