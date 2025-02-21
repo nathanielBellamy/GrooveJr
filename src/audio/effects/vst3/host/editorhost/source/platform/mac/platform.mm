@@ -89,7 +89,6 @@ void Platform::setApplication (ApplicationPtr&& app)
 WindowPtr Platform::createWindow (const std::string& title, Size size, bool resizeable,
                                   const WindowControllerPtr& controller)
 {
-  puts("Platform::createWindow");
 	return Window::make (title, size, resizeable, controller);
 }
 
@@ -137,7 +136,6 @@ FUnknown* Platform::getPluginFactoryContext ()
 //------------------------------------------------------------------------
 IPlatform& IPlatform::instance ()
 {
-  std::cout << "IPlatform::instance()\n";
 	return Platform::instance ();
 }
 
