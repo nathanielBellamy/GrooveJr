@@ -6,6 +6,8 @@
 #define GJAUDIOMIXER_H
 
 #include <iostream>
+#include <cmath>
+#include <algorithm>
 #include "../AppState.h"
 #include "./Channel.h"
 #include "./effects/EffectsChannel.h"
@@ -19,6 +21,8 @@ class Mixer {
     Channel dryChannel;
     int channelCount;
     std::vector<Effects::EffectsChannel*> effectsChannels;
+
+    void incorporateLatencySamples(int latencySamples) const;
 
   public:
     float** inputBuffers;

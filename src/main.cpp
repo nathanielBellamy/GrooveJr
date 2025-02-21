@@ -70,10 +70,10 @@ extern "C" {
 
         Mixer->addEffectsChannel();
         // Mixer->addEffectsChannel();
-        // Mixer->addEffectToChannel(
-        //     0,
-        //     "/Library/Audio/Plug-Ins/VST3/TDR Nova.vst3"
-        // );
+        Mixer->addEffectToChannel(
+            0,
+            "/Library/Audio/Plug-Ins/VST3/TDR Nova.vst3"
+        );
         Mixer->addEffectToChannel(
             0,
             "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3"
