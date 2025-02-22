@@ -80,20 +80,11 @@ bool Mixer::setSampleRate(const int sampleRate) const {
 }
 
 void Mixer::incorporateLatencySamples(const int latencySamples) const {
-  if (latencySamples == 0) return;
+  if (latencySamples == 0 || gAppState->audioFramesPerBuffer > latencySamples) return;
 
-  int exponent = 7;
-  int powerOfTwo = 128;
+  const double exponent = std::log2(latencySamples);
 
-  int maxFrames = std::max(gAppState->audioFramesPerBuffer, latencySamples);
-
-  // least power of two >= max(128, maxFrames)
-  while (powerOfTwo < maxFrames) {
-    exponent++;
-    powerOfTwo = pow(2, exponent);
-  }
-
-  gAppState->audioFramesPerBuffer = powerOfTwo;
+  gAppState->audioFramesPerBuffer = static_cast<int>(std::pow(2, std::ceil(exponent)));
 }
 
 bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) const {
