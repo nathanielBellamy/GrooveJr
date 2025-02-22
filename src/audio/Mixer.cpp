@@ -80,7 +80,7 @@ bool Mixer::setSampleRate(const int sampleRate) const {
 }
 
 void Mixer::incorporateLatencySamples(const int latencySamples) const {
-  if (latencySamples == 0 || gAppState->audioFramesPerBuffer > latencySamples) return;
+  if (gAppState->audioFramesPerBuffer > latencySamples) return;
 
   const double exponent = std::log2(latencySamples);
 
