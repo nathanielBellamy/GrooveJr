@@ -90,8 +90,8 @@ void Mixer::incorporateLatencySamples(const int latencySamples) const {
 bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) const {
   const auto effect = new Audio::Effects::Vst3::Plugin(effectPath, gAppState->audioFramesPerBuffer);
   FUnknownPtr<Vst::IAudioProcessor> processor = effect->getProcesser();
-  int latencySamples = processor->getLatencySamples();
-  incorporateLatencySamples(latencySamples);
+  // int latencySamples = processor->getLatencySamples();
+  // incorporateLatencySamples(latencySamples);
 
   if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer)) {
     std::cout << "Mixer: " << effectPath << " Unable to process sample size" << std::endl;

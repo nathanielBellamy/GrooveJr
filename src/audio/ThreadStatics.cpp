@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Audio {
 
-const char* ThreadStatics::filePath = "/Users/ns/GrooveSprings_MusicLibrary/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac";
+const char* ThreadStatics::filePath = "/Users/ns/Music/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac";
 std::mutex ThreadStatics::filePathMutex;
 
 long ThreadStatics::frameId = 0;

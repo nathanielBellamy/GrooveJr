@@ -151,7 +151,7 @@ int Cassette::play()
 {
   std::cout << "Playing Cassette..." << std::endl;
 
-  // intialize data needed for audio playback
+  // initialize data needed for audio playback
   sf_count_t index = 0;
 
   SF_INFO sfinfo;
@@ -181,35 +181,33 @@ int Cassette::play()
   }
 
   // update plugin effects with info about audio to be processed
-  mixer->setSampleRate(sfinfo.samplerate);
-
+  if (!mixer->setSampleRate(sfinfo.samplerate)) {
+    std::cout << std::endl << "Unable to set Sample Rate " << sfinfo.samplerate << std::endl;
+    goto error;
+  }
 
   AudioData audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
-  std::cout << "initial frame id: " << initialFrameId << std::endl;
-  std::cout << "thread id: " << threadId << std::endl;
-  std::cout << "sfinfo sampleRate: " << sfinfo.samplerate << std::endl;
-  std::cout << "readcount: " << readcount << std::endl;
 
   // init cafData
   CAF_DATA cafData(actorSystem);
 
   // Init PA
-  PaStreamParameters inputParameters, outputParameters;
+  PaStreamParameters outputParameters; // inputParameters
   PaStream *stream;
   PaError err;
 
   err = Pa_Initialize();
   if( err != paNoError ) goto error;
 
-  inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
-  if (inputParameters.device == paNoDevice) {
-      std::cout << "Error: No default input device." << std::endl;
-      goto error;
-  }
-  // TODO: handle live input audio
-  inputParameters.channelCount = 1;
-  inputParameters.sampleFormat = PA_SAMPLE_TYPE;
-  inputParameters.hostApiSpecificStreamInfo = NULL;
+  // // TODO: handle live input audio
+  // inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
+  // if (inputParameters.device == paNoDevice) {
+  //     std::cout << "Error: No default input device." << std::endl;
+  //     goto error;
+  // }
+  // inputParameters.channelCount = 1;
+  // inputParameters.sampleFormat = PA_SAMPLE_TYPE;
+  // inputParameters.hostApiSpecificStreamInfo = NULL;
 
   outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
   if (outputParameters.device == paNoDevice) {
@@ -223,7 +221,7 @@ int Cassette::play()
 
   err = Pa_OpenStream(
             &stream,
-            &inputParameters,
+            nullptr, // &inputParameters,
             &outputParameters,
             audioData.sfinfo.samplerate,
             mixer->getAudioFramesPerBuffer(),
@@ -244,15 +242,13 @@ int Cassette::play()
   {
     // hold thread open until stopped
 
-//    std::cout << "start loop -- thread id: " <<  Gj::Audio::ThreadStatics::getThreadId() << std::endl;
-
     // here is our chance to pull data out of the application
     // and
     // make it accessible to our running audio callback through the audioData obj
 
     if (audioData.readComplete) { // reached end of input file
-        Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::STOP);
-        Gj::Audio::ThreadStatics::setReadComplete(true);
+        ThreadStatics::setPlayState(Gj::PlayState::STOP);
+        ThreadStatics::setReadComplete(true);
         break;
     }
 
@@ -260,9 +256,6 @@ int Cassette::play()
         audioData.fadeIn -= 0.01;
         audioData.volume += 0.01;
     }
-
-//    std::cout << " my theradId: " << threadId << std::endl;
-//    std::cout << " global threadId: " << Gj::Audio::ThreadStatics::getThreadId() << std::endl;
 
     if ( threadId != Gj::Audio::ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
         if (audioData.fadeOut < 0.01) { // break + cleanup
@@ -272,26 +265,21 @@ int Cassette::play()
             audioData.fadeOut -= 0.001;
         }
     } else {
-        audioData.playbackSpeed = Gj::Audio::ThreadStatics::getPlaybackSpeed();
-        audioData.playState = Gj::Audio::ThreadStatics::getPlayState();
-        Gj::Audio::ThreadStatics::setFrameId( (long) audioData.index );
-
-//            std::cout << "\n =========== \n";
-//            std::cout << "\n audioData.playState: " << audioData.playState << "\n";
-//            std::cout << "\n audioData.index " << audioData.index << "\n";
-//            std::cout << "\n =========== \n";
+        audioData.playbackSpeed = ThreadStatics::getPlaybackSpeed();
+        audioData.playState = ThreadStatics::getPlayState();
+        ThreadStatics::setFrameId( (long) audioData.index );
     }
 
     std::this_thread::sleep_for( std::chrono::milliseconds(10) );
   } // end of while loop
 
-  if ( threadId == Gj::Audio::ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
+  if ( threadId == ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
       if (audioData.playState == Gj::PlayState::PLAY) {
-          Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::STOP);
+          ThreadStatics::setPlayState(Gj::PlayState::STOP);
       } else {
-          Gj::Audio::ThreadStatics::setPlayState(audioData.playState);
+          ThreadStatics::setPlayState(audioData.playState);
       }
-      Gj::Audio::ThreadStatics::setReadComplete(true);
+      ThreadStatics::setReadComplete(true);
   }
 
   err = Pa_StopStream( stream );
@@ -305,7 +293,7 @@ int Cassette::play()
 
   error:
     Pa_Terminate();
-    Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::STOP);
+    ThreadStatics::setPlayState(Gj::PlayState::STOP);
     freeAudioData(&audioData);
     std::cout << "An error occurred while using the portaudio stream" << std::endl;
     std::cout << "Error number: " << err << std::endl;
