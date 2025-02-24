@@ -19,8 +19,8 @@
 #include "../actors/ActorIds.h"
 #include "../messaging/atoms.h"
 #include "../messaging/EnvelopeQtPtr.h"
-#include "../enums/PlayState.h"
 
+#include "./MenuBar.h"
 #include "./TransportControl.h"
 
 #include <QFrame>
@@ -37,17 +37,17 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 
-class MainWindow : public QMainWindow {
+class MainWindow final : public QMainWindow {
   public:
-    MainWindow(actor_system& sys);
+    explicit MainWindow(actor_system& sys);
     int hydrateState(const Gj::AppStatePacket& appStatePacket);
 
   private:
     QFrame frame;
     QLabel label {&frame};
-    TransportControl transportControl;
     actor_system& sys;
-    Gj::PlayState playState;
+    MenuBar* menuBar;
+    TransportControl transportControl;
 };
 
 } // Gui

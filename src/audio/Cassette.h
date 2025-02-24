@@ -11,7 +11,6 @@
 #include <portaudio.h>
 #include "caf/actor_system.hpp"
 #include "./AudioData.h"
-#include "./caf_data.h"
 #include "./Mixer.h"
 #include "./ThreadStatics.h"
 

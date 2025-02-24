@@ -11,12 +11,11 @@ namespace Gui {
 
 MainWindow::MainWindow(actor_system& sys)
     : sys(sys)
-    , transportControl(this, sys)
-    {
+    , menuBar(new MenuBar)
+    , transportControl(this, sys) {
 
   label.setText("GrooveJr");
   label.setFont({label.font().family(), 36});
-
 
   addToolBar(Qt::BottomToolBarArea, &transportControl);
   setCentralWidget(&frame);

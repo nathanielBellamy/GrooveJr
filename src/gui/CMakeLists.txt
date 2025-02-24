@@ -19,6 +19,10 @@ find_package (CAF
 qt_add_library(GjGui STATIC
         MainWindow.h
         MainWindow.cpp
+        MenuBar.h
+        MenuBar.cpp
+        TransportControl.h
+        TransportControl.h
 )
 
 target_compile_options(GjGui

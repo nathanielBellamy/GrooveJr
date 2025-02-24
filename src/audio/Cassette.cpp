@@ -180,16 +180,13 @@ int Cassette::play()
       return 1;
   }
 
+  AudioData audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
+
   // update plugin effects with info about audio to be processed
   if (!mixer->setSampleRate(sfinfo.samplerate)) {
     std::cout << std::endl << "Unable to set Sample Rate " << sfinfo.samplerate << std::endl;
     goto error;
   }
-
-  AudioData audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
-
-  // init cafData
-  CAF_DATA cafData(actorSystem);
 
   // Init PA
   PaStreamParameters outputParameters; // inputParameters
