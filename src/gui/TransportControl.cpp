@@ -14,14 +14,14 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
       sys(sys)
     {
 
-  this->addAction(&playTrigAction);
-  this->addAction(&pauseTrigAction);
-  this->addAction(&stopTrigAction);
-  this->addAction(&rwTrigAction);
-  this->addAction(&ffTrigAction);
+  addAction(&playTrigAction);
+  addAction(&pauseTrigAction);
+  addAction(&stopTrigAction);
+  addAction(&rwTrigAction);
+  addAction(&ffTrigAction);
 
-  this->addSeparator();
-  this->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  addSeparator();
+  setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
   connect(&playTrigAction, &QAction::triggered, [&] {
     std::cout << "TransportControl : playTrigAction" << std::endl;

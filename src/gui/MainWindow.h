@@ -20,7 +20,7 @@
 #include "../messaging/atoms.h"
 #include "../messaging/EnvelopeQtPtr.h"
 
-#include "./MenuBar.h"
+#include "./MenuBar/MenuBar.h"
 #include "./TransportControl.h"
 
 #include <QFrame>
@@ -39,13 +39,13 @@ namespace Gui {
 
 class MainWindow final : public QMainWindow {
   public:
-    explicit MainWindow(actor_system& sys);
+    explicit MainWindow(actor_system& actorSystem);
     int hydrateState(const Gj::AppStatePacket& appStatePacket);
 
   private:
     QFrame frame;
     QLabel label {&frame};
-    actor_system& sys;
+    actor_system& actorSystem;
     MenuBar* menuBar;
     TransportControl transportControl;
 };

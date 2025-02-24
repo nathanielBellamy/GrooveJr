@@ -27,10 +27,10 @@
 #include <QStyle>
 #include <QWidget>
 
-using namespace caf;
-
 namespace Gj {
 namespace Gui {
+
+using namespace caf;
 
 class TransportControl : public QToolBar {
   Q_OBJECT

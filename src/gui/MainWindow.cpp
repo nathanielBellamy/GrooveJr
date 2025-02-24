@@ -9,10 +9,10 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 
-MainWindow::MainWindow(actor_system& sys)
-    : sys(sys)
-    , menuBar(new MenuBar)
-    , transportControl(this, sys) {
+MainWindow::MainWindow(actor_system& actorSystem)
+    : actorSystem(actorSystem)
+    , menuBar(new MenuBar(actorSystem))
+    , transportControl(this, actorSystem) {
 
   label.setText("GrooveJr");
   label.setFont({label.font().family(), 36});
