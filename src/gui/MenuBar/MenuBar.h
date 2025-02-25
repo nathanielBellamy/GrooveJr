@@ -5,6 +5,8 @@
 #ifndef MENUBAR_H
 #define MENUBAR_H
 
+#include <iostream>
+
 #include "caf/actor_from_state.hpp"
 #include "caf/actor_ostream.hpp"
 #include "caf/actor_registry.hpp"
@@ -23,9 +25,12 @@ namespace Gui {
 using namespace caf;
 
 class MenuBar final : QMenuBar {
+  Q_OBJECT
 
 private:
   actor_system& actorSystem;
+  FileMenu* fileMenu;
+  QAction fileMenuAction;
 
 public:
   MenuBar(actor_system&);

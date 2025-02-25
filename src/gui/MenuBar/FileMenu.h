@@ -14,16 +14,20 @@
 #include "caf/scoped_actor.hpp"
 
 #include <QMenu>
+#include <QAction>
+#include <QWidget>
 
 namespace Gj {
 namespace Gui {
 
 using namespace caf;
 
-class FileMenu final : QMenu {
+class FileMenu final : public QMenu {
+  Q_OBJECT
 
   private:
     actor_system& actorSystem;
+    QAction* openAction;
 
   public:
     FileMenu(actor_system& actorSystem, QWidget* parent);

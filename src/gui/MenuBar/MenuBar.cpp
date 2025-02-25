@@ -10,9 +10,8 @@ namespace Gui {
 MenuBar::MenuBar(actor_system& actorSystem)
     : QMenuBar(nullptr)
     , actorSystem(actorSystem)
-    {
+    , fileMenu(new FileMenu(actorSystem, this)) {
 
-    QMenu* fileMenu = new QMenu("File", this);
     addMenu(fileMenu);
 
 }

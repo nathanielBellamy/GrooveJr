@@ -33,7 +33,7 @@ namespace Gui {
 using namespace caf;
 
 class TransportControl : public QToolBar {
-  Q_OBJECT
+  // Q_OBJECT
 
   public:
     TransportControl(QWidget* parent, actor_system& sys);
