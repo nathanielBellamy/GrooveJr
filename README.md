@@ -1,10 +1,10 @@
 # GrooveJr
-### Music Library + Player Built With
+### Music Library, Player, and VST3 Host Built With
 - portaudio
+- libsndfile
+- vst3sdk
 - CAF (C++ Actor Framework)
 - Qt
-- vst3sdk
-- libsndfile
 
 ---
 
