@@ -15,6 +15,7 @@
 #include "caf/event_based_actor.hpp"
 #include "caf/scoped_actor.hpp"
 
+#include <QWidget>
 #include <QMenuBar>
 
 #include "FileMenu.h"
@@ -25,7 +26,6 @@ namespace Gui {
 using namespace caf;
 
 class MenuBar final : QMenuBar {
-  Q_OBJECT
 
 private:
   actor_system& actorSystem;
@@ -33,7 +33,7 @@ private:
   QAction fileMenuAction;
 
 public:
-  MenuBar(actor_system&);
+  MenuBar(actor_system&, QWidget* parent = nullptr);
 
 };
 

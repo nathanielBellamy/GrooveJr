@@ -10,17 +10,17 @@ namespace Gj {
 namespace Gui {
 
 FileMenu::FileMenu(actor_system& actorSystem, QWidget* parent)
-    : QMenu("File", parent)
+    : QMenu("&File", parent)
     , actorSystem(actorSystem)
-    , openAction(new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen),
-                   tr("&Open"), this))
+    , renderAction(new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Render"), this))
     {
 
-  openAction->setShortcuts(QKeySequence::Open);
-  openAction->setStatusTip(tr("Open an existing file"));
-  connect(openAction, &QAction::triggered, [&]() {
-    std::cout << "open file" << std::endl;
+  renderAction->setStatusTip(tr("Render Audio"));
+  connect(renderAction, &QAction::triggered, [&]() {
+    // TODO
+    std::cout << " kOffline Render Audio " << std::endl;
   });
+  addAction(renderAction);
 
 }
 

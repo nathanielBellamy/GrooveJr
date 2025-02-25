@@ -11,7 +11,7 @@ namespace Gui {
 
 MainWindow::MainWindow(actor_system& actorSystem)
     : actorSystem(actorSystem)
-    , menuBar(new MenuBar(actorSystem))
+    , menuBar(new MenuBar(actorSystem, this))
     , transportControl(this, actorSystem) {
 
   label.setText("GrooveJr");

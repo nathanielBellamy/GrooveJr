@@ -23,11 +23,10 @@ namespace Gui {
 using namespace caf;
 
 class FileMenu final : public QMenu {
-  Q_OBJECT
 
   private:
     actor_system& actorSystem;
-    QAction* openAction;
+    QAction* renderAction;
 
   public:
     FileMenu(actor_system& actorSystem, QWidget* parent);

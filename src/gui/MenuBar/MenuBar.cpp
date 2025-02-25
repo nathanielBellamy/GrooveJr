@@ -7,8 +7,8 @@
 namespace Gj {
 namespace Gui {
 
-MenuBar::MenuBar(actor_system& actorSystem)
-    : QMenuBar(nullptr)
+MenuBar::MenuBar(actor_system& actorSystem, QWidget* parent)
+    : QMenuBar(parent)
     , actorSystem(actorSystem)
     , fileMenu(new FileMenu(actorSystem, this)) {
 
