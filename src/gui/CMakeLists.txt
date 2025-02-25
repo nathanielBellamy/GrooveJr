@@ -21,8 +21,12 @@ qt_add_library(GjGui STATIC
         MainWindow.cpp
         MenuBar/MenuBar.h
         MenuBar/MenuBar.cpp
-        MenuBar/FileMenu.h
-        MenuBar/FileMenu.cpp
+        MenuBar/Menus/FileMenu.h
+        MenuBar/Menus/FileMenu.cpp
+        MenuBar/Menus/MusicMenu.h
+        MenuBar/Menus/MusicMenu.cpp
+        MenuBar/Menus/EffectsMenu.h
+        MenuBar/Menus/EffectsMenu.cpp
         TransportControl.h
         TransportControl.cpp
 )

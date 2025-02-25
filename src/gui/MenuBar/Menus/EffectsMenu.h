@@ -1,9 +1,11 @@
 //
-// Created by ns on 2/23/25.
+// Created by ns on 2/25/25.
 //
 
-#ifndef FILEMENU_H
-#define FILEMENU_H
+#ifndef EFFECTSMENU_H
+#define EFFECTSMENU_H
+
+#include <iostream>
 
 #include "caf/actor_from_state.hpp"
 #include "caf/actor_ostream.hpp"
@@ -22,15 +24,13 @@ namespace Gui {
 
 using namespace caf;
 
-class FileMenu final : public QMenu {
-
+class EffectsMenu final : public QMenu {
   private:
     actor_system& actorSystem;
-    QAction* renderAction;
+    QAction* addEffectAction;
 
   public:
-    FileMenu(actor_system& actorSystem, QWidget* parent);
-
+    EffectsMenu(actor_system& actorSystem, QWidget* parent);
 };
 
 } // Gui
@@ -38,4 +38,4 @@ class FileMenu final : public QMenu {
 
 
 
-#endif //FILEMENU_H
+#endif //EFFECTSMENU_H

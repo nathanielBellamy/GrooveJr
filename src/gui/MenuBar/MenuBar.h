@@ -18,7 +18,9 @@
 #include <QWidget>
 #include <QMenuBar>
 
-#include "FileMenu.h"
+#include "./Menus/FileMenu.h"
+#include "./Menus/MusicMenu.h"
+#include "./Menus/EffectsMenu.h"
 
 namespace Gj {
 namespace Gui {
@@ -30,11 +32,11 @@ class MenuBar final : QMenuBar {
 private:
   actor_system& actorSystem;
   FileMenu* fileMenu;
-  QAction fileMenuAction;
+  MusicMenu* musicMenu;
+  EffectsMenu* effectsMenu;
 
 public:
   MenuBar(actor_system&, QWidget* parent = nullptr);
-
 };
 
 } // Gui
