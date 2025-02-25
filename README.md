@@ -1,8 +1,9 @@
 # GrooveJr
 ### Music Library + Player Built With
+- portaudio
 - CAF (C++ Actor Framework)
 - Qt
-- portaudio
+- vst3sdk
 - libsndfile
 
 ---
@@ -15,6 +16,11 @@
   cd GrooveJr/src
   vim CMakeLists.txt
   ```
+  
+  - it may be helpful to run: 
+    ```bash
+      brew services restart jack
+    ```
 - update `GJ_BASE_DIR` to be the directory containing the `GrooveJr` repo
 
 - build the following from source in `GJ_BASE_DIR`
