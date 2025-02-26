@@ -18,6 +18,11 @@
 #include <QMenu>
 #include <QAction>
 #include <QWidget>
+#include <QList>
+#include <QUrl>
+#include <QString>
+
+#include "./FolderSelect.h"
 
 namespace Gj {
 namespace Gui {
@@ -27,10 +32,13 @@ using namespace caf;
 class MusicMenu final : public QMenu {
   private:
     actor_system& actorSystem;
+    FolderSelect* folderSelect;
     QAction* addFolderToLibraryAction;
+    QUrl folderUrl;
 
   public:
     MusicMenu(actor_system& actorSystem, QWidget* parent);
+    ~MusicMenu() override;
 };
 
 } // Gui

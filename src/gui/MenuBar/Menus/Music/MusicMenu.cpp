@@ -7,19 +7,36 @@
 namespace Gj {
 namespace Gui {
 
+MusicMenu::~MusicMenu() {
+  delete addFolderToLibraryAction;
+  delete folderSelect;
+}
+
+
 MusicMenu::MusicMenu(actor_system& actorSystem, QWidget* parent)
     : QMenu("&Music", parent)
     , actorSystem(actorSystem)
     , addFolderToLibraryAction(new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Folder To Library"), this))
+    , folderUrl(QUrl())
     {
+
+  folderSelect = new FolderSelect(this);
+  connect(folderSelect, &QFileDialog::directoryUrlEntered, [&](const QUrl& dir) {
+    folderUrl = dir;
+  });
+
 
   addFolderToLibraryAction->setStatusTip(tr("Add folder to Music Library"));
   connect(addFolderToLibraryAction, &QAction::triggered, [&]() {
-    // TODO
-    std::cout << " scan folder and add to music library " << std::endl;
-  });
-  addAction(addFolderToLibraryAction);
+    if (folderSelect->exec() == QDialog::Accepted) {
+      auto url = QUrl();
+      folderSelect->urlSelected(url);
 
+      std::cout << "folder selected: " << folderUrl.toDisplayString().toStdString() << std::endl;
+    }
+  });
+
+  addAction(addFolderToLibraryAction);
 }
 
 

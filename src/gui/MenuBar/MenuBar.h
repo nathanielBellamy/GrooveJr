@@ -19,7 +19,7 @@
 #include <QMenuBar>
 
 #include "./Menus/FileMenu.h"
-#include "./Menus/MusicMenu.h"
+#include "./Menus/Music/MusicMenu.h"
 #include "./Menus/EffectsMenu.h"
 
 namespace Gj {
