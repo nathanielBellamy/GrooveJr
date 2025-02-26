@@ -32,8 +32,8 @@ using namespace caf;
 class MusicMenu final : public QMenu {
   private:
     actor_system& actorSystem;
-    FolderSelect* folderSelect;
     QAction* addFolderToLibraryAction;
+    FolderSelect* folderSelect;
     QUrl folderUrl;
 
   public:
