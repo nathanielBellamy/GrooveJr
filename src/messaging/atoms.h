@@ -31,6 +31,9 @@ CAF_BEGIN_TYPE_ID_BLOCK(groovejr, first_custom_type_id)
 
   CAF_ADD_ATOM(groovejr, audio_thread_init_a)
 
+  CAF_ADD_ATOM(groovejr, add_effect_a)
+  CAF_ADD_ATOM(groovejr, remove_effect_a)
+
 CAF_END_TYPE_ID_BLOCK(groovejr)
 
 #endif //MAIN_H

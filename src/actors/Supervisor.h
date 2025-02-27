@@ -14,8 +14,9 @@
 #include "./ActorIds.h"
 #include "../messaging/atoms.h"
 #include "./AppStateManager.h"
-#include "./Playback.h"
 #include "./Display.h"
+#include "./EffectsManager.h"
+#include "./Playback.h"
 
 #include "../gui/MainWindow.h"
 #include "../audio/Mixer.h"
@@ -35,6 +36,7 @@ using Supervisor = typed_actor<SupervisorTrait>;
 
 struct SupervisorState {
      strong_actor_ptr playbackActorPtr;
+     strong_actor_ptr effectsManagerPtr;
      strong_actor_ptr appStateManagerPtr;
      strong_actor_ptr displayPtr;
 
@@ -52,6 +54,9 @@ struct SupervisorState {
 //           auto gs_controller = sys.spawn(actor_from_state<gs_controller_state
            auto playback = self->system().spawn(actor_from_state<PlaybackState>, actor_cast<strong_actor_ptr>(self), mixer);
            playbackActorPtr = actor_cast<strong_actor_ptr>(playback);
+
+           auto effectsManager = self->system().spawn(actor_from_state<EffectsManagerState>, actor_cast<strong_actor_ptr>(self), mixer);
+           effectsManagerPtr = actor_cast<strong_actor_ptr>(effectsManager);
 
            auto appStateManager = self->system().spawn(
                actor_from_state<AppStateManagerState>,

@@ -64,6 +64,7 @@ add_executable(GrooveJr
         actors/ActorIds.h
         actors/AppStateManager.h
         actors/AudioThread.h
+        actors/EffectsManager.h
         enums/PlayState.h
         messaging/atoms.h
         messaging/EnvelopeQtPtr.h
