@@ -9,6 +9,11 @@
 namespace Gj {
 namespace Gui {
 
+FileMenu::~FileMenu() {
+  delete renderAction;
+  delete this;
+}
+
 FileMenu::FileMenu(actor_system& actorSystem, QWidget* parent)
     : QMenu("&File", parent)
     , actorSystem(actorSystem)

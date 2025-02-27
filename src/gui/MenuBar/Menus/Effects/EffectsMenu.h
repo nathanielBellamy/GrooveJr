@@ -15,9 +15,12 @@
 #include "caf/event_based_actor.hpp"
 #include "caf/scoped_actor.hpp"
 
-#include <QMenu>
 #include <QAction>
+#include <QFileDialog>
+#include <QMenu>
 #include <QWidget>
+
+#include "./VstSelect.h"
 
 namespace Gj {
 namespace Gui {
@@ -28,9 +31,12 @@ class EffectsMenu final : public QMenu {
   private:
     actor_system& actorSystem;
     QAction* addEffectAction;
+    VstSelect* vstSelect;
+    QUrl vstUrl;
 
   public:
     EffectsMenu(actor_system& actorSystem, QWidget* parent);
+    ~EffectsMenu() override;
 };
 
 } // Gui

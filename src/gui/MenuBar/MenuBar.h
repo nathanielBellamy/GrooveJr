@@ -20,7 +20,7 @@
 
 #include "./Menus/FileMenu.h"
 #include "./Menus/Music/MusicMenu.h"
-#include "./Menus/EffectsMenu.h"
+#include "./Menus/Effects/EffectsMenu.h"
 
 namespace Gj {
 namespace Gui {
@@ -36,7 +36,8 @@ private:
   EffectsMenu* effectsMenu;
 
 public:
-  MenuBar(actor_system&, QWidget* parent = nullptr);
+  explicit MenuBar(actor_system&, QWidget* parent = nullptr);
+  ~MenuBar() override;
 };
 
 } // Gui

@@ -10,6 +10,7 @@ namespace Gui {
 MusicMenu::~MusicMenu() {
   delete addFolderToLibraryAction;
   delete folderSelect;
+  delete this;
 }
 
 
@@ -18,7 +19,6 @@ MusicMenu::MusicMenu(actor_system& actorSystem, QWidget* parent)
     , actorSystem(actorSystem)
     , addFolderToLibraryAction(new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Folder To Library"), this))
     , folderSelect(new FolderSelect(this))
-    , folderUrl(QUrl())
     {
 
   addFolderToLibraryAction->setStatusTip(tr("Add folder to Music Library"));

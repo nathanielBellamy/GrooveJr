@@ -27,8 +27,10 @@ qt_add_library(GjGui STATIC
         MenuBar/Menus/Music/MusicMenu.cpp
         MenuBar/Menus/Music/FolderSelect.h
         MenuBar/Menus/Music/FolderSelect.cpp
-        MenuBar/Menus/EffectsMenu.h
-        MenuBar/Menus/EffectsMenu.cpp
+        MenuBar/Menus/Effects/EffectsMenu.h
+        MenuBar/Menus/Effects/EffectsMenu.cpp
+        MenuBar/Menus/Effects/VstSelect.h
+        MenuBar/Menus/Effects/VstSelect.cpp
         TransportControl.h
         TransportControl.cpp
 )

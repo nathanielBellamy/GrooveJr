@@ -30,6 +30,7 @@ class FileMenu final : public QMenu {
 
   public:
     FileMenu(actor_system& actorSystem, QWidget* parent);
+    ~FileMenu() override;
 };
 
 } // Gui

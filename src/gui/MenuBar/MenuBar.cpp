@@ -7,6 +7,14 @@
 namespace Gj {
 namespace Gui {
 
+MenuBar::~MenuBar() {
+    delete fileMenu;
+    delete musicMenu;
+    delete effectsMenu;
+    delete this;
+}
+
+
 MenuBar::MenuBar(actor_system& actorSystem, QWidget* parent)
     : QMenuBar(parent)
     , actorSystem(actorSystem)

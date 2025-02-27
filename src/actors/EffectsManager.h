@@ -5,4 +5,7 @@
 #ifndef EFFECTSMANAGER_H
 #define EFFECTSMANAGER_H
 
+
+
+
 #endif //EFFECTSMANAGER_H
