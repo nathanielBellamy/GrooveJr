@@ -20,10 +20,9 @@
 #include "../messaging/EnvelopeQtPtr.h"
 #include "../enums/PlayState.h"
 
-#include <QFrame>
 #include <QToolbar>
-#include <QToolButton>
 #include <QAction>
+#include <QLabel>
 #include <QStyle>
 #include <QWidget>
 
@@ -32,15 +31,16 @@ namespace Gui {
 
 using namespace caf;
 
-class TransportControl : public QToolBar {
+class TransportControl final : public QToolBar {
   public:
     TransportControl(QWidget* parent, actor_system& sys);
-    int hydrateState(const Gj::AppStatePacket& appStatePacket);
-    void setPlayState(Gj::PlayState state);
+    int hydrateState(const AppStatePacket& appStatePacket);
+    void setPlayState(PlayState state);
 
   private:
     actor_system& sys;
-    Gj::PlayState playState;
+    PlayState playState;
+    QLabel title;
     QAction playTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay), "", this};
     QAction pauseTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause), "", this};
     QAction stopTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop), "", this};

@@ -23,14 +23,7 @@
 #include "./MenuBar/MenuBar.h"
 #include "./TransportControl.h"
 
-#include <QFrame>
 #include <QMainWindow>
-#include <QLabel>
-#include <QScreen>
-#include <QToolbar>
-#include <QToolButton>
-#include <QAction>
-#include <QStyle>
 
 using namespace caf;
 
@@ -40,11 +33,9 @@ namespace Gui {
 class MainWindow final : public QMainWindow {
   public:
     explicit MainWindow(actor_system& actorSystem);
-    int hydrateState(const Gj::AppStatePacket& appStatePacket);
+    int hydrateState(const AppStatePacket& appStatePacket);
 
   private:
-    QFrame frame;
-    QLabel label {&frame};
     actor_system& actorSystem;
     MenuBar* menuBar;
     TransportControl transportControl;

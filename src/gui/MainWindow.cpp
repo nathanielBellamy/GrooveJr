@@ -14,11 +14,7 @@ MainWindow::MainWindow(actor_system& actorSystem)
     , menuBar(new MenuBar(actorSystem, this))
     , transportControl(this, actorSystem) {
 
-  label.setText("GrooveJr");
-  label.setFont({label.font().family(), 36});
-
-  addToolBar(Qt::BottomToolBarArea, &transportControl);
-  setCentralWidget(&frame);
+  addToolBar(Qt::TopToolBarArea, &transportControl);
   setUnifiedTitleAndToolBarOnMac(true);
   setWindowTitle("GrooveJr");
   resize(640, 480);

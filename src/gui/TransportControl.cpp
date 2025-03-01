@@ -10,9 +10,18 @@ namespace Gj {
 namespace Gui {
 
 TransportControl::TransportControl(QWidget* parent, actor_system& sys)
-    : QToolBar(parent),
-      sys(sys)
+    : QToolBar(parent)
+    , sys(sys)
+    , title()
     {
+
+  title.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  title.setText("GrooveJr");
+  title.setFont({title.font().family(), 36});
+  addWidget(&title);
+
+  addSeparator();
+  addSeparator();
 
   addAction(&playTrigAction);
   addAction(&pauseTrigAction);
@@ -20,7 +29,6 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   addAction(&rwTrigAction);
   addAction(&ffTrigAction);
 
-  addSeparator();
   setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
   connect(&playTrigAction, &QAction::triggered, [&] {
@@ -92,7 +100,6 @@ void TransportControl::setPlayState(Gj::PlayState newState) {
   playState = newState;
   std::cout << "New State :" << newState << std::endl;
 }
-
 
 } // Gui
 } // Gj
