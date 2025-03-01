@@ -12,7 +12,9 @@ namespace Gui {
 MainWindow::MainWindow(actor_system& actorSystem)
     : actorSystem(actorSystem)
     , menuBar(new MenuBar(actorSystem, this))
-    , transportControl(this, actorSystem) {
+    , transportControl(this, actorSystem)
+    , mixerWindow(this)
+    {
 
   addToolBar(Qt::TopToolBarArea, &transportControl);
   setUnifiedTitleAndToolBarOnMac(true);

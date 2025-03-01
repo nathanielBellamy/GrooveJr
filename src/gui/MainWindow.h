@@ -21,6 +21,7 @@
 #include "../messaging/EnvelopeQtPtr.h"
 
 #include "./MenuBar/MenuBar.h"
+#include "./Mixer/MixerWindow.h"
 #include "./TransportControl.h"
 
 #include <QMainWindow>
@@ -39,6 +40,7 @@ class MainWindow final : public QMainWindow {
     actor_system& actorSystem;
     MenuBar* menuBar;
     TransportControl transportControl;
+    MixerWindow mixerWindow;
 };
 
 } // Gui

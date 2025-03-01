@@ -31,6 +31,8 @@ qt_add_library(GjGui STATIC
         MenuBar/Menus/Effects/EffectsMenu.cpp
         MenuBar/Menus/Effects/VstSelect.h
         MenuBar/Menus/Effects/VstSelect.cpp
+        Mixer/MixerWindow.h
+        Mixer/MixerWindow.cpp
         TransportControl.h
         TransportControl.cpp
 )
