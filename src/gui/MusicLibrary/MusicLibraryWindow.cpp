@@ -1,28 +1,26 @@
 //
-// Created by ns on 2/28/25.
+// Created by ns on 3/2/25.
 //
 
-#include "MixerWindow.h"
+#include "MusicLibraryWindow.h"
 
 namespace Gj {
 namespace Gui {
 
-MixerWindow::MixerWindow(QWidget* parent)
+MusicLibraryWindow::MusicLibraryWindow(QWidget* parent)
   : QWidget(parent)
   , title(this)
   {
   setStyle();
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   title.setAlignment(Qt::AlignLeft|Qt::AlignBottom);
-  title.setText("Mixer");
+  title.setText("Music Library");
   title.setFont({title.font().family(), 36});
 }
 
-void MixerWindow::setStyle() {
-  setStyleSheet("background-color: green;");
+void MusicLibraryWindow::setStyle() {
+  setStyleSheet("background-color: cyan;");
 }
-
-
 
 } // Gui
 } // Gj

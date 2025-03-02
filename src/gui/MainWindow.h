@@ -22,6 +22,7 @@
 
 #include "./MenuBar/MenuBar.h"
 #include "./Mixer/MixerWindow.h"
+#include "./MusicLibrary/MusicLibraryWindow.h"
 #include "./TransportControl.h"
 
 #include <QMainWindow>
@@ -43,6 +44,7 @@ class MainWindow final : public QMainWindow {
     MenuBar* menuBar;
     TransportControl transportControl;
     QGridLayout grid;
+    MusicLibraryWindow musicLibraryWindow;
     MixerWindow mixerWindow;
 
     void initGrid();

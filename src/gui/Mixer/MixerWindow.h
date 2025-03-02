@@ -17,6 +17,7 @@ class MixerWindow final : public QWidget {
 
   private:
     QLabel title;
+    void setStyle();
 };
 
 } // Gui

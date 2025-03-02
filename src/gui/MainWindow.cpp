@@ -15,6 +15,7 @@ MainWindow::MainWindow(actor_system& actorSystem)
     , menuBar(new MenuBar(actorSystem, this))
     , transportControl(this, actorSystem)
     , grid(&container)
+    , musicLibraryWindow(&container)
     , mixerWindow(&container)
     {
 
@@ -27,7 +28,7 @@ MainWindow::MainWindow(actor_system& actorSystem)
   resize(640, 480);
 }
 
-int MainWindow::hydrateState(const Gj::AppStatePacket& appStatePacket) {
+int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
     std::cout << "MainWindow : hydrateState: " << std::endl;
     transportControl.hydrateState(appStatePacket);
     return 0;
@@ -35,19 +36,15 @@ int MainWindow::hydrateState(const Gj::AppStatePacket& appStatePacket) {
 
 void MainWindow::initGrid() {
   grid.setVerticalSpacing(1);
-  grid.setRowMinimumHeight(0, 25);
-  grid.setRowMinimumHeight(1, 25);
-  grid.setRowMinimumHeight(2, 25);
-  grid.setRowMinimumHeight(3, 25);
-  grid.setRowMinimumHeight(4, 25);
-  grid.setColumnMinimumWidth(0, 25);
-  grid.setColumnMinimumWidth(1, 25);
-  grid.setColumnMinimumWidth(2, 25);
-  grid.setColumnMinimumWidth(3, 25);
-  grid.setColumnMinimumWidth(4, 25);
+  for (int i = 0; i < 5; i++) {
+    grid.setRowMinimumHeight(i, 25);
+    grid.setColumnMinimumWidth(i, 25);
+  }
   grid.setColumnStretch(0, 1);
-  mixerWindow.setStyleSheet("background-color: green;");
+
+  grid.addWidget(&musicLibraryWindow, 2, 0, 1, -1);
   grid.addWidget(&mixerWindow, 5, 0, -1, -1);
+
   container.setLayout(&grid);
   container.setStyleSheet("background-color: red;");
 }

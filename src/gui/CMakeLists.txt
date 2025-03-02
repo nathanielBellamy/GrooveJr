@@ -33,6 +33,8 @@ qt_add_library(GjGui STATIC
         MenuBar/Menus/Effects/VstSelect.cpp
         Mixer/MixerWindow.h
         Mixer/MixerWindow.cpp
+        MusicLibrary/MusicLibraryWindow.h
+        MusicLibrary/MusicLibraryWindow.cpp
         TransportControl.h
         TransportControl.cpp
 )
