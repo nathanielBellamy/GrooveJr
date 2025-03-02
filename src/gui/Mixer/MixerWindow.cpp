@@ -11,8 +11,10 @@ MixerWindow::MixerWindow(QWidget* parent)
   : QWidget(parent)
   , title(this)
   {
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   title.setAlignment(Qt::AlignLeft|Qt::AlignBottom);
   title.setText("Mixer");
+  title.setFont({title.font().family(), 36});
 }
 
 

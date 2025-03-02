@@ -25,6 +25,7 @@
 #include "./TransportControl.h"
 
 #include <QMainWindow>
+#include <QGridLayout>
 
 using namespace caf;
 
@@ -38,9 +39,13 @@ class MainWindow final : public QMainWindow {
 
   private:
     actor_system& actorSystem;
+    QWidget container;
     MenuBar* menuBar;
     TransportControl transportControl;
+    QGridLayout grid;
     MixerWindow mixerWindow;
+
+    void initGrid();
 };
 
 } // Gui
