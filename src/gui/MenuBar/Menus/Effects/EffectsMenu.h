@@ -30,13 +30,12 @@ using namespace caf;
 class EffectsMenu final : public QMenu {
   private:
     actor_system& actorSystem;
-    QAction* addEffectAction;
-    VstSelect* vstSelect;
+    QAction addEffectAction;
+    VstSelect vstSelect;
     QUrl vstUrl;
 
   public:
     EffectsMenu(actor_system& actorSystem, QWidget* parent);
-    ~EffectsMenu() override;
 };
 
 } // Gui

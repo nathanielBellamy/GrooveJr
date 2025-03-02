@@ -32,13 +32,12 @@ using namespace caf;
 class MusicMenu final : public QMenu {
   private:
     actor_system& actorSystem;
-    QAction* addFolderToLibraryAction;
-    FolderSelect* folderSelect;
+    QAction addFolderToLibraryAction;
+    FolderSelect folderSelect;
     QUrl folderUrl;
 
   public:
     MusicMenu(actor_system& actorSystem, QWidget* parent);
-    ~MusicMenu() override;
 };
 
 } // Gui

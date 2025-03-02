@@ -31,13 +31,12 @@ class MenuBar final : QMenuBar {
 
 private:
   actor_system& actorSystem;
-  FileMenu* fileMenu;
-  MusicMenu* musicMenu;
-  EffectsMenu* effectsMenu;
+  FileMenu fileMenu;
+  MusicMenu musicMenu;
+  EffectsMenu effectsMenu;
 
 public:
   explicit MenuBar(actor_system&, QWidget* parent = nullptr);
-  ~MenuBar() override;
 };
 
 } // Gui

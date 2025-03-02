@@ -26,11 +26,10 @@ class FileMenu final : public QMenu {
 
   private:
     actor_system& actorSystem;
-    QAction* renderAction;
+    QAction renderAction;
 
   public:
     FileMenu(actor_system& actorSystem, QWidget* parent);
-    ~FileMenu() override;
 };
 
 } // Gui
