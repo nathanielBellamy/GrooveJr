@@ -12,7 +12,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent)
   , title(this)
   {
   setStyle();
-  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   title.setAlignment(Qt::AlignLeft|Qt::AlignBottom);
   title.setText("Music Library");
   title.setFont({title.font().family(), 36});
