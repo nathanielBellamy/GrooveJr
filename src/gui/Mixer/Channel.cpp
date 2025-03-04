@@ -16,6 +16,7 @@ Channel::Channel(QWidget* parent)
 }
 
 void Channel::setStyle() {
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet("background-color: purple;");
 }
 

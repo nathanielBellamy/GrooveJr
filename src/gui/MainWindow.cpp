@@ -36,14 +36,10 @@ int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
 
 void MainWindow::initGrid() {
   grid.setVerticalSpacing(1);
-  for (int i = 0; i < 5; i++) {
-    grid.setRowMinimumHeight(i, 25);
-    grid.setColumnMinimumWidth(i, 25);
-  }
   grid.setColumnStretch(0, 1);
 
-  grid.addWidget(&musicLibraryWindow, 2, 0, 1, -1);
-  grid.addWidget(&mixerWindow, 5, 0, -1, -1);
+  grid.addWidget(&musicLibraryWindow, 0, 0, 1, -1);
+  grid.addWidget(&mixerWindow, 1, 0, -1, -1);
 
   container.setLayout(&grid);
   container.setStyleSheet("background-color: red;");
