@@ -31,11 +31,11 @@ void shutdown_handler(const int sig) {
   exit(sig);
 }
 
-void caf_main(int argc, char *argv[], actor_system& sys, AppState* gAppState, Audio::Mixer* mixer) {
+void caf_main(int argc, char *argv[], void (*shutdown_handler) (int), actor_system& sys, AppState* gAppState, Audio::Mixer* mixer) {
 
   // init Qt App
   auto qtApp = QApplication {argc, argv};
-  auto mainWindow = Gui::MainWindow { sys };
+  auto mainWindow = Gui::MainWindow { sys, shutdown_handler };
 
   // init ActorSystem
   auto supervisor = sys.spawn(
@@ -97,7 +97,7 @@ extern "C" {
         // Create the actor system.
         actor_system sys{cfg};
         // Run user-defined code.
-        caf_main(argc, argv, sys, gAppState, Mixer);
+        caf_main(argc, argv, &shutdown_handler, sys, gAppState, Mixer);
 
         return 0;
     }

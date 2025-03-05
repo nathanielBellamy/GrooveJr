@@ -9,8 +9,9 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 
-MainWindow::MainWindow(actor_system& actorSystem)
+MainWindow::MainWindow(actor_system& actorSystem, void (*shutdown_handler) (int))
     : actorSystem(actorSystem)
+    , shutdown_handler(shutdown_handler)
     , container(this)
     , menuBar(new MenuBar(actorSystem, this))
     , transportControl(this, actorSystem)
@@ -43,6 +44,11 @@ void MainWindow::initGrid() {
 
   container.setLayout(&grid);
   container.setStyleSheet("background-color: red;");
+}
+
+void MainWindow::closeEvent (QCloseEvent* e) {
+  std::cout << "MainWindow::closeEvent " << std::endl;
+  shutdown_handler(3);
 }
 
 } // Gui

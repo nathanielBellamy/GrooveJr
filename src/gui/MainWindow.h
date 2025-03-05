@@ -25,6 +25,7 @@
 #include "./MusicLibrary/MusicLibraryWindow.h"
 #include "./TransportControl.h"
 
+#include <QCloseEvent>
 #include <QMainWindow>
 #include <QGridLayout>
 
@@ -35,11 +36,13 @@ namespace Gui {
 
 class MainWindow final : public QMainWindow {
   public:
-    explicit MainWindow(actor_system& actorSystem);
+    explicit MainWindow(actor_system& actorSystem, void (*shutdown_handler) (int));
     int hydrateState(const AppStatePacket& appStatePacket);
+    void closeEvent(QCloseEvent* event) override;
 
   private:
     actor_system& actorSystem;
+    void (*shutdown_handler)(int);
     QWidget container;
     MenuBar* menuBar;
     TransportControl transportControl;
