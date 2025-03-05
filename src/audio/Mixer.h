@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <memory>
 #include "../AppState.h"
 #include "./Channel.h"
 #include "./effects/EffectsChannel.h"
@@ -28,7 +29,7 @@ class Mixer {
     float** inputBuffers;
     float* outputBuffer;
 
-    Mixer(AppState*);
+    explicit Mixer(AppState*);
     ~Mixer();
 
     bool allocateInputBuffers();

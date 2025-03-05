@@ -11,14 +11,13 @@ using namespace Steinberg::Vst;
 
 namespace Gj {
 
-Audio::Effects::Vst3::Host::App* PluginContext = new Audio::Effects::Vst3::Host::App();
-AppState* gAppState = new AppState(128, PlayState::STOP);
-Audio::Mixer* Mixer = new Audio::Mixer(gAppState);
+auto PluginContext = new Audio::Effects::Vst3::Host::App();
+auto gAppState = new AppState(128, PlayState::STOP);
+auto Mixer = new Audio::Mixer(gAppState);
 
-void shutdown_handler(int sig) {
+void shutdown_handler(const int sig) {
   std::cout << "Caught signal: " << sig << std::endl;
   std::cout << "Freeing resources..." << std::endl;
-
 
   delete Mixer;
   delete gAppState;
@@ -29,7 +28,7 @@ void shutdown_handler(int sig) {
 
   std::cout << "Done Freeing resources." << std::endl;
   std::cout << "== GrooveJr ==" << std::endl;
-  exit(1);
+  exit(sig);
 }
 
 void caf_main(int argc, char *argv[], actor_system& sys, AppState* gAppState, Audio::Mixer* mixer) {
@@ -60,7 +59,7 @@ extern "C" {
     int main(int argc, char *argv[]) {
 
         // setup signal handle
-        struct sigaction sigIntHandler;
+        struct sigaction sigIntHandler{};
         sigIntHandler.sa_handler = shutdown_handler;
         sigemptyset(&sigIntHandler.sa_mask);
         sigIntHandler.sa_flags = 0;
@@ -70,14 +69,14 @@ extern "C" {
 
         Mixer->addEffectsChannel();
         // Mixer->addEffectsChannel();
-        Mixer->addEffectToChannel(
-            0,
-            "/Library/Audio/Plug-Ins/VST3/TDR Nova.vst3"
-        );
-        Mixer->addEffectToChannel(
-            0,
-            "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3"
-        );
+        // Mixer->addEffectToChannel(
+        //     0,
+        //     "/Library/Audio/Plug-Ins/VST3/TDR Nova.vst3"
+        // );
+        // Mixer->addEffectToChannel(
+        //     0,
+        //     "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3"
+        // );
 
 
         // Mixer->addEffectToChannel(

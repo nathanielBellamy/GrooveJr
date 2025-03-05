@@ -41,9 +41,6 @@ Plugin::Plugin(const std::string& path, int audioFramesPerBuffer) :
 Plugin::~Plugin() {
   audioHost->terminate();
   editorHost->terminate();
-  delete audioHost;
-  delete editorHost;
-  delete this;
 }
 
 

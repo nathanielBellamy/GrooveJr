@@ -15,6 +15,7 @@ Mixer::Mixer(AppState* gAppState)
     , dryChannel({ 1.0f, 0.0f })
     , channelCount(1)
     , effectsChannels(std::vector<Effects::EffectsChannel*>())
+    , inputBuffers(nullptr)
     {
       allocateInputBuffers();
 
@@ -22,14 +23,15 @@ Mixer::Mixer(AppState* gAppState)
     }
 
 Mixer::~Mixer() {
+  std::cout << "Mixer::~Mixer" << std::endl;
   for (const auto channel : effectsChannels) {
     delete channel;
   }
 
+  std::cout << "Mixer done delete effectsChannels." << std::endl;
   freeInputBuffers();
 
   delete outputBuffer;
-  delete this;
 }
 
 bool Mixer::allocateInputBuffers() {

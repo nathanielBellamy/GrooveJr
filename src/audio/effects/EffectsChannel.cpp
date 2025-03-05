@@ -18,7 +18,6 @@ EffectsChannel::~EffectsChannel() {
   for (const auto plugin : vst3Plugins) {
     delete plugin;
   }
-  delete this;
 }
 
 bool EffectsChannel::addEffect(Vst3::Plugin* plugin) {
