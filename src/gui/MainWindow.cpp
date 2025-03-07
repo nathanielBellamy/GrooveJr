@@ -41,6 +41,10 @@ void MainWindow::initGrid() {
 
   grid.addWidget(&musicLibraryWindow, 0, 0, 1, -1);
   grid.addWidget(&mixerWindow, 1, 0, -1, -1);
+  for (int i = 0; i < 2; i++) {
+    grid.setRowMinimumHeight(i, 200);
+    grid.setRowStretch(i, 1);
+  }
 
   container.setLayout(&grid);
   container.setStyleSheet("background-color: red;");

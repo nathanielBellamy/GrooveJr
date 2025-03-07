@@ -7,11 +7,14 @@
 namespace Gj {
 namespace Gui {
 
-
-Channel::Channel(QWidget* parent)
+Channel::Channel(QWidget* parent, int index)
   : QWidget(parent)
+  , title(this)
+  , index(index)
   {
 
+  title.setText("Channel " + QString::number(index));
+  title.setFont({title.font().family(), 16});
   setStyle();
 }
 

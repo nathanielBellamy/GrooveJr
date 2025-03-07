@@ -9,17 +9,29 @@ namespace Gui {
 
 MusicLibraryWindow::MusicLibraryWindow(QWidget* parent)
   : QWidget(parent)
+  , grid(this)
   , title(this)
   {
-  setStyle();
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-  title.setAlignment(Qt::AlignLeft|Qt::AlignBottom);
   title.setText("Music Library");
-  title.setFont({title.font().family(), 36});
+  title.setFont({title.font().family(), 18});
+
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  setStyle();
+  setupGrid();
 }
 
 void MusicLibraryWindow::setStyle() {
   setStyleSheet("background-color: cyan;");
+}
+
+void MusicLibraryWindow::setupGrid() {
+  grid.setVerticalSpacing(1);
+
+  grid.addWidget(&title, 0, 0, 1, -1);
+  grid.setRowStretch(0, 1);
+  grid.setRowMinimumHeight(0, 20);
+
+  setLayout(&grid);
 }
 
 } // Gui

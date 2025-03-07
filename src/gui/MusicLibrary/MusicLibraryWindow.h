@@ -5,6 +5,7 @@
 #ifndef MUSICLIBRARYWINDOW_H
 #define MUSICLIBRARYWINDOW_H
 
+#include <QGridLayout>
 #include <QLabel>
 #include <QWidget>
 
@@ -16,8 +17,10 @@ class MusicLibraryWindow final : public QWidget {
     explicit MusicLibraryWindow(QWidget *parent);
 
   private:
+    QGridLayout grid;
     QLabel title;
     void setStyle();
+    void setupGrid();
 };
 
 } // Gui
