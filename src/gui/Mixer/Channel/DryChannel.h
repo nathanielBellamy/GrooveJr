@@ -2,8 +2,8 @@
 // Created by ns on 3/2/25.
 //
 
-#ifndef CHANNEL_H
-#define CHANNEL_H
+#ifndef DRYCHANNEL_H
+#define DRYCHANNEL_H
 
 #include <QLabel>
 #include <QWidget>
@@ -11,14 +11,13 @@
 namespace Gj {
 namespace Gui {
 
-class Channel final : public QWidget {
+class DryChannel final : public QWidget {
 
   public:
-    Channel(QWidget* parent, int index);
+    DryChannel(QWidget* parent);
 
   private:
     QLabel title;
-    int index;
     void setStyle();
 };
 
@@ -27,4 +26,4 @@ class Channel final : public QWidget {
 
 
 
-#endif //CHANNEL_H
+#endif //DRYCHANNEL_H

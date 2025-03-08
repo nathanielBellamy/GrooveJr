@@ -2,23 +2,22 @@
 // Created by ns on 3/2/25.
 //
 
-#include "Channel.h"
+#include "DryChannel.h"
 
 namespace Gj {
 namespace Gui {
 
-Channel::Channel(QWidget* parent, int index)
+DryChannel::DryChannel(QWidget* parent)
   : QWidget(parent)
   , title(this)
-  , index(index)
   {
 
-  title.setText("Channel " + QString::number(index));
+  title.setText("Dry");
   title.setFont({title.font().family(), 16});
   setStyle();
 }
 
-void Channel::setStyle() {
+void DryChannel::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet("background-color: purple;");
 }
