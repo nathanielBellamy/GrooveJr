@@ -7,6 +7,7 @@
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QSlider>
 #include <QWidget>
 
 namespace Gj {
@@ -18,9 +19,12 @@ class EffectsChannel final : public QWidget {
     EffectsChannel(QWidget* parent, int index);
 
   private:
+    QGridLayout grid;
     QLabel title;
+    QSlider slider;
     int index;
     void setStyle();
+    void setupGrid();
 };
 
 

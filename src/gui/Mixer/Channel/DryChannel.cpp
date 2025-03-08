@@ -17,6 +17,8 @@ DryChannel::DryChannel(QWidget* parent)
   title.setText("Dry");
   title.setFont({title.font().family(), 16});
 
+  slider.setMinimum(0);
+  slider.setMaximum(127);
   slider.setTickInterval(1);
   slider.setTickPosition(QSlider::TicksRight);
 
