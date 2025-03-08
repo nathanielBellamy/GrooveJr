@@ -13,7 +13,7 @@
 #include <QWidget>
 
 #include "./Channel/DryChannel.h"
-#include "./Channel/EffectsChannel/EffectsChannel.h"
+#include "./Channel/EffectsChannel/EffectsChannelContainer.h"
 
 namespace Gj {
 namespace Gui {
@@ -26,7 +26,7 @@ class MixerWindow final : public QWidget {
     QGridLayout grid;
     QLabel title;
     DryChannel dryChannel;
-    std::vector<std::unique_ptr<EffectsChannel>> channels;
+    EffectsChannelContainer effectsChannelContainer;
 
     void setStyle();
     void setupGrid();

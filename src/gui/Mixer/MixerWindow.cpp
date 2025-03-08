@@ -12,10 +12,8 @@ MixerWindow::MixerWindow(QWidget* parent)
   , grid(this)
   , title(this)
   , dryChannel(this)
+  , effectsChannelContainer(this)
   {
-
-  auto effectsChannel = std::make_unique<EffectsChannel>(this, 1);
-  channels.push_back(std::move(effectsChannel));
 
   title.setText("Mixer");
   title.setFont({title.font().family(), 18});
@@ -34,12 +32,10 @@ void MixerWindow::setupGrid() {
 
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.addWidget(&dryChannel, 1, 0, -1, 1);
-  int col = 1;
-  for (auto &effectsChannel : channels) {
-    grid.addWidget(effectsChannel.get(), 1, col, -1, 1);
-    col++;
-  }
-  grid.setRowStretch(0, 1);
+  grid.addWidget(&effectsChannelContainer, 1, 1, -1, -1);
+
+  grid.setColumnStretch(0, 1);
+  grid.setColumnStretch(1, 10);
   grid.setRowMinimumHeight(0, 20);
   grid.setRowStretch(1, 10);
 

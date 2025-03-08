@@ -5,7 +5,9 @@
 #ifndef DRYCHANNEL_H
 #define DRYCHANNEL_H
 
+#include <QGridLayout>
 #include <QLabel>
+#include <QSlider>
 #include <QWidget>
 
 namespace Gj {
@@ -17,8 +19,11 @@ class DryChannel final : public QWidget {
     DryChannel(QWidget* parent);
 
   private:
+    QGridLayout grid;
     QLabel title;
+    QSlider slider;
     void setStyle();
+    void setupGrid();
 };
 
 } // Gui
