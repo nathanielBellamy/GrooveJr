@@ -35,10 +35,14 @@ qt_add_library(GjGui STATIC
         Mixer/MixerWindow.cpp
         Mixer/Channel/DryChannel.h
         Mixer/Channel/DryChannel.cpp
-        Mixer/Channel/EffectsChannel/EffectsChannelContainer.h
-        Mixer/Channel/EffectsChannel/EffectsChannelContainer.cpp
+        Mixer/Channel/EffectsChannel/EffectsChannelsContainer.h
+        Mixer/Channel/EffectsChannel/EffectsChannelsContainer.cpp
         Mixer/Channel/EffectsChannel/EffectsChannel.h
         Mixer/Channel/EffectsChannel/EffectsChannel.cpp
+        Mixer/Channel/EffectsChannel/EffectSlot.h
+        Mixer/Channel/EffectsChannel/EffectSlot.cpp
+        Mixer/Channel/EffectsChannel/EffectsSlots.h
+        Mixer/Channel/EffectsChannel/EffectsSlots.cpp
         MusicLibrary/MusicLibraryWindow.h
         MusicLibrary/MusicLibraryWindow.cpp
         TransportControl.h

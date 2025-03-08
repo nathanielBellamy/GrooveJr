@@ -20,7 +20,7 @@ DryChannel::DryChannel(QWidget* parent)
   slider.setMinimum(0);
   slider.setMaximum(127);
   slider.setTickInterval(1);
-  slider.setTickPosition(QSlider::TicksRight);
+  slider.setTickPosition(QSlider::NoTicks);
 
   setupGrid();
   setStyle();

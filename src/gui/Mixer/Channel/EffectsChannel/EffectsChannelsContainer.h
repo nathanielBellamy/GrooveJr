@@ -5,6 +5,9 @@
 #ifndef EFFECTSCHANNELCONTAINER_H
 #define EFFECTSCHANNELCONTAINER_H
 
+#include <memory>
+#include <vector>
+
 #include <QGridLayout>
 #include <QWidget>
 
@@ -13,13 +16,14 @@
 namespace Gj {
 namespace Gui {
 
-class EffectsChannelContainer final : public QWidget {
+class EffectsChannelsContainer final : public QWidget {
 
   public:
-    EffectsChannelContainer(QWidget* parent);
+    EffectsChannelsContainer(QWidget* parent);
 
   private:
     QGridLayout grid;
+    QWidget spacer;
     std::vector<std::unique_ptr<EffectsChannel>> channels;
     void setStyle();
     void setupGrid();

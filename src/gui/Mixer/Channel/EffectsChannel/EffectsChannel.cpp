@@ -12,6 +12,7 @@ EffectsChannel::EffectsChannel(QWidget* parent, int index)
   , grid(this)
   , title(this)
   , slider(Qt::Vertical, this)
+  , effectSlots(this)
   , index(index)
   {
 
@@ -21,7 +22,7 @@ EffectsChannel::EffectsChannel(QWidget* parent, int index)
   slider.setMinimum(0);
   slider.setMaximum(127);
   slider.setTickInterval(1);
-  slider.setTickPosition(QSlider::TicksRight);
+  slider.setTickPosition(QSlider::NoTicks);
 
   setStyle();
   setupGrid();
@@ -37,7 +38,9 @@ void EffectsChannel::setupGrid() {
 
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.addWidget(&slider, 1, 0, -1, -1);
+  grid.addWidget(&effectSlots, 1, 1, -1, 1);
 
+  grid.setColumnMinimumWidth(0, 20);
   grid.setRowStretch(0, 1);
   grid.setRowMinimumHeight(0, 20);
   grid.setRowMinimumHeight(1, 100);

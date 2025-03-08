@@ -10,6 +10,8 @@
 #include <QSlider>
 #include <QWidget>
 
+#include "EffectsSlots.h"
+
 namespace Gj {
 namespace Gui {
 
@@ -22,6 +24,7 @@ class EffectsChannel final : public QWidget {
     QGridLayout grid;
     QLabel title;
     QSlider slider;
+    EffectsSlots effectSlots;
     int index;
     void setStyle();
     void setupGrid();

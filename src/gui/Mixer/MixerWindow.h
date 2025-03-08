@@ -5,15 +5,12 @@
 #ifndef MIXERWINDOW_H
 #define MIXERWINDOW_H
 
-#include <memory>
-#include <vector>
-
 #include <QGridLayout>
 #include <QLabel>
 #include <QWidget>
 
 #include "./Channel/DryChannel.h"
-#include "./Channel/EffectsChannel/EffectsChannelContainer.h"
+#include "./Channel/EffectsChannel/EffectsChannelsContainer.h"
 
 namespace Gj {
 namespace Gui {
@@ -26,7 +23,7 @@ class MixerWindow final : public QWidget {
     QGridLayout grid;
     QLabel title;
     DryChannel dryChannel;
-    EffectsChannelContainer effectsChannelContainer;
+    EffectsChannelsContainer effectsChannelsContainer;
 
     void setStyle();
     void setupGrid();
