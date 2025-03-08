@@ -11,6 +11,7 @@
 #include <QWidget>
 
 #include "EffectsSlots.h"
+#include "MuteSoloContainer.h"
 
 namespace Gj {
 namespace Gui {
@@ -25,6 +26,7 @@ class EffectsChannel final : public QWidget {
     QLabel title;
     QSlider slider;
     EffectsSlots effectSlots;
+    MuteSoloContainer muteSoloContainer;
     int index;
     void setStyle();
     void setupGrid();

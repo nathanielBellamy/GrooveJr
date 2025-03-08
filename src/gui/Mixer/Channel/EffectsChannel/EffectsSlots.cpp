@@ -28,6 +28,8 @@ EffectsSlots::EffectsSlots(QWidget* parent)
 }
 
 void EffectsSlots::setupGrid() {
+  grid.setVerticalSpacing(0);
+
   int row = 0;
   for (auto &effectSlot : effectsSlots) {
     grid.addWidget(effectSlot.get(), row, 0, 1, 1);

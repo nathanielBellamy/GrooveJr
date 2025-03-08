@@ -35,6 +35,12 @@ qt_add_library(GjGui STATIC
         Mixer/MixerWindow.cpp
         Mixer/Channel/DryChannel.h
         Mixer/Channel/DryChannel.cpp
+        Mixer/Channel/MainDryContainer.h
+        Mixer/Channel/MainDryContainer.cpp
+        Mixer/Channel/MuteButton.h
+        Mixer/Channel/MuteButton.cpp
+        Mixer/Channel/SoloButton.h
+        Mixer/Channel/SoloButton.cpp
         Mixer/Channel/EffectsChannel/EffectsChannelsContainer.h
         Mixer/Channel/EffectsChannel/EffectsChannelsContainer.cpp
         Mixer/Channel/EffectsChannel/EffectsChannel.h
@@ -43,6 +49,8 @@ qt_add_library(GjGui STATIC
         Mixer/Channel/EffectsChannel/EffectSlot.cpp
         Mixer/Channel/EffectsChannel/EffectsSlots.h
         Mixer/Channel/EffectsChannel/EffectsSlots.cpp
+        Mixer/Channel/EffectsChannel/MuteSoloContainer.h
+        Mixer/Channel/EffectsChannel/MuteSoloContainer.cpp
         MusicLibrary/MusicLibraryWindow.h
         MusicLibrary/MusicLibraryWindow.cpp
         TransportControl.h

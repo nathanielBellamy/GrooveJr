@@ -11,7 +11,7 @@ MixerWindow::MixerWindow(QWidget* parent)
   : QWidget(parent)
   , grid(this)
   , title(this)
-  , dryChannel(this)
+  , mainDryContainer(this)
   , effectsChannelsContainer(this)
   {
 
@@ -31,7 +31,7 @@ void MixerWindow::setupGrid() {
   grid.setVerticalSpacing(1);
 
   grid.addWidget(&title, 0, 0, 1, -1);
-  grid.addWidget(&dryChannel, 1, 0, -1, 1);
+  grid.addWidget(&mainDryContainer, 1, 0, -1, 1);
   grid.addWidget(&effectsChannelsContainer, 1, 1, -1, -1);
 
   grid.setColumnStretch(0, 1);

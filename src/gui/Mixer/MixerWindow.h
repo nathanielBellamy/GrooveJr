@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QWidget>
 
-#include "./Channel/DryChannel.h"
+#include "./Channel/MainDryContainer.h"
 #include "./Channel/EffectsChannel/EffectsChannelsContainer.h"
 
 namespace Gj {
@@ -22,7 +22,7 @@ class MixerWindow final : public QWidget {
   private:
     QGridLayout grid;
     QLabel title;
-    DryChannel dryChannel;
+    MainDryContainer mainDryContainer;
     EffectsChannelsContainer effectsChannelsContainer;
 
     void setStyle();

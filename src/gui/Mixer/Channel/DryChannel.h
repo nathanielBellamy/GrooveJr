@@ -10,6 +10,9 @@
 #include <QSlider>
 #include <QWidget>
 
+#include "MuteButton.h"
+#include "SoloButton.h"
+
 namespace Gj {
 namespace Gui {
 
@@ -22,6 +25,8 @@ class DryChannel final : public QWidget {
     QGridLayout grid;
     QLabel title;
     QSlider slider;
+    MuteButton mute;
+    SoloButton solo;
     void setStyle();
     void setupGrid();
 };

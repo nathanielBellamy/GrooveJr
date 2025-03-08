@@ -12,6 +12,8 @@ DryChannel::DryChannel(QWidget* parent)
   , grid(this)
   , title(this)
   , slider(Qt::Vertical, this)
+  , mute(this)
+  , solo(this)
   {
 
   title.setText("Dry");
@@ -35,7 +37,12 @@ void DryChannel::setupGrid() {
   grid.setVerticalSpacing(1);
 
   grid.addWidget(&title, 0, 0, 1, -1);
-  grid.addWidget(&slider, 1, 0, -1, -1);
+  grid.addWidget(&slider, 1, 0, -1, 1);
+  grid.addWidget(&mute, 2, 1, 1, 1);
+  grid.addWidget(&solo, 2, 2, 1, 1);
+
+  grid.setColumnMinimumWidth(0, 10);
+  grid.setHorizontalSpacing(2);
 
   grid.setRowStretch(0, 1);
   grid.setRowMinimumHeight(0, 20);

@@ -13,10 +13,15 @@ EffectsChannel::EffectsChannel(QWidget* parent, int index)
   , title(this)
   , slider(Qt::Vertical, this)
   , effectSlots(this)
+  , muteSoloContainer(this)
   , index(index)
   {
 
-  title.setText("FX " + QString::number(index));
+  if (index == 0) {
+    title.setText("Main");
+  } else {
+    title.setText("FX " + QString::number(index));
+  }
   title.setFont({title.font().family(), 16});
 
   slider.setMinimum(0);
@@ -38,7 +43,11 @@ void EffectsChannel::setupGrid() {
 
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.addWidget(&slider, 1, 0, -1, -1);
-  grid.addWidget(&effectSlots, 1, 1, -1, 1);
+  grid.addWidget(&effectSlots, 1, 1, 1, 1);
+  grid.addWidget(&muteSoloContainer, 2, 1, 1, 1);
+
+  grid.setVerticalSpacing(2);
+  grid.setHorizontalSpacing(2);
 
   grid.setColumnMinimumWidth(0, 20);
   grid.setRowStretch(0, 1);
