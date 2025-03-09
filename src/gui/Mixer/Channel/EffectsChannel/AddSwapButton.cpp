@@ -7,14 +7,15 @@
 namespace Gj {
 namespace Gui {
 
-AddSwapButton::AddSwapButton(QWidget *parent, bool occupied)
+AddSwapButton::AddSwapButton(QWidget *parent, int channelIndex, int slotIndex, bool occupied)
   : QPushButton(occupied ? "&Swap" : "&Add", parent)
+  , channelIndex(channelIndex)
+  , slotIndex(slotIndex)
   , occupied(occupied)
   {}
 
-bool AddSwapButton::hitButton(const QPoint& pos) const {
-  std::cout << "AddSwapButton::hitButton" << std::endl;
-  return true;
+void AddSwapButton::mousePressEvent(QMouseEvent* event) {
+  std::cout << "AddSwapButton::hitButton : " << channelIndex << " : " << slotIndex << std::endl;
 }
 
 

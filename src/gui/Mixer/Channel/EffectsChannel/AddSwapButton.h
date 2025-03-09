@@ -16,11 +16,13 @@ namespace Gui {
 class AddSwapButton final : public QPushButton {
 
   public:
-    AddSwapButton(QWidget* parent, bool occupied);
+    AddSwapButton(QWidget* parent, int channelIndex, int slotIndex, bool occupied);
 
   private:
+    int channelIndex;
+    int slotIndex;
     bool occupied;
-    bool hitButton(const QPoint& pos) const override;
+    void mousePressEvent(QMouseEvent* event) override;
 
 };
 

@@ -31,7 +31,6 @@ class EffectSlot final : public QWidget {
     QLabel pluginName;
     void setStyle();
     void setupGrid();
-    void mousePressEvent(QMouseEvent* event) override;
 };
 
 } // Gui

@@ -14,7 +14,7 @@ EffectSlot::EffectSlot(QWidget* parent, int channelIndex, int slotIndex, bool oc
   , occupied(occupied)
   , grid(this)
   , title(this)
-  , addSwapButton(this, occupied)
+  , addSwapButton(this, channelIndex, slotIndex, occupied)
   , pluginName(this)
   {
 
@@ -40,10 +40,6 @@ void EffectSlot::setupGrid() {
 
   grid.setVerticalSpacing(0);
   grid.setHorizontalSpacing(1);
-}
-
-void EffectSlot::mousePressEvent(QMouseEvent* event) {
-  std::cout << "foo " << channelIndex << " " << slotIndex << std::endl;
 }
 
 } // Gui
