@@ -27,6 +27,7 @@ EffectsChannel::EffectsChannel(QWidget* parent, int channelIndex)
   slider.setMinimum(0);
   slider.setMaximum(127);
   slider.setTickInterval(1);
+  slider.setValue(63);
   slider.setTickPosition(QSlider::NoTicks);
 
   setStyle();
