@@ -19,15 +19,15 @@ namespace Gui {
 class EffectsChannel final : public QWidget {
 
   public:
-    EffectsChannel(QWidget* parent, int index);
+    EffectsChannel(QWidget* parent, int channelIndex);
 
   private:
+    int channelIndex;
     QGridLayout grid;
     QLabel title;
     QSlider slider;
-    EffectsSlots effectSlots;
+    EffectsSlots effectsSlots;
     MuteSoloContainer muteSoloContainer;
-    int index;
     void setStyle();
     void setupGrid();
 };

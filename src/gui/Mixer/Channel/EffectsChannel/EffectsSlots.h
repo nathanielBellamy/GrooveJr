@@ -19,9 +19,10 @@ namespace Gui {
 class EffectsSlots final : public QWidget {
 
   public:
-    EffectsSlots(QWidget* parent);
+    EffectsSlots(QWidget* parent, int channelIndex);
 
   private:
+    int channelIndex;
     QGridLayout grid;
     std::vector<std::unique_ptr<EffectSlot>> effectsSlots;
     void setupGrid();

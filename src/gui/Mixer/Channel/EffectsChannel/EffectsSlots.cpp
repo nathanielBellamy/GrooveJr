@@ -7,22 +7,23 @@
 namespace Gj {
 namespace Gui {
 
-EffectsSlots::EffectsSlots(QWidget* parent)
+EffectsSlots::EffectsSlots(QWidget* parent, int channelIndex)
   : QWidget(parent)
+  , channelIndex(channelIndex)
   , grid(this)
   {
 
-  auto slot1 = std::make_unique<EffectSlot>(this);
-  auto slot2 = std::make_unique<EffectSlot>(this);
-  auto slot3 = std::make_unique<EffectSlot>(this);
-  auto slot4 = std::make_unique<EffectSlot>(this);
-  auto slot5 = std::make_unique<EffectSlot>(this);
+  auto slot0 = std::make_unique<EffectSlot>(this, channelIndex, 0);
+  auto slot1 = std::make_unique<EffectSlot>(this, channelIndex, 1);
+  auto slot2 = std::make_unique<EffectSlot>(this, channelIndex, 2);
+  auto slot3 = std::make_unique<EffectSlot>(this, channelIndex, 3);
+  auto slot4 = std::make_unique<EffectSlot>(this, channelIndex, 4);
 
+  effectsSlots.push_back(std::move(slot0));
   effectsSlots.push_back(std::move(slot1));
   effectsSlots.push_back(std::move(slot2));
   effectsSlots.push_back(std::move(slot3));
   effectsSlots.push_back(std::move(slot4));
-  effectsSlots.push_back(std::move(slot5));
 
   setupGrid();
 }

@@ -15,9 +15,11 @@ namespace Gui {
 class EffectSlot final : public QWidget {
 
   public:
-    EffectSlot(QWidget* parent);
+    EffectSlot(QWidget* parent, int channelIndex, int slotIndex);
 
   private:
+    int channelIndex;
+    int slotIndex;
     QLabel title;
     void setStyle();
 

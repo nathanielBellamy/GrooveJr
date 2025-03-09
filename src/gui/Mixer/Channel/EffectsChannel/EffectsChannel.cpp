@@ -7,20 +7,20 @@
 namespace Gj {
 namespace Gui {
 
-EffectsChannel::EffectsChannel(QWidget* parent, int index)
+EffectsChannel::EffectsChannel(QWidget* parent, int channelIndex)
   : QWidget(parent)
+  , channelIndex(channelIndex)
   , grid(this)
   , title(this)
   , slider(Qt::Vertical, this)
-  , effectSlots(this)
+  , effectsSlots(this, channelIndex)
   , muteSoloContainer(this)
-  , index(index)
   {
 
-  if (index == 0) {
+  if (channelIndex == 0) {
     title.setText("Main");
   } else {
-    title.setText("FX " + QString::number(index));
+    title.setText("FX " + QString::number(channelIndex));
   }
   title.setFont({title.font().family(), 16});
 
@@ -43,7 +43,7 @@ void EffectsChannel::setupGrid() {
 
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.addWidget(&slider, 1, 0, -1, -1);
-  grid.addWidget(&effectSlots, 1, 1, 1, 1);
+  grid.addWidget(&effectsSlots, 1, 1, 1, 1);
   grid.addWidget(&muteSoloContainer, 2, 1, 1, 1);
 
   grid.setVerticalSpacing(2);

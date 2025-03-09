@@ -7,8 +7,10 @@
 namespace Gj {
 namespace Gui {
 
-EffectSlot::EffectSlot(QWidget* parent)
+EffectSlot::EffectSlot(QWidget* parent, int channelIndex, int slotIndex)
   : QWidget(parent)
+  , channelIndex(channelIndex)
+  , slotIndex(slotIndex)
   , title(this)
   {
 
