@@ -16,7 +16,7 @@ MainWindow::MainWindow(actor_system& actorSystem, void (*shutdown_handler) (int)
     , menuBar(new MenuBar(actorSystem, this))
     , transportControl(this, actorSystem)
     , grid(&container)
-    , musicLibraryWindow(&container)
+    , musicLibraryWindow(&container, actorSystem)
     , mixerWindow(&container, actorSystem)
     {
 

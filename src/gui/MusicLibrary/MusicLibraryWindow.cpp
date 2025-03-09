@@ -7,8 +7,9 @@
 namespace Gj {
 namespace Gui {
 
-MusicLibraryWindow::MusicLibraryWindow(QWidget* parent)
+MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSystem)
   : QWidget(parent)
+  , actorSystem(actorSystem)
   , grid(this)
   , title(this)
   {

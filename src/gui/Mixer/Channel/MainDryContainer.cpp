@@ -11,7 +11,7 @@ MainDryContainer::MainDryContainer(QWidget* parent, actor_system& actorSystem)
   : QWidget(parent)
   , actorSystem(actorSystem)
   , grid(this)
-  , dryChannel(this)
+  , dryChannel(this, actorSystem)
   , mainChannel(this, actorSystem, 0)
   {
 

@@ -5,18 +5,23 @@
 #ifndef MUSICLIBRARYWINDOW_H
 #define MUSICLIBRARYWINDOW_H
 
+#include "caf/actor_system.hpp"
+
 #include <QGridLayout>
 #include <QLabel>
 #include <QWidget>
+
+using namespace caf;
 
 namespace Gj {
 namespace Gui {
 
 class MusicLibraryWindow final : public QWidget {
   public:
-    explicit MusicLibraryWindow(QWidget *parent);
+    explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem);
 
   private:
+    actor_system& actorSystem;
     QGridLayout grid;
     QLabel title;
     void setStyle();
