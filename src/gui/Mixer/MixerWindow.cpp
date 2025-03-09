@@ -7,12 +7,13 @@
 namespace Gj {
 namespace Gui {
 
-MixerWindow::MixerWindow(QWidget* parent)
+MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem)
   : QWidget(parent)
+  , actorSystem(actorSystem)
   , grid(this)
   , title(this)
-  , mainDryContainer(this)
-  , effectsChannelsContainer(this)
+  , mainDryContainer(this, actorSystem)
+  , effectsChannelsContainer(this, actorSystem)
   {
 
   title.setText("Mixer");

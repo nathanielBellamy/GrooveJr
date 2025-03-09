@@ -7,11 +7,12 @@
 namespace Gj {
 namespace Gui {
 
-MainDryContainer::MainDryContainer(QWidget* parent)
+MainDryContainer::MainDryContainer(QWidget* parent, actor_system& actorSystem)
   : QWidget(parent)
+  , actorSystem(actorSystem)
   , grid(this)
   , dryChannel(this)
-  , mainChannel(this, 0)
+  , mainChannel(this, actorSystem, 0)
   {
 
   setupGrid();

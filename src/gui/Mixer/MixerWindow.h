@@ -5,6 +5,8 @@
 #ifndef MIXERWINDOW_H
 #define MIXERWINDOW_H
 
+#include "caf/actor_system.hpp"
+
 #include <QGridLayout>
 #include <QLabel>
 #include <QWidget>
@@ -12,14 +14,17 @@
 #include "./Channel/MainDryContainer.h"
 #include "./Channel/EffectsChannel/EffectsChannelsContainer.h"
 
+using namespace caf;
+
 namespace Gj {
 namespace Gui {
 
 class MixerWindow final : public QWidget {
   public:
-    explicit MixerWindow(QWidget *parent);
+    explicit MixerWindow(QWidget *parent, actor_system& actorSystem);
 
   private:
+    actor_system& actorSystem;
     QGridLayout grid;
     QLabel title;
     MainDryContainer mainDryContainer;

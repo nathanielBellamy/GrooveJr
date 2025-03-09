@@ -5,6 +5,8 @@
 #ifndef GUIEFFECTSCHANNEL_H
 #define GUIEFFECTSCHANNEL_H
 
+#include "caf/actor_system.hpp"
+
 #include <QGridLayout>
 #include <QLabel>
 #include <QSlider>
@@ -13,15 +15,18 @@
 #include "EffectsSlots.h"
 #include "MuteSoloContainer.h"
 
+using namespace caf;
+
 namespace Gj {
 namespace Gui {
 
 class EffectsChannel final : public QWidget {
 
   public:
-    EffectsChannel(QWidget* parent, int channelIndex);
+    EffectsChannel(QWidget* parent, actor_system& actorSystem, int channelIndex);
 
   private:
+    actor_system& actorSystem;
     int channelIndex;
     QGridLayout grid;
     QLabel title;

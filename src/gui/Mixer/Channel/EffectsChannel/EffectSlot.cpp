@@ -7,8 +7,9 @@
 namespace Gj {
 namespace Gui {
 
-EffectSlot::EffectSlot(QWidget* parent, int channelIndex, int slotIndex, bool occupied)
+EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, int channelIndex, int slotIndex, bool occupied)
   : QWidget(parent)
+  , actorSystem(actorSystem)
   , channelIndex(channelIndex)
   , slotIndex(slotIndex)
   , occupied(occupied)

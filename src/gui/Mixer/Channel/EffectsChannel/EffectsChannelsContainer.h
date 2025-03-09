@@ -5,6 +5,8 @@
 #ifndef EFFECTSCHANNELCONTAINER_H
 #define EFFECTSCHANNELCONTAINER_H
 
+#include "caf/actor_system.hpp"
+
 #include <memory>
 #include <vector>
 
@@ -13,15 +15,18 @@
 
 #include "EffectsChannel.h"
 
+using namespace caf;
+
 namespace Gj {
 namespace Gui {
 
 class EffectsChannelsContainer final : public QWidget {
 
   public:
-    EffectsChannelsContainer(QWidget* parent);
+    EffectsChannelsContainer(QWidget* parent, actor_system& actorSystem);
 
   private:
+    actor_system& actorSystem;
     QGridLayout grid;
     QWidget spacer;
     std::vector<std::unique_ptr<EffectsChannel>> channels;

@@ -7,13 +7,14 @@
 namespace Gj {
 namespace Gui {
 
-EffectsChannel::EffectsChannel(QWidget* parent, int channelIndex)
+EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, int channelIndex)
   : QWidget(parent)
+  , actorSystem(actorSystem)
   , channelIndex(channelIndex)
   , grid(this)
   , title(this)
   , slider(Qt::Vertical, this)
-  , effectsSlots(this, channelIndex)
+  , effectsSlots(this, actorSystem, channelIndex)
   , muteSoloContainer(this)
   {
 

@@ -5,11 +5,15 @@
 #ifndef MAINDRYCONTAINER_H
 #define MAINDRYCONTAINER_H
 
+#include "caf/actor_system.hpp"
+
 #include <QGridLayout>
 #include <QWidget>
 
 #include "DryChannel.h"
 #include "EffectsChannel/EffectsChannel.h"
+
+using namespace caf;
 
 namespace Gj {
 namespace Gui {
@@ -17,9 +21,10 @@ namespace Gui {
 class MainDryContainer final : public QWidget {
 
   public:
-    MainDryContainer(QWidget* parent);
+    MainDryContainer(QWidget* parent, actor_system& actorSystem);
 
   private:
+    actor_system& actorSystem;
     QGridLayout grid;
     DryChannel dryChannel;
     EffectsChannel mainChannel;

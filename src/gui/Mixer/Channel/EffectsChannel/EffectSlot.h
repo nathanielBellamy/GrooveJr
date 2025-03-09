@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "caf/actor_system.hpp"
+
 #include <QAction>
 #include <QGridLayout>
 #include <QLabel>
@@ -15,15 +17,18 @@
 #include "AddSwapButton.h"
 #include "../../../Shared/VstSelect.h"
 
+using namespace caf;
+
 namespace Gj {
 namespace Gui {
 
 class EffectSlot final : public QWidget {
 
   public:
-    EffectSlot(QWidget* parent, int channelIndex, int slotIndex, bool occupied);
+    EffectSlot(QWidget* parent, actor_system& actorSystem, int channelIndex, int slotIndex, bool occupied);
 
   private:
+    actor_system& actorSystem;
     int channelIndex;
     int slotIndex;
     bool occupied;

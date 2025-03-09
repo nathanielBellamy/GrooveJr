@@ -7,8 +7,9 @@
 namespace Gj {
 namespace Gui {
 
-DryChannel::DryChannel(QWidget* parent)
+DryChannel::DryChannel(QWidget* parent, actor_system& actorSystem)
   : QWidget(parent)
+  , actorSystem(actorSystem)
   , grid(this)
   , title(this)
   , slider(Qt::Vertical, this)

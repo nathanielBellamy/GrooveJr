@@ -17,7 +17,7 @@ MainWindow::MainWindow(actor_system& actorSystem, void (*shutdown_handler) (int)
     , transportControl(this, actorSystem)
     , grid(&container)
     , musicLibraryWindow(&container)
-    , mixerWindow(&container)
+    , mixerWindow(&container, actorSystem)
     {
 
   setCentralWidget(&container);
