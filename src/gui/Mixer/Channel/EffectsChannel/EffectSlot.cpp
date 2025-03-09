@@ -14,11 +14,14 @@ EffectSlot::EffectSlot(QWidget* parent, int channelIndex, int slotIndex, bool oc
   , occupied(occupied)
   , grid(this)
   , title(this)
+  , addSwapButton(this, occupied)
+  , pluginName(this)
   {
 
   title.setText(QString::number(slotIndex + 1));
   title.setFont({title.font().family(), 12});
   setStyle();
+  setupGrid();
 }
 
 void EffectSlot::setStyle() {
@@ -29,6 +32,14 @@ void EffectSlot::setStyle() {
 
 void EffectSlot::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, 1);
+  grid.addWidget(&addSwapButton, 0, 1, 1, 1);
+  grid.addWidget(&pluginName, 1, 0, -1, -1);
+
+  grid.setColumnMinimumWidth(1, 30);
+  grid.setColumnStretch(1, 10);
+
+  grid.setVerticalSpacing(0);
+  grid.setHorizontalSpacing(1);
 }
 
 void EffectSlot::mousePressEvent(QMouseEvent* event) {

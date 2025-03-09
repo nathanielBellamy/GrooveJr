@@ -11,6 +11,8 @@
 #include <QLabel>
 #include <QWidget>
 
+#include "AddSwapButton.h"
+
 namespace Gj {
 namespace Gui {
 
@@ -25,6 +27,8 @@ class EffectSlot final : public QWidget {
     bool occupied;
     QGridLayout grid;
     QLabel title;
+    AddSwapButton addSwapButton;
+    QLabel pluginName;
     void setStyle();
     void setupGrid();
     void mousePressEvent(QMouseEvent* event) override;

@@ -41,6 +41,8 @@ qt_add_library(GjGui STATIC
         Mixer/Channel/MuteButton.cpp
         Mixer/Channel/SoloButton.h
         Mixer/Channel/SoloButton.cpp
+        Mixer/Channel/EffectsChannel/AddSwapButton.h
+        Mixer/Channel/EffectsChannel/AddSwapButton.cpp
         Mixer/Channel/EffectsChannel/EffectsChannelsContainer.h
         Mixer/Channel/EffectsChannel/EffectsChannelsContainer.cpp
         Mixer/Channel/EffectsChannel/EffectsChannel.h

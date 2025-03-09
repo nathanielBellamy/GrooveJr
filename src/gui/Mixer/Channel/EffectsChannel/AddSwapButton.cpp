@@ -12,5 +12,11 @@ AddSwapButton::AddSwapButton(QWidget *parent, bool occupied)
   , occupied(occupied)
   {}
 
+bool AddSwapButton::hitButton(const QPoint& pos) const {
+  std::cout << "AddSwapButton::hitButton" << std::endl;
+  return true;
+}
+
+
 } // Gui
 } // Gj

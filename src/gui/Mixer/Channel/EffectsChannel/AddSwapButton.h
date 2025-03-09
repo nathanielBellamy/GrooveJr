@@ -5,6 +5,9 @@
 #ifndef ADDSWAPBUTTON_H
 #define ADDSWAPBUTTON_H
 
+#include <iostream>
+
+#include <QPoint>
 #include <QPushButton>
 
 namespace Gj {
@@ -17,6 +20,7 @@ class AddSwapButton final : public QPushButton {
 
   private:
     bool occupied;
+    bool hitButton(const QPoint& pos) const override;
 
 };
 
