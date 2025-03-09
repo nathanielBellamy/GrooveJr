@@ -20,7 +20,7 @@
 #include <QMenu>
 #include <QWidget>
 
-#include "./VstSelect.h"
+#include "../../../Shared/VstSelect.h"
 
 namespace Gj {
 namespace Gui {

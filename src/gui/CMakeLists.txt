@@ -29,8 +29,8 @@ qt_add_library(GjGui STATIC
         MenuBar/Menus/Music/FolderSelect.cpp
         MenuBar/Menus/Effects/EffectsMenu.h
         MenuBar/Menus/Effects/EffectsMenu.cpp
-        MenuBar/Menus/Effects/VstSelect.h
-        MenuBar/Menus/Effects/VstSelect.cpp
+        Shared/VstSelect.h
+        Shared/VstSelect.cpp
         Mixer/MixerWindow.h
         Mixer/MixerWindow.cpp
         Mixer/Channel/DryChannel.h

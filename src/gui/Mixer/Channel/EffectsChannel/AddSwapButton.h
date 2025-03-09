@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+#include <QAction>
 #include <QPoint>
 #include <QPushButton>
 
@@ -16,12 +17,13 @@ namespace Gui {
 class AddSwapButton final : public QPushButton {
 
   public:
-    AddSwapButton(QWidget* parent, int channelIndex, int slotIndex, bool occupied);
+    AddSwapButton(QWidget* parent, int channelIndex, int slotIndex, bool occupied, QAction* action);
 
   private:
     int channelIndex;
     int slotIndex;
     bool occupied;
+    QAction* addEffectAction;
     void mousePressEvent(QMouseEvent* event) override;
 
 };

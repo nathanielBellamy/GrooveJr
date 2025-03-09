@@ -7,11 +7,13 @@
 
 #include <iostream>
 
+#include <QAction>
 #include <QGridLayout>
 #include <QLabel>
 #include <QWidget>
 
 #include "AddSwapButton.h"
+#include "../../../Shared/VstSelect.h"
 
 namespace Gj {
 namespace Gui {
@@ -27,7 +29,10 @@ class EffectSlot final : public QWidget {
     bool occupied;
     QGridLayout grid;
     QLabel title;
+    QAction addEffectAction;
     AddSwapButton addSwapButton;
+    VstSelect vstSelect;
+    QUrl vstUrl;
     QLabel pluginName;
     void setStyle();
     void setupGrid();
