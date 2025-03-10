@@ -68,7 +68,8 @@ extern "C" {
         initVst3PluginContext();
 
         Mixer->addEffectsChannel();
-        // Mixer->addEffectsChannel();
+        Mixer->addEffectsChannel();
+        Mixer->addEffectsChannel();
         // Mixer->addEffectToChannel(
         //     0,
         //     "/Library/Audio/Plug-Ins/VST3/TDR Nova.vst3"

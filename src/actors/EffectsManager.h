@@ -7,10 +7,8 @@
 
 #include <string>
 
-#include "caf/actor_ostream.hpp"
 #include "caf/actor_registry.hpp"
 #include "caf/actor_system.hpp"
-#include "caf/caf_main.hpp"
 #include "caf/event_based_actor.hpp"
 
 #include "./ActorIds.h"
@@ -51,8 +49,15 @@ struct EffectsManagerState {
      EffectsManager::behavior_type make_behavior() {
        return {
            [this](strong_actor_ptr replyToPtr, int channel, std::string path, add_effect_a) {
-             std::cout << "EffectsManager : add_effect_a " << channel << " " << path << std::endl;
-//             strong_actor_ptr appStateManager = self->system().registry().get(APP_STATE_MANAGER);
+             std::cout << "EffectsManager : add_effect_a " << channel << " " << path.substr(7) << std::endl;
+             strong_actor_ptr appStateManager = self->system().registry().get(APP_STATE_MANAGER);
+             if (mixer->addEffectToChannel(channel, path.substr(7))) {
+               // mixer->showEditor(channel, index);
+               std::cout << "EffectsManager - effect added" << std::endl;
+             } else {
+               std::cout << "EffectsManager - failed to add effect" << std::endl;
+               // error
+             };
            },
            [this](strong_actor_ptr replyToPtr, int channel, int effectIndex, remove_effect_a) {
              std::cout << "EffectsManager : current_state_a " << std::endl;
