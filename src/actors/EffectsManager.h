@@ -50,7 +50,7 @@ struct EffectsManagerState {
 
      EffectsManager::behavior_type make_behavior() {
        return {
-           [this](strong_actor_ptr replyToPtr, int channel, std::string& path, add_effect_a) {
+           [this](strong_actor_ptr replyToPtr, int channel, std::string path, add_effect_a) {
              std::cout << "EffectsManager : add_effect_a " << channel << " " << path << std::endl;
 //             strong_actor_ptr appStateManager = self->system().registry().get(APP_STATE_MANAGER);
            },

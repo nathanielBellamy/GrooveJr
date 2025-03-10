@@ -34,6 +34,15 @@ EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, int channelIn
   connect(&addEffectAction, &QAction::triggered, [&]() {
     if (vstSelect.exec() == QDialog::Accepted) {
       std::cout << "vst selected: " << vstUrl.toDisplayString().toStdString() << std::endl;
+      strong_actor_ptr effectsManager = actorSystem.registry().get(Gj::Act::ActorIds::EFFECTS_MANAGER);
+      const scoped_actor self{actorSystem};
+      self->anon_send(
+          actor_cast<actor>(effectsManager),
+          actor_cast<strong_actor_ptr>(effectsManager), // TODO
+          channelIndex,
+          vstUrl.toDisplayString().toStdString(),
+          add_effect_a_v
+      );
     }
   });
 

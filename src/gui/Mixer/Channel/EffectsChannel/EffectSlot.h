@@ -8,6 +8,8 @@
 #include <iostream>
 
 #include "caf/actor_system.hpp"
+#include "caf/actor_registry.hpp"
+#include "caf/scoped_actor.hpp"
 
 #include <QAction>
 #include <QGridLayout>
@@ -16,6 +18,8 @@
 
 #include "AddSwapButton.h"
 #include "../../../Shared/VstSelect.h"
+#include "../../../../actors/ActorIds.h"
+#include "../../../../messaging/atoms.h"
 
 using namespace caf;
 

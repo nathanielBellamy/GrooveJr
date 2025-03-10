@@ -46,7 +46,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
     std::cout << "TransportControl : pauseTrigAction" << std::endl;
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
-    scoped_actor self{sys};
+    const scoped_actor self{sys};
     self->anon_send(
         actor_cast<actor>(appStateManagerPtr),
         tc_trig_pause_a_v

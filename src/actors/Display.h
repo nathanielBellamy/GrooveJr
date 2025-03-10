@@ -58,7 +58,7 @@ struct DisplayState {
                  read_state_a_v
              );
            },
-           [this](strong_actor_ptr replyToPtr, Gj::AppStatePacket appStatePacket, current_state_a) {
+           [this](strong_actor_ptr replyToPtr, AppStatePacket appStatePacket, current_state_a) {
              std::cout << "Display : current_state_a " << std::endl;
              if ( mainWindow->hydrateState(appStatePacket) )
                std::cout << "Display : Error : unable to hydrate state " << std::endl;
