@@ -21,7 +21,7 @@ set (GJ_BASE_DIR "/Users/ns/code/")
 set (VST3SDK_HOME "${GJ_BASE_DIR}/vst3sdk")
 
 # logging
-find_package(Boost REQUIRED COMPONENTS Log)
+find_package(Boost REQUIRED COMPONENTS log_setup log)
 
 # setup Qt
 list(APPEND CMAKE_PREFIX_PATH "${GJ_BASE_DIR}/qt6-build/qtbase/lib/cmake")
@@ -84,6 +84,7 @@ target_link_libraries(GrooveJr
         Qt6::Widgets
         Qt6::Gui
         Boost::log
+        ${Boost_LIBRARIES}
 )
 target_compile_options(GrooveJr PRIVATE ${INCLUDE_FLAGS})
 set_target_properties(GrooveJr PROPERTIES LINKER_LANGUAGE CXX)

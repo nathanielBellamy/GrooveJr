@@ -11,7 +11,7 @@
 ### MacOs Build (Dev Build)
 
 - ```bash
-  brew install cmake jack portaudio libsndfile
+  brew install boost cmake jack portaudio libsndfile
   git clone git@github.com:nathanielBellamy/GrooveJr.git 
   cd GrooveJr/src
   vim CMakeLists.txt

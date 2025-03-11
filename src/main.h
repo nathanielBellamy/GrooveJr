@@ -17,6 +17,9 @@
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/sources/record_ostream.hpp>
+#include <boost/move/utility_core.hpp>
+#include <boost/log/sources/logger.hpp>
+#include <boost/log/sources/global_logger_storage.hpp>
 
 #include "caf/actor_from_state.hpp"
 #include "caf/actor_ostream.hpp"
