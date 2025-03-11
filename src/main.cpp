@@ -31,6 +31,23 @@ void shutdown_handler(const int sig) {
   exit(sig);
 }
 
+void initLogging() {
+  boost::log::add_file_log(
+      boost::log::keywords::file_name = "/Users/ns/code/GrooveJr/groove_jr_%N.log",
+      boost::log::keywords::rotation_size = 10 * 1024 * 1024
+      // boost::log::keywords::format = "[%TimeStamp%]: %Message%"
+  );
+
+  using namespace boost::log::trivial;
+  boost::log::add_common_attributes();
+  boost::log::sources::severity_logger< severity_level > lg;
+  BOOST_LOG_SEV(lg, info) << " foo bar An error severity message";
+
+  // boost::log::core::get()->set_filter(
+  //     boost::log::trivial::severity >= boost::log::trivial::info
+  // );
+}
+
 void caf_main(int argc, char *argv[], void (*shutdown_handler) (int), actor_system& sys, AppState* gAppState, Audio::Mixer* mixer) {
 
   // init Qt App
@@ -64,6 +81,9 @@ extern "C" {
         sigemptyset(&sigIntHandler.sa_mask);
         sigIntHandler.sa_flags = 0;
         sigaction(SIGINT, &sigIntHandler, nullptr);
+
+        // setup logging
+        initLogging();
 
         initVst3PluginContext();
 

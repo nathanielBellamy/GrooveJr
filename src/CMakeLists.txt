@@ -20,6 +20,9 @@ set (C_LIBS_HOME "/opt/homebrew/Cellar")
 set (GJ_BASE_DIR "/Users/ns/code/")
 set (VST3SDK_HOME "${GJ_BASE_DIR}/vst3sdk")
 
+# logging
+find_package(Boost REQUIRED COMPONENTS Log)
+
 # setup Qt
 list(APPEND CMAKE_PREFIX_PATH "${GJ_BASE_DIR}/qt6-build/qtbase/lib/cmake")
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets gui)
@@ -80,6 +83,7 @@ target_link_libraries(GrooveJr
         Qt6::Core
         Qt6::Widgets
         Qt6::Gui
+        Boost::log
 )
 target_compile_options(GrooveJr PRIVATE ${INCLUDE_FLAGS})
 set_target_properties(GrooveJr PROPERTIES LINKER_LANGUAGE CXX)
