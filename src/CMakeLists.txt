@@ -62,6 +62,8 @@ add_executable(GrooveJr
         main.cpp
         AppState.h
         AppState.cpp
+        Logging.h
+        Logging.cpp
         actors/Supervisor.h
         actors/Playback.h
         actors/ActorIds.h

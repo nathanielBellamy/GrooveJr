@@ -9,18 +9,6 @@
 #include <signal.h>
 #include <unordered_map>
 
-#include <boost/log/core.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/log/expressions.hpp>
-#include <boost/log/sinks/text_file_backend.hpp>
-#include <boost/log/utility/setup/file.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
-#include <boost/log/sources/severity_logger.hpp>
-#include <boost/log/sources/record_ostream.hpp>
-#include <boost/move/utility_core.hpp>
-#include <boost/log/sources/logger.hpp>
-#include <boost/log/sources/global_logger_storage.hpp>
-
 #include "caf/actor_from_state.hpp"
 #include "caf/actor_ostream.hpp"
 #include "caf/actor_system.hpp"
@@ -37,6 +25,7 @@
 #include "./audio/effects/vst3/Plugin.h"
 #include "./audio/Mixer.h"
 
+#include "./Logging.h"
 #include "./AppState.h"
 #include "./enums/PlayState.h"
 

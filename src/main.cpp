@@ -9,15 +9,6 @@ using namespace caf;
 using namespace Steinberg;
 using namespace Steinberg::Vst;
 
-enum severity_level {
-  info,
-  notification,
-  warning,
-  error,
-  critical
-};
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(gjLog, boost::log::sources::severity_logger<severity_level>);
-
 namespace Gj {
 
 auto PluginContext = new Audio::Effects::Vst3::Host::App();
@@ -40,36 +31,14 @@ void shutdown_handler(const int sig) {
   exit(sig);
 }
 
-void initLogging() {
-  boost::log::register_simple_formatter_factory< severity_level, char >("Severity");
-  boost::log::add_file_log(
-      boost::log::keywords::file_name = "/Users/ns/code/GrooveJr/logs/groove_jr_%N.log",
-      boost::log::keywords::rotation_size = 10 * 1024 * 1024,
-      boost::log::keywords::auto_flush = true,
-      boost::log::keywords::format = "[%TimeStamp%] :: %Severity% :: %Caller% :: %Message%"
-  );
-  boost::log::add_common_attributes();
-
-  boost::log::sources::severity_logger< severity_level > slg;
-
-  boost::log::sources::severity_logger<severity_level> lg = gjLog::get();
-  lg.add_attribute("Caller", boost::log::attributes::constant<std::string>("initLogging"));
-  BOOST_LOG_SEV(lg, info) << "GrooveJr log initialized";
-
-  // boost::log::core::get()->set_filter(
-  //     boost::log::trivial::severity >= boost::log::trivial::info
-  // );
-}
-
 void caf_main(int argc, char *argv[], void (*shutdown_handler) (int), actor_system& sys, AppState* gAppState, Audio::Mixer* mixer) {
-  boost::log::sources::severity_logger<severity_level> lg = gjLog::get();
-  lg.add_attribute("Caller", boost::log::attributes::constant<std::string>("caf_main"));
+  Logging::write(Info, "caf_main", "Starting caf_main");
 
   // init Qt App
   auto qtApp = QApplication {argc, argv};
   auto mainWindow = Gui::MainWindow { sys, shutdown_handler };
 
-  BOOST_LOG_SEV(lg, info) << "qtApp instantiated";
+  Logging::write(Info, "caf_main", "Qt instantiated");
 
   // init ActorSystem
   auto supervisor = sys.spawn(
@@ -79,7 +48,7 @@ void caf_main(int argc, char *argv[], void (*shutdown_handler) (int), actor_syst
     mixer
   );
 
-  BOOST_LOG_SEV(lg, info) << "Supervisor actor spawned";
+  Logging::write(Info, "caf_main", "Supervisor actor spawned");
 
   mainWindow.show();
   qtApp.exec();
@@ -102,7 +71,7 @@ extern "C" {
         sigaction(SIGINT, &sigIntHandler, nullptr);
 
         // setup logging
-        initLogging();
+        Logging::init();
 
         initVst3PluginContext();
 
