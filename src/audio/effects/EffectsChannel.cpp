@@ -12,7 +12,10 @@ namespace Effects {
 EffectsChannel::EffectsChannel(float** inputBuffers)
   : inputBuffers(inputBuffers)
   , channel({ 1.0f, 0.0f })
-{}
+  {
+
+  Logging::write(Error, "EffecstChannel::ctor", "TODO: rework buffers");
+}
 
 EffectsChannel::~EffectsChannel() {
   for (const auto plugin : vst3Plugins) {

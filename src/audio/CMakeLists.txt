@@ -10,7 +10,10 @@ project(GjAudio VERSION 0.0.0)
 set (CMAKE_CXX_STANDARD 17)
 # utilize vst3sdk cmake modules
 list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
-include(SMTG_DetectPlatform) # to detect platform
+include(SMTG_DetectPlatform)
+
+# logging
+find_package(Boost REQUIRED COMPONENTS log_setup log)
 
 set (C_LIBS_INCLUDE_FLAGS
         -I${C_LIBS_HOME}/libsndfile/1.2.2/include
@@ -59,6 +62,8 @@ add_library(GjAudio SHARED
         Mixer.h
         Mixer.cpp
         Channel.h
+        Logging.h
+        Logging.cpp
         effects/vst3/Plugin.h
         effects/vst3/Plugin.cpp
         effects/EffectsChannel.h
@@ -81,4 +86,8 @@ if (SMTG_MAC)
     -framework Foundation"
     )
 endif (SMTG_MAC)
-target_link_libraries(GjAudio PUBLIC ${LINK_LIBRARIES})
+target_link_libraries(GjAudio PUBLIC
+    ${LINK_LIBRARIES}
+    Boost::log
+    ${Boost_LIBRARIES}
+)

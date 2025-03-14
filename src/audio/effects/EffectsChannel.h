@@ -7,6 +7,7 @@
 
 #include "./vst3/Plugin.h"
 #include "../Channel.h"
+#include "../Logging.h"
 
 namespace Gj {
 namespace Audio {
