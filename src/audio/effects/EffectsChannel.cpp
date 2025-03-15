@@ -9,16 +9,33 @@ namespace Gj {
 namespace Audio {
 namespace Effects {
 
-EffectsChannel::EffectsChannel(float** inputBuffers, int audioFramesPerBuffer)
-  : audioFramesPerBuffer(audioFramesPerBuffer)
+using namespace Steinberg;
+
+EffectsChannel::EffectsChannel(AppState* gAppState, int index, float** inputBuffers)
+  : gAppState(gAppState)
+	, index(index)
 	, inputBuffers(inputBuffers)
   , channel({ 1.0f, 0.0f })
   {
 
-  Logging::write(Info, "EffectsChannel::ctor", "Instantiating EffectsChannel");
+  Logging::write(
+  	Info,
+  	"EffectsChannel::ctor",
+  	"Instantiating EffectsChannel: " + std::to_string(index)
+  );
+
+	allocateBuffers();
+
+	Logging::write(
+		Info,
+		"EffectsChannel::ctor",
+		"Allocated input buffers for EffectsChannel: " + std::to_string(index)
+	);
 }
 
 EffectsChannel::~EffectsChannel() {
+	freeBuffers();
+
   for (const auto plugin : vst3Plugins) {
     delete plugin;
   }
@@ -26,10 +43,10 @@ EffectsChannel::~EffectsChannel() {
 
 void EffectsChannel::allocateBuffers() {
 	buffersA = static_cast<float**>(
-		malloc(2 * audioFramesPerBuffer * sizeof(float))
+		malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
 	);
 	buffersB = static_cast<float**>(
-		malloc(2 * audioFramesPerBuffer * sizeof(float))
+		malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
 	);
 
 	if (buffersA == nullptr || buffersB == nullptr) {
@@ -38,17 +55,90 @@ void EffectsChannel::allocateBuffers() {
 			"EffectsChannel::allocateBuffers",
 			"Unable to allocate memory for buffersIn or buffersOut."
 		);
-		throw std::runtime_error ("Unable to allocate memory for buffersIn.");
+		throw std::runtime_error ("Unable to allocate memory for EffectsChannel buffers.");
 	}
 
 	for (int c = 0; c < 2; c++) {
-		buffersA[c] = new float[audioFramesPerBuffer];
-		buffersB[c] = new float[audioFramesPerBuffer];
+		buffersA[c] = new float[gAppState->audioFramesPerBuffer];
+		buffersB[c] = new float[gAppState->audioFramesPerBuffer];
 	}
 }
 
-bool EffectsChannel::addEffect(Vst3::Plugin* plugin) {
-  vst3Plugins.push_back(plugin);
+void EffectsChannel::freeBuffers() const {
+	try {
+		for (int i = 0; i < 2; i++) {
+			delete buffersA[i];
+			delete buffersB[i];
+		}
+
+		free(buffersA);
+		free(buffersB);
+	} catch (...) {
+		Logging::write(
+			Error,
+			"EffectsChannel::freeBuffers",
+			"An error occurred while attempting to free buffers for EffectsChannel " + std::to_string(index)
+		);
+	}
+}
+
+float** EffectsChannel::determineInputBuffers(const int index) const {
+	if (index == 0) {
+		return inputBuffers;
+	} else if (index % 2 == 0) {
+		return buffersB;
+	} else if (index % 2 == 1) {
+		return buffersA;
+	}
+}
+
+float** EffectsChannel::determineOutputBuffers(const int index) const {
+	if (index % 2 == 0) {
+		return buffersA;
+	} else if (index % 2 == 1) {
+		return buffersB;
+	}
+}
+
+bool EffectsChannel::addEffect(const std::string& effectPath) {
+	const int effectIndex = vst3Plugins.size();
+	float** in = determineInputBuffers(effectIndex);
+	float** out = determineOutputBuffers(effectIndex);
+  const auto effect =
+  	std::make_unique<Vst3::Plugin>(
+  		effectPath,
+  		gAppState,
+  		in,
+  		out
+  	);
+
+  const FUnknownPtr<Vst::IAudioProcessor> processor = effect->getProcesser();
+  // int latencySamples = processor->getLatencySamples();
+  // incorporateLatencySamples(latencySamples);
+
+  if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer)) {
+    std::cout << "Mixer: " << effectPath << " Unable to process sample size" << std::endl;
+    return false;
+  }
+
+  // Vst::BusDirection busDirection;
+  // int32 index;
+  // Vst::SpeakerArrangement arrangement;
+  // processor->getBusArrangement(busDirection, index, arrangement);
+
+  const int32 maxSamplesPerBlock = gAppState->audioFramesPerBuffer;
+  Vst::ProcessSetup setup = {
+    Vst::kRealtime,
+    Vst::kSample64,
+    maxSamplesPerBlock,
+    44100.0
+  };
+  processor->setupProcessing(setup);
+
+  effect->setAudioFramesPerBuffer(gAppState->audioFramesPerBuffer);
+  effect->allocateBuffers();
+
+  vst3Plugins.push_back(effect);
   return chainBuffers();
 }
 

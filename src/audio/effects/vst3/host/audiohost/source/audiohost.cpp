@@ -65,9 +65,20 @@ void App::setModule (VST3::Hosting::Module::Ptr module_) {
   module = module_;
 }
 
-App::App(const int audioFramesPerBuffer)
-	: audioFramesPerBuffer(audioFramesPerBuffer)
-	{}
+App::App(Gj::AppState* gAppState, float** inputBuffers, float** outputBuffers)
+	: gAppState(gAppState)
+	, inputBuffers(inputBuffers)
+	, outputBuffers(outputBuffers)
+	{
+
+	buffers = { // Steinberg::Vst::IAudioClient::Buffers
+			 inputBuffers,
+			channelCount,
+			outputBuffers,
+			channelCount,
+			gAppState->audioFramesPerBuffer
+	};
+}
 
 //------------------------------------------------------------------------
 App::~App () noexcept
@@ -137,68 +148,9 @@ void App::init (const std::vector<std::string>& cmdArgs)
 	startAudioClient (cmdArgs.back (), std::move (uid), flags);
 }
 
-void App::allocateBuffers()
-{
-	const auto buffersIn = static_cast<float**>(
-		malloc(channelCount * audioFramesPerBuffer * sizeof(float))
-	);
-	const auto buffersOut = static_cast<float**>(
-		malloc(channelCount * audioFramesPerBuffer * sizeof(float))
-	);
-
-	if (buffersIn == nullptr || buffersOut == nullptr) {
-		std::cout << "Unable to allocate memory for buffersIn or buffersOut." << std::endl;
-		throw std::runtime_error ("Unable to allocate memory for buffersIn.");
-	}
-
-	for (int c = 0; c < channelCount; c++) {
-		buffersIn[c] = new float[audioFramesPerBuffer];
-		buffersOut[c] = new float[audioFramesPerBuffer];
-	}
-
-	buffers = { // Steinberg::Vst::IAudioClient::Buffers
-			 buffersIn,
-			channelCount,
-			buffersOut,
-			channelCount,
-			audioFramesPerBuffer
-	};
-}
-
-void App::allocateInputBuffers()
-{
-	// must be called after allocateBuffers
-	const auto buffersIn = static_cast<float**>(
-		malloc(channelCount * audioFramesPerBuffer * sizeof(float))
-	);
-
-	if (buffersIn == nullptr) {
-		std::cout << "Unable to allocate memory for buffersIn." << std::endl;
-		throw std::runtime_error ("Unable to allocate memory for buffersIn.");
-	}
-
-	for (int c = 0; c < channelCount; c++) {
-		buffersIn[c] = new float[audioFramesPerBuffer];
-	}
-
-	buffers.inputs = buffersIn;
-}
-
-void App::freeBuffers() const {
-	for (int i = 0; i < 2; i++) {
-		delete buffers.inputs[i];
-		delete buffers.outputs[i];
-	}
-
-	free(buffers.inputs);
-	free(buffers.outputs);
-}
-
-
 //------------------------------------------------------------------------
 void App::terminate ()
 {
-	freeBuffers ();
 	delete this;
 }
 

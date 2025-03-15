@@ -5,8 +5,11 @@
 #ifndef EFFECTSCHANNEL_H
 #define EFFECTSCHANNEL_H
 
+#include <memory>
+
 #include "./vst3/Plugin.h"
 #include "../Channel.h"
+#include "../../AppState.h"
 #include "../Logging.h"
 
 namespace Gj {
@@ -16,17 +19,22 @@ namespace Effects {
 class EffectsChannel {
   // NOTE:
   // fx0:inputBuffers->buffersA, fx1:buffersA->buffersB, fx2:buffersB->buffersA, fx3:buffersA->buffersB, ...
-  int audioFramesPerBuffer;
+  AppState* gAppState;
+  int index;
   float** inputBuffers;
   float** buffersA;
   float** buffersB;
+  std::vector<std::unique_ptr<Vst3::Plugin>> vst3Plugins;
+
   void allocateBuffers();
+  void freeBuffers() const;
+  float** EffectsChannel::determineInputBuffers(const int index) const;
+  float** EffectsChannel::determineOutputBuffers(const int index) const;
 
   public:
     Channel channel;
-    std::vector<Vst3::Plugin*> vst3Plugins;
 
-    EffectsChannel(float** inputBuffers, int audioFramesPerBuffer);
+    EffectsChannel(int index, int audioFramesPerBuffer, float** inputBuffers);
     ~EffectsChannel();
 
     bool addPlugin();
@@ -41,7 +49,7 @@ class EffectsChannel {
     bool chainBuffers() const;
     bool unchainBuffers() const;
 
-    bool addEffect(Vst3::Plugin *plugin);
+    bool addEffect(const std::string& effectPath);
 
 
 };

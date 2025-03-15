@@ -37,6 +37,8 @@
 
 #pragma once
 
+#include "../../../../../../AppState.h"
+
 #include "./media/audioclient.h"
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/iapplication.h"
 // #include "public.sdk/samples/vst-hosting/audiohost/source/media/audioclient.h"
@@ -52,10 +54,12 @@ namespace AudioHost {
 //------------------------------------------------------------------------
 class App : public EditorHost::IApplication
 {
-	int audioFramesPerBuffer;
+	Gj::AppState* gAppState;
+	float** inputBuffers;
+	float** outputBuffers;
 
 public:
-	App(int audioFramesPerBuffer);
+	App(Gj::AppState* gAppState, float** inputBuffers, float** outputBuffers);
 	~App () noexcept override;
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;
@@ -66,15 +70,10 @@ public:
 	OPtr<IEditController> editController;
 	AudioClientPtr audioClient;
 	int channelCount = {2}; // TODO: access info from libsndfile
-	void setAudioFramesPerBuffer(int framesPerBuffer) {  audioFramesPerBuffer = framesPerBuffer; }
-	void allocateBuffers ();
-	void allocateInputBuffers (); // used during unchaining of plugin buffers
 
 private:
 	enum OpenFlags
 	{};
-
-	void freeBuffers () const;
 
 	void startAudioClient (const std::string& path, VST3::Optional<VST3::UID> effectID,
 	                       uint32 flags);

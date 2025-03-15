@@ -9,9 +9,11 @@ namespace Audio {
 namespace Effects {
 namespace Vst3 {
 
-Plugin::Plugin(const std::string& path, int audioFramesPerBuffer) :
-  name(path),
-  path(path) {
+Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffers, float** outputBuffers)
+	: name(path)
+	, path(path)
+	, gAppState(gAppState)
+	{
 
 	std::string error;
 	const VST3::Hosting::Module::Ptr module = VST3::Hosting::Module::create(path, error);
@@ -23,7 +25,11 @@ Plugin::Plugin(const std::string& path, int audioFramesPerBuffer) :
 //		Steinberg::IPlatform::instance ().kill (-1, reason);
 	}
 
-	audioHost = new Steinberg::Vst::AudioHost::App(audioFramesPerBuffer);
+	audioHost = new Steinberg::Vst::AudioHost::App(
+		gAppState,
+		inputBuffers,
+		outputBuffers
+	);
 	audioHost->setModule(module);
 	const auto& cmdArgs = std::vector<std::string> { path };
 	audioHost->init(cmdArgs);

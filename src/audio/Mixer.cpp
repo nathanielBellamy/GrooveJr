@@ -61,7 +61,13 @@ bool Mixer::freeInputBuffers() const {
 }
 
 bool Mixer::addEffectsChannel() {
-    effectsChannels.push_back(new Effects::EffectsChannel(inputBuffers, gAppState->audioFramesPerBuffer));
+    effectsChannels.push_back(
+      new Effects::EffectsChannel(
+        effectsChannels.size(),
+        gAppState->audioFramesPerBuffer,
+        inputBuffers
+      )
+    );
     channelCount++;
     return true;
 }
