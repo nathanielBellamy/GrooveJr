@@ -20,7 +20,7 @@ class Mixer {
     AppState* gAppState;
     Channel mainChannel;
     Channel dryChannel;
-    int channelCount;
+    float channelCount;
     std::vector<Effects::EffectsChannel*> effectsChannels;
 
     void incorporateLatencySamples(int latencySamples) const;

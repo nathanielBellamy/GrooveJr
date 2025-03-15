@@ -24,6 +24,7 @@ class EffectsChannel {
   float** inputBuffers;
   float** buffersA;
   float** buffersB;
+  std::vector<std::unique_ptr<Vst3::Plugin>> vst3Plugins;
 
   void allocateBuffers();
   void freeBuffers() const;
@@ -31,14 +32,12 @@ class EffectsChannel {
   [[nodiscard]] float** determineOutputBuffers(int index) const;
 
   public:
-    std::vector<std::unique_ptr<Vst3::Plugin>> vst3Plugins;
     Channel channel;
 
-    EffectsChannel(int index, int audioFramesPerBuffer, float** inputBuffers);
+    EffectsChannel(AppState* gAppState, int index, float** inputBuffers);
     ~EffectsChannel();
 
-    bool addPlugin();
-    bool removePlugin();
+    void process() const;
 
     float getGain();
     void setGain(float gain);
@@ -46,11 +45,9 @@ class EffectsChannel {
     float getPan();
     void setPan(float pan);
 
-    bool chainBuffers() const;
-    bool unchainBuffers() const;
-
     bool addEffect(const std::string& effectPath);
-
+    [[nodiscard]] float** getBuffersWriteOut() const;
+    void setSampleRate(int sampleRate) const;
 
 };
 

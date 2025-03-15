@@ -15,6 +15,8 @@ EffectsChannel::EffectsChannel(AppState* gAppState, int index, float** inputBuff
   : gAppState(gAppState)
 	, index(index)
 	, inputBuffers(inputBuffers)
+	, buffersA()
+	, buffersB()
   , channel({ 1.0f, 0.0f })
   {
 
@@ -92,6 +94,7 @@ float** EffectsChannel::determineInputBuffers(const int index) const {
 	}
 }
 
+// output for plugin at index
 float** EffectsChannel::determineOutputBuffers(const int index) const {
 	if (index % 2 == 0) {
 		return buffersA;
@@ -100,8 +103,17 @@ float** EffectsChannel::determineOutputBuffers(const int index) const {
 	}
 }
 
+// output read by Mixer after processing
+float** EffectsChannel::getBuffersWriteOut() const {
+	if (vst3Plugins.size() % 2 == 0) {
+		return buffersB;
+	} else {
+		return buffersA;
+	}
+}
+
 bool EffectsChannel::addEffect(const std::string& effectPath) {
-	const int effectIndex = vst3Plugins.size();
+	const int effectIndex = static_cast<int>(vst3Plugins.size());
 	float** in = determineInputBuffers(effectIndex);
 	float** out = determineOutputBuffers(effectIndex);
   const auto effect =
@@ -136,32 +148,24 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
   processor->setupProcessing(setup);
 
   vst3Plugins.push_back(effect);
-  return chainBuffers();
+	return true;
 }
 
-bool EffectsChannel::chainBuffers() const {
-  vst3Plugins.front()->audioHost->buffers.inputs = inputBuffers;
-
-  for (int i = 1; i < vst3Plugins.size(); ++i) {
-    const auto currentPlugin = vst3Plugins.at(i);
-    const auto previousPlugin = vst3Plugins.at(i-1);
-    const auto toFree = currentPlugin->audioHost->buffers.inputs;
-    currentPlugin->audioHost->buffers.inputs = previousPlugin->audioHost->buffers.outputs;
-    for (int j = 0; j < 2; j++) {
-    	delete toFree[j];
+void EffectsChannel::setSampleRate(int sampleRate) const {
+    for (const auto plugin : vst3Plugins) {
+      plugin->audioHost->audioClient->setSamplerate(sampleRate);
+      plugin->audioHost->audioClient->setBlockSize(gAppState->audioFramesPerBuffer);
     }
-    free(toFree);
-  }
-
-  return true;
 }
 
-bool EffectsChannel::unchainBuffers() const {
-  for (int i = 1; i < vst3Plugins.size(); ++i) {
-  	vst3Plugins.at(i)->audioHost->allocateInputBuffers();
-  }
 
-  return true;
+void EffectsChannel::process() const {
+	for (const auto plugin : vst3Plugins) {
+		const auto audioHost = plugin->audioHost;
+		audioHost->audioClient->process(audioHost->buffers, gAppState->audioFramesPerBuffer);
+	}
+}
+
 }
 
 } // Effects

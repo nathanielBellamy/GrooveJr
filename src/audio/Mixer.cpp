@@ -13,7 +13,7 @@ Mixer::Mixer(AppState* gAppState)
   : gAppState(gAppState)
   , mainChannel({ 1.0f, 0.0f })
   , dryChannel({ 1.0f, 0.0f })
-  , channelCount(1)
+  , channelCount(1.0f)
   , effectsChannels(std::vector<Effects::EffectsChannel*>())
   , inputBuffers(nullptr)
   {
@@ -63,8 +63,8 @@ bool Mixer::freeInputBuffers() const {
 bool Mixer::addEffectsChannel() {
     effectsChannels.push_back(
       new Effects::EffectsChannel(
-        effectsChannels.size(),
-        gAppState->audioFramesPerBuffer,
+        gAppState,
+        static_cast<int>(effectsChannels.size()),
         inputBuffers
       )
     );
@@ -80,10 +80,7 @@ bool Mixer::removeEffectsChannel(const int idx) {
 
 bool Mixer::setSampleRate(const int sampleRate) const {
   for (const auto effectsChannel : effectsChannels) {
-    for (const auto effect : effectsChannel->vst3Plugins) {
-      effect->audioHost->audioClient->setSamplerate(44100);
-      effect->audioHost->audioClient->setBlockSize(gAppState->audioFramesPerBuffer);
-    }
+    effectsChannel->setSampleRate(sampleRate);
   }
   return true;
 }
@@ -115,7 +112,7 @@ bool Mixer::mixDown(
     for (int i = 0; i < framesPerBuffer; i++) {
       const auto val = audioDataBuffer[audioDataIndex + 2 * i + c];
       // write dry channel output buffer
-      outputBuffer[2 * i + c] = dryChannel.gain * val / channelCount;
+      outputBuffer[2 * i + c] = (dryChannel.gain * val) / channelCount;
 
       // de-interlace audio into shared effects input buffers
       inputBuffers[c][i] = val;
@@ -123,21 +120,17 @@ bool Mixer::mixDown(
   }
 
   for (const auto effectsChannel : effectsChannels) {
-    if (channelCount == 1) // dry channel only
+    effectsChannel->process();
+    if (channelCount == 1.0f) // dry channel only
       break;
 
-    // process audio plugins
-    for (int j = 0; j < effectsChannel->vst3Plugins.size(); j++) {
-      // note: buffers have been chained
-      const auto currPlugin = effectsChannel->vst3Plugins.at(j);
-      currPlugin->audioHost->audioClient->process(currPlugin->audioHost->buffers, framesPerBuffer);
-    }
+    const auto effectsChannelBuffersWriteOut = effectsChannel->getBuffersWriteOut();
 
     // write processed audio to outputBuffer
     for (int c = 0; c < audioDataSfChannels; c++) {
       for (int i = 0; i < framesPerBuffer; i++) {
         outputBuffer[2 * i + c] +=
-          ( effectsChannel->channel.gain * effectsChannel->vst3Plugins.back()->audioHost->buffers.outputs[c][i] ) / channelCount;
+          ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[c][i] ) / channelCount;
       }
     }
   }
