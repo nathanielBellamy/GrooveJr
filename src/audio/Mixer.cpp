@@ -10,17 +10,18 @@ namespace Audio {
   using namespace Steinberg;
 
 Mixer::Mixer(AppState* gAppState)
-    : gAppState(gAppState)
-    , mainChannel({ 1.0f, 0.0f })
-    , dryChannel({ 1.0f, 0.0f })
-    , channelCount(1)
-    , effectsChannels(std::vector<Effects::EffectsChannel*>())
-    , inputBuffers(nullptr)
-    {
-      allocateInputBuffers();
+  : gAppState(gAppState)
+  , mainChannel({ 1.0f, 0.0f })
+  , dryChannel({ 1.0f, 0.0f })
+  , channelCount(1)
+  , effectsChannels(std::vector<Effects::EffectsChannel*>())
+  , inputBuffers(nullptr)
+  {
 
-      outputBuffer = new float[gAppState->audioFramesPerBuffer * 2];
-    }
+  allocateInputBuffers();
+
+  outputBuffer = new float[gAppState->audioFramesPerBuffer * 2];
+}
 
 Mixer::~Mixer() {
   std::cout << "Mixer::~Mixer" << std::endl;
@@ -35,19 +36,19 @@ Mixer::~Mixer() {
 }
 
 bool Mixer::allocateInputBuffers() {
-    // TODO: don't assume stereo
-    inputBuffers = static_cast<float**>(
-        malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
-    );
+  // TODO: don't assume stereo
+  inputBuffers = static_cast<float**>(
+      malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
+  );
 
-    if (inputBuffers == nullptr)
-      std::cout << "Unable to allocate memory for Mixer.inputBuffers" << std::endl;
+  if (inputBuffers == nullptr)
+    std::cout << "Unable to allocate memory for Mixer.inputBuffers" << std::endl;
 
-    for (int c = 0; c < 2; c++) {
-      inputBuffers[c] = new float[gAppState->audioFramesPerBuffer];
-    }
+  for (int c = 0; c < 2; c++) {
+    inputBuffers[c] = new float[gAppState->audioFramesPerBuffer];
+  }
 
-    return true;
+  return true;
 }
 
 bool Mixer::freeInputBuffers() const {
@@ -60,7 +61,7 @@ bool Mixer::freeInputBuffers() const {
 }
 
 bool Mixer::addEffectsChannel() {
-    effectsChannels.push_back(new Effects::EffectsChannel(inputBuffers));
+    effectsChannels.push_back(new Effects::EffectsChannel(inputBuffers, gAppState->audioFramesPerBuffer));
     channelCount++;
     return true;
 }

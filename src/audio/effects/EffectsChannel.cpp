@@ -9,8 +9,9 @@ namespace Gj {
 namespace Audio {
 namespace Effects {
 
-EffectsChannel::EffectsChannel(float** inputBuffers)
-  : inputBuffers(inputBuffers)
+EffectsChannel::EffectsChannel(float** inputBuffers, int audioFramesPerBuffer)
+  : audioFramesPerBuffer(audioFramesPerBuffer)
+	, inputBuffers(inputBuffers)
   , channel({ 1.0f, 0.0f })
   {
 
@@ -21,6 +22,29 @@ EffectsChannel::~EffectsChannel() {
   for (const auto plugin : vst3Plugins) {
     delete plugin;
   }
+}
+
+void EffectsChannel::allocateBuffers() {
+	buffersA = static_cast<float**>(
+		malloc(2 * audioFramesPerBuffer * sizeof(float))
+	);
+	buffersB = static_cast<float**>(
+		malloc(2 * audioFramesPerBuffer * sizeof(float))
+	);
+
+	if (buffersA == nullptr || buffersB == nullptr) {
+		Logging::write(
+			Error,
+			"EffectsChannel::allocateBuffers",
+			"Unable to allocate memory for buffersIn or buffersOut."
+		);
+		throw std::runtime_error ("Unable to allocate memory for buffersIn.");
+	}
+
+	for (int c = 0; c < 2; c++) {
+		buffersA[c] = new float[audioFramesPerBuffer];
+		buffersB[c] = new float[audioFramesPerBuffer];
+	}
 }
 
 bool EffectsChannel::addEffect(Vst3::Plugin* plugin) {

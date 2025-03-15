@@ -14,13 +14,19 @@ namespace Audio {
 namespace Effects {
 
 class EffectsChannel {
+  // NOTE:
+  // fx0:inputBuffers->buffersA, fx1:buffersA->buffersB, fx2:buffersB->buffersA, fx3:buffersA->buffersB, ...
+  int audioFramesPerBuffer;
   float** inputBuffers;
+  float** buffersA;
+  float** buffersB;
+  void allocateBuffers();
 
   public:
     Channel channel;
     std::vector<Vst3::Plugin*> vst3Plugins;
 
-    EffectsChannel(float** inputBuffers);
+    EffectsChannel(float** inputBuffers, int audioFramesPerBuffer);
     ~EffectsChannel();
 
     bool addPlugin();
@@ -36,6 +42,7 @@ class EffectsChannel {
     bool unchainBuffers() const;
 
     bool addEffect(Vst3::Plugin *plugin);
+
 
 };
 

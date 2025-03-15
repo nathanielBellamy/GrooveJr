@@ -156,13 +156,13 @@ void App::allocateBuffers()
 		buffersOut[c] = new float[audioFramesPerBuffer];
 	}
 
-    buffers = { // Steinberg::Vst::IAudioClient::Buffers
-         buffersIn,
-        channelCount,
-        buffersOut,
-        channelCount,
-        audioFramesPerBuffer
-    };
+	buffers = { // Steinberg::Vst::IAudioClient::Buffers
+			 buffersIn,
+			channelCount,
+			buffersOut,
+			channelCount,
+			audioFramesPerBuffer
+	};
 }
 
 void App::allocateInputBuffers()
