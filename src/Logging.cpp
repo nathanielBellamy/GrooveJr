@@ -10,11 +10,12 @@ BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(Logger, boost::log::sources::severity_log
 
 void Logging::init() {
   boost::log::register_simple_formatter_factory< LogSeverityLevel, char >("Severity");
+  boost::log::register_simple_formatter_factory< Audio::LogSeverityLevel, char >("AudioSeverity");
   boost::log::add_file_log(
       boost::log::keywords::file_name = "/Users/ns/code/GrooveJr/logs/groove_jr_%N.log",
       boost::log::keywords::rotation_size = 10 * 1024 * 1024,
       boost::log::keywords::auto_flush = true,
-      boost::log::keywords::format = "[%TimeStamp%] :: %Severity% :: %Caller% :: %Message%"
+      boost::log::keywords::format = "[%TimeStamp%] :: %Severity%%AudioSeverity% :: %Caller% :: %Message%"
   );
   boost::log::add_common_attributes();
 

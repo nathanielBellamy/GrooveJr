@@ -14,8 +14,9 @@ void Logging::write(LogSeverityLevel severity, const std::string& caller, const 
   // TODO:
   // - debug severity in log
   boost::log::sources::severity_logger<LogSeverityLevel> lg = AudioLogger::get();
+  lg.add_attribute("AudioSeverity", boost::log::attributes::constant<LogSeverityLevel>(severity));
   lg.add_attribute("Caller", boost::log::attributes::constant<std::string>(caller));
-  BOOST_LOG_SEV(lg, severity) << message;
+  BOOST_LOG_SEV(lg, severity) << message; // NOTE: severity here is a placeholder
 }
 
 } // Audio

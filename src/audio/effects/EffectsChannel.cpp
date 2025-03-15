@@ -14,7 +14,7 @@ EffectsChannel::EffectsChannel(float** inputBuffers)
   , channel({ 1.0f, 0.0f })
   {
 
-  Logging::write(Error, "EffecstChannel::ctor", "TODO: rework buffers");
+  Logging::write(Info, "EffectsChannel::ctor", "Instantiating EffectsChannel");
 }
 
 EffectsChannel::~EffectsChannel() {

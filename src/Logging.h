@@ -19,6 +19,8 @@
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/sources/global_logger_storage.hpp>
 
+#include "audio/Logging.h"
+
 namespace Gj {
 
 enum LogSeverityLevel {
