@@ -79,8 +79,8 @@ bool Mixer::removeEffectsChannel(const int idx) {
 }
 
 bool Mixer::setSampleRate(const int sampleRate) const {
-  for (auto effectsChannel : effectsChannels) {
-    for (auto effect : effectsChannel->vst3Plugins) {
+  for (const auto effectsChannel : effectsChannels) {
+    for (const auto effect : effectsChannel->vst3Plugins) {
       effect->audioHost->audioClient->setSamplerate(44100);
       effect->audioHost->audioClient->setBlockSize(gAppState->audioFramesPerBuffer);
     }
@@ -97,33 +97,7 @@ void Mixer::incorporateLatencySamples(const int latencySamples) const {
 }
 
 bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) const {
-  const auto effect = new Audio::Effects::Vst3::Plugin(effectPath, gAppState->audioFramesPerBuffer);
-  FUnknownPtr<Vst::IAudioProcessor> processor = effect->getProcesser();
-  // int latencySamples = processor->getLatencySamples();
-  // incorporateLatencySamples(latencySamples);
-
-  if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer)) {
-    std::cout << "Mixer: " << effectPath << " Unable to process sample size" << std::endl;
-    return false;
-  }
-
-  // Vst::BusDirection busDirection;
-  // int32 index;
-  // Vst::SpeakerArrangement arrangement;
-  // processor->getBusArrangement(busDirection, index, arrangement);
-
-  const int32 maxSamplesPerBlock = gAppState->audioFramesPerBuffer;
-  Vst::ProcessSetup setup = {
-    Vst::kRealtime,
-    Vst::kSample64,
-    maxSamplesPerBlock,
-    44100.0
-  };
-  processor->setupProcessing(setup);
-
-  effect->setAudioFramesPerBuffer(gAppState->audioFramesPerBuffer);
-  effect->allocateBuffers();
-  return effectsChannels.at(idx)->addEffect(effect);
+  return effectsChannels.at(idx)->addEffect(effectPath);
 }
 
 bool Mixer::mixDown(

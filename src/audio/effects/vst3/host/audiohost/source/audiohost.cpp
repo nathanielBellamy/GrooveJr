@@ -59,7 +59,7 @@ namespace Steinberg {
 
 namespace Vst {
 namespace AudioHost {
-static AudioHost::AppInit gInit (std::make_unique<App> (128));
+// static AudioHost::AppInit gInit (std::make_unique<App> (128));
 
 void App::setModule (VST3::Hosting::Module::Ptr module_) {
   module = module_;

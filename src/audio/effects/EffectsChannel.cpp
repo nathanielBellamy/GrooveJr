@@ -87,7 +87,7 @@ float** EffectsChannel::determineInputBuffers(const int index) const {
 		return inputBuffers;
 	} else if (index % 2 == 0) {
 		return buffersB;
-	} else if (index % 2 == 1) {
+	} else { // index % 2 == 1
 		return buffersA;
 	}
 }
@@ -95,7 +95,7 @@ float** EffectsChannel::determineInputBuffers(const int index) const {
 float** EffectsChannel::determineOutputBuffers(const int index) const {
 	if (index % 2 == 0) {
 		return buffersA;
-	} else if (index % 2 == 1) {
+	} else {
 		return buffersB;
 	}
 }
@@ -134,9 +134,6 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
     44100.0
   };
   processor->setupProcessing(setup);
-
-  effect->setAudioFramesPerBuffer(gAppState->audioFramesPerBuffer);
-  effect->allocateBuffers();
 
   vst3Plugins.push_back(effect);
   return chainBuffers();

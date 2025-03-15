@@ -24,14 +24,14 @@ class EffectsChannel {
   float** inputBuffers;
   float** buffersA;
   float** buffersB;
-  std::vector<std::unique_ptr<Vst3::Plugin>> vst3Plugins;
 
   void allocateBuffers();
   void freeBuffers() const;
-  float** EffectsChannel::determineInputBuffers(const int index) const;
-  float** EffectsChannel::determineOutputBuffers(const int index) const;
+  [[nodiscard]] float** determineInputBuffers(int index) const;
+  [[nodiscard]] float** determineOutputBuffers(int index) const;
 
   public:
+    std::vector<std::unique_ptr<Vst3::Plugin>> vst3Plugins;
     Channel channel;
 
     EffectsChannel(int index, int audioFramesPerBuffer, float** inputBuffers);

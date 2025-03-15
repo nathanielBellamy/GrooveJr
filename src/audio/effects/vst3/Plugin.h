@@ -30,14 +30,6 @@ struct Plugin {
     );
     ~Plugin();
 
-    void setAudioFramesPerBuffer(int framesPerBuffer) {
-        audioHost->setAudioFramesPerBuffer(framesPerBuffer);
-    };
-
-    void allocateBuffers() {
-        audioHost->allocateBuffers();
-    }
-
     Steinberg::FUnknownPtr<Steinberg::Vst::IAudioProcessor> getProcesser() {
         return audioHost->audioClient->getComponent();
     }
