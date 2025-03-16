@@ -53,7 +53,7 @@ Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffer
 	Logging::write(
 		Info,
 		"Plugin::Plugin()",
-		"Initiated audioHost for " + path
+		"Initialized audioHost for " + path
 	);
 
 	try {
@@ -75,7 +75,7 @@ Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffer
 	Logging::write(
 		Info,
 		"Plugin::Plugin()",
-		"Initiated editorHost for " + path
+		"Initialized editorHost for " + path
 	);
 }
 

@@ -72,11 +72,11 @@ App::App(Gj::AppState* gAppState, float** inputBuffers, float** outputBuffers)
 	{
 
 	buffers = { // Steinberg::Vst::IAudioClient::Buffers
-			 inputBuffers,
-			channelCount,
-			outputBuffers,
-			channelCount,
-			gAppState->audioFramesPerBuffer
+		inputBuffers,
+		channelCount,
+		outputBuffers,
+		channelCount,
+		gAppState->audioFramesPerBuffer
 	};
 }
 
