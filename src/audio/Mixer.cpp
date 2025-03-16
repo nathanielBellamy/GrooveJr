@@ -94,6 +94,11 @@ void Mixer::incorporateLatencySamples(const int latencySamples) const {
 }
 
 bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) const {
+  Logging::write(
+    Info,
+    "Mixer::addEffectToChannel",
+    "Adding effect " + effectPath + " to channel " + std::to_string(idx)
+  );
   return effectsChannels.at(idx)->addEffect(effectPath);
 }
 

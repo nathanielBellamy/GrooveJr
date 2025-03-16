@@ -143,8 +143,6 @@ void App::init (const std::vector<std::string>& cmdArgs)
 	VST3::Optional<VST3::UID> uid;
 	uint32 flags {};
 
-	// allocateBuffers ();
-	std::cout << "Allocating audiohost buffers done" << std::endl;
 	startAudioClient (cmdArgs.back (), std::move (uid), flags);
 }
 

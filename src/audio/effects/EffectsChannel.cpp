@@ -108,6 +108,12 @@ float** EffectsChannel::getBuffersWriteOut() const {
 }
 
 bool EffectsChannel::addEffect(const std::string& effectPath) {
+	Logging::write(
+		Info,
+		"EffectsChannel::addEffect",
+		"Adding effect: " + effectPath + " to channel " + std::to_string(index)
+	);
+
 	const int effectIndex = static_cast<int>(vst3Plugins.size());
 	float** in = determineInputBuffers(effectIndex);
 	float** out = determineOutputBuffers(effectIndex);
@@ -119,12 +125,24 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
   		out
   	);
 
+	Logging::write(
+		Info,
+		"EffectsChannel::addEffect",
+		"Instantiated plugin " + effectPath + " for channel " + std::to_string(index)
+	);
+
   const FUnknownPtr<Vst::IAudioProcessor> processor = effect->getProcesser();
   // int latencySamples = processor->getLatencySamples();
   // incorporateLatencySamples(latencySamples);
 
-  if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer))
-    return false;
+  if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer)) {
+		Logging::write(
+			Warning,
+			"EffectsChannel::addEffect",
+			"Processor for " + effectPath + " on channel " + std::to_string(index) + " cannot process sample size " + std::to_string(gAppState->audioFramesPerBuffer)
+		);
+  	return false;
+  }
 
   // Vst::BusDirection busDirection;
   // int32 index;
@@ -139,8 +157,14 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
     44100.0
   };
   processor->setupProcessing(setup);
-
   vst3Plugins.push_back(std::move(effect));
+
+	Logging::write(
+		Info,
+		"EffectsChannel::addEffect",
+		"Effect " + effectPath + " added on channel " + std::to_string(index)
+	);
+
 	return true;
 }
 

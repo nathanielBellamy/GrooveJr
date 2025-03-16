@@ -9,7 +9,9 @@
 #include <cmath>
 #include <algorithm>
 #include <memory>
+
 #include "../AppState.h"
+#include "../Logging.h"
 #include "./Channel.h"
 #include "./effects/EffectsChannel.h"
 

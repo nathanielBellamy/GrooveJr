@@ -5,6 +5,7 @@
 #ifndef VST3PLUGIN_H
 #define VST3PLUGIN_H
 
+#include "../../../Logging.h"
 #include "../../../AppState.h"
 #include "./host/audiohost/source/audiohost.h"
 #include "./host/editorhost/source/editorhost.h"

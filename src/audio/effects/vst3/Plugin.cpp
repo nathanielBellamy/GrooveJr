@@ -10,10 +10,16 @@ namespace Effects {
 namespace Vst3 {
 
 Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffers, float** outputBuffers)
-	: name(path)
+	: gAppState(gAppState)
+	, name(path)
 	, path(path)
-	, gAppState(gAppState)
 	{
+
+	Logging::write(
+		Info,
+		"Plugin::Plugin()",
+		"Instantiating plugin " + path
+	);
 
 	std::string error;
 	const VST3::Hosting::Module::Ptr module = VST3::Hosting::Module::create(path, error);
@@ -30,6 +36,13 @@ Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffer
 		inputBuffers,
 		outputBuffers
 	);
+
+	Logging::write(
+		Info,
+		"Plugin::Plugin()",
+		"Instantiated audioHost for " + path
+	);
+
 	audioHost->setModule(module);
 	const auto& cmdArgs = std::vector<std::string> { path };
 	audioHost->init(cmdArgs);
