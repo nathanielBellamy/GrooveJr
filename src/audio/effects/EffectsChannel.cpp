@@ -37,10 +37,6 @@ EffectsChannel::EffectsChannel(AppState* gAppState, int index, float** inputBuff
 
 EffectsChannel::~EffectsChannel() {
 	freeBuffers();
-
-  for (const auto plugin : vst3Plugins) {
-    delete plugin;
-  }
 }
 
 void EffectsChannel::allocateBuffers() {
@@ -85,38 +81,37 @@ void EffectsChannel::freeBuffers() const {
 }
 
 float** EffectsChannel::determineInputBuffers(const int index) const {
-	if (index == 0) {
+	if (index == 0)
 		return inputBuffers;
-	} else if (index % 2 == 0) {
+
+	if (index % 2 == 0)
 		return buffersB;
-	} else { // index % 2 == 1
-		return buffersA;
-	}
+
+	// index % 2 == 1
+	return buffersA;
 }
 
 // output for plugin at index
 float** EffectsChannel::determineOutputBuffers(const int index) const {
-	if (index % 2 == 0) {
+	if (index % 2 == 0)
 		return buffersA;
-	} else {
-		return buffersB;
-	}
+
+	return buffersB;
 }
 
 // output read by Mixer after processing
 float** EffectsChannel::getBuffersWriteOut() const {
-	if (vst3Plugins.size() % 2 == 0) {
+	if (vst3Plugins.size() % 2 == 0)
 		return buffersB;
-	} else {
-		return buffersA;
-	}
+
+	return buffersA;
 }
 
 bool EffectsChannel::addEffect(const std::string& effectPath) {
 	const int effectIndex = static_cast<int>(vst3Plugins.size());
 	float** in = determineInputBuffers(effectIndex);
 	float** out = determineOutputBuffers(effectIndex);
-  const auto effect =
+  auto effect =
   	std::make_unique<Vst3::Plugin>(
   		effectPath,
   		gAppState,
@@ -128,10 +123,8 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
   // int latencySamples = processor->getLatencySamples();
   // incorporateLatencySamples(latencySamples);
 
-  if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer)) {
-    std::cout << "Mixer: " << effectPath << " Unable to process sample size" << std::endl;
+  if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer))
     return false;
-  }
 
   // Vst::BusDirection busDirection;
   // int32 index;
@@ -147,25 +140,23 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
   };
   processor->setupProcessing(setup);
 
-  vst3Plugins.push_back(effect);
+  vst3Plugins.push_back(std::move(effect));
 	return true;
 }
 
 void EffectsChannel::setSampleRate(int sampleRate) const {
-    for (const auto plugin : vst3Plugins) {
-      plugin->audioHost->audioClient->setSamplerate(sampleRate);
-      plugin->audioHost->audioClient->setBlockSize(gAppState->audioFramesPerBuffer);
-    }
+	for (auto&& plugin : vst3Plugins) {
+		plugin->audioHost->audioClient->setSamplerate(sampleRate);
+		plugin->audioHost->audioClient->setBlockSize(gAppState->audioFramesPerBuffer);
+	}
 }
 
 
 void EffectsChannel::process() const {
-	for (const auto plugin : vst3Plugins) {
+	for (auto&& plugin : vst3Plugins) {
 		const auto audioHost = plugin->audioHost;
 		audioHost->audioClient->process(audioHost->buffers, gAppState->audioFramesPerBuffer);
 	}
-}
-
 }
 
 } // Effects
