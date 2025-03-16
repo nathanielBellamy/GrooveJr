@@ -53,6 +53,10 @@ qt_add_library(GjGui STATIC
         Mixer/Channel/EffectsChannel/EffectsSlots.cpp
         Mixer/Channel/EffectsChannel/MuteSoloContainer.h
         Mixer/Channel/EffectsChannel/MuteSoloContainer.cpp
+        Mixer/Effects/EffectsContainer.h
+        Mixer/Effects/EffectsContainer.cpp
+        Mixer/Effects/VST3Window.h
+        Mixer/Effects/VST3Window.cpp
         MusicLibrary/MusicLibraryWindow.h
         MusicLibrary/MusicLibraryWindow.cpp
         TransportControl.h
