@@ -31,30 +31,52 @@ Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffer
 //		Steinberg::IPlatform::instance ().kill (-1, reason);
 	}
 
-	audioHost = new Steinberg::Vst::AudioHost::App(
-		gAppState,
-		inputBuffers,
-		outputBuffers
-	);
+	const auto& cmdArgs = std::vector<std::string> { path };
+
+	try {
+		audioHost = new Steinberg::Vst::AudioHost::App(
+			gAppState,
+			inputBuffers,
+			outputBuffers
+		);
+		audioHost->setModule(module);
+		audioHost->init(cmdArgs);
+	} catch (...) {
+		Logging::write(
+			Error,
+			"Plugin::Plugin()",
+			"An error occurred while initialiazing audioHost for " + path
+		);
+		return;
+	}
 
 	Logging::write(
 		Info,
 		"Plugin::Plugin()",
-		"Instantiated audioHost for " + path
+		"Initiated audioHost for " + path
 	);
 
-	audioHost->setModule(module);
-	const auto& cmdArgs = std::vector<std::string> { path };
-	audioHost->init(cmdArgs);
+	try {
+		editorHost = new Steinberg::Vst::EditorHost::App;
+		editorHost->setModule(module);
+		editorHost->plugProvider = audioHost->plugProvider;
+		editorHost->editController = audioHost->editController;
+		editorHost->processorComponent = audioHost->component;
+		editorHost->init (cmdArgs);
+	} catch (...) {
+		Logging::write(
+			Warning,
+			"Plugin::Plugin()",
+			"An error occured while initiating editorhost for " + path
+		);
+		return;
+	}
 
-	editorHost = new Steinberg::Vst::EditorHost::App;
-	editorHost->setModule(module);
-
-	editorHost->plugProvider = audioHost->plugProvider;
-	editorHost->editController = audioHost->editController;
-	editorHost->processorComponent = audioHost->component;
-
-	editorHost->init (cmdArgs);
+	Logging::write(
+		Info,
+		"Plugin::Plugin()",
+		"Initiated editorHost for " + path
+	);
 }
 
 Plugin::~Plugin() {
