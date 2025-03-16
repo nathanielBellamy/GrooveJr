@@ -48,6 +48,7 @@
 #include "ComponentHandler.h"
 #include "WindowController.h"
 
+#include "../../../../../../Logging.h"
 //------------------------------------------------------------------------
 namespace Steinberg {
 namespace Vst {

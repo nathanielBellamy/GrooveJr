@@ -82,12 +82,23 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 {
 	std::string error;
 
-    auto factory = module->getFactory ();
+	auto factory = module->getFactory ();
 	if (auto factoryHostContext = IPlatform::instance ().getPluginFactoryContext ())
 		factory.setHostContext (factoryHostContext);
 
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"EditorHost::openEditor",
+		"Retrived factory from module"
+	);
+
 	if (!plugProvider)
 	{
+		Gj::Audio::Logging::write(
+			Gj::Audio::LogSeverityLevel::Error,
+			"EditorHost::openEditor",
+			"No VST3 plugProvider."
+		);
 		if (effectID)
 			error =
 			    "No VST3 Audio Module Class with UID " + effectID->toString () + " found in file ";
@@ -99,6 +110,11 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 
 	if (!editController)
 	{
+		Gj::Audio::Logging::write(
+			Gj::Audio::LogSeverityLevel::Error,
+			"EditorHost::openEditor",
+			"No VST3 editController."
+		);
 		error = "No EditController found (needed for allowing editor) in file " + path;
 		IPlatform::instance ().kill (-1, error);
 	}
@@ -109,6 +125,12 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 	{
 		// SMTG_DBPRT0 ("setComponentHandler is used\n");
 		editController->setComponentHandler (&gComponentHandler);
+
+		Gj::Audio::Logging::write(
+			Gj::Audio::LogSeverityLevel::Info,
+			"EditorHost::openEditor",
+			"Set editController componentHandler"
+		);
 
 		// connect the 2 components
 		Vst::IConnectionPoint* iConnectionPointComponent = nullptr;
@@ -121,6 +143,12 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 		{
 			iConnectionPointComponent->connect (iConnectionPointController);
 			iConnectionPointController->connect (iConnectionPointComponent);
+
+			Gj::Audio::Logging::write(
+				Gj::Audio::LogSeverityLevel::Info,
+				"EditorHost::openEditor",
+				"Connected controller and component thru ConnectionPoints"
+			);
 		}
 
 		// TODO: debug undefined MemoryStream ctor + dtor
@@ -137,6 +165,12 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 	// SMTG_DBPRT1 ("Open Editor for %s...\n", path.c_str ());
 	createViewAndShow (editController);
 
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"EditorHost::openEditor",
+		"Created view and showed"
+	);
+
 	if (flags & kSecondWindow)
 	{
 		// SMTG_DBPRT0 ("Open 2cd Editor...\n");
@@ -150,6 +184,11 @@ void App::createViewAndShow (IEditController* controller)
 	auto view = owned (controller->createView (ViewType::kEditor));
 	if (!view)
 	{
+		Gj::Audio::Logging::write(
+			Gj::Audio::LogSeverityLevel::Error,
+			"EditorHost::createViewAndShow",
+			"Could not create view"
+		);
 		IPlatform::instance ().kill (-1, "EditController does not provide its own editor");
 	}
 
@@ -157,20 +196,45 @@ void App::createViewAndShow (IEditController* controller)
 	auto result = view->getSize (&plugViewSize);
 	if (result != kResultTrue)
 	{
+		Gj::Audio::Logging::write(
+			Gj::Audio::LogSeverityLevel::Error,
+			"EditorHost::createViewAndShow",
+			"Could not get view size"
+		);
 		IPlatform::instance ().kill (-1, "Could not get editor view size");
 	}
 
 	auto viewRect = ViewRectToRect (plugViewSize);
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"EditorHost::createViewAndShow",
+		"Retrieved view rect"
+	);
 
 	windowController = std::make_shared<WindowController> (view);
 	window = IPlatform::instance ().createWindow (
-	    "GS Editor", viewRect.size, view->canResize () == kResultTrue, windowController);
+	    "Gj Editor", viewRect.size, view->canResize () == kResultTrue, windowController);
 	if (!window)
 	{
+		Gj::Audio::Logging::write(
+			Gj::Audio::LogSeverityLevel::Error,
+			"EditorHost::createViewAndShow",
+			"Could not create window"
+		);
 		IPlatform::instance ().kill (-1, "Could not create window");
 	}
 
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"EditorHost::createViewAndShow",
+		"Will call window->show()"
+	);
 	window->show ();
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"EditorHost::createViewAndShow",
+		"Called window->show()"
+	);
 }
 
 //------------------------------------------------------------------------
@@ -213,6 +277,11 @@ options:
 		IPlatform::instance ().kill (0, helpText);
 	}
 
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"EditorHost::init",
+		"Handled cmdArgs - will call openEditor"
+	);
 	openEditor (cmdArgs.back (), std::move (uid), flags);
 }
 
