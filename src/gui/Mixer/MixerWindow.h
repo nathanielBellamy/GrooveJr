@@ -13,6 +13,7 @@
 
 #include "./Channel/MainDryContainer.h"
 #include "./Channel/EffectsChannel/EffectsChannelsContainer.h"
+#include "./Effects/EffectsContainer.h"
 
 using namespace caf;
 
@@ -29,6 +30,7 @@ class MixerWindow final : public QWidget {
     QLabel title;
     MainDryContainer mainDryContainer;
     EffectsChannelsContainer effectsChannelsContainer;
+    EffectsContainer effectsContainer;
 
     void setStyle();
     void setupGrid();
