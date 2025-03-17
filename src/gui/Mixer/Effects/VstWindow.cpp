@@ -2,28 +2,28 @@
 // Created by ns on 3/16/25.
 //
 
-#include "VST3Window.h"
+#include "VstWindow.h"
 
 namespace Gj {
 namespace Gui {
 
-VST3Window::VST3Window(QWidget* parent)
+VstWindow::VstWindow(QWidget* parent)
   : QWidget(parent)
   {}
 
-void VST3Window::show() {
+void VstWindow::show() {
  // TODO
 }
 
-void VST3Window::close() {
+void VstWindow::close() {
   // TODO
 }
 
-void VST3Window::resize(Size newSize) {
+void VstWindow::resize(Size newSize) {
   // TODO
 }
 
-Size VST3Window::getContentSize() {
+Size VstWindow::getContentSize() {
   return {
     300,
     300

@@ -55,24 +55,30 @@ qt_add_library(GjGui STATIC
         Mixer/Channel/EffectsChannel/MuteSoloContainer.cpp
         Mixer/Effects/EffectsContainer.h
         Mixer/Effects/EffectsContainer.cpp
-        Mixer/Effects/VST3Window.h
-        Mixer/Effects/VST3Window.cpp
+        Mixer/Effects/VstWindow.h
+        Mixer/Effects/VstWindow.cpp
         MusicLibrary/MusicLibraryWindow.h
         MusicLibrary/MusicLibraryWindow.cpp
         TransportControl.h
         TransportControl.cpp
 )
 
+message(GUI_VST3_SDK="${VST3SDK_HOME}")
+
 target_compile_options(GjGui
         PRIVATE
+        -I${VST3SDK_HOME}
         -I/Users/ns/code/qt6-build/qtbase/include
         -I/Users/ns/code/actor-framework/libcaf_core
         -I/Users/ns/code/actor-framework/libcaf_io
 )
+
 target_link_libraries(GjGui
         PRIVATE
         Qt6::Core
         Qt6::Widgets
         Qt6::Gui
         CAF::core
+        -L${VST3SDK_HOME}/build/lib/Release
+        -lsdk
 )

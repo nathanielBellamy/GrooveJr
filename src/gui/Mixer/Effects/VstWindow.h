@@ -2,22 +2,23 @@
 // Created by ns on 3/16/25.
 //
 
-#ifndef VST3WINDOW_H
-#define VST3WINDOW_H
+#ifndef VSTWINDOW_H
+#define VSTWINDOW_H
 
 #include <QWidget>
 
-#include "../../../audio/effects/vst3/host/editorhost/source/platform/iwindow.h";
+#include "../../../audio/effects/vst3/host/editorhost/source/platform/iwindow.h"
 
 namespace Gj {
 namespace Gui {
 
 using namespace Steinberg::Vst::EditorHost;
 
-class VST3Window : public QWidget, public IWindow {
+class VstWindow : public QWidget, public IWindow {
 
 public:
-	~VST3Window () noexcept = default;
+  VstWindow(QWidget* parent);
+	~VstWindow () noexcept = default;
 
 	void show ();
 	void close ();
@@ -35,4 +36,4 @@ public:
 
 
 
-#endif //VST3WINDOW_H
+#endif //VSTWINDOW_H
