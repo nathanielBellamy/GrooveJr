@@ -23,6 +23,24 @@ void VstWindow::resize(Size newSize) {
   // TODO
 }
 
+NativePlatformWindow VstWindow::getNativePlatformWindow() const {
+  #if SMTG_OS_WINDOWS
+    const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringWin;
+  #elif SMTG_OS_IOS
+    const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringIOS;
+  #elif SMTG_OS_MACOS
+    const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringMac;
+  #elif SMTG_OS_LINUX
+    const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringLinux;
+  #endif
+
+  return {
+    Steinberg::kPlatformStringMac,
+    nullptr // TODO
+  };
+}
+
+
 Size VstWindow::getContentSize() {
   return {
     300,

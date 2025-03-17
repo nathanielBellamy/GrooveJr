@@ -17,17 +17,17 @@ using namespace Steinberg::Vst::EditorHost;
 class VstWindow : public QWidget, public IWindow {
 
 public:
-  VstWindow(QWidget* parent);
-	~VstWindow () noexcept = default;
+  explicit VstWindow(QWidget* parent);
+	~VstWindow () noexcept override = default;
 
-	void show ();
-	void close ();
-	void resize (Size newSize);
-	Size getContentSize ();
+	void show () override;
+	void close () override;
+	void resize (Size newSize) override;
+	Size getContentSize () override;
 
-	NativePlatformWindow getNativePlatformWindow () const;
+	NativePlatformWindow getNativePlatformWindow () const override;
 
-	Steinberg::tresult queryInterface (const Steinberg::TUID iid, void** obj);
+	Steinberg::tresult queryInterface (const Steinberg::TUID iid, void** obj) override;
 
 };
 

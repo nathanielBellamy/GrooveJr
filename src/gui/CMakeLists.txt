@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(LLVM_INSTALL_DIR /opt/homebrew/opt/llvm)
 
+list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
+include(SMTG_DetectPlatform)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
 qt_standard_project_setup()
