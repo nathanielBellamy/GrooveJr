@@ -40,7 +40,6 @@ NativePlatformWindow VstWindow::getNativePlatformWindow() const {
   };
 }
 
-
 Size VstWindow::getContentSize() {
   return {
     300,
@@ -48,8 +47,7 @@ Size VstWindow::getContentSize() {
   };
 }
 
-
-Steinberg::tresult queryInterface (const Steinberg::TUID iid, void** obj) {
+Steinberg::tresult VstWindow::queryInterface (const Steinberg::TUID iid, void** obj) {
   return 1;
 };
 

@@ -25,7 +25,7 @@ public:
 	void resize (Size newSize) override;
 	Size getContentSize () override;
 
-	NativePlatformWindow getNativePlatformWindow () const override;
+	[[nodiscard]] NativePlatformWindow getNativePlatformWindow () const override;
 
 	Steinberg::tresult queryInterface (const Steinberg::TUID iid, void** obj) override;
 
