@@ -11,6 +11,10 @@ VstWindow::VstWindow(QWidget* parent)
   : QWidget(parent)
   {}
 
+void VstWindow::setStyle() {
+  setStyleSheet("background-color: purple;");
+}
+
 void VstWindow::show() {
  // TODO
 }
@@ -36,7 +40,7 @@ NativePlatformWindow VstWindow::getNativePlatformWindow() const {
 
   return {
     Steinberg::kPlatformStringMac,
-    nullptr // TODO
+    (void*) this
   };
 }
 

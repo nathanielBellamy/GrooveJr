@@ -14,7 +14,7 @@ namespace Gui {
 
 using namespace Steinberg::Vst::EditorHost;
 
-class VstWindow : public QWidget, public IWindow {
+class VstWindow final : public QWidget, public IWindow {
 
 public:
   explicit VstWindow(QWidget* parent);
@@ -29,6 +29,7 @@ public:
 
 	Steinberg::tresult queryInterface (const Steinberg::TUID iid, void** obj) override;
 
+	void setStyle();
 };
 
 } // Gui

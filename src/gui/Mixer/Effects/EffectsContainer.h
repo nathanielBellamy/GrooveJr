@@ -5,14 +5,19 @@
 #ifndef EFFECTSCONTAINER_H
 #define EFFECTSCONTAINER_H
 
+#include<memory>
+#include<vector>
+
 #include <QLabel>
 #include <QWidget>
 #include <QGridLayout>
 
+#include "VstWindow.h"
+
 namespace Gj {
 namespace Gui {
 
-class EffectsContainer : public QWidget {
+class EffectsContainer final : public QWidget {
 
   public:
      EffectsContainer(QWidget* parent);
@@ -20,6 +25,7 @@ class EffectsContainer : public QWidget {
   private:
     QGridLayout grid;
     QLabel title;
+    std::vector<std::unique_ptr<VstWindow>> vstWindows;
     void setupGrid();
     void setStyle();
 };
