@@ -9,6 +9,9 @@ set(LLVM_INSTALL_DIR /opt/homebrew/opt/llvm)
 list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
 
+# logging
+find_package(Boost REQUIRED COMPONENTS log_setup log)
+
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
 qt_standard_project_setup()
 
@@ -83,4 +86,6 @@ target_link_libraries(GjGui
         CAF::core
         -L${VST3SDK_HOME}/build/lib/Release
         -lsdk
+        Boost::log
+        ${Boost_LIBRARIES}
 )
