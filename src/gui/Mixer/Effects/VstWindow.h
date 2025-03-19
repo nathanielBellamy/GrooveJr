@@ -7,7 +7,8 @@
 
 #include <QWidget>
 
-#include "../../../audio/effects/vst3/host/editorhost/source/editorhost.h"
+#include "public.sdk/samples/vst-hosting/editorhost/source/platform/iwindow.h"
+#include "public.sdk/source/vst/hosting/plugprovider.h"
 
 namespace Gj {
 namespace Gui {
