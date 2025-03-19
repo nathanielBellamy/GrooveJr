@@ -9,10 +9,32 @@ namespace Gui {
 
 VstWindow::VstWindow(QWidget* parent)
   : QWidget(parent)
-  {}
+  , grid(this)
+  , title(this) {
+
+  title.setText("VstWindow");
+  title.setFont({title.font().family(), 18});
+
+  setStyle();
+  setupGrid();
+}
 
 void VstWindow::setStyle() {
   setStyleSheet("background-color: purple;");
+}
+
+void VstWindow::setupGrid() {
+  grid.setVerticalSpacing(1);
+
+  grid.addWidget(&title, 0, 0, 1, -1);
+
+  grid.setColumnStretch(0, 1);
+  grid.setColumnStretch(1, 10);
+  grid.setRowMinimumHeight(0, 20);
+  grid.setRowStretch(1, 10);
+
+
+  setLayout(&grid);
 }
 
 void VstWindow::show() {

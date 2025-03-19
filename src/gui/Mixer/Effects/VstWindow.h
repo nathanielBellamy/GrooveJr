@@ -6,6 +6,8 @@
 #define VSTWINDOW_H
 
 #include <QWidget>
+#include <QGridLayout>
+#include <QLabel>
 
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/iwindow.h"
 #include "public.sdk/source/vst/hosting/plugprovider.h"
@@ -16,6 +18,12 @@ namespace Gui {
 using namespace Steinberg::Vst::EditorHost;
 
 class VstWindow final : public QWidget, public IWindow {
+
+private:
+	QGridLayout grid;
+	QLabel title;
+	void setStyle();
+	void setupGrid();
 
 public:
   explicit VstWindow(QWidget* parent);
@@ -30,7 +38,6 @@ public:
 
 	Steinberg::tresult queryInterface (const Steinberg::TUID iid, void** obj) override;
 
-	void setStyle();
 };
 
 } // Gui
