@@ -37,6 +37,9 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/iapplication.h"
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/iwindow.h"
 #include "public.sdk/source/vst/hosting/module.h"
@@ -58,15 +61,17 @@ namespace EditorHost {
 class App : public IApplication
 {
 public:
+	App(std::vector<std::shared_ptr<IWindow>>& windows);
 	~App () noexcept override;
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;
-    void setModule(VST3::Hosting::Module::Ptr module);
+	void setModule(VST3::Hosting::Module::Ptr module);
 	OPtr<IEditController> editController {nullptr};
-    OPtr<IComponent> processorComponent;
+	OPtr<IComponent> processorComponent;
 	IPtr<PlugProvider> plugProvider {nullptr};
 
 private:
+	std::vector<std::shared_ptr<IWindow>>& windows;
 	enum OpenFlags
 	{
 		kSetComponentHandler = 1 << 0,

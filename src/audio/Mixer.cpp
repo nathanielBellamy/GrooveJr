@@ -98,7 +98,7 @@ bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) con
     "Mixer::addEffectToChannel",
     "Adding effect " + effectPath + " to channel " + std::to_string(idx)
   );
-  return effectsChannels.at(idx)->addEffect(effectPath);
+  return effectsChannels.at(idx)->addEffect(effectPath, vstWindows);
 }
 
 bool Mixer::mixDown(

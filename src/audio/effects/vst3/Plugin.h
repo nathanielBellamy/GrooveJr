@@ -9,6 +9,7 @@
 #include "../../../AppState.h"
 #include "./host/audiohost/source/audiohost.h"
 #include "./host/editorhost/source/editorhost.h"
+#include "../../../gui/Mixer/Effects/VstWindow.h"
 
 
 namespace Gj {
@@ -27,7 +28,8 @@ struct Plugin {
         const std::string& path,
         AppState* gAppState,
         float** inputBuffers,
-        float** outputBuffers
+        float** outputBuffers,
+        std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows
     );
     ~Plugin();
 

@@ -29,7 +29,7 @@ class Mixer {
     void incorporateLatencySamples(int latencySamples) const;
 
   public:
-    std::vector<std::unique_ptr<Gui::VstWindow>> vstWindows;
+    std::vector<std::shared_ptr<Gui::VstWindow>> vstWindows;
     float** inputBuffers;
     float* outputBuffer;
 

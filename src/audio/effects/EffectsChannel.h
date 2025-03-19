@@ -11,6 +11,7 @@
 #include "../Channel.h"
 #include "../../AppState.h"
 #include "../Logging.h"
+#include "../../gui/Mixer/Effects/VstWindow.h"
 
 namespace Gj {
 namespace Audio {
@@ -45,7 +46,7 @@ class EffectsChannel {
     float getPan();
     void setPan(float pan);
 
-    bool addEffect(const std::string& effectPath);
+    bool addEffect(const std::string& effectPath, const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows);
     [[nodiscard]] float** getBuffersWriteOut() const;
     void setSampleRate(int sampleRate) const;
 

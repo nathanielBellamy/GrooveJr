@@ -9,7 +9,7 @@ namespace Audio {
 namespace Effects {
 namespace Vst3 {
 
-Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffers, float** outputBuffers)
+Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffers, float** outputBuffers, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows)
 	: gAppState(gAppState)
 	, name(path)
 	, path(path)
@@ -57,7 +57,8 @@ Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffer
 	);
 
 	try {
-		editorHost = new Steinberg::Vst::EditorHost::App;
+		// TODO: cast vstWindows to std::vector<WindowPtr>
+		editorHost = new Steinberg::Vst::EditorHost::App(vstWindows);
 		editorHost->setModule(module);
 		editorHost->plugProvider = audioHost->plugProvider;
 		editorHost->editController = audioHost->editController;

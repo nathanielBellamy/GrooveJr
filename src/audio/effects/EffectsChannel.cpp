@@ -107,7 +107,7 @@ float** EffectsChannel::getBuffersWriteOut() const {
 	return buffersA;
 }
 
-bool EffectsChannel::addEffect(const std::string& effectPath) {
+bool EffectsChannel::addEffect(const std::string& effectPath, const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) {
 	Logging::write(
 		Info,
 		"EffectsChannel::addEffect",
@@ -122,7 +122,8 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
   		effectPath,
   		gAppState,
   		in,
-  		out
+  		out,
+  		vstWindows
   	);
 
 	Logging::write(

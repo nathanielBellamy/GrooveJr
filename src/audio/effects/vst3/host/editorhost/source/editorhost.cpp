@@ -65,7 +65,11 @@ inline bool operator!= (const ViewRect& r1, const ViewRect& r2)
 namespace Vst {
 namespace EditorHost {
 
-static AppInit gInit (std::make_unique<App> ());
+// static AppInit gInit (std::make_unique<App> ());
+
+App::App(std::vector<std::shared_ptr<IWindow>>& windows)
+	: windows(windows)
+	{}
 
 //------------------------------------------------------------------------
 App::~App () noexcept
@@ -212,8 +216,9 @@ void App::createViewAndShow (IEditController* controller)
 	);
 
 	windowController = std::make_shared<WindowController> (view);
-	window = IPlatform::instance ().createWindow (
-	    "Gj Editor", viewRect.size, view->canResize () == kResultTrue, windowController);
+	window = static_cast<WindowPtr>(windows.front().get());
+		// IPlatform::instance ().createWindow (
+	 //    "Gj Editor", viewRect.size, view->canResize () == kResultTrue, windowController);
 	if (!window)
 	{
 		Gj::Audio::Logging::write(
