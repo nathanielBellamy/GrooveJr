@@ -14,7 +14,6 @@ Mixer::Mixer(AppState* gAppState)
   , mainChannel({ 1.0f, 0.0f })
   , dryChannel({ 1.0f, 0.0f })
   , channelCount(1.0f)
-  , effectsChannels(std::vector<Effects::EffectsChannel*>())
   , inputBuffers(nullptr)
   {
 

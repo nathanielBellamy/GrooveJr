@@ -9,15 +9,16 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 
-MainWindow::MainWindow(actor_system& actorSystem, void (*shutdown_handler) (int))
+MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*shutdown_handler) (int))
     : actorSystem(actorSystem)
+    , mixer(mixer)
     , shutdown_handler(shutdown_handler)
     , container(this)
     , menuBar(new MenuBar(actorSystem, this))
     , transportControl(this, actorSystem)
     , grid(&container)
     , musicLibraryWindow(&container, actorSystem)
-    , mixerWindow(&container, actorSystem)
+    , mixerWindow(&container, actorSystem, mixer)
     {
 
   setCentralWidget(&container);

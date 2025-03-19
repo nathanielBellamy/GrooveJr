@@ -15,6 +15,9 @@ include(SMTG_DetectPlatform)
 # logging
 find_package(Boost REQUIRED COMPONENTS log_setup log)
 
+# handle Vst3 Windows in Qt
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+
 set (C_LIBS_INCLUDE_FLAGS
         -I${C_LIBS_HOME}/libsndfile/1.2.2/include
         -I${C_LIBS_HOME}/portaudio/19.7.0/include
@@ -90,4 +93,6 @@ target_link_libraries(GjAudio PUBLIC
     ${LINK_LIBRARIES}
     Boost::log
     ${Boost_LIBRARIES}
+    Qt6::Core
+    Qt6::Widgets
 )

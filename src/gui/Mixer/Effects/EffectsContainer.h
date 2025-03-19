@@ -13,6 +13,7 @@
 #include <QGridLayout>
 
 #include "VstWindow.h"
+#include "../../../audio/Mixer.h"
 
 namespace Gj {
 namespace Gui {
@@ -20,12 +21,12 @@ namespace Gui {
 class EffectsContainer final : public QWidget {
 
   public:
-     EffectsContainer(QWidget* parent);
+     EffectsContainer(QWidget* parent, Audio::Mixer* mixer);
 
   private:
+    Audio::Mixer* mixer;
     QGridLayout grid;
     QLabel title;
-    std::vector<std::unique_ptr<VstWindow>> vstWindows;
     void setupGrid();
     void setStyle();
 };

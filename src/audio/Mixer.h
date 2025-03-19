@@ -14,6 +14,7 @@
 #include "../Logging.h"
 #include "./Channel.h"
 #include "./effects/EffectsChannel.h"
+#include "../gui/Mixer/Effects/VstWindow.h"
 
 namespace Gj {
 namespace Audio {
@@ -28,6 +29,7 @@ class Mixer {
     void incorporateLatencySamples(int latencySamples) const;
 
   public:
+    std::vector<std::unique_ptr<Gui::VstWindow>> vstWindows;
     float** inputBuffers;
     float* outputBuffer;
 
