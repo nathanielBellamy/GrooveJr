@@ -33,11 +33,15 @@ void VstWindow::setupGrid() {
   grid.setRowMinimumHeight(0, 20);
   grid.setRowStretch(1, 10);
 
-
   setLayout(&grid);
 }
 
 void VstWindow::show() {
+  Logging::write(
+    Info,
+    "VstWindow::show",
+    "EditorHost called VstWindow show"
+  );
  // TODO
 }
 

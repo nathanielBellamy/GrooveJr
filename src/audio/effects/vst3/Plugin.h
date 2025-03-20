@@ -29,7 +29,7 @@ struct Plugin {
         AppState* gAppState,
         float** inputBuffers,
         float** outputBuffers,
-        std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows
+        Steinberg::Vst::EditorHost::WindowPtr window
     );
     ~Plugin();
 

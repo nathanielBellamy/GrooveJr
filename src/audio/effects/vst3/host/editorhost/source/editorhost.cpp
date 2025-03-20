@@ -67,8 +67,8 @@ namespace EditorHost {
 
 // static AppInit gInit (std::make_unique<App> ());
 
-App::App(std::vector<std::shared_ptr<IWindow>>& windows)
-	: windows(windows)
+App::App(WindowPtr window)
+	: window(window)
 	{}
 
 //------------------------------------------------------------------------
@@ -216,7 +216,6 @@ void App::createViewAndShow (IEditController* controller)
 	);
 
 	windowController = std::make_shared<WindowController> (view);
-	window = static_cast<WindowPtr>(windows.front().get());
 		// IPlatform::instance ().createWindow (
 	 //    "Gj Editor", viewRect.size, view->canResize () == kResultTrue, windowController);
 	if (!window)
@@ -347,7 +346,7 @@ void WindowController::closePlugView ()
 		}
 		plugView = nullptr;
 	}
-	window = nullptr;
+	// window = nullptr;
 }
 
 //------------------------------------------------------------------------

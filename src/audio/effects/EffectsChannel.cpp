@@ -117,13 +117,16 @@ bool EffectsChannel::addEffect(const std::string& effectPath, const std::vector<
 	const int effectIndex = static_cast<int>(vst3Plugins.size());
 	float** in = determineInputBuffers(effectIndex);
 	float** out = determineOutputBuffers(effectIndex);
+
+	auto window = static_cast<Vst::EditorHost::WindowPtr>(vstWindows[effectIndex]);
+
   auto effect =
   	std::make_unique<Vst3::Plugin>(
   		effectPath,
   		gAppState,
   		in,
   		out,
-  		vstWindows
+  		window
   	);
 
 	Logging::write(

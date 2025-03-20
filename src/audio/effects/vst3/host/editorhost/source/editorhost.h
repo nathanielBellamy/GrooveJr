@@ -61,7 +61,7 @@ namespace EditorHost {
 class App : public IApplication
 {
 public:
-	App(std::vector<std::shared_ptr<IWindow>>& windows);
+	App(WindowPtr window);
 	~App () noexcept override;
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;
@@ -71,7 +71,6 @@ public:
 	IPtr<PlugProvider> plugProvider {nullptr};
 
 private:
-	std::vector<std::shared_ptr<IWindow>>& windows;
 	enum OpenFlags
 	{
 		kSetComponentHandler = 1 << 0,
