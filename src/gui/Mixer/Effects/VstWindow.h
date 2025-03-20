@@ -6,6 +6,7 @@
 #define VSTWINDOW_H
 
 #include <QWidget>
+#include <QWindow>
 #include <QGridLayout>
 #include <QLabel>
 

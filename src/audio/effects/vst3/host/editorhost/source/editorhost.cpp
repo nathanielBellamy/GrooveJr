@@ -234,6 +234,8 @@ void App::createViewAndShow (IEditController* controller)
 		"Will call window->show()"
 	);
 	window->show ();
+	// TODO
+	// windowController->onShow(*window.get());
 	Gj::Audio::Logging::write(
 		Gj::Audio::LogSeverityLevel::Info,
 		"EditorHost::createViewAndShow",
@@ -315,23 +317,32 @@ void WindowController::onShow (IWindow& w)
 {
 	// SMTG_DBPRT1 ("onShow called (%p)\n", (void*)&w);
 
-	window = &w;
+	// window = &w;
 	if (!plugView)
 		return;
 
 	auto platformWindow = window->getNativePlatformWindow ();
 	if (plugView->isPlatformTypeSupported (platformWindow.type) != kResultTrue)
 	{
-    	std::cout << "plugview dns platform type" << std::endl;
 		IPlatform::instance ().kill (-1, std::string ("PlugView does not support platform type:") +
 		                                     platformWindow.type);
 	}
 
 	plugView->setFrame (this);
 
-//	std::cout << "set frame called" << std::endl;
-	if (plugView->attached (platformWindow.ptr, platformWindow.type) != kResultTrue)
+	if (plugView->attached (platformWindow.ptr, platformWindow.type) != kResultTrue) {
 		IPlatform::instance ().kill (-1, "Attaching PlugView failed");
+		Gj::Audio::Logging::write(
+			Gj::Audio::LogSeverityLevel::Error,
+			"WindowController::onShow",
+			"Could not attach to PlugView"
+		);
+	}
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"WindowController::onShow",
+		"PlugView attached"
+	);
 }
 
 //------------------------------------------------------------------------

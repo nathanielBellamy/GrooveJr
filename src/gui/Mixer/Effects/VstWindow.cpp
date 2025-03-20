@@ -42,6 +42,7 @@ void VstWindow::show() {
     "VstWindow::show",
     "EditorHost called VstWindow show"
   );
+  nativeParentWidget()->windowHandle()->show();
  // TODO
 }
 
@@ -66,7 +67,7 @@ NativePlatformWindow VstWindow::getNativePlatformWindow() const {
 
   return {
     Steinberg::kPlatformStringMac,
-    (void*) this
+    (void*) nativeParentWidget()->windowHandle()
   };
 }
 
