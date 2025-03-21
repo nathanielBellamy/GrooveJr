@@ -235,7 +235,16 @@ void App::createViewAndShow (IEditController* controller)
 	);
 	window->show ();
 	// TODO
-	// windowController->onShow(*window.get());
+	try {
+		windowController->onShow(*window.get());
+	} catch (const std::exception& e) {
+		std::cout << e.what () << std::endl;
+		Gj::Audio::Logging::write(
+			Gj::Audio::LogSeverityLevel::Error,
+			"EditorHost::createViewAndShow",
+			"An Error occurred when calling windowController->onShow"
+		);
+	}
 	Gj::Audio::Logging::write(
 		Gj::Audio::LogSeverityLevel::Info,
 		"EditorHost::createViewAndShow",
@@ -317,14 +326,14 @@ void WindowController::onShow (IWindow& w)
 {
 	// SMTG_DBPRT1 ("onShow called (%p)\n", (void*)&w);
 
-	// window = &w;
+	window = &w;
 	if (!plugView)
 		return;
 
 	auto platformWindow = window->getNativePlatformWindow ();
 	if (plugView->isPlatformTypeSupported (platformWindow.type) != kResultTrue)
 	{
-		IPlatform::instance ().kill (-1, std::string ("PlugView does not support platform type:") +
+		IPlatform::instance ().kill (-1, std::string ("PlugView does not support platform type: ") +
 		                                     platformWindow.type);
 	}
 

@@ -66,7 +66,7 @@ NativePlatformWindow VstWindow::getNativePlatformWindow() const {
   #endif
 
   return {
-    Steinberg::kPlatformStringMac,
+    kPlatformString,
     (void*) nativeParentWidget()->windowHandle()
   };
 }
