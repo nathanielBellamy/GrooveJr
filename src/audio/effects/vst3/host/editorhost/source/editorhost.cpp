@@ -324,11 +324,15 @@ WindowController::~WindowController () noexcept
 //------------------------------------------------------------------------
 void WindowController::onShow (IWindow& w)
 {
-	// SMTG_DBPRT1 ("onShow called (%p)\n", (void*)&w);
-
 	window = &w;
-	if (!plugView)
+	if (!plugView) {
+		Gj::Audio::Logging::write(
+			Gj::Audio::LogSeverityLevel::Error,
+			"WindowController::onShow",
+			"plugView is not defined"
+		);
 		return;
+	}
 
 	auto platformWindow = window->getNativePlatformWindow ();
 	if (plugView->isPlatformTypeSupported (platformWindow.type) != kResultTrue)
@@ -337,14 +341,39 @@ void WindowController::onShow (IWindow& w)
 		                                     platformWindow.type);
 	}
 
-	plugView->setFrame (this);
-
-	if (plugView->attached (platformWindow.ptr, platformWindow.type) != kResultTrue) {
-		IPlatform::instance ().kill (-1, "Attaching PlugView failed");
+	try {
+		plugView->setFrame (this);
+	} catch (...) {
 		Gj::Audio::Logging::write(
 			Gj::Audio::LogSeverityLevel::Error,
 			"WindowController::onShow",
-			"Could not attach to PlugView"
+			"Error calling plugView->setFrame"
+		);
+	}
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"WindowController::onShow",
+		"plugView setFrame called"
+	);
+
+	try {
+		// TODO:
+		// QObject::setParent: Cannot set parent, new parent is in a different thread
+		// QObject::installEventFilter(): Cannot filter events for objects in a different thread.
+
+		if (plugView->attached (std::move(platformWindow.ptr), platformWindow.type) != kResultTrue) {
+			IPlatform::instance ().kill (-1, "Attaching PlugView failed");
+			Gj::Audio::Logging::write(
+				Gj::Audio::LogSeverityLevel::Error,
+				"WindowController::onShow",
+				"Could not attach to PlugView"
+			);
+		}
+	} catch (...) {
+		Gj::Audio::Logging::write(
+			Gj::Audio::LogSeverityLevel::Error,
+			"WindowController::onShow",
+			"An error occurred attaching plugview"
 		);
 	}
 	Gj::Audio::Logging::write(
