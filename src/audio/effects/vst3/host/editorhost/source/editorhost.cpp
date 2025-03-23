@@ -357,10 +357,6 @@ void WindowController::onShow (IWindow& w)
 	);
 
 	try {
-		// TODO:
-		// QObject::setParent: Cannot set parent, new parent is in a different thread
-		// QObject::installEventFilter(): Cannot filter events for objects in a different thread.
-
 		if (plugView->attached (std::move(platformWindow.ptr), platformWindow.type) != kResultTrue) {
 			IPlatform::instance ().kill (-1, "Attaching PlugView failed");
 			Gj::Audio::Logging::write(

@@ -37,11 +37,12 @@ void VstWindow::setupGrid() {
 }
 
 void VstWindow::show() {
-  Logging::write(
-    Info,
-    "VstWindow::show",
-    "EditorHost called VstWindow show"
-  );
+  QWidget::show();
+  // Logging::write(
+  //   Info,
+  //   "VstWindow::show",
+  //   "EditorHost called VstWindow show"
+  // );
   // nativeParentWidget()->windowHandle();
  // TODO
 }
@@ -55,19 +56,19 @@ void VstWindow::resize(Size newSize) {
 }
 
 NativePlatformWindow VstWindow::getNativePlatformWindow() const {
-  #if SMTG_OS_WINDOWS
-    const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringWin;
-  #elif SMTG_OS_IOS
-    const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringIOS;
-  #elif SMTG_OS_MACOS
-    const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringMac;
-  #elif SMTG_OS_LINUX
-    const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringLinux;
-  #endif
+  // #if SMTG_OS_WINDOWS
+  //   const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringWin;
+  // #elif SMTG_OS_IOS
+  //   const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringIOS;
+  // #elif SMTG_OS_MACOS
+  //   const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringMac;
+  // #elif SMTG_OS_LINUX
+  //   const Steinberg::FIDString kPlatformString = Steinberg::kPlatformStringLinux;
+  // #endif
 
   return {
     Steinberg::kPlatformTypeHIView,
-    (void*) winId()
+    reinterpret_cast<void*>(winId())
   };
 }
 

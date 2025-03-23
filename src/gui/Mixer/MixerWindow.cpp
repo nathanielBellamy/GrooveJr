@@ -15,7 +15,7 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
   , title(this)
   , mainDryContainer(this, actorSystem)
   , effectsChannelsContainer(this, actorSystem)
-  , effectsContainer(this, mixer)
+  , effectsContainer(nullptr, mixer)
   {
 
   title.setText("Mixer");
@@ -36,7 +36,7 @@ void MixerWindow::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.addWidget(&mainDryContainer, 1, 0, -1, 1);
   grid.addWidget(&effectsChannelsContainer, 1, 1, -1, 1);
-  grid.addWidget(&effectsContainer, 1, 2, -1, -1);
+  // grid.addWidget(&effectsContainer, 1, 2, -1, -1);
 
   grid.setColumnStretch(0, 1);
   grid.setColumnStretch(1, 10);
