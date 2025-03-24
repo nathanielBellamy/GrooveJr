@@ -7,12 +7,13 @@
 namespace Gj {
 namespace Gui {
 
-MainDryContainer::MainDryContainer(QWidget* parent, actor_system& actorSystem)
+MainDryContainer::MainDryContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer)
   : QWidget(parent)
   , actorSystem(actorSystem)
+  , mixer(mixer)
   , grid(this)
   , dryChannel(this, actorSystem)
-  , mainChannel(this, actorSystem, 0)
+  , mainChannel(this, actorSystem, mixer, 0)
   {
 
   setupGrid();

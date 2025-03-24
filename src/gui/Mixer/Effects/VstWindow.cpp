@@ -38,6 +38,7 @@ void VstWindow::setupGrid() {
 
 void VstWindow::show() {
   QWidget::show();
+  raise();
   // Logging::write(
   //   Info,
   //   "VstWindow::show",

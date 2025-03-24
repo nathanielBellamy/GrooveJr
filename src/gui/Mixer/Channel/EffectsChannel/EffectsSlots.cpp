@@ -7,18 +7,19 @@
 namespace Gj {
 namespace Gui {
 
-EffectsSlots::EffectsSlots(QWidget* parent, actor_system& actorSystem, int channelIndex)
+EffectsSlots::EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex)
   : QWidget(parent)
   , actorSystem(actorSystem)
+  , mixer(mixer)
   , channelIndex(channelIndex)
   , grid(this)
   {
 
-  auto slot0 = std::make_unique<EffectSlot>(this, actorSystem, channelIndex, 0, false);
-  auto slot1 = std::make_unique<EffectSlot>(this, actorSystem, channelIndex, 1, false);
-  auto slot2 = std::make_unique<EffectSlot>(this, actorSystem, channelIndex, 2, false);
-  auto slot3 = std::make_unique<EffectSlot>(this, actorSystem, channelIndex, 3, false);
-  auto slot4 = std::make_unique<EffectSlot>(this, actorSystem, channelIndex, 4, false);
+  auto slot0 = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 0, false);
+  auto slot1 = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 1, false);
+  auto slot2 = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 2, false);
+  auto slot3 = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 3, false);
+  auto slot4 = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 4, false);
 
   effectsSlots.push_back(std::move(slot0));
   effectsSlots.push_back(std::move(slot1));

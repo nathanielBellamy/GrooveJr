@@ -7,16 +7,17 @@
 namespace Gj {
 namespace Gui {
 
-EffectsChannelsContainer::EffectsChannelsContainer(QWidget* parent, actor_system& actorSystem)
+EffectsChannelsContainer::EffectsChannelsContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer)
   : QWidget(parent)
   , actorSystem(actorSystem)
+  , mixer(mixer)
   , spacer(this)
   , grid(this)
   {
 
-  auto effectsChannel1 = std::make_unique<EffectsChannel>(this, actorSystem, 1);
+  auto effectsChannel1 = std::make_unique<EffectsChannel>(this, actorSystem, mixer, 1);
   channels.push_back(std::move(effectsChannel1));
-  auto effectsChannel2 = std::make_unique<EffectsChannel>(this, actorSystem, 2);
+  auto effectsChannel2 = std::make_unique<EffectsChannel>(this, actorSystem, mixer, 2);
   channels.push_back(std::move(effectsChannel2));
 
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);

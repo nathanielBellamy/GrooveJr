@@ -13,8 +13,8 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
   , mixer(mixer)
   , grid(this)
   , title(this)
-  , mainDryContainer(this, actorSystem)
-  , effectsChannelsContainer(this, actorSystem)
+  , mainDryContainer(this, actorSystem, mixer)
+  , effectsChannelsContainer(this, actorSystem, mixer)
   , effectsContainer(nullptr, mixer)
   {
 

@@ -12,6 +12,7 @@
 
 #include "DryChannel.h"
 #include "EffectsChannel/EffectsChannel.h"
+#include "../../../audio/Mixer.h"
 
 using namespace caf;
 
@@ -21,10 +22,11 @@ namespace Gui {
 class MainDryContainer final : public QWidget {
 
   public:
-    MainDryContainer(QWidget* parent, actor_system& actorSystem);
+    MainDryContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer);
 
   private:
     actor_system& actorSystem;
+    Audio::Mixer* mixer;
     QGridLayout grid;
     DryChannel dryChannel;
     EffectsChannel mainChannel;

@@ -14,6 +14,7 @@
 #include <QWidget>
 
 #include "EffectSlot.h"
+#include "../../../../audio/Mixer.h"
 
 using namespace caf;
 
@@ -23,10 +24,11 @@ namespace Gui {
 class EffectsSlots final : public QWidget {
 
   public:
-    EffectsSlots(QWidget* parent, actor_system& actorSystem, int channelIndex);
+    EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex);
 
   private:
     actor_system& actorSystem;
+    Audio::Mixer* mixer;
     int channelIndex;
     QGridLayout grid;
     std::vector<std::unique_ptr<EffectSlot>> effectsSlots;

@@ -13,6 +13,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
+#include "../../../../audio/Mixer.h"
 #include "EffectsChannel.h"
 
 using namespace caf;
@@ -23,10 +24,11 @@ namespace Gui {
 class EffectsChannelsContainer final : public QWidget {
 
   public:
-    EffectsChannelsContainer(QWidget* parent, actor_system& actorSystem);
+    EffectsChannelsContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer);
 
   private:
     actor_system& actorSystem;
+    Audio::Mixer* mixer;
     QGridLayout grid;
     QWidget spacer;
     std::vector<std::unique_ptr<EffectsChannel>> channels;

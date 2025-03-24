@@ -24,7 +24,7 @@ EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer)
   // - init editorhost here avoid Qt threading error
   // - rendering vstwindow within qt
   // - todo: style
-  auto foo = mixer->addEffectToChannel(0, "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3");
+  // auto foo = mixer->addEffectToChannel(0, "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3");
 
   setStyle();
   setupGrid();

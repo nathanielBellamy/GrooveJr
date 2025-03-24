@@ -20,6 +20,7 @@
 #include "../../../Shared/VstSelect.h"
 #include "../../../../actors/ActorIds.h"
 #include "../../../../messaging/atoms.h"
+#include "../../../../audio/Mixer.h"
 
 using namespace caf;
 
@@ -29,10 +30,11 @@ namespace Gui {
 class EffectSlot final : public QWidget {
 
   public:
-    EffectSlot(QWidget* parent, actor_system& actorSystem, int channelIndex, int slotIndex, bool occupied);
+    EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, int slotIndex, bool occupied);
 
   private:
     actor_system& actorSystem;
+    Audio::Mixer* mixer;
     int channelIndex;
     int slotIndex;
     bool occupied;

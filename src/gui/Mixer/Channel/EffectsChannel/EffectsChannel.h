@@ -12,6 +12,7 @@
 #include <QSlider>
 #include <QWidget>
 
+#include "../../../../audio/Mixer.h"
 #include "EffectsSlots.h"
 #include "MuteSoloContainer.h"
 
@@ -23,10 +24,11 @@ namespace Gui {
 class EffectsChannel final : public QWidget {
 
   public:
-    EffectsChannel(QWidget* parent, actor_system& actorSystem, int channelIndex);
+    EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex);
 
   private:
     actor_system& actorSystem;
+    Audio::Mixer* mixer;
     int channelIndex;
     QGridLayout grid;
     QLabel title;
