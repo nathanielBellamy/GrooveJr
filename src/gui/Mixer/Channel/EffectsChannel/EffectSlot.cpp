@@ -34,9 +34,12 @@ EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer*
 
   connect(&addEffectAction, &QAction::triggered, [&]() {
     if (vstSelect.exec() == QDialog::Accepted) {
-      std::cout << "vst selected: " << vstUrl.toDisplayString().toStdString() << " for channel " << this->channelIndex << std::endl;
+      std::cout <<
+        "vst selected: " << vstUrl.toDisplayString().toStdString() <<
+          " for channel " << this->channelIndex << std::endl <<
+            " vstWindow count " << mixer->vstWindows.size() << std::endl;
       if (!mixer->addEffectToChannel(0, vstUrl.toDisplayString().toStdString().substr(7)))
-        std::cout << "=== Unabe to add effect to channel" << std::endl;
+        std::cout << "=== Unable to add effect to channel" << std::endl;
       // strong_actor_ptr effectsManager = actorSystem.registry().get(Gj::Act::ActorIds::EFFECTS_MANAGER);
       // const scoped_actor self{actorSystem};
       // self->anon_send(
