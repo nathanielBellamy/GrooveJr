@@ -7,12 +7,12 @@
 namespace Gj {
 namespace Gui {
 
-MuteSoloContainer::MuteSoloContainer(QWidget* parent)
+MuteSoloContainer::MuteSoloContainer(QWidget* parent, QAction* openEffectsContainer)
   : QWidget(parent)
   , grid(this)
   , mute(this)
   , solo(this)
-  , effects(this)
+  , effects(this, openEffectsContainer)
   {
 
   setupGrid();

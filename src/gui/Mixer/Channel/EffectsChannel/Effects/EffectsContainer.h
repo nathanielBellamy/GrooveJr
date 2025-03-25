@@ -22,11 +22,12 @@ namespace Gui {
 class EffectsContainer final : public QWidget {
 
   public:
-     EffectsContainer(QWidget* parent, Audio::Mixer* mixer);
+     EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex);
 
   private:
     Audio::Mixer* mixer;
     QGridLayout grid;
+    int channelIndex;
     QLabel title;
     void setupGrid();
     void setStyle();

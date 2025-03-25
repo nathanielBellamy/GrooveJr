@@ -7,8 +7,9 @@
 namespace Gj {
 namespace Gui {
 
-EffectsButton::EffectsButton(QWidget* parent)
+EffectsButton::EffectsButton(QWidget* parent, QAction* openEffectsContainer)
   : QPushButton("&Fx", parent)
+  , openEffectsContainer(openEffectsContainer)
   {
   setStyle();
 }
@@ -16,6 +17,10 @@ EffectsButton::EffectsButton(QWidget* parent)
 void EffectsButton::setStyle() {
   setCursor(Qt::PointingHandCursor);
   setStyleSheet("background-color: green; border: 2px solid white; border-radius: 5px;");
+}
+
+void EffectsButton::mousePressEvent(QMouseEvent* event) {
+  openEffectsContainer->activate(QAction::Trigger);
 }
 
 } // Gui

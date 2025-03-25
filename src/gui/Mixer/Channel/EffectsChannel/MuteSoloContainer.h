@@ -5,6 +5,7 @@
 #ifndef MUTESOLOCONTAINER_H
 #define MUTESOLOCONTAINER_H
 
+#include <QAction>
 #include <QGridLayout>
 #include <QWidget>
 
@@ -17,7 +18,7 @@ namespace Gui {
 
 class MuteSoloContainer final : public QWidget {
   public:
-    MuteSoloContainer(QWidget* parent);
+    MuteSoloContainer(QWidget* parent, QAction* openEffectsContainer);
 
   private:
     QGridLayout grid;

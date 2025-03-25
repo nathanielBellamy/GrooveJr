@@ -11,28 +11,20 @@ EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
-  , effectsContainer(nullptr, mixer)
+  , effectsContainer(nullptr, mixer, channelIndex)
+  , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
   , channelIndex(channelIndex)
   , grid(this)
   , title(this)
   , slider(Qt::Vertical, this)
   , effectsSlots(this, actorSystem, mixer, channelIndex)
-  , muteSoloContainer(this)
+  , muteSoloContainer(this, &openEffectsContainer)
   {
 
-  if (channelIndex == 0) {
-    title.setText("Main");
-  } else {
-    title.setText("FX " + QString::number(channelIndex));
-  }
-  title.setFont({title.font().family(), 16});
+  connectActions();
 
-  slider.setMinimum(0);
-  slider.setMaximum(127);
-  slider.setTickInterval(1);
-  slider.setValue(63);
-  slider.setTickPosition(QSlider::NoTicks);
-
+  setupTitle();
+  setupSlider();
   setStyle();
   setupGrid();
 }
@@ -60,6 +52,29 @@ void EffectsChannel::setupGrid() {
   grid.setRowStretch(1, 10);
 
   setLayout(&grid);
+}
+
+void EffectsChannel::setupTitle() {
+  if (channelIndex == 0) {
+    title.setText("Main");
+  } else {
+    title.setText("FX " + QString::number(channelIndex));
+  }
+  title.setFont({title.font().family(), 16});
+}
+
+void EffectsChannel::setupSlider() {
+  slider.setMinimum(0);
+  slider.setMaximum(127);
+  slider.setTickInterval(1);
+  slider.setValue(63);
+  slider.setTickPosition(QSlider::NoTicks);
+}
+
+void EffectsChannel::connectActions() {
+  connect(&openEffectsContainer, &QAction::triggered, [&]() {
+    effectsContainer.show();
+  });
 }
 
 } // Gui

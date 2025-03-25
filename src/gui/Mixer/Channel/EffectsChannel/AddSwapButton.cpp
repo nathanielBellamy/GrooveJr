@@ -17,7 +17,6 @@ AddSwapButton::AddSwapButton(QWidget *parent, int channelIndex, int slotIndex, b
 }
 
 void AddSwapButton::mousePressEvent(QMouseEvent* event) {
-  std::cout << "AddSwapButton::hitButton : " << channelIndex << " : " << slotIndex << std::endl;
   addEffectAction->activate(QAction::Trigger);
 }
 

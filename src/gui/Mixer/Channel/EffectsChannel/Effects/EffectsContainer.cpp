@@ -7,12 +7,19 @@
 namespace Gj {
 namespace Gui {
 
-EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer)
+EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex)
   : QWidget(nullptr)
   , mixer(mixer)
+  , channelIndex(channelIndex)
   , grid(this)
   , title(this)
   {
+
+  if (channelIndex == 0) {
+    setWindowTitle("Main Channel Effects");
+  } else {
+    setWindowTitle("Channel " + QString::number(channelIndex) + " Effects");
+  }
 
   title.setText("EffectsContainer");
   title.setFont({title.font().family(), 18});
@@ -30,8 +37,7 @@ EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer)
   setStyle();
   setupGrid();
 
-  show();
-  raise();
+  hide();
 }
 
 void EffectsContainer::setStyle() {

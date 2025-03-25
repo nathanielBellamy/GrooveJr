@@ -7,6 +7,7 @@
 
 #include "caf/actor_system.hpp"
 
+#include <QAction>
 #include <QGridLayout>
 #include <QLabel>
 #include <QSlider>
@@ -31,6 +32,7 @@ class EffectsChannel final : public QWidget {
     actor_system& actorSystem;
     Audio::Mixer* mixer;
     EffectsContainer effectsContainer;
+    QAction openEffectsContainer;
     int channelIndex;
     QGridLayout grid;
     QLabel title;
@@ -39,8 +41,10 @@ class EffectsChannel final : public QWidget {
     MuteSoloContainer muteSoloContainer;
     void setStyle();
     void setupGrid();
+    void setupTitle();
+    void setupSlider();
+    void connectActions();
 };
-
 
 } // Gui
 } // Gj

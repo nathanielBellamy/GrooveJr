@@ -5,6 +5,7 @@
 #ifndef EFFECTSBUTTON_H
 #define EFFECTSBUTTON_H
 
+#include <QAction>
 #include <QPushButton>
 
 namespace Gj {
@@ -13,10 +14,12 @@ namespace Gui {
 class EffectsButton final : public QPushButton {
 
   public:
-    EffectsButton(QWidget* parent);
+    EffectsButton(QWidget* parent, QAction* action);
 
   private:
+    QAction* openEffectsContainer;
     void setStyle();
+    void mousePressEvent(QMouseEvent* event) override;
 };
 
 } // Gui
