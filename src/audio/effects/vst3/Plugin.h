@@ -21,6 +21,7 @@ struct Plugin {
     AppState*                           gAppState;
     const std::string&                  name;
     const std::string&                  path;
+    VST3::Hosting::Module::Ptr          module;
     Steinberg::Vst::AudioHost::App*     audioHost;
     Steinberg::Vst::EditorHost::App*    editorHost;
 
@@ -28,16 +29,16 @@ struct Plugin {
         const std::string& path,
         AppState* gAppState,
         float** inputBuffers,
-        float** outputBuffers,
-        Steinberg::Vst::EditorHost::WindowPtr window
+        float** outputBuffers
     );
     ~Plugin();
 
     Steinberg::FUnknownPtr<Steinberg::Vst::IAudioProcessor> getProcesser() {
         return audioHost->audioClient->getComponent();
     }
-};
 
+    void initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window);
+};
 
 } // Vst3
 } // Effects

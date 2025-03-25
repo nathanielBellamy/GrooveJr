@@ -46,7 +46,7 @@ class EffectsChannel {
     float getPan();
     void setPan(float pan);
 
-    bool addEffect(const std::string& effectPath, const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows);
+    bool addEffect(const std::string& effectPath);
     [[nodiscard]] float** getBuffersWriteOut() const;
     void setSampleRate(int sampleRate) const;
 

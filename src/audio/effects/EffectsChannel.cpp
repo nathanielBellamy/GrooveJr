@@ -107,7 +107,7 @@ float** EffectsChannel::getBuffersWriteOut() const {
 	return buffersA;
 }
 
-bool EffectsChannel::addEffect(const std::string& effectPath, const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) {
+bool EffectsChannel::addEffect(const std::string& effectPath) {
 	Logging::write(
 		Info,
 		"EffectsChannel::addEffect",
@@ -118,15 +118,12 @@ bool EffectsChannel::addEffect(const std::string& effectPath, const std::vector<
 	float** in = determineInputBuffers(effectIndex);
 	float** out = determineOutputBuffers(effectIndex);
 
-	auto window = static_cast<Vst::EditorHost::WindowPtr>(vstWindows[effectIndex]);
-
   auto effect =
   	std::make_unique<Vst3::Plugin>(
   		effectPath,
   		gAppState,
   		in,
-  		out,
-  		window
+  		out
   	);
 
 	Logging::write(
@@ -178,7 +175,6 @@ void EffectsChannel::setSampleRate(int sampleRate) const {
 		plugin->audioHost->audioClient->setBlockSize(gAppState->audioFramesPerBuffer);
 	}
 }
-
 
 void EffectsChannel::process() const {
 	for (auto&& plugin : vst3Plugins) {

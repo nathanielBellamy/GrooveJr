@@ -96,9 +96,9 @@ bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) con
   Logging::write(
     Info,
     "Mixer::addEffectToChannel",
-    "Adding effect " + effectPath + " to channel " + std::to_string(idx) + " vstWindow count: " + std::to_string(vstWindows.size())
+    "Adding effect " + effectPath + " to channel " + std::to_string(idx)
   );
-  return effectsChannels.at(idx)->addEffect(effectPath, vstWindows);
+  return effectsChannels.at(idx)->addEffect(effectPath);
 }
 
 bool Mixer::mixDown(

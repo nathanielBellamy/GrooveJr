@@ -9,7 +9,7 @@ namespace Audio {
 namespace Effects {
 namespace Vst3 {
 
-Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffers, float** outputBuffers, Steinberg::Vst::EditorHost::WindowPtr window)
+Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffers, float** outputBuffers)
 	: gAppState(gAppState)
 	, name(path)
 	, path(path)
@@ -22,13 +22,17 @@ Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffer
 	);
 
 	std::string error;
-	const VST3::Hosting::Module::Ptr module = VST3::Hosting::Module::create(path, error);
+	module = VST3::Hosting::Module::create(path, error);
 	if (!module) {
 		std::string reason = "Could not create Module for file:";
 		reason += path;
 		reason += "\nError: ";
 		reason += error;
-//		Steinberg::IPlatform::instance ().kill (-1, reason);
+		Logging::write(
+			LogSeverityLevel::Error,
+			"Plugin::Plugin()",
+			reason
+		);
 	}
 
 	const auto& cmdArgs = std::vector<std::string> { path };
@@ -55,9 +59,16 @@ Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffer
 		"Plugin::Plugin()",
 		"Initialized audioHost for " + path
 	);
+}
 
+Plugin::~Plugin() {
+  audioHost->terminate();
+  editorHost->terminate();
+}
+
+void Plugin::initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window) {
 	try {
-		// TODO: cast vstWindows to std::vector<WindowPtr>
+		const auto& cmdArgs = std::vector<std::string> { path };
 		editorHost = new Steinberg::Vst::EditorHost::App(window);
 		editorHost->setModule(module);
 		editorHost->plugProvider = audioHost->plugProvider;
@@ -80,10 +91,6 @@ Plugin::Plugin(const std::string& path, AppState* gAppState, float** inputBuffer
 	);
 }
 
-Plugin::~Plugin() {
-  audioHost->terminate();
-  editorHost->terminate();
-}
 
 
 } // Vst3
