@@ -91,6 +91,9 @@ void Plugin::initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window) {
 	);
 }
 
+void Plugin::terminateEditorHost() {
+	editorHost->terminate();
+}
 
 
 } // Vst3

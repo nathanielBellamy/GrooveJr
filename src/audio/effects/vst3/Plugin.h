@@ -38,6 +38,7 @@ struct Plugin {
     }
 
     void initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window);
+    void terminateEditorHost();
 };
 
 } // Vst3

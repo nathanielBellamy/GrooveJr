@@ -12,14 +12,14 @@ AddSwapButton::AddSwapButton(QWidget *parent, int channelIndex, int slotIndex, b
   , channelIndex(channelIndex)
   , slotIndex(slotIndex)
   , occupied(occupied)
-  , addEffectAction(action)
-  {}
+  , addEffectAction(action) {
+  setCursor(Qt::PointingHandCursor);
+}
 
 void AddSwapButton::mousePressEvent(QMouseEvent* event) {
   std::cout << "AddSwapButton::hitButton : " << channelIndex << " : " << slotIndex << std::endl;
   addEffectAction->activate(QAction::Trigger);
 }
-
 
 } // Gui
 } // Gj
