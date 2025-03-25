@@ -15,6 +15,7 @@
 #include "../../../../audio/Mixer.h"
 #include "EffectsSlots.h"
 #include "MuteSoloContainer.h"
+#include "./Effects/EffectsContainer.h"
 
 using namespace caf;
 
@@ -29,6 +30,7 @@ class EffectsChannel final : public QWidget {
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;
+    EffectsContainer effectsContainer;
     int channelIndex;
     QGridLayout grid;
     QLabel title;

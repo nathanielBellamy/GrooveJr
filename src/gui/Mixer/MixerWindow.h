@@ -13,7 +13,6 @@
 
 #include "./Channel/MainDryContainer.h"
 #include "./Channel/EffectsChannel/EffectsChannelsContainer.h"
-#include "./Effects/EffectsContainer.h"
 
 #include "../../audio/Mixer.h"
 
@@ -27,13 +26,12 @@ class MixerWindow final : public QWidget {
     explicit MixerWindow(QWidget *parent, actor_system& actorSystem, Audio::Mixer* mixer);
 
   private:
-    Audio::Mixer* mixer;
     actor_system& actorSystem;
+    Audio::Mixer* mixer;
     QGridLayout grid;
     QLabel title;
     MainDryContainer mainDryContainer;
     EffectsChannelsContainer effectsChannelsContainer;
-    EffectsContainer effectsContainer;
 
     void setStyle();
     void setupGrid();

@@ -11,6 +11,7 @@ EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
+  , effectsContainer(nullptr, mixer)
   , channelIndex(channelIndex)
   , grid(this)
   , title(this)

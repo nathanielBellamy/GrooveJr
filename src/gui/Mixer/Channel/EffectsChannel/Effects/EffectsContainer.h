@@ -14,7 +14,7 @@
 #include <QGridLayout>
 
 #include "VstWindow.h"
-#include "../../../audio/Mixer.h"
+#include "../../../../../audio/Mixer.h"
 
 namespace Gj {
 namespace Gui {

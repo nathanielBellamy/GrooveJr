@@ -9,7 +9,7 @@
 #include "../../../AppState.h"
 #include "./host/audiohost/source/audiohost.h"
 #include "./host/editorhost/source/editorhost.h"
-#include "../../../gui/Mixer/Effects/VstWindow.h"
+#include "../../../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
 
 
 namespace Gj {

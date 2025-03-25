@@ -14,7 +14,7 @@
 #include "../Logging.h"
 #include "./Channel.h"
 #include "./effects/EffectsChannel.h"
-#include "../gui/Mixer/Effects/VstWindow.h"
+#include "../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
 
 namespace Gj {
 namespace Audio {

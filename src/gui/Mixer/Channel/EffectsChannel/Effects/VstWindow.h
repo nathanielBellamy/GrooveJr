@@ -13,7 +13,7 @@
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/iwindow.h"
 #include "public.sdk/source/vst/hosting/plugprovider.h"
 
-#include "../../../Logging.h"
+#include "../../../../../Logging.h"
 
 namespace Gj {
 namespace Gui {
