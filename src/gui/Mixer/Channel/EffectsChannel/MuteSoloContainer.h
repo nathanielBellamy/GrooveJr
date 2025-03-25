@@ -10,6 +10,7 @@
 
 #include "../MuteButton.h"
 #include "../SoloButton.h"
+#include "EffectsButton.h"
 
 namespace Gj {
 namespace Gui {
@@ -22,6 +23,7 @@ class MuteSoloContainer final : public QWidget {
     QGridLayout grid;
     MuteButton mute;
     SoloButton solo;
+    EffectsButton effects;
     void setupGrid();
 
 };

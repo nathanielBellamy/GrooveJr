@@ -15,6 +15,7 @@ SoloButton::SoloButton(QWidget* parent)
 }
 
 void SoloButton::setStyle() {
+  setCursor(Qt::PointingHandCursor);
   setStyleSheet("background-color: gold; border: 2px solid white; border-radius: 5px; color: black;");
 }
 

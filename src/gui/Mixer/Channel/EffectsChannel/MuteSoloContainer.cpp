@@ -12,6 +12,7 @@ MuteSoloContainer::MuteSoloContainer(QWidget* parent)
   , grid(this)
   , mute(this)
   , solo(this)
+  , effects(this)
   {
 
   setupGrid();
@@ -24,6 +25,7 @@ void MuteSoloContainer::setupGrid() {
 
   grid.addWidget(&mute, 0, 0, 1, 1);
   grid.addWidget(&solo, 0, 1, 1, 1);
+  grid.addWidget(&effects, 0, 2, 1, 1);
 }
 
 

@@ -15,6 +15,7 @@ MuteButton::MuteButton(QWidget* parent)
 }
 
 void MuteButton::setStyle() {
+  setCursor(Qt::PointingHandCursor);
   setStyleSheet("background-color: grey; border: 2px solid white; border-radius: 5px;");
 }
 
