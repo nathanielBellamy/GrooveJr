@@ -41,8 +41,10 @@ class Mixer {
 
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);
+    int effectsOnChannelCount(int idx) const;
 
     bool addEffectToChannel(int idx, const std::string& effectPath) const;
+    void initEditorHostsOnChannel(int idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
 
     bool setSampleRate(int sampleRate) const;
 

@@ -46,7 +46,6 @@ void EffectsContainer::setStyle() {
 }
 
 void EffectsContainer::setupGrid() {
-
   grid.setVerticalSpacing(1);
 
   grid.addWidget(&title, 0, 0, 1, -1);
@@ -59,6 +58,15 @@ void EffectsContainer::setupGrid() {
 
   setLayout(&grid);
 }
+
+void EffectsContainer::initVstWindows() {
+  for (int i = 0; i < mixer->effectsOnChannelCount(channelIndex); i++) {
+    auto vstWindow = std::make_unique<VstWindow>(this);
+    vstWindows.push_back(std::move(vstWindow));
+  }
+  mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
+}
+
 
 
 } // Gui

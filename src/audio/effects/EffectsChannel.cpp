@@ -183,6 +183,18 @@ void EffectsChannel::process() const {
 	}
 }
 
+int EffectsChannel::effectCount() const {
+	return static_cast<int>(vst3Plugins.size());
+}
+
+void EffectsChannel::initEditorHosts(std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
+	int index = 0;
+	for (auto&& plugin : vst3Plugins) {
+		plugin->initEditorHost(vstWindows.at(index));
+		index++;
+	}
+}
+
 } // Effects
 } // Audio
 } // Gj

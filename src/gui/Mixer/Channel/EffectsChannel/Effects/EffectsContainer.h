@@ -26,9 +26,12 @@ class EffectsContainer final : public QWidget {
 
   private:
     Audio::Mixer* mixer;
-    QGridLayout grid;
     int channelIndex;
+    QGridLayout grid;
     QLabel title;
+    std::vector<std::shared_ptr<VstWindow>> vstWindows;
+
+    void initVstWindows();
     void setupGrid();
     void setStyle();
 };

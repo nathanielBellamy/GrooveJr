@@ -11,8 +11,8 @@ EffectsChannelsContainer::EffectsChannelsContainer(QWidget* parent, actor_system
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
-  , spacer(this)
   , grid(this)
+  , spacer(this)
   {
 
   auto effectsChannel1 = std::make_unique<EffectsChannel>(this, actorSystem, mixer, 1);

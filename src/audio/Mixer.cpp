@@ -142,5 +142,13 @@ bool Mixer::mixDown(
   return true;
 }
 
+int Mixer::effectsOnChannelCount(int idx) const {
+  return effectsChannels.at(idx)->effectCount();
+}
+
+void Mixer::initEditorHostsOnChannel(int idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
+  return effectsChannels.at(idx)->initEditorHosts(vstWindows);
+}
+
 } // Audio
 } // Gj

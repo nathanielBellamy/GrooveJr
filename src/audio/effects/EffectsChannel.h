@@ -49,6 +49,9 @@ class EffectsChannel {
     [[nodiscard]] float** getBuffersWriteOut() const;
     void setSampleRate(int sampleRate) const;
 
+    int effectCount() const;
+    void initEditorHosts(std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
+
 };
 
 } // Effects
