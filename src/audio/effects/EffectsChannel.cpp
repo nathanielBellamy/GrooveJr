@@ -195,6 +195,13 @@ void EffectsChannel::initEditorHosts(std::vector<std::shared_ptr<Gui::VstWindow>
 	}
 }
 
+void EffectsChannel::terminateEditorHosts() const {
+	for (auto&& plugin : vst3Plugins) {
+		plugin->terminateEditorHost();
+	}
+}
+
+
 } // Effects
 } // Audio
 } // Gj

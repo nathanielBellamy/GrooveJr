@@ -59,13 +59,30 @@ void EffectsContainer::setupGrid() {
   setLayout(&grid);
 }
 
+void EffectsContainer::showEvent(QShowEvent *event) {
+  initVstWindows();
+}
+
 void EffectsContainer::initVstWindows() {
   for (int i = 0; i < mixer->effectsOnChannelCount(channelIndex); i++) {
-    auto vstWindow = std::make_unique<VstWindow>(this);
+    auto vstWindow = std::make_shared<VstWindow>(this);
     vstWindows.push_back(std::move(vstWindow));
   }
   mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
 }
+
+void EffectsContainer::hideEvent(QHideEvent *event) {
+  terminateVstWindows();
+}
+
+void EffectsContainer::terminateVstWindows() const {
+  mixer->terminateEditorHostsOnChannel(channelIndex);
+  for (auto vstWindow : vstWindows) {
+    vstWindow->close();
+    vstWindow.reset();
+  }
+}
+
 
 
 

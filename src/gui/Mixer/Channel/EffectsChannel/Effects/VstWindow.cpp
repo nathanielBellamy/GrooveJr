@@ -49,7 +49,7 @@ void VstWindow::show() {
 }
 
 void VstWindow::close() {
-  // TODO
+  QWidget::close();
 }
 
 void VstWindow::resize(Size newSize) {

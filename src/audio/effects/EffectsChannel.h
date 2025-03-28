@@ -51,6 +51,7 @@ class EffectsChannel {
 
     int effectCount() const;
     void initEditorHosts(std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
+    void terminateEditorHosts() const;
 
 };
 

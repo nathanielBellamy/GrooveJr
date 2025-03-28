@@ -150,5 +150,10 @@ void Mixer::initEditorHostsOnChannel(int idx, std::vector<std::shared_ptr<Gui::V
   return effectsChannels.at(idx)->initEditorHosts(vstWindows);
 }
 
+void Mixer::terminateEditorHostsOnChannel(int idx) const {
+  return effectsChannels.at(idx)->terminateEditorHosts();
+}
+
+
 } // Audio
 } // Gj

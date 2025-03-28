@@ -12,6 +12,8 @@
 #include <QLabel>
 #include <QWidget>
 #include <QGridLayout>
+#include <QHideEvent>
+#include <QShowEvent>
 
 #include "VstWindow.h"
 #include "../../../../../audio/Mixer.h"
@@ -32,8 +34,11 @@ class EffectsContainer final : public QWidget {
     std::vector<std::shared_ptr<VstWindow>> vstWindows;
 
     void initVstWindows();
+    void terminateVstWindows() const;
     void setupGrid();
     void setStyle();
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
 };
 
 } // Gui
