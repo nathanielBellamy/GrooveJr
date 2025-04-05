@@ -39,6 +39,8 @@ class EffectsChannel {
 
     void process() const;
 
+    [[nodiscard]] int getIndex() const { return index; }
+
     float getGain();
     void setGain(float gain);
 

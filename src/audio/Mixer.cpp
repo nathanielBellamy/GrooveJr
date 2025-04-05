@@ -14,6 +14,7 @@ Mixer::Mixer(AppState* gAppState)
   , mainChannel({ 1.0f, 0.0f })
   , dryChannel({ 1.0f, 0.0f })
   , channelCount(1.0f)
+  , effectsChannels()
   , inputBuffers(nullptr)
   {
 
@@ -23,12 +24,16 @@ Mixer::Mixer(AppState* gAppState)
 }
 
 Mixer::~Mixer() {
-  std::cout << "Mixer::~Mixer" << std::endl;
   for (const auto channel : effectsChannels) {
     delete channel;
   }
 
-  std::cout << "Mixer done delete effectsChannels." << std::endl;
+  Logging::write(
+    Info,
+    "Mixer::~Mixer",
+    "Mixer done delete effectsChannels"
+  );
+
   freeInputBuffers();
 
   delete outputBuffer;
@@ -41,7 +46,11 @@ bool Mixer::allocateInputBuffers() {
   );
 
   if (inputBuffers == nullptr)
-    std::cout << "Unable to allocate memory for Mixer.inputBuffers" << std::endl;
+    Logging::write(
+      Error,
+      "Mixer::allocateInputBuffers",
+      "Unable to allocate memory for Mixer.inputBuffers"
+    );
 
   for (int c = 0; c < 2; c++) {
     inputBuffers[c] = new float[gAppState->audioFramesPerBuffer];
@@ -98,6 +107,14 @@ bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) con
     "Mixer::addEffectToChannel",
     "Adding effect " + effectPath + " to channel " + std::to_string(idx)
   );
+  if (effectsChannels.at(idx) == nullptr) {
+    Logging::write(
+      Error,
+      "Mixer::addEffectToChannel",
+      "No channel found at idx: " + std::to_string(idx)
+    );
+    return false;
+  }
   return effectsChannels.at(idx)->addEffect(effectPath);
 }
 

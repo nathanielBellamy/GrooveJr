@@ -11,7 +11,7 @@ namespace Effects {
 
 using namespace Steinberg;
 
-EffectsChannel::EffectsChannel(AppState* gAppState, int index, float** inputBuffers)
+EffectsChannel::EffectsChannel(AppState* gAppState, const int index, float** inputBuffers)
   : gAppState(gAppState)
 	, index(index)
 	, inputBuffers(inputBuffers)
@@ -188,10 +188,10 @@ int EffectsChannel::effectCount() const {
 }
 
 void EffectsChannel::initEditorHosts(std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
-	int index = 0;
+	int i = 0;
 	for (auto&& plugin : vst3Plugins) {
-		plugin->initEditorHost(vstWindows.at(index));
-		index++;
+		plugin->initEditorHost(vstWindows.at(i));
+		i++;
 	}
 }
 

@@ -25,8 +25,7 @@ EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int cha
   title.setFont({title.font().family(), 18});
 
   auto vstWindow1 = std::make_unique<VstWindow>(this);
-  mixer->vstWindows.push_back(std::move(vstWindow1));
-  std::cout << "VstWindow added to Mixer" << std::endl;
+  vstWindows.push_back(std::move(vstWindow1));
   // TODO
   // - here for testing
   // - init editorhost here avoid Qt threading error
@@ -49,7 +48,6 @@ void EffectsContainer::setupGrid() {
   grid.setVerticalSpacing(1);
 
   grid.addWidget(&title, 0, 0, 1, -1);
-  grid.addWidget(mixer->vstWindows.front().get(), 1, 0, -1, -1);
 
   grid.setColumnStretch(0, 1);
   grid.setColumnStretch(1, 10);
@@ -82,9 +80,6 @@ void EffectsContainer::terminateVstWindows() const {
     vstWindow.reset();
   }
 }
-
-
-
 
 } // Gui
 } // Gj

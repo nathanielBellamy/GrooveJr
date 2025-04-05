@@ -7,12 +7,12 @@
 namespace Gj {
 namespace Gui {
 
-EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex)
+EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, const int channelIndex)
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , effectsContainer(nullptr, mixer, channelIndex)
-  , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
+  , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Effects"), this)
   , channelIndex(channelIndex)
   , grid(this)
   , title(this)
