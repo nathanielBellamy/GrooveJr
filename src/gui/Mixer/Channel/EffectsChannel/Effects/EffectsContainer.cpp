@@ -24,15 +24,6 @@ EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int cha
   title.setText("EffectsContainer");
   title.setFont({title.font().family(), 18});
 
-  auto vstWindow1 = std::make_unique<VstWindow>(this);
-  vstWindows.push_back(std::move(vstWindow1));
-  // TODO
-  // - here for testing
-  // - init editorhost here avoid Qt threading error
-  // - rendering vstwindow within qt
-  // - todo: style
-  // auto foo = mixer->addEffectToChannel(0, "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3");
-
   setStyle();
   setupGrid();
 
@@ -66,7 +57,17 @@ void EffectsContainer::initVstWindows() {
     auto vstWindow = std::make_shared<VstWindow>(this);
     vstWindows.push_back(std::move(vstWindow));
   }
+  Logging::write(
+    Info,
+    "EffectsContainer::initVstWindows()",
+    "Created VstWindows for channel: " + std::to_string(channelIndex)
+  );
   mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
+  Logging::write(
+    Info,
+    "EffectsContainer::initVstWindows()",
+    "Editorhosts initialized for channel: " + std::to_string(channelIndex)
+  );
 }
 
 void EffectsContainer::hideEvent(QHideEvent *event) {

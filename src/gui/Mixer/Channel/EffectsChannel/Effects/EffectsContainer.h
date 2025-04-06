@@ -17,6 +17,7 @@
 
 #include "VstWindow.h"
 #include "../../../../../audio/Mixer.h"
+#include "../../../../../Logging.h"
 
 namespace Gj {
 namespace Gui {

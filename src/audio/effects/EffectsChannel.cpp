@@ -129,7 +129,7 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
 	Logging::write(
 		Info,
 		"EffectsChannel::addEffect",
-		"Instantiated plugin " + effectPath + " for channel " + std::to_string(index)
+		"Instantiated plugin " + effect->path + " for channel " + std::to_string(index)
 	);
 
   const FUnknownPtr<Vst::IAudioProcessor> processor = effect->getProcesser();
@@ -188,8 +188,18 @@ int EffectsChannel::effectCount() const {
 }
 
 void EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
+	Logging::write(
+		Info,
+		"EffectsChannel::initEditorHosts",
+		"Initializing Editor Hosts on channel " + std::to_string(index)
+	);
 	int i = 0;
-	for (auto&& plugin : vst3Plugins) {
+	for (const auto& plugin : vst3Plugins) {
+		Logging::write(
+			Info,
+			"EffectsChannel::initEditorHosts",
+			"Initializing Editor Host for effect " + plugin->path + " on channel " + std::to_string(index)
+		);
 		plugin->initEditorHost(vstWindows.at(i));
 		i++;
 	}

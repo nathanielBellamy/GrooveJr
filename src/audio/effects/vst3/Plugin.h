@@ -19,14 +19,14 @@ namespace Vst3 {
 
 struct Plugin {
     AppState*                           gAppState;
-    const std::string&                  name;
-    const std::string&                  path;
+    const std::string                  name;
+    const std::string                  path;
     VST3::Hosting::Module::Ptr          module;
     Steinberg::Vst::AudioHost::App*     audioHost;
     Steinberg::Vst::EditorHost::App*    editorHost;
 
     Plugin(
-        const std::string& path,
+        std::string path,
         AppState* gAppState,
         float** inputBuffers,
         float** outputBuffers

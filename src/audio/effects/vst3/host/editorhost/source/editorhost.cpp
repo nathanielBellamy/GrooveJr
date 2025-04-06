@@ -127,7 +127,6 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 	// if (flags & kSetComponentHandler)
 	if (true)
 	{
-		// SMTG_DBPRT0 ("setComponentHandler is used\n");
 		editController->setComponentHandler (&gComponentHandler);
 
 		Gj::Audio::Logging::write(
@@ -272,6 +271,11 @@ void App::init (const std::vector<std::string>& cmdArgs)
 		}
 	}
 
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"EditorHost::init",
+		"cmdArgs: " + cmdArgs.back()
+	);
 	if (cmdArgs.empty () || cmdArgs.back ().find (".vst3") == std::string::npos)
 	{
 		auto helpText = R"(
