@@ -25,6 +25,7 @@ EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int cha
   title.setFont({title.font().family(), 18});
 
   setStyle();
+  setupGrid();
 
   hide();
 }
@@ -40,12 +41,12 @@ void EffectsContainer::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.setRowMinimumHeight(0, 40);
 
-  int i = 0;
-  for (auto&& vstWindow : vstWindows) {
-    grid.addWidget(vstWindow.get(), i, 0, 1, -1);
-    grid.setRowMinimumHeight(i, 300);
-    i++;
-  }
+  // int i = 0;
+  // for (auto&& vstWindow : vstWindows) {
+  //   grid.addWidget(vstWindow.get(), i, 0, 1, -1);
+  //   grid.setRowMinimumHeight(i, 300);
+  //   i++;
+  // }
 
   grid.setColumnStretch(0, 1);
   grid.setColumnStretch(1, 10);
@@ -61,7 +62,7 @@ void EffectsContainer::showEvent(QShowEvent *event) {
 
 void EffectsContainer::initVstWindows() {
   for (int i = 0; i < mixer->effectsOnChannelCount(channelIndex); i++) {
-    auto vstWindow = std::make_shared<VstWindow>(this);
+    auto vstWindow = std::make_shared<VstWindow>(nullptr);
     vstWindows.push_back(std::move(vstWindow));
   }
   Logging::write(
@@ -74,7 +75,6 @@ void EffectsContainer::initVstWindows() {
   for (auto&& vstWindow : vstWindows) {
     vstWindow->show();
   }
-  setupGrid();
   Logging::write(
     Info,
     "EffectsContainer::initVstWindows()",

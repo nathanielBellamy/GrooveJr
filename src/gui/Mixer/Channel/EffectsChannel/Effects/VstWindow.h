@@ -8,7 +8,6 @@
 #include <QWidget>
 #include <QWindow>
 #include <QGridLayout>
-#include <QLabel>
 
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/iwindow.h"
 #include "public.sdk/source/vst/hosting/plugprovider.h"
@@ -24,7 +23,6 @@ class VstWindow final : public QWidget, public IWindow {
 
 private:
 	QGridLayout grid;
-	QLabel title;
 	void setStyle();
 	void setupGrid();
 
