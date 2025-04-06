@@ -11,13 +11,15 @@ EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
+  , channelIndex(channelIndex)
   , effectsContainer(nullptr, mixer, channelIndex)
   , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Effects"), this)
-  , channelIndex(channelIndex)
+  , vstSelect(this)
+  , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
   , grid(this)
   , title(this)
   , slider(Qt::Vertical, this)
-  , effectsSlots(this, actorSystem, mixer, channelIndex)
+  , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction)
   , muteSoloContainer(this, &openEffectsContainer)
   {
 
@@ -74,6 +76,32 @@ void EffectsChannel::setupSlider() {
 void EffectsChannel::connectActions() {
   connect(&openEffectsContainer, &QAction::triggered, [&]() {
     effectsContainer.show();
+  });
+
+  connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl& url) {
+    std::cout << "selecting vst for channel " << channelIndex << std::endl;
+    Logging::write(
+      Info,
+      "EffectsChannel::vstSelect",
+      "Selecting VST for channel " + std::to_string(channelIndex)
+    );
+    vstUrl = url;
+  });
+
+  connect(&addEffectAction, &QAction::triggered, [&]() {
+    if (vstSelect.exec() == QDialog::Accepted) {
+      Logging::write(
+        Info,
+        "EffectsChannel::addEffectAction",
+        "Adding effect: " + vstUrl.toDisplayString().toStdString() + " to channel " + std::to_string(channelIndex)
+      );
+      if (!mixer->addEffectToChannel(channelIndex, vstUrl.toDisplayString().toStdString().substr(7)))
+        Logging::write(
+          Error,
+          "EffectsChannel::addEffectAction",
+          "Unable to add effect: " + vstUrl.toDisplayString().toStdString() + " to channel " + std::to_string(channelIndex)
+        );
+    }
   });
 }
 

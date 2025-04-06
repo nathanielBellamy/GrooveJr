@@ -24,7 +24,7 @@ namespace Gui {
 class EffectsSlots final : public QWidget {
 
   public:
-    EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex);
+    EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, QAction* addEffectAction);
 
   private:
     actor_system& actorSystem;

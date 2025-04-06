@@ -30,7 +30,7 @@ namespace Gui {
 class EffectSlot final : public QWidget {
 
   public:
-    EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, int slotIndex, bool occupied);
+    EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, int slotIndex, QAction* addEffectAction, bool occupied);
 
   private:
     actor_system& actorSystem;
@@ -40,9 +40,7 @@ class EffectSlot final : public QWidget {
     bool occupied;
     QGridLayout grid;
     QLabel title;
-    QAction addEffectAction;
     AddSwapButton addSwapButton;
-    VstSelect vstSelect;
     QUrl vstUrl;
     QLabel pluginName;
     void setStyle();

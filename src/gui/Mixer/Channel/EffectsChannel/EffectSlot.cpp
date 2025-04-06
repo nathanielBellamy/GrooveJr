@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, const int channelIndex, const int slotIndex, const bool occupied)
+EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, const int channelIndex, const int slotIndex, QAction* addEffectAction, const bool occupied)
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
@@ -16,40 +16,12 @@ EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer*
   , occupied(occupied)
   , grid(this)
   , title(this)
-  , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
-  , addSwapButton(this, channelIndex, slotIndex, occupied, &addEffectAction)
-  , vstSelect(this)
+  , addSwapButton(this, channelIndex, slotIndex, occupied, addEffectAction)
   , pluginName(this)
   {
 
   title.setText(QString::number(slotIndex + 1));
   title.setFont({title.font().family(), 12});
-
-  addEffectAction.setStatusTip(tr("Add effect"));
-  addAction(&addEffectAction);
-
-  connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl& url) {
-    vstUrl = url;
-  });
-
-  connect(&addEffectAction, &QAction::triggered, [&]() {
-    if (vstSelect.exec() == QDialog::Accepted) {
-      std::cout <<
-        "vst selected: " << vstUrl.toDisplayString().toStdString() <<
-          " for channel " << channelIndex << std::endl;
-      if (!mixer->addEffectToChannel(channelIndex, vstUrl.toDisplayString().toStdString().substr(7)))
-        std::cout << "=== Unable to add effect to channel" << std::endl;
-      // strong_actor_ptr effectsManager = actorSystem.registry().get(Gj::Act::ActorIds::EFFECTS_MANAGER);
-      // const scoped_actor self{actorSystem};
-      // self->anon_send(
-      //     actor_cast<actor>(effectsManager),
-      //     actor_cast<strong_actor_ptr>(effectsManager), // TODO
-      //     this->channelIndex,
-      //     vstUrl.toDisplayString().toStdString(),
-      //     add_effect_a_v
-      // );
-    }
-  });
 
   setStyle();
   setupGrid();

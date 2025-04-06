@@ -187,7 +187,7 @@ int EffectsChannel::effectCount() const {
 	return static_cast<int>(vst3Plugins.size());
 }
 
-void EffectsChannel::initEditorHosts(std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
+void EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
 	int i = 0;
 	for (auto&& plugin : vst3Plugins) {
 		plugin->initEditorHost(vstWindows.at(i));

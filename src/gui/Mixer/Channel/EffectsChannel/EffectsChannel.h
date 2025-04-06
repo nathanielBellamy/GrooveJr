@@ -12,11 +12,15 @@
 #include <QLabel>
 #include <QSlider>
 #include <QWidget>
+#include <QUrl>
 
 #include "../../../../audio/Mixer.h"
 #include "EffectsSlots.h"
 #include "MuteSoloContainer.h"
 #include "./Effects/EffectsContainer.h"
+#include "../../../Shared/VstSelect.h"
+
+#include "../../../../Logging.h"
 
 using namespace caf;
 
@@ -31,9 +35,12 @@ class EffectsChannel final : public QWidget {
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;
+    int channelIndex;
     EffectsContainer effectsContainer;
     QAction openEffectsContainer;
-    int channelIndex;
+    VstSelect vstSelect;
+    QUrl vstUrl;
+    QAction addEffectAction;
     QGridLayout grid;
     QLabel title;
     QSlider slider;
