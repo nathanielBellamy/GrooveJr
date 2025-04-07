@@ -11,6 +11,7 @@ set (CMAKE_CXX_STANDARD 17)
 # utilize vst3sdk cmake modules
 list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
+include(SMTG_FindJack)
 
 # logging
 find_package(Boost REQUIRED COMPONENTS log_setup log)
@@ -22,11 +23,6 @@ find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 if(NOT ${LIBJACK_FOUND})
     message(INFO " --GjAudio--LIBJACK--NOT--FOUND--")
 endif()
-
-#target_include_directories(GjAudio
-#        PRIVATE
-#        ${LIBJACK_INCLUDE_DIR}
-#)
 
 set (C_LIBS_INCLUDE_FLAGS
         -I${C_LIBS_HOME}/libsndfile/1.2.2/include
@@ -108,4 +104,8 @@ target_link_libraries(GjAudio PUBLIC
     Qt6::Core
     Qt6::Widgets
     ${LIBJACK_LIBRARY}
+)
+target_include_directories(GjAudio
+        PRIVATE
+        ${LIBJACK_INCLUDE_DIR}
 )

@@ -37,14 +37,6 @@
 
 #include "JackClient.h"
 
-//! Workaround for Jack on Windows
-#if defined(SMTG_OS_WINDOWS) && defined(_STDINT)
-#define _STDINT_H
-#endif
-
-#include <jack/jack.h>
-#include <jack/midiport.h>
-
 //------------------------------------------------------------------------
 namespace Steinberg {
 namespace Vst {
