@@ -51,10 +51,15 @@ Mixer::Mixer(AppState* gAppState)
 }
 
 Mixer::~Mixer() {
+  Logging::write(
+    Info,
+    "Mixer::~Mixer",
+    "Destroying Mixer."
+  );
+
   for (const auto channel : effectsChannels) {
     delete channel;
   }
-
   Logging::write(
     Info,
     "Mixer::~Mixer",
@@ -62,8 +67,25 @@ Mixer::~Mixer() {
   );
 
   freeInputBuffers();
-
   delete outputBuffer;
+  Logging::write(
+    Info,
+    "Mixer::~Mixer",
+    "Done freeing buffers."
+  );
+
+  delete jackClient;
+  Logging::write(
+    Info,
+    "Mixer::~Mixer",
+    "Deleted JackClient."
+  );
+
+  Logging::write(
+    Info,
+    "Mixer::~Mixer",
+    "Destroyed Mixer."
+  );
 }
 
 bool Mixer::allocateInputBuffers() {
