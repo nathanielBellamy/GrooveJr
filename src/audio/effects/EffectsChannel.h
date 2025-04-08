@@ -11,6 +11,7 @@
 #include "../Channel.h"
 #include "../../AppState.h"
 #include "../Logging.h"
+#include "../JackClient.h"
 
 namespace Gj {
 namespace Audio {
@@ -20,6 +21,7 @@ class EffectsChannel {
   // NOTE:
   // fx0:inputBuffers->buffersA, fx1:buffersA->buffersB, fx2:buffersB->buffersA, fx3:buffersA->buffersB, ...
   AppState* gAppState;
+  std::shared_ptr<JackClient> jackClient;
   int index;
   float** inputBuffers;
   float** buffersA;
@@ -34,7 +36,7 @@ class EffectsChannel {
   public:
     Channel channel;
 
-    EffectsChannel(AppState* gAppState, int index, float** inputBuffers);
+    EffectsChannel(AppState* gAppState, std::shared_ptr<JackClient> jackClient, int index, float** inputBuffers);
     ~EffectsChannel();
 
     void process() const;

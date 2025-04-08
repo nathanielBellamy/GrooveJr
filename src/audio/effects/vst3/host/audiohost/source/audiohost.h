@@ -42,6 +42,7 @@
 #include "./media/audioclient.h"
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/iapplication.h"
 // #include "public.sdk/samples/vst-hosting/audiohost/source/media/audioclient.h"
+#include "../../../../../JackClient.h"
 #include "public.sdk/source/vst/hosting/module.h"
 #include "public.sdk/source/vst/hosting/plugprovider.h"
 #include "public.sdk/source/vst/utility/optional.h"
@@ -55,11 +56,12 @@ namespace AudioHost {
 class App : public EditorHost::IApplication
 {
 	Gj::AppState* gAppState;
+	std::shared_ptr<Gj::Audio::JackClient> jackClient;
 	float** inputBuffers;
 	float** outputBuffers;
 
 public:
-	App(Gj::AppState* gAppState, float** inputBuffers, float** outputBuffers);
+	App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackClient, float** inputBuffers, float** outputBuffers);
 	~App () noexcept override;
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;

@@ -11,8 +11,9 @@ namespace Effects {
 
 using namespace Steinberg;
 
-EffectsChannel::EffectsChannel(AppState* gAppState, const int index, float** inputBuffers)
+EffectsChannel::EffectsChannel(AppState* gAppState, std::shared_ptr<JackClient> jackClient, const int index, float** inputBuffers)
   : gAppState(gAppState)
+	, jackClient(jackClient)
 	, index(index)
 	, inputBuffers(inputBuffers)
 	, buffersA()
@@ -122,6 +123,7 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
   	std::make_unique<Vst3::Plugin>(
   		effectPath,
   		gAppState,
+  		jackClient,
   		in,
   		out
   	);

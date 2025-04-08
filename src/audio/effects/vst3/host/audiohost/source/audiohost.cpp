@@ -49,6 +49,8 @@
 #include <cstdio>
 #include <iostream>
 
+#include "../../../../../JackClient.h"
+
 //#if WIN32
 //#include "windows.h"
 //#include <wtypes.h>
@@ -65,8 +67,9 @@ void App::setModule (VST3::Hosting::Module::Ptr module_) {
   module = module_;
 }
 
-App::App(Gj::AppState* gAppState, float** inputBuffers, float** outputBuffers)
+App::App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackClient, float** inputBuffers, float** outputBuffers)
 	: gAppState(gAppState)
+	, jackClient(jackClient)
 	, inputBuffers(inputBuffers)
 	, outputBuffers(outputBuffers)
 	{
@@ -125,7 +128,7 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
 
 	std::string name;
 	name = plugProvider->getClassInfo().name();
-	audioClient = AudioClient::create (name, component, midiMapping);
+	audioClient = AudioClient::create (name, component, midiMapping, jackClient);
 }
 
 //------------------------------------------------------------------------

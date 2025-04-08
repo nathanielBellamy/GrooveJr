@@ -152,10 +152,10 @@ AudioClient::~AudioClient ()
 
 //------------------------------------------------------------------------
 AudioClientPtr AudioClient::create (const Name& name, IComponent* component,
-                                    IMidiMapping* midiMapping)
+                                    IMidiMapping* midiMapping, IMediaServerPtr jackClient)
 {
 	auto newProcessor = std::make_shared<AudioClient> ();
-	newProcessor->initialize (name, component, midiMapping);
+	newProcessor->initialize (name, component, midiMapping, jackClient);
 	return newProcessor;
 }
 
@@ -167,15 +167,15 @@ void AudioClient::initProcessContext ()
 }
 
 //------------------------------------------------------------------------
-void AudioClient::createLocalMediaServer (const Name& name)
-{
-	mediaServer = createMediaServer (name);
-	mediaServer->registerAudioClient (this);
-	mediaServer->registerMidiClient (this);
-}
+// void AudioClient::createLocalMediaServer (const Name& name)
+// {
+// 	mediaServer = createMediaServer (name);
+// 	mediaServer->registerAudioClient (this);
+// 	mediaServer->registerMidiClient (this);
+// }
 
 //------------------------------------------------------------------------
-bool AudioClient::initialize (const Name& name, IComponent* _component, IMidiMapping* midiMapping)
+bool AudioClient::initialize (const Name& name, IComponent* _component, IMidiMapping* midiMapping, IMediaServerPtr jackClient)
 {
 	component = _component;
 	if (!component)
@@ -188,7 +188,8 @@ bool AudioClient::initialize (const Name& name, IComponent* _component, IMidiMap
 	if (midiMapping)
 		midiCCMapping = initMidiCtrlerAssignment (component, midiMapping);
 
-	createLocalMediaServer (name);
+	mediaServer = jackClient;
+	// createLocalMediaServer (name);
 	return true;
 }
 

@@ -9,7 +9,7 @@ namespace Audio {
 namespace Effects {
 namespace Vst3 {
 
-Plugin::Plugin(std::string path, AppState* gAppState, float** inputBuffers, float** outputBuffers)
+Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient> jackClient, float** inputBuffers, float** outputBuffers)
 	: gAppState(gAppState)
 	, name(path)
 	, path(path)
@@ -40,6 +40,7 @@ Plugin::Plugin(std::string path, AppState* gAppState, float** inputBuffers, floa
 	try {
 		audioHost = new Steinberg::Vst::AudioHost::App(
 			gAppState,
+			jackClient,
 			inputBuffers,
 			outputBuffers
 		);

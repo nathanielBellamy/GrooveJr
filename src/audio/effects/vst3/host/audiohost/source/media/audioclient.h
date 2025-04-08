@@ -76,7 +76,7 @@ public:
 	~AudioClient () override;
 
 	static AudioClientPtr create (const Name& name, IComponent* component,
-	                              IMidiMapping* midiMapping);
+	                              IMidiMapping* midiMapping, IMediaServerPtr jackClient);
 
 	IComponent* getComponent() const { return component; }
 
@@ -95,11 +95,11 @@ public:
 
 	MidiCCMapping getMidiCCMapping ();
 
-	bool initialize (const Name& name, IComponent* component, IMidiMapping* midiMapping);
+	bool initialize (const Name& name, IComponent* component, IMidiMapping* midiMapping, IMediaServerPtr jackClient);
 
 //--------------------------------------------------------------------
 private:
-	void createLocalMediaServer (const Name& name);
+	// void createLocalMediaServer (const Name& name);
 	void terminate ();
 	void updateBusBuffers (Buffers& buffers, HostProcessData& processData);
 	void initProcessData ();

@@ -7,6 +7,7 @@
 
 #include "../../../Logging.h"
 #include "../../../AppState.h"
+#include "../../JackClient.h"
 #include "./host/audiohost/source/audiohost.h"
 #include "./host/editorhost/source/editorhost.h"
 #include "../../../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
@@ -19,8 +20,8 @@ namespace Vst3 {
 
 struct Plugin {
     AppState*                           gAppState;
-    const std::string                  name;
-    const std::string                  path;
+    const std::string                   name;
+    const std::string                   path;
     VST3::Hosting::Module::Ptr          module;
     Steinberg::Vst::AudioHost::App*     audioHost;
     Steinberg::Vst::EditorHost::App*    editorHost;
@@ -28,6 +29,7 @@ struct Plugin {
     Plugin(
         std::string path,
         AppState* gAppState,
+        std::shared_ptr<JackClient> jackClient,
         float** inputBuffers,
         float** outputBuffers
     );

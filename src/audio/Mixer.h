@@ -22,7 +22,7 @@ namespace Audio {
 
 class Mixer {
     AppState* gAppState;
-    JackClient* jackClient;
+    std::shared_ptr<JackClient> jackClient;
     Channel mainChannel;
     Channel dryChannel;
     float channelCount;

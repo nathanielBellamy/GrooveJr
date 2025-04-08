@@ -11,7 +11,6 @@ namespace Audio {
 
 Mixer::Mixer(AppState* gAppState)
   : gAppState(gAppState)
-  , jackClient(new JackClient())
   , mainChannel({ 1.0f, 0.0f })
   , dryChannel({ 1.0f, 0.0f })
   , channelCount(1.0f)
@@ -74,13 +73,6 @@ Mixer::~Mixer() {
     "Done freeing buffers."
   );
 
-  delete jackClient;
-  Logging::write(
-    Info,
-    "Mixer::~Mixer",
-    "Deleted JackClient."
-  );
-
   Logging::write(
     Info,
     "Mixer::~Mixer",
@@ -121,6 +113,7 @@ bool Mixer::addEffectsChannel() {
     effectsChannels.push_back(
       new Effects::EffectsChannel(
         gAppState,
+        jackClient,
         static_cast<int>(effectsChannels.size()),
         inputBuffers
       )
