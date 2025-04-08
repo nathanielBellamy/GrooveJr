@@ -13,6 +13,7 @@
 #include "../AppState.h"
 #include "../Logging.h"
 #include "./Channel.h"
+#include "JackClient.h"
 #include "./effects/EffectsChannel.h"
 #include "../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
 
@@ -21,6 +22,7 @@ namespace Audio {
 
 class Mixer {
     AppState* gAppState;
+    JackClient* jackClient;
     Channel mainChannel;
     Channel dryChannel;
     float channelCount;

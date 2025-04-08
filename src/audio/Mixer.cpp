@@ -11,6 +11,7 @@ namespace Audio {
 
 Mixer::Mixer(AppState* gAppState)
   : gAppState(gAppState)
+  , jackClient(new JackClient())
   , mainChannel({ 1.0f, 0.0f })
   , dryChannel({ 1.0f, 0.0f })
   , channelCount(1.0f)
@@ -18,9 +19,35 @@ Mixer::Mixer(AppState* gAppState)
   , inputBuffers(nullptr)
   {
 
+  Logging::write(
+    Info,
+    "Mixer::Mixer()",
+    "Instantiating Mixer..."
+  );
+
+  jackClient->initialize("GrooveJr-JACK");
+
+  Logging::write(
+    Info,
+    "Mixer::Mixer()",
+    "Initialized GrooveJr JackClient."
+  );
+
   allocateInputBuffers();
 
   outputBuffer = new float[gAppState->audioFramesPerBuffer * 2];
+
+  Logging::write(
+    Info,
+    "Mixer::Mixer()",
+    "Allocated Buffers."
+  );
+
+  Logging::write(
+    Info,
+    "Mixer::Mixer()",
+    "Initialized Mixer."
+  );
 }
 
 Mixer::~Mixer() {

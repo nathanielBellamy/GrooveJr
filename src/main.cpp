@@ -11,9 +11,9 @@ using namespace Steinberg::Vst;
 
 namespace Gj {
 
-auto PluginContext = new Audio::Effects::Vst3::Host::App();
-auto gAppState = new AppState(128, PlayState::STOP);
-auto Mixer = new Audio::Mixer(gAppState);
+Audio::Effects::Vst3::Host::App* PluginContext;
+AppState* gAppState;
+Audio::Mixer* Mixer;
 
 void shutdown_handler(const int sig) {
   std::cout << "Caught signal: " << sig << std::endl;
@@ -62,7 +62,6 @@ void initVst3PluginContext() {
 
 extern "C" {
     int main(int argc, char *argv[]) {
-
         // setup signal handle
         struct sigaction sigIntHandler{};
         sigIntHandler.sa_handler = shutdown_handler;
@@ -73,29 +72,14 @@ extern "C" {
         // setup logging
         Logging::init();
 
+        // setup Audio
+        gAppState = new AppState(128, PlayState::STOP);
+        Mixer = new Audio::Mixer(gAppState);
         initVst3PluginContext();
 
         Mixer->addEffectsChannel();
         Mixer->addEffectsChannel();
         Mixer->addEffectsChannel();
-        // Mixer->addEffectToChannel(
-        //     0,
-        //     "/Library/Audio/Plug-Ins/VST3/TDR Nova.vst3"
-        // );
-        // Mixer->addEffectToChannel(
-        //     0,
-        //     "/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3"
-        // );
-
-
-        // Mixer->addEffectToChannel(
-        //    1,
-        //    new Audio::Effects::Vst3::Plugin("/Library/Audio/Plug-Ins/VST3/TDR Nova.vst3" )
-        // );
-        //Mixer->addEffectToChannel(
-        //    1,
-        //    new Audio::Effects::Vst3::Plugin("/Library/Audio/Plug-Ins/VST3/ValhallaSupermassive.vst3" )
-        //);
 
         // init actor system
         // Initialize the global type information before anything else.
