@@ -73,9 +73,9 @@ extern "C" {
         Logging::init();
 
         // setup Audio
+        initVst3PluginContext();
         gAppState = new AppState(128, PlayState::STOP);
         Mixer = new Audio::Mixer(gAppState);
-        initVst3PluginContext();
 
         Mixer->addEffectsChannel();
         Mixer->addEffectsChannel();

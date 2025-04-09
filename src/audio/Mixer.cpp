@@ -11,6 +11,7 @@ namespace Audio {
 
 Mixer::Mixer(AppState* gAppState)
   : gAppState(gAppState)
+  , jackClient(new JackClient())
   , mainChannel({ 1.0f, 0.0f })
   , dryChannel({ 1.0f, 0.0f })
   , channelCount(1.0f)
