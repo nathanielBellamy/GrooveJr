@@ -139,9 +139,29 @@ bool JackClient::registerMidiClient (IMidiClient* client)
 //------------------------------------------------------------------------
 bool JackClient::initialize (JackClient::JackName name)
 {
-	jackClient = registerClient (name);
-	if (!jackClient)
+	Logging::write(
+		Info,
+		"JackClient::initialize",
+		"Initializing JackClient"
+	);
+	try {
+		jackClient = registerClient(name);
+	} catch (...) {
+		Logging::write(
+			Error,
+			"JackClient::initialize",
+			"An error occurred while attempting to Register JackClient"
+		);
+	}
+
+	if (!jackClient) {
+		Logging::write(
+			Error,
+			"JackClient::initialize",
+			"Unable to Register JackClient"
+		);
 		return false;
+	}
 
 	return true;
 }
@@ -293,10 +313,28 @@ int JackClient::processMidi (jack_nframes_t nframes)
 //------------------------------------------------------------------------
 jack_client_t* JackClient::registerClient (JackClient::JackName name)
 {
-	jack_options_t options = JackNullOption;
+	Logging::write(
+		Info,
+		"JackClient::registerClient",
+		"Registering JackClient: " + name
+	);
+	jack_options_t options = JackServerName;
 	jack_status_t status;
 
-	jackClient = jack_client_open (name.data (), options, &status, nullptr);
+	try {
+		jackClient = jack_client_open (name.data (), options, &status, nullptr);
+	} catch(...) {
+		Logging::write(
+			Error,
+			"JackClient::registerClient",
+			"An error occurred while attempting to open jack client - jack_client_open: " + name
+		);
+	}
+	Logging::write(
+		Info,
+		"JackClient::registerClient",
+		"Opened JackClient: " + name
+	);
 	return jackClient;
 
 	/* Use the status to check for errors:

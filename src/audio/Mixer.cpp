@@ -14,7 +14,6 @@ Mixer::Mixer(AppState* gAppState)
   , mainChannel({ 1.0f, 0.0f })
   , dryChannel({ 1.0f, 0.0f })
   , channelCount(1.0f)
-  , effectsChannels()
   , inputBuffers(nullptr)
   {
 
@@ -24,7 +23,7 @@ Mixer::Mixer(AppState* gAppState)
     "Instantiating Mixer..."
   );
 
-  jackClient->initialize("GrooveJr-JACK");
+  jackClient->initialize("GrooveJrJACK");
 
   Logging::write(
     Info,

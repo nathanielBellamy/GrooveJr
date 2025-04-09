@@ -12,6 +12,8 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 
+#include "Logging.h"
+
 namespace Gj {
 namespace Audio {
 
