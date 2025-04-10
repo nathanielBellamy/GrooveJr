@@ -205,15 +205,16 @@ bool Mixer::mixDown(
 
   // TODO: handle pan/gain
 
-  for (int c = 0; c < audioDataSfChannels; c++) { // TODO: at the moment, we can assume audioDataSfChannels = 2
-    for (int i = 0; i < framesPerBuffer; i++) {
-      const auto val = audioDataBuffer[audioDataIndex + 2 * i + c];
-      // write dry channel output buffer
-      outputBuffer[2 * i + c] = (dryChannel.gain * val) / channelCount;
+  for (int i = 0; i < framesPerBuffer; i++) {
+    const auto valL = audioDataBuffer[audioDataIndex + 2 * i];
+    const auto valR = audioDataBuffer[audioDataIndex + 2 * i];
+    // write dry channel output buffer
+    outputBuffers[0][i] = (dryChannel.gain * valL) / channelCount;
+    outputBuffers[1][i] = (dryChannel.gain * valR ) / channelCount;
 
-      // de-interlace audio into shared effects input buffers
-      inputBuffers[c][i] = val;
-    }
+    // de-interlace audio into shared effects input buffers
+    inputBuffers[0][i] = valL;
+    inputBuffers[1][i] = valR;
   }
 
   for (const auto effectsChannel : effectsChannels) {
