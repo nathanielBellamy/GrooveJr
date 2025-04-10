@@ -15,7 +15,11 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
   , fileName(fileName)
   , initialFrameId(initialFrameId)
   , mixer(mixer)
-  {}
+  , jackClient(mixer->getJackClient())
+  {
+  outPorts[0] = jack_port_register(jackClient, "GrooveJr_out_left", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+  outPorts[1] = jack_port_register(jackClient, "GrooveJr_out_right", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+}
 
 void Cassette::freeAudioData(AudioData *audioData) {
   free(audioData->buffer);
@@ -23,6 +27,28 @@ void Cassette::freeAudioData(AudioData *audioData) {
   std::cout << "\nDone freeing resources for file: " << fileName;
 };
 
+// jack process callback
+// do not allocate/free memory within this method
+// as it may be called at system-interrupt level
+int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) const {
+  auto* outl = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(outPorts[0], nframes));
+  auto* outr = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(outPorts[1], nframes));
+
+  AudioData *audioData = static_cast<AudioData*>(arg);
+  // >> MIXER
+  audioData->mixer->mixDown(audioData->index, audioData->buffer, audioData->sfinfo.channels, nframes);
+
+  for (jack_nframes_t i = 0; i < nframes * audioData->sfinfo.channels; i++) {
+      outl[i] = audioData->mixer->outputBuffers[0][i] * audioData->volume;
+      outr[i] = audioData->mixer->outputBuffers[1][i] * audioData->volume;
+  }
+
+  audioData->index += nframes * audioData->sfinfo.channels;
+  return 0;
+}
+
+// TODO:
+  // - cleanup once JACK is working
 // portaudio callback
 // do not allocate/free memory within this method
 // as it may be called at system-interrupt level
@@ -176,7 +202,11 @@ int Cassette::play()
   // Read the audio data into buffer
   long readcount = sf_read_float(file, buffer, sfinfo.frames * sfinfo.channels);
   if (readcount == 0) {
-      std::cout << "Cannot read file" << std::endl;
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "Unable to read file: " + std::string(fileName)
+    );
       return 1;
   }
 
@@ -184,51 +214,62 @@ int Cassette::play()
 
   // update plugin effects with info about audio to be processed
   if (!mixer->setSampleRate(sfinfo.samplerate)) {
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "Unable to set sample rate: " + std::to_string(sfinfo.samplerate)
+    );
     std::cout << std::endl << "Unable to set Sample Rate " << sfinfo.samplerate << std::endl;
     goto error;
   }
 
-  // Init PA
-  PaStreamParameters outputParameters; // inputParameters
-  PaStream *stream;
-  PaError err;
+  // TODO
+  // - wip, switching to use JACK directly
+  if (false) {
+    // TODO:
+    // - cleanup once JACK is working
+    // Init PA
+    PaStreamParameters outputParameters; // inputParameters
+    PaStream *stream;
+    PaError err;
 
-  err = Pa_Initialize();
-  if( err != paNoError ) goto error;
+    err = Pa_Initialize();
+    if( err != paNoError ) goto error;
 
-  // // TODO: handle live input audio
-  // inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
-  // if (inputParameters.device == paNoDevice) {
-  //     std::cout << "Error: No default input device." << std::endl;
-  //     goto error;
-  // }
-  // inputParameters.channelCount = 1;
-  // inputParameters.sampleFormat = PA_SAMPLE_TYPE;
-  // inputParameters.hostApiSpecificStreamInfo = NULL;
+    // // TODO: handle live input audio
+    // inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
+    // if (inputParameters.device == paNoDevice) {
+    //     std::cout << "Error: No default input device." << std::endl;
+    //     goto error;
+    // }
+    // inputParameters.channelCount = 1;
+    // inputParameters.sampleFormat = PA_SAMPLE_TYPE;
+    // inputParameters.hostApiSpecificStreamInfo = NULL;
 
-  outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
-  if (outputParameters.device == paNoDevice) {
-      std::cout << "Error: No default output device." << std::endl;
-      goto error;
+    outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
+    if (outputParameters.device == paNoDevice) {
+        std::cout << "Error: No default output device." << std::endl;
+        goto error;
+    }
+    outputParameters.channelCount = audioData.sfinfo.channels;
+    outputParameters.sampleFormat = PA_SAMPLE_TYPE;
+    outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
+    outputParameters.hostApiSpecificStreamInfo = NULL;
+
+    err = Pa_OpenStream(
+              &stream,
+              nullptr, // &inputParameters,
+              &outputParameters,
+              audioData.sfinfo.samplerate,
+              mixer->getAudioFramesPerBuffer(),
+              paNoFlag, /* paClipOn, */
+              callback,
+              &audioData );
+    if( err != paNoError ) goto error;
+
+    err = Pa_StartStream( stream );
+    if( err != paNoError ) goto error;
   }
-  outputParameters.channelCount = audioData.sfinfo.channels;
-  outputParameters.sampleFormat = PA_SAMPLE_TYPE;
-  outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
-  outputParameters.hostApiSpecificStreamInfo = NULL;
-
-  err = Pa_OpenStream(
-            &stream,
-            nullptr, // &inputParameters,
-            &outputParameters,
-            audioData.sfinfo.samplerate,
-            mixer->getAudioFramesPerBuffer(),
-            paNoFlag, /* paClipOn, */
-            callback,
-            &audioData );
-  if( err != paNoError ) goto error;
-
-  err = Pa_StartStream( stream );
-  if( err != paNoError ) goto error;
 
   while(
           audioData.playState != Gj::PlayState::STOP

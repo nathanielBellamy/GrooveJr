@@ -32,6 +32,11 @@ public:
 	JackClient () = default;
 	~JackClient () override;
 
+	[[nodiscard]]
+	jack_client_t* getJackClient() const {
+		return jackClient;
+	};
+
 	// IMediaServer interface
 	bool registerAudioClient (IAudioClient* client) override;
 	bool registerMidiClient (IMidiClient* client) override;

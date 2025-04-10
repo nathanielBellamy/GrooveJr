@@ -8,11 +8,13 @@
 #include <chrono>
 
 #include <sndfile.hh>
+#include <jack/jack.h>
 #include <portaudio.h>
 #include "caf/actor_system.hpp"
 #include "./AudioData.h"
 #include "./Mixer.h"
 #include "./ThreadStatics.h"
+#include "Logging.h"
 
 using namespace caf;
 
@@ -26,6 +28,10 @@ class Cassette
   char const* fileName;
   long initialFrameId;
   Mixer* mixer;
+  jack_client_t* jackClient;
+  jack_port_t* outPorts[2];
+
+  int jackProcessCallback(jack_nframes_t nframes, void* arg) const;
 
   public:
     Cassette(

@@ -32,13 +32,20 @@ class Mixer {
 
   public:
     float** inputBuffers;
-    float* outputBuffer;
+    float** outputBuffers;
 
     explicit Mixer(AppState*);
     ~Mixer();
 
+    [[nodiscard]]
+    jack_client_t* getJackClient() const {
+      return jackClient->getJackClient();
+    };
+
     bool allocateInputBuffers();
     bool freeInputBuffers() const;
+    bool allocateOutputBuffers();
+    bool freeOutputBuffers() const;
 
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);

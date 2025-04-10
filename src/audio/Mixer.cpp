@@ -33,8 +33,7 @@ Mixer::Mixer(AppState* gAppState)
   );
 
   allocateInputBuffers();
-
-  outputBuffer = new float[gAppState->audioFramesPerBuffer * 2];
+  allocateOutputBuffers();
 
   Logging::write(
     Info,
@@ -65,8 +64,14 @@ Mixer::~Mixer() {
     "Mixer done delete effectsChannels"
   );
 
-  freeInputBuffers();
-  delete outputBuffer;
+  if (!freeInputBuffers || !freeOutputBuffers) {
+    Logging::write(
+      Error,
+      "Mixer::~Mixer",
+      "An error occureed while freeing buffers."
+    );
+  }
+
   Logging::write(
     Info,
     "Mixer::~Mixer",
@@ -105,6 +110,35 @@ bool Mixer::freeInputBuffers() const {
     delete inputBuffers[i];
   }
   free(inputBuffers);
+
+  return true;
+}
+
+bool Mixer::allocateOutputBuffers() {
+  // TODO: don't assume stereo
+  outputBuffers = static_cast<float**>(
+      malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
+  );
+
+  if (outputBuffers == nullptr)
+    Logging::write(
+      Error,
+      "Mixer::allocateOutputBuffers",
+      "Unable to allocate memory for Mixer.outputBuffers"
+    );
+
+  for (int c = 0; c < 2; c++) {
+    outputBuffers[c] = new float[gAppState->audioFramesPerBuffer];
+  }
+
+  return true;
+}
+
+bool Mixer::freeOutputBuffers() const {
+  for (auto i = 0; i < 2; i++) {
+    delete outputBuffers[i];
+  }
+  free(outputBuffers);
 
   return true;
 }
@@ -190,11 +224,9 @@ bool Mixer::mixDown(
     const auto effectsChannelBuffersWriteOut = effectsChannel->getBuffersWriteOut();
 
     // write processed audio to outputBuffer
-    for (int c = 0; c < audioDataSfChannels; c++) {
-      for (int i = 0; i < framesPerBuffer; i++) {
-        outputBuffer[2 * i + c] +=
-          ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[c][i] ) / channelCount;
-      }
+    for (int i = 0; i < framesPerBuffer; i++) {
+      outputBuffers[0][i] += ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[0][i] ) / channelCount;
+      outputBuffers[1][i] += ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[1][i] ) / channelCount;
     }
   }
 
