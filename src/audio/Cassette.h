@@ -29,9 +29,8 @@ class Cassette
   long initialFrameId;
   Mixer* mixer;
   jack_client_t* jackClient;
-  jack_port_t* outPorts[2];
 
-  int jackProcessCallback(jack_nframes_t nframes, void* arg) const;
+  static int jackProcessCallback(jack_nframes_t nframes, void* arg);
 
   public:
     Cassette(
@@ -44,13 +43,13 @@ class Cassette
 
     int play();
 
-    void freeAudioData(AudioData *audioData);
+    void freeAudioData(AudioData *audioData) const;
 
-    static int callback(const void *inputBuffer, void *outputBuffer,
-                        unsigned long framesPerBuffer,
-                        const PaStreamCallbackTimeInfo* timeInfo,
-                        PaStreamCallbackFlags statusFlags,
-                        void *userData );
+    // static int callback(const void *inputBuffer, void *outputBuffer,
+    //                     unsigned long framesPerBuffer,
+    //                     const PaStreamCallbackTimeInfo* timeInfo,
+    //                     PaStreamCallbackFlags statusFlags,
+    //                     void *userData );
 };
 
 } // Audio

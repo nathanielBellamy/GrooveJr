@@ -64,7 +64,7 @@ Mixer::~Mixer() {
     "Mixer done delete effectsChannels"
   );
 
-  if (!freeInputBuffers || !freeOutputBuffers) {
+  if (!freeInputBuffers() || !freeOutputBuffers()) {
     Logging::write(
       Error,
       "Mixer::~Mixer",

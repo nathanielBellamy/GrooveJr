@@ -9,6 +9,9 @@ using namespace caf;
 namespace Gj {
 namespace Audio {
 
+jack_port_t* outPortL;
+jack_port_t* outPortR;
+
 Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileName, long initialFrameId, Mixer* mixer)
   : actorSystem(actorSystem)
   , threadId(threadId)
@@ -16,31 +19,32 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
   , initialFrameId(initialFrameId)
   , mixer(mixer)
   , jackClient(mixer->getJackClient())
-  {
-  outPorts[0] = jack_port_register(jackClient, "GrooveJr_out_left", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-  outPorts[1] = jack_port_register(jackClient, "GrooveJr_out_right", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-}
+  {}
 
-void Cassette::freeAudioData(AudioData *audioData) {
+void Cassette::freeAudioData(AudioData *audioData) const {
   free(audioData->buffer);
   sf_close(audioData->file);
-  std::cout << "\nDone freeing resources for file: " << fileName;
+  Logging::write(
+    Info,
+    "Cassette::freeAudioData",
+    "Done freeing resources for file" + std::string(fileName)
+  );
 };
 
 // jack process callback
 // do not allocate/free memory within this method
 // as it may be called at system-interrupt level
-int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) const {
-  auto* outl = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(outPorts[0], nframes));
-  auto* outr = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(outPorts[1], nframes));
+int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
+  auto* outL = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(outPortL, nframes));
+  auto* outR = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(outPortR, nframes));
 
   AudioData *audioData = static_cast<AudioData*>(arg);
   // >> MIXER
   audioData->mixer->mixDown(audioData->index, audioData->buffer, audioData->sfinfo.channels, nframes);
 
   for (jack_nframes_t i = 0; i < nframes * audioData->sfinfo.channels; i++) {
-      outl[i] = audioData->mixer->outputBuffers[0][i] * audioData->volume;
-      outr[i] = audioData->mixer->outputBuffers[1][i] * audioData->volume;
+      outL[i] = audioData->mixer->outputBuffers[0][i] * audioData->volume;
+      outR[i] = audioData->mixer->outputBuffers[1][i] * audioData->volume;
   }
 
   audioData->index += nframes * audioData->sfinfo.channels;
@@ -52,130 +56,134 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) const {
 // portaudio callback
 // do not allocate/free memory within this method
 // as it may be called at system-interrupt level
-int Cassette::callback(const void *inputBuffer, void *outputBuffer,
-                    unsigned long framesPerBuffer,
-                    const PaStreamCallbackTimeInfo* timeInfo,
-                    PaStreamCallbackFlags statusFlags,
-                    void *userData )
-{
-  SAMPLE *out = (SAMPLE*) outputBuffer;
-  unsigned int i;
-  unsigned int c;
-  (void) inputBuffer;
-  (void) timeInfo; /* Prevent unused variable warnings. */
-  (void) statusFlags;
-  AudioData *audioData = static_cast<AudioData*>(userData);
-
-  // >> MIXER
-  audioData->mixer->mixDown(audioData->index, audioData->buffer, audioData->sfinfo.channels, framesPerBuffer);
-
-  for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
-      *out++ = audioData->mixer->outputBuffer[i] * audioData->volume;
-  }
-
-  // TODO: early return here for testing
-  audioData->index += framesPerBuffer * audioData->sfinfo.channels;
-  return paContinue;
-
-  // << MIXER
-
-  if( audioData->buffer == NULL )
-  {
-//      for( i=0; i < framesPerBuffer; i++ )
-//      {
-//          *out++ = 0;  /* left - silent */
-//          *out++ = 0;  /* right - silent */
-//      }
-     audioData->index = 0;
-     audioData->readComplete = true;
-     return paComplete;
-  }
-  else if (audioData->index > audioData->sfinfo.frames * audioData->sfinfo.channels - 1)
-  {
-     audioData->index = 0;
-     audioData->readComplete = true;
-     return paComplete;
-  }
-  else if (audioData->index < 0)
-  {
-    audioData->index = 0;
-    audioData->readComplete = true;
-    return paComplete;
-  }
-  // audioData->buffer --> paOut
-  else if (audioData->playbackSpeed == -1.0) // reverse
-  {
-    for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
-        *out++ = audioData->buffer[audioData->index - i] * audioData->volume;
-    }
-
-    audioData->index -= framesPerBuffer * audioData->sfinfo.channels;
-    return paContinue;
-  }
-  else if (audioData->playbackSpeed == 0.5) // half-speed
-  {
-    int halfFramesPerBuffer = framesPerBuffer / 2; // framesPerBuffer is a power of 2
-    for (i = 0; i < halfFramesPerBuffer * audioData->sfinfo.channels; i++) {
-      *out++ = audioData->buffer[audioData->index + i] * audioData->volume;
-      *out++ = audioData->buffer[audioData->index + i] * audioData->volume;
-    }
-
-    audioData->index += halfFramesPerBuffer * audioData->sfinfo.channels;
-    return paContinue;
-  }
-  else if (audioData->playbackSpeed == -0.5) // half-speed reverse
-  {
-    int halfFramesPerBuffer = framesPerBuffer / 2; // framesPerBuffer is a power of 2
-    for (i = 0; i < halfFramesPerBuffer * audioData->sfinfo.channels; i++) {
-      *out++ = audioData->buffer[audioData->index - i] * audioData->volume;
-      *out++ = audioData->buffer[audioData->index - i] * audioData->volume;
-    }
-
-    audioData->index -= halfFramesPerBuffer * audioData->sfinfo.channels;
-    return paContinue;
-  }
-  else if (audioData->playbackSpeed == 2.0) // double speed
-  {
-    for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
-      *out++ = audioData->buffer[audioData->index + (i * 2)] * audioData->volume;
-    }
-
-    audioData->index += (2 * framesPerBuffer) * audioData->sfinfo.channels;
-    return paContinue;
-  }
-  else if (audioData->playbackSpeed == -2.0) // double speed reverse
-  {
-    for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
-      *out++ = audioData->buffer[audioData->index - (2 * i)] * audioData->volume;
-    }
-
-    audioData->index -= (2 * framesPerBuffer) * audioData->sfinfo.channels;
-    return paContinue;
-  }
-  else if (audioData->index < audioData->sfinfo.frames * audioData->sfinfo.channels)// play, regular speed
-  {
-    for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
-        if (audioData->index + i < audioData->sfinfo.frames * audioData->sfinfo.channels) {
-          *out++ = audioData->buffer[audioData->index + i] * audioData->volume;
-        } else {
-          audioData->index = 0;
-          audioData->readComplete = true;
-          return paComplete;
-        }
-    }
-    audioData->index += framesPerBuffer * audioData->sfinfo.channels;
-
-    return paContinue;
-  } else {
-    audioData->index = 0;
-    audioData->readComplete = true;
-    return paComplete;
-  }
-};
+// int Cassette::callback(const void *inputBuffer, void *outputBuffer,
+//                     unsigned long framesPerBuffer,
+//                     const PaStreamCallbackTimeInfo* timeInfo,
+//                     PaStreamCallbackFlags statusFlags,
+//                     void *userData )
+// {
+//   SAMPLE *out = (SAMPLE*) outputBuffer;
+//   unsigned int i;
+//   unsigned int c;
+//   (void) inputBuffer;
+//   (void) timeInfo; /* Prevent unused variable warnings. */
+//   (void) statusFlags;
+//   AudioData *audioData = static_cast<AudioData*>(userData);
+//
+//   // >> MIXER
+//   audioData->mixer->mixDown(audioData->index, audioData->buffer, audioData->sfinfo.channels, framesPerBuffer);
+//
+//   for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
+//       *out++ = audioData->mixer->outputBuffer[i] * audioData->volume;
+//   }
+//
+//   // TODO: early return here for testing
+//   audioData->index += framesPerBuffer * audioData->sfinfo.channels;
+//   return paContinue;
+//
+//   // << MIXER
+//
+//   if( audioData->buffer == NULL )
+//   {
+// //      for( i=0; i < framesPerBuffer; i++ )
+// //      {
+// //          *out++ = 0;  /* left - silent */
+// //          *out++ = 0;  /* right - silent */
+// //      }
+//      audioData->index = 0;
+//      audioData->readComplete = true;
+//      return paComplete;
+//   }
+//   else if (audioData->index > audioData->sfinfo.frames * audioData->sfinfo.channels - 1)
+//   {
+//      audioData->index = 0;
+//      audioData->readComplete = true;
+//      return paComplete;
+//   }
+//   else if (audioData->index < 0)
+//   {
+//     audioData->index = 0;
+//     audioData->readComplete = true;
+//     return paComplete;
+//   }
+//   // audioData->buffer --> paOut
+//   else if (audioData->playbackSpeed == -1.0) // reverse
+//   {
+//     for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
+//         *out++ = audioData->buffer[audioData->index - i] * audioData->volume;
+//     }
+//
+//     audioData->index -= framesPerBuffer * audioData->sfinfo.channels;
+//     return paContinue;
+//   }
+//   else if (audioData->playbackSpeed == 0.5) // half-speed
+//   {
+//     int halfFramesPerBuffer = framesPerBuffer / 2; // framesPerBuffer is a power of 2
+//     for (i = 0; i < halfFramesPerBuffer * audioData->sfinfo.channels; i++) {
+//       *out++ = audioData->buffer[audioData->index + i] * audioData->volume;
+//       *out++ = audioData->buffer[audioData->index + i] * audioData->volume;
+//     }
+//
+//     audioData->index += halfFramesPerBuffer * audioData->sfinfo.channels;
+//     return paContinue;
+//   }
+//   else if (audioData->playbackSpeed == -0.5) // half-speed reverse
+//   {
+//     int halfFramesPerBuffer = framesPerBuffer / 2; // framesPerBuffer is a power of 2
+//     for (i = 0; i < halfFramesPerBuffer * audioData->sfinfo.channels; i++) {
+//       *out++ = audioData->buffer[audioData->index - i] * audioData->volume;
+//       *out++ = audioData->buffer[audioData->index - i] * audioData->volume;
+//     }
+//
+//     audioData->index -= halfFramesPerBuffer * audioData->sfinfo.channels;
+//     return paContinue;
+//   }
+//   else if (audioData->playbackSpeed == 2.0) // double speed
+//   {
+//     for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
+//       *out++ = audioData->buffer[audioData->index + (i * 2)] * audioData->volume;
+//     }
+//
+//     audioData->index += (2 * framesPerBuffer) * audioData->sfinfo.channels;
+//     return paContinue;
+//   }
+//   else if (audioData->playbackSpeed == -2.0) // double speed reverse
+//   {
+//     for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
+//       *out++ = audioData->buffer[audioData->index - (2 * i)] * audioData->volume;
+//     }
+//
+//     audioData->index -= (2 * framesPerBuffer) * audioData->sfinfo.channels;
+//     return paContinue;
+//   }
+//   else if (audioData->index < audioData->sfinfo.frames * audioData->sfinfo.channels)// play, regular speed
+//   {
+//     for (i = 0; i < framesPerBuffer * audioData->sfinfo.channels; i++) {
+//         if (audioData->index + i < audioData->sfinfo.frames * audioData->sfinfo.channels) {
+//           *out++ = audioData->buffer[audioData->index + i] * audioData->volume;
+//         } else {
+//           audioData->index = 0;
+//           audioData->readComplete = true;
+//           return paComplete;
+//         }
+//     }
+//     audioData->index += framesPerBuffer * audioData->sfinfo.channels;
+//
+//     return paContinue;
+//   } else {
+//     audioData->index = 0;
+//     audioData->readComplete = true;
+//     return paComplete;
+//   }
+// };
 
 int Cassette::play()
 {
-  std::cout << "Playing Cassette..." << std::endl;
+  Logging::write(
+    Info,
+    "Cassette::play()",
+    "Playing Cassette..."
+  );
 
   // initialize data needed for audio playback
   sf_count_t index = 0;
@@ -187,7 +195,11 @@ int Cassette::play()
   SNDFILE *file;
 
   if (! (file = sf_open(fileName, SFM_READ, &sfinfo))) {
-    std::cout << "Unable to open input file : sf : " << sf_strerror (NULL) << std::endl;
+    Logging::write(
+      Info,
+      "Cassette::play()",
+      "Unable to open input file : sf : " + std::string(sf_strerror(NULL))
+    );
     return 1 ;
   };
 
@@ -195,7 +207,11 @@ int Cassette::play()
   float *buffer;
   buffer = (float *) malloc(sfinfo.frames * sfinfo.channels * sizeof(float));
   if (!buffer) {
-      std::cout << "Cannot allocate memory for audioDataBuffer" << std::endl;
+      Logging::write(
+        Info,
+        "Cassette::play()",
+        "Cannot allocate memory for audioDataBuffer"
+      );
       return 1;
   }
 
@@ -219,22 +235,21 @@ int Cassette::play()
       "Cassette::play",
       "Unable to set sample rate: " + std::to_string(sfinfo.samplerate)
     );
-    std::cout << std::endl << "Unable to set Sample Rate " << sfinfo.samplerate << std::endl;
     goto error;
   }
 
   // TODO
   // - wip, switching to use JACK directly
-  if (false) {
+  // if (false) {
     // TODO:
     // - cleanup once JACK is working
     // Init PA
-    PaStreamParameters outputParameters; // inputParameters
-    PaStream *stream;
-    PaError err;
-
-    err = Pa_Initialize();
-    if( err != paNoError ) goto error;
+    // PaStreamParameters outputParameters; // inputParameters
+    // PaStream *stream;
+    // PaError err;
+    //
+    // err = Pa_Initialize();
+    // if( err != paNoError ) goto error;
 
     // // TODO: handle live input audio
     // inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
@@ -245,30 +260,64 @@ int Cassette::play()
     // inputParameters.channelCount = 1;
     // inputParameters.sampleFormat = PA_SAMPLE_TYPE;
     // inputParameters.hostApiSpecificStreamInfo = NULL;
+  //
+  //   outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
+  //   if (outputParameters.device == paNoDevice) {
+  //       std::cout << "Error: No default output device." << std::endl;
+  //       goto error;
+  //   }
+  //   outputParameters.channelCount = audioData.sfinfo.channels;
+  //   outputParameters.sampleFormat = PA_SAMPLE_TYPE;
+  //   outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
+  //   outputParameters.hostApiSpecificStreamInfo = NULL;
+  //
+  //   err = Pa_OpenStream(
+  //             &stream,
+  //             nullptr, // &inputParameters,
+  //             &outputParameters,
+  //             audioData.sfinfo.samplerate,
+  //             mixer->getAudioFramesPerBuffer(),
+  //             paNoFlag, /* paClipOn, */
+  //             callback,
+  //             &audioData );
+  //   if( err != paNoError ) goto error;
+  //
+  //   err = Pa_StartStream( stream );
+  //   if( err != paNoError ) goto error;
+  // }
 
-    outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
-    if (outputParameters.device == paNoDevice) {
-        std::cout << "Error: No default output device." << std::endl;
-        goto error;
-    }
-    outputParameters.channelCount = audioData.sfinfo.channels;
-    outputParameters.sampleFormat = PA_SAMPLE_TYPE;
-    outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
-    outputParameters.hostApiSpecificStreamInfo = NULL;
+  if (!jack_set_process_callback(jackClient,
+                                 &Cassette::jackProcessCallback,
+                                 &audioData)) {
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "Unable to set process callback"
+    );
+  }
 
-    err = Pa_OpenStream(
-              &stream,
-              nullptr, // &inputParameters,
-              &outputParameters,
-              audioData.sfinfo.samplerate,
-              mixer->getAudioFramesPerBuffer(),
-              paNoFlag, /* paClipOn, */
-              callback,
-              &audioData );
-    if( err != paNoError ) goto error;
+  outPortL = jack_port_register(
+    jackClient,
+    "GrooveJrOutPortL",
+    JACK_DEFAULT_AUDIO_TYPE,
+    JackPortIsOutput,
+    0
+  );
 
-    err = Pa_StartStream( stream );
-    if( err != paNoError ) goto error;
+  outPortR = jack_port_register(
+    jackClient,
+    "GrooveJrOutPortR",
+    JACK_DEFAULT_AUDIO_TYPE,
+    JackPortIsOutput,
+    0
+  );
+
+  if (!jack_activate(jackClient)) {
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "Unable to activate jack"
+    );
   }
 
   while(
@@ -287,6 +336,11 @@ int Cassette::play()
     if (audioData.readComplete) { // reached end of input file
         ThreadStatics::setPlayState(Gj::PlayState::STOP);
         ThreadStatics::setReadComplete(true);
+        Logging::write(
+          Info,
+          "Cassette::play",
+          "Read complete"
+        );
         break;
     }
 
@@ -320,12 +374,15 @@ int Cassette::play()
       ThreadStatics::setReadComplete(true);
   }
 
-  err = Pa_StopStream( stream );
-  if( err != paNoError ) goto error;
-
-  err = Pa_CloseStream( stream );
-  if( err != paNoError ) goto error;
-  Pa_Terminate();
+  jack_deactivate(jackClient);
+  outPortL = nullptr;
+  outPortR = nullptr;
+  // err = Pa_StopStream( stream );
+  // if( err != paNoError ) goto error;
+  //
+  // err = Pa_CloseStream( stream );
+  // if( err != paNoError ) goto error;
+  // Pa_Terminate();
   freeAudioData(&audioData);
   return 0;
 
@@ -333,9 +390,11 @@ int Cassette::play()
     Pa_Terminate();
     ThreadStatics::setPlayState(Gj::PlayState::STOP);
     freeAudioData(&audioData);
-    std::cout << "An error occurred while using the portaudio stream" << std::endl;
-    std::cout << "Error number: " << err << std::endl;
-    std::cout << "Error message: " << Pa_GetErrorText( err ) << std::endl;
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "An Error occurred during audio playback"
+    );
     return 1;
 };
 
