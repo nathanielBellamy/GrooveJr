@@ -234,7 +234,10 @@ int Cassette::play()
       return 1;
   }
 
+  // setup jack
   AudioData audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
+  int setProcessStatus;
+  int jackActivateStatus;
 
   // update plugin effects with info about audio to be processed
   if (!mixer->setSampleRate(sfinfo.samplerate)) {
@@ -246,85 +249,63 @@ int Cassette::play()
     goto error;
   }
 
-  // TODO
-  // - wip, switching to use JACK directly
-  // if (false) {
-    // TODO:
-    // - cleanup once JACK is working
-    // Init PA
-    // PaStreamParameters outputParameters; // inputParameters
-    // PaStream *stream;
-    // PaError err;
-    //
-    // err = Pa_Initialize();
-    // if( err != paNoError ) goto error;
-
-    // // TODO: handle live input audio
-    // inputParameters.device = Pa_GetDefaultInputDevice(); /* default input device */
-    // if (inputParameters.device == paNoDevice) {
-    //     std::cout << "Error: No default input device." << std::endl;
-    //     goto error;
-    // }
-    // inputParameters.channelCount = 1;
-    // inputParameters.sampleFormat = PA_SAMPLE_TYPE;
-    // inputParameters.hostApiSpecificStreamInfo = NULL;
-  //
-  //   outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
-  //   if (outputParameters.device == paNoDevice) {
-  //       std::cout << "Error: No default output device." << std::endl;
-  //       goto error;
-  //   }
-  //   outputParameters.channelCount = audioData.sfinfo.channels;
-  //   outputParameters.sampleFormat = PA_SAMPLE_TYPE;
-  //   outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
-  //   outputParameters.hostApiSpecificStreamInfo = NULL;
-  //
-  //   err = Pa_OpenStream(
-  //             &stream,
-  //             nullptr, // &inputParameters,
-  //             &outputParameters,
-  //             audioData.sfinfo.samplerate,
-  //             mixer->getAudioFramesPerBuffer(),
-  //             paNoFlag, /* paClipOn, */
-  //             callback,
-  //             &audioData );
-  //   if( err != paNoError ) goto error;
-  //
-  //   err = Pa_StartStream( stream );
-  //   if( err != paNoError ) goto error;
-  // }
-
-  if (!jack_set_process_callback(jackClient,
-                                 &Cassette::jackProcessCallback,
-                                 &audioData)) {
+  setProcessStatus = jack_set_process_callback(
+    jackClient,
+    &Cassette::jackProcessCallback,
+    &audioData
+  );
+  if (setProcessStatus != 0) {
     Logging::write(
       Error,
       "Cassette::play",
-      "Unable to set process callback"
+      "Unable to set process callback - status: " + std::to_string(setProcessStatus)
     );
   }
 
   outPortL = jack_port_register(
     jackClient,
-    "GrooveJrOutPortL",
+    "out_port_L",
     JACK_DEFAULT_AUDIO_TYPE,
     JackPortIsOutput,
     0
   );
 
-  outPortR = jack_port_register(
-    jackClient,
-    "GrooveJrOutPortR",
-    JACK_DEFAULT_AUDIO_TYPE,
-    JackPortIsOutput,
-    0
-  );
-
-  if (!jack_activate(jackClient)) {
+  if (outPortL == nullptr) {
     Logging::write(
       Error,
       "Cassette::play",
-      "Unable to activate jack"
+      "Unable to create Jack outPortL"
+    );
+  }
+
+  outPortR = jack_port_register(
+    jackClient,
+    "out_port_R",
+    JACK_DEFAULT_AUDIO_TYPE,
+    JackPortIsOutput,
+    0
+  );
+
+  if (outPortR == nullptr) {
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "Unable to create Jack outPortR"
+    );
+  }
+
+  jackActivateStatus = jack_activate(jackClient);
+  if (jackActivateStatus != 0) {
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "Unable to activate jack - status: " + std::to_string(jackActivateStatus)
+    );
+  } else {
+    Logging::write(
+      Info,
+      "Cassette::play",
+      "Jack activated successfully"
     );
   }
 

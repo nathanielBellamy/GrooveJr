@@ -39,7 +39,7 @@ class Mixer {
 
     [[nodiscard]]
     jack_client_t* getJackClient() const {
-      return jackClient->getJackClient();
+      return jackClient.get()->getJackClient();
     };
 
     bool allocateInputBuffers();
