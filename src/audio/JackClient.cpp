@@ -318,7 +318,7 @@ jack_client_t* JackClient::registerClient (JackClient::JackName name)
 		"JackClient::registerClient",
 		"Registering JackClient: " + name
 	);
-	jack_options_t options = JackServerName;
+	constexpr jack_options_t options = JackServerName;
 	jack_status_t status;
 
 	try {
@@ -330,11 +330,20 @@ jack_client_t* JackClient::registerClient (JackClient::JackName name)
 			"An error occurred while attempting to open jack client - jack_client_open: " + name
 		);
 	}
-	Logging::write(
-		Info,
-		"JackClient::registerClient",
-		"Opened JackClient: " + name
-	);
+	if (!jackClient) {
+		Logging::write(
+			Error,
+			"JackClient::registerClient",
+			"Unable to open JackClient: " + name + " - status: " + std::to_string (status)
+		);
+	} else {
+		Logging::write(
+			Info,
+			"JackClient::registerClient",
+			"Opened JackClient: " + name
+		);
+	}
+
 	return jackClient;
 
 	/* Use the status to check for errors:

@@ -26,11 +26,19 @@ Mixer::Mixer(AppState* gAppState)
 
   jackClient->initialize("GrooveJrJACK");
 
-  Logging::write(
-    Info,
-    "Mixer::Mixer()",
-    "Initialized GrooveJr JackClient."
-  );
+  if (jackClient->getJackClient() == nullptr) {
+    Logging::write(
+      Error,
+      "Mixer::Mixer()",
+      "Failed to initialize JackClient"
+    );
+  } else {
+    Logging::write(
+      Info,
+      "Mixer::Mixer()",
+      "Initialized GrooveJr JackClient."
+    );
+  }
 
   allocateInputBuffers();
   allocateOutputBuffers();
@@ -68,7 +76,7 @@ Mixer::~Mixer() {
     Logging::write(
       Error,
       "Mixer::~Mixer",
-      "An error occureed while freeing buffers."
+      "An error occurred while freeing buffers."
     );
   }
 
@@ -106,10 +114,14 @@ bool Mixer::allocateInputBuffers() {
 }
 
 bool Mixer::freeInputBuffers() const {
-  for (auto i = 0; i < 2; i++) {
-    delete inputBuffers[i];
+  try {
+    for (auto i = 0; i < 2; i++) {
+      delete inputBuffers[i];
+    }
+    free(inputBuffers);
+  } catch (...) {
+    return false;
   }
-  free(inputBuffers);
 
   return true;
 }
@@ -135,10 +147,14 @@ bool Mixer::allocateOutputBuffers() {
 }
 
 bool Mixer::freeOutputBuffers() const {
-  for (auto i = 0; i < 2; i++) {
-    delete outputBuffers[i];
+  try {
+    for (auto i = 0; i < 2; i++) {
+      delete outputBuffers[i];
+    }
+    free(outputBuffers);
+  } catch (...) {
+    return false;
   }
-  free(outputBuffers);
 
   return true;
 }

@@ -185,6 +185,14 @@ int Cassette::play()
     "Playing Cassette..."
   );
 
+  if (jackClient == nullptr) {
+    Logging::write(
+      Error,
+      "Cassette::play()",
+      "jackClient is null"
+    );
+  }
+
   // initialize data needed for audio playback
   sf_count_t index = 0;
 
