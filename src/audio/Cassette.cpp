@@ -262,13 +262,15 @@ int Cassette::play()
     );
   }
 
-  outPortL = jack_port_register(
-    jackClient,
-    "out_port_L",
-    JACK_DEFAULT_AUDIO_TYPE,
-    JackPortIsOutput,
-    0
-  );
+  if (outPortL == nullptr) {
+      outPortL = jack_port_register(
+        jackClient,
+        "out_port_L",
+        JACK_DEFAULT_AUDIO_TYPE,
+        JackPortIsOutput,
+        0
+      );
+  }
 
   if (outPortL == nullptr) {
     Logging::write(
@@ -278,13 +280,15 @@ int Cassette::play()
     );
   }
 
-  outPortR = jack_port_register(
-    jackClient,
-    "out_port_R",
-    JACK_DEFAULT_AUDIO_TYPE,
-    JackPortIsOutput,
-    0
-  );
+  if (outPortR == nullptr) {
+      outPortR = jack_port_register(
+        jackClient,
+        "out_port_R",
+        JACK_DEFAULT_AUDIO_TYPE,
+        JackPortIsOutput,
+        0
+      );
+  }
 
   if (outPortR == nullptr) {
     Logging::write(
@@ -364,8 +368,6 @@ int Cassette::play()
   }
 
   jack_deactivate(jackClient);
-  outPortL = nullptr;
-  outPortR = nullptr;
   // err = Pa_StopStream( stream );
   // if( err != paNoError ) goto error;
   //
