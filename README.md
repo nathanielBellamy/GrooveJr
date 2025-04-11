@@ -11,16 +11,18 @@
 ### MacOs Build (Dev Build)
 
 - ```bash
-  brew install boost cmake jack portaudio libsndfile
+  brew install boost cmake jack blackhole-2ch libsndfile
   git clone git@github.com:nathanielBellamy/GrooveJr.git 
   cd GrooveJr/src
   vim CMakeLists.txt
   ```
-  
   - it may be helpful to run: 
     ```bash
       brew services restart jack
     ```
+  - blackhole-2ch is required for devices without built-in input and/or output audio devices
+    - blackhole-2ch creates virtual inputs and outputs
+    - without these the jack server will not be able to run 
 - update `GJ_BASE_DIR` to be the directory containing the `GrooveJr` repo
 
 - build the following from source in `GJ_BASE_DIR`
