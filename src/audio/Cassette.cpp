@@ -35,8 +35,12 @@ void Cassette::freeAudioData(AudioData *audioData) const {
 // do not allocate/free memory within this method
 // as it may be called at system-interrupt level
 int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
-  auto* outL = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(outPortL, nframes));
-  auto* outR = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(outPortR, nframes));
+  auto* outL = static_cast<jack_default_audio_sample_t*>(
+    jack_port_get_buffer(outPortL, nframes)
+  );
+  auto* outR = static_cast<jack_default_audio_sample_t*>(
+    jack_port_get_buffer(outPortR, nframes)
+  );
 
   AudioData *audioData = static_cast<AudioData*>(arg);
   audioData->mixer->mixDown(audioData->index, audioData->buffer, audioData->sfinfo.channels, nframes);
@@ -260,15 +264,6 @@ int Cassette::play() const {
     );
   }
 
-  const char** ports = jack_get_ports(jackClient, nullptr, nullptr, 0);
-  if (ports == nullptr) {
-    printf("No ports found.\n");
-  } else {
-    for (int i = 0; ports[i] != nullptr; i++) {
-      printf("Port: %s\n", ports[i]);
-    }
-  }
-
   if (outPortL == nullptr) {
       outPortL = jack_port_register(
         jackClient,
@@ -277,14 +272,6 @@ int Cassette::play() const {
         JackPortIsOutput,
         0
       );
-      int connectStatusL = jack_connect(jackClient, "GrooveJr:out_port_L", "system:playback_1");
-      if (connectStatusL != 0) {
-        Logging::write(
-          Error,
-          "Cassette::play()",
-          "Unable to connect out_port_L - status: " + std::to_string(connectStatusL)
-        );
-      }
   }
 
   if (outPortL == nullptr) {
@@ -303,16 +290,7 @@ int Cassette::play() const {
       JackPortIsOutput,
       0
     );
-    int connectStatusR = jack_connect(jackClient, "GrooveJr:out_port_R", "system:playback_2");
-    if (connectStatusR != 0) {
-        Logging::write(
-          Error,
-          "Cassette::play()",
-          "Unable to connect out_port_R - status: " + std::to_string(connectStatusR)
-        );
-    }
   }
-
   if (outPortR == nullptr) {
     Logging::write(
       Error,
@@ -335,6 +313,35 @@ int Cassette::play() const {
       "Jack activated successfully"
     );
   }
+
+  int connectStatusL = jack_connect(jackClient, jack_port_name(outPortL), "system:playback_1");
+  if (connectStatusL != 0) {
+    Logging::write(
+      Error,
+      "Cassette::play()",
+      "Unable to connect out_port_L - status: " + std::to_string(connectStatusL)
+    );
+  }
+
+  int connectStatusR = jack_connect(jackClient, jack_port_name(outPortR), "system:playback_2");
+  if (connectStatusR != 0) {
+      Logging::write(
+        Error,
+        "Cassette::play()",
+        "Unable to connect out_port_R - status: " + std::to_string(connectStatusR)
+      );
+  }
+
+  // TESTING SHOW PORTS
+  const char** ports = jack_get_ports(jackClient, nullptr, nullptr, 0);
+  if (ports == nullptr) {
+    printf("No ports found.\n");
+  } else {
+    for (int i = 0; ports[i] != nullptr; i++) {
+      printf("Port: %s\n", ports[i]);
+    }
+  }
+  // TESTING SHOW PORTS
 
   while(
           audioData.playState != Gj::PlayState::STOP

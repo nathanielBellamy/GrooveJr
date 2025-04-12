@@ -81,6 +81,7 @@ add_library(GjAudio SHARED
         effects/EffectsChannel.cpp
 )
 target_compile_options(GjAudio PRIVATE ${INCLUDE_FLAGS})
+add_definitions(-DQT_NO_VERSION_TAGGING)
 set(LINK_LIBRARIES
         -L${VST3SDK_HOME}/build/lib/Release
         -lsdk_common

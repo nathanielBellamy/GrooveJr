@@ -26,6 +26,7 @@ Mixer::Mixer(AppState* gAppState)
 
   jackClient->initialize("GrooveJr");
 
+
   if (jackClient->getJackClient() == nullptr) {
     Logging::write(
       Error,

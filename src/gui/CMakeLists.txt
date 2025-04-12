@@ -79,6 +79,7 @@ target_compile_options(GjGui
         -I/Users/ns/code/actor-framework/libcaf_core
         -I/Users/ns/code/actor-framework/libcaf_io
 )
+add_definitions(-DQT_NO_VERSION_TAGGING)
 
 target_link_libraries(GjGui
         PRIVATE
