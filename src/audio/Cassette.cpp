@@ -39,7 +39,6 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   auto* outR = static_cast<jack_default_audio_sample_t*>(jack_port_get_buffer(outPortR, nframes));
 
   AudioData *audioData = static_cast<AudioData*>(arg);
-  // >> MIXER
   audioData->mixer->mixDown(audioData->index, audioData->buffer, audioData->sfinfo.channels, nframes);
 
   for (jack_nframes_t i = 0; i < nframes * audioData->sfinfo.channels; i++) {
@@ -177,8 +176,7 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
 //   }
 // };
 
-int Cassette::play()
-{
+int Cassette::play() const {
   Logging::write(
     Info,
     "Cassette::play()",
@@ -246,7 +244,7 @@ int Cassette::play()
       "Cassette::play",
       "Unable to set sample rate: " + std::to_string(sfinfo.samplerate)
     );
-    goto error;
+    // goto error;
   }
 
   setProcessStatus = jack_set_process_callback(
@@ -262,6 +260,15 @@ int Cassette::play()
     );
   }
 
+  const char** ports = jack_get_ports(jackClient, nullptr, nullptr, 0);
+  if (ports == nullptr) {
+    printf("No ports found.\n");
+  } else {
+    for (int i = 0; ports[i] != nullptr; i++) {
+      printf("Port: %s\n", ports[i]);
+    }
+  }
+
   if (outPortL == nullptr) {
       outPortL = jack_port_register(
         jackClient,
@@ -270,6 +277,14 @@ int Cassette::play()
         JackPortIsOutput,
         0
       );
+      int connectStatusL = jack_connect(jackClient, "GrooveJr:out_port_L", "system:playback_1");
+      if (connectStatusL != 0) {
+        Logging::write(
+          Error,
+          "Cassette::play()",
+          "Unable to connect out_port_L - status: " + std::to_string(connectStatusL)
+        );
+      }
   }
 
   if (outPortL == nullptr) {
@@ -281,13 +296,21 @@ int Cassette::play()
   }
 
   if (outPortR == nullptr) {
-      outPortR = jack_port_register(
-        jackClient,
-        "out_port_R",
-        JACK_DEFAULT_AUDIO_TYPE,
-        JackPortIsOutput,
-        0
-      );
+    outPortR = jack_port_register(
+      jackClient,
+      "out_port_R",
+      JACK_DEFAULT_AUDIO_TYPE,
+      JackPortIsOutput,
+      0
+    );
+    int connectStatusR = jack_connect(jackClient, "GrooveJr:out_port_R", "system:playback_2");
+    if (connectStatusR != 0) {
+        Logging::write(
+          Error,
+          "Cassette::play()",
+          "Unable to connect out_port_R - status: " + std::to_string(connectStatusR)
+        );
+    }
   }
 
   if (outPortR == nullptr) {

@@ -16,18 +16,45 @@ AppState* gAppState;
 Audio::Mixer* Mixer;
 
 void shutdown_handler(const int sig) {
-  std::cout << "Caught signal: " << sig << std::endl;
-  std::cout << "Freeing resources..." << std::endl;
+  Logging::write(
+    Info,
+    "shutdown_handler",
+    "Caught Signal: " + std::to_string(sig)
+  );
 
   delete Mixer;
+  Logging::write(
+    Info,
+    "shutdown_handler",
+    "Deleted Mixer"
+  );
+
   delete gAppState;
+  Logging::write(
+    Info,
+    "shutdown_handler",
+    "Deleted gAppState"
+  );
 
   PluginContext->terminate();
   PluginContextFactory::instance().setPluginContext (nullptr);
   delete PluginContext;
+  Logging::write(
+    Info,
+    "shutdown_handler",
+    "Deleted PluginContext"
+  );
 
-  std::cout << "Done Freeing resources." << std::endl;
-  std::cout << "== GrooveJr ==" << std::endl;
+  Logging::write(
+    Info,
+    "shutdown_handler",
+    "Done Freeing Resources"
+  );
+  Logging::write(
+    Info,
+    "shutdown_handler",
+    "== GrooveJr =="
+  );
   exit(sig);
 }
 
@@ -71,11 +98,21 @@ extern "C" {
 
         // setup logging
         Logging::init();
+        Logging::write(
+          Info,
+          "main",
+          "== GrooveJr =="
+        );
 
         // setup Audio
         initVst3PluginContext();
         gAppState = new AppState(128, PlayState::STOP);
         Mixer = new Audio::Mixer(gAppState);
+        Logging::write(
+          Info,
+          "main",
+          "Instantiated Mixer"
+        );
 
         Mixer->addEffectsChannel();
         Mixer->addEffectsChannel();

@@ -41,7 +41,7 @@ class Cassette
         Mixer* mixer
     );
 
-    int play();
+    int play() const;
 
     void freeAudioData(AudioData *audioData) const;
 

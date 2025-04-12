@@ -24,7 +24,7 @@ Mixer::Mixer(AppState* gAppState)
     "Instantiating Mixer..."
   );
 
-  jackClient->initialize("GrooveJrJACK");
+  jackClient->initialize("GrooveJr");
 
   if (jackClient->getJackClient() == nullptr) {
     Logging::write(
@@ -72,19 +72,33 @@ Mixer::~Mixer() {
     "Mixer done delete effectsChannels"
   );
 
+  if (jack_client_close(jackClient->getJackClient())) {
+    Logging::write(
+      Error,
+      "Mixer::~Mixer",
+      "Failed to close JackClient"
+    );
+  } else {
+    Logging::write(
+      Error,
+      "Mixer::~Mixer",
+      "Closed JackClient"
+    );
+  }
+
   if (!freeInputBuffers() || !freeOutputBuffers()) {
     Logging::write(
       Error,
       "Mixer::~Mixer",
       "An error occurred while freeing buffers."
     );
+  } else {
+    Logging::write(
+      Info,
+      "Mixer::~Mixer",
+      "Done freeing buffers."
+    );
   }
-
-  Logging::write(
-    Info,
-    "Mixer::~Mixer",
-    "Done freeing buffers."
-  );
 
   Logging::write(
     Info,
