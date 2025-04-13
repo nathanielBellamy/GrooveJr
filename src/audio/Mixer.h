@@ -32,7 +32,6 @@ class Mixer {
 
   public:
     float** inputBuffers;
-    float** outputBuffers;
 
     explicit Mixer(AppState*);
     ~Mixer();
@@ -44,8 +43,6 @@ class Mixer {
 
     bool allocateInputBuffers();
     bool freeInputBuffers() const;
-    bool allocateOutputBuffers();
-    bool freeOutputBuffers() const;
 
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);
@@ -57,7 +54,13 @@ class Mixer {
 
     bool setSampleRate(int sampleRate) const;
 
-    bool mixDown(int audioDataIndex, const float* audioDataBuffer, int audioDataSfChannels, int framesPerBuffer) const;
+    bool mixDown(
+      jack_default_audio_sample_t* outL,
+      jack_default_audio_sample_t* outR,
+      int audioDataIndex,
+      const float* audioDataBuffer,
+      int audioDataSfChannels,
+      jack_nframes_t nframes) const;
 
     // TODO
     bool removeEffectFromChannel(int channelIdx, int effectIdx);

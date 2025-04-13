@@ -42,14 +42,9 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
     jack_port_get_buffer(outPortR, nframes)
   );
 
-  AudioData *audioData = static_cast<AudioData*>(arg);
-  int channelCount = audioData->sfinfo.channels;
-  audioData->mixer->mixDown(audioData->index, audioData->buffer, channelCount, nframes);
-
-  for (jack_nframes_t i = 0; i < nframes; i++) {
-      outL[i] = audioData->mixer->outputBuffers[0][i] * audioData->volume;
-      outR[i] = audioData->mixer->outputBuffers[1][i] * audioData->volume;
-  }
+  auto *audioData = static_cast<AudioData*>(arg);
+  const int channelCount = audioData->sfinfo.channels;
+  audioData->mixer->mixDown(outL, outR, audioData->index, audioData->buffer, channelCount, nframes);
 
   audioData->index += nframes * channelCount;
   return 0;

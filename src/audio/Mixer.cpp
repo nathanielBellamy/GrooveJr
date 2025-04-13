@@ -41,7 +41,6 @@ Mixer::Mixer(AppState* gAppState)
   }
 
   allocateInputBuffers();
-  allocateOutputBuffers();
 
   Logging::write(
     Info,
@@ -86,7 +85,7 @@ Mixer::~Mixer() {
     );
   }
 
-  if (!freeInputBuffers() || !freeOutputBuffers()) {
+  if (!freeInputBuffers()) {
     Logging::write(
       Error,
       "Mixer::~Mixer",
@@ -133,39 +132,6 @@ bool Mixer::freeInputBuffers() const {
       delete inputBuffers[i];
     }
     free(inputBuffers);
-  } catch (...) {
-    return false;
-  }
-
-  return true;
-}
-
-bool Mixer::allocateOutputBuffers() {
-  // TODO: don't assume stereo
-  outputBuffers = static_cast<float**>(
-      malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
-  );
-
-  if (outputBuffers == nullptr)
-    Logging::write(
-      Error,
-      "Mixer::allocateOutputBuffers",
-      "Unable to allocate memory for Mixer.outputBuffers"
-    );
-
-  for (int c = 0; c < 2; c++) {
-    outputBuffers[c] = new float[gAppState->audioFramesPerBuffer];
-  }
-
-  return true;
-}
-
-bool Mixer::freeOutputBuffers() const {
-  try {
-    for (auto i = 0; i < 2; i++) {
-      delete outputBuffers[i];
-    }
-    free(outputBuffers);
   } catch (...) {
     return false;
   }
@@ -224,23 +190,25 @@ bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) con
   return effectsChannels.at(idx)->addEffect(effectPath);
 }
 
+// called from audio thread
+// do not allocate/free memory!
 bool Mixer::mixDown(
+  jack_default_audio_sample_t* outL,
+  jack_default_audio_sample_t* outR,
   const int audioDataIndex,
   const float* audioDataBuffer,
   const int audioDataSfChannels,
-  const int framesPerBuffer
+  const jack_nframes_t nframes
   ) const {
-  // called from audio thread
-  // do not allocate/free memory!
 
   // TODO: handle pan/gain
 
-  for (int i = 0; i < framesPerBuffer; i++) {
+  for (int i = 0; i < nframes; i++) {
     const auto valL = audioDataBuffer[audioDataIndex + 2 * i];
     const auto valR = audioDataBuffer[audioDataIndex + 2 * i + 1];
     // write dry channel output buffer
-    outputBuffers[0][i] = (dryChannel.gain * valL) / channelCount;
-    outputBuffers[1][i] = (dryChannel.gain * valR ) / channelCount;
+    outL[i] = (dryChannel.gain * valL) / channelCount;
+    outR[i] = (dryChannel.gain * valR ) / channelCount;
 
     // de-interlace audio into shared effects input buffers
     inputBuffers[0][i] = valL;
@@ -255,9 +223,9 @@ bool Mixer::mixDown(
     const auto effectsChannelBuffersWriteOut = effectsChannel->getBuffersWriteOut();
 
     // write processed audio to outputBuffer
-    for (int i = 0; i < framesPerBuffer; i++) {
-      outputBuffers[0][i] += ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[0][i] ) / channelCount;
-      outputBuffers[1][i] += ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[1][i] ) / channelCount;
+    for (int i = 0; i < nframes; i++) {
+      outL[i] += ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[0][i] ) / channelCount;
+      outR[i] += ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[1][i] ) / channelCount;
     }
   }
 
