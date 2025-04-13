@@ -85,9 +85,26 @@ IMediaServerPtr createMediaServer (const AudioClientName& name)
 //------------------------------------------------------------------------
 JackClient::~JackClient ()
 {
+	Logging::write(
+		Info,
+		"JackClient::~JackClient()",
+		"Destroying JackClient"
+	);
 	//! We do not need to "unregister" ports. It is done automatically with "jack_client_close"
-	jack_deactivate (jackClient); // Stops calls of process
+	// jack_deactivate (jackClient); // Stops calls of process
 	jack_client_close (jackClient); // Remove client from process graph and remove all ports
+
+	Logging::write(
+		Info,
+		"JackClient::~JackClient()",
+		"jackClient closed"
+	);
+
+	Logging::write(
+		Info,
+		"JackClient::~JackClient()",
+		"Destroying JackClient"
+	);
 }
 
 //------------------------------------------------------------------------

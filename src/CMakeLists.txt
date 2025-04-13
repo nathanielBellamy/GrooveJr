@@ -56,6 +56,7 @@ add_subdirectory(
 add_subdirectory(
         /Users/ns/code/GrooveJr/src/gui
 )
+add_definitions(-DQT_NO_VERSION_TAGGING)
 
 add_executable(GrooveJr
         main.h

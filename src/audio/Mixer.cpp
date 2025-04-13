@@ -26,7 +26,6 @@ Mixer::Mixer(AppState* gAppState)
 
   jackClient->initialize("GrooveJr");
 
-
   if (jackClient->getJackClient() == nullptr) {
     Logging::write(
       Error,
@@ -238,7 +237,7 @@ bool Mixer::mixDown(
 
   for (int i = 0; i < framesPerBuffer; i++) {
     const auto valL = audioDataBuffer[audioDataIndex + 2 * i];
-    const auto valR = audioDataBuffer[audioDataIndex + 2 * i];
+    const auto valR = audioDataBuffer[audioDataIndex + 2 * i + 1];
     // write dry channel output buffer
     outputBuffers[0][i] = (dryChannel.gain * valL) / channelCount;
     outputBuffers[1][i] = (dryChannel.gain * valR ) / channelCount;
