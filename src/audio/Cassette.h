@@ -31,6 +31,7 @@ class Cassette
   jack_client_t* jackClient;
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);
+  int setupJack(AudioData& audioData) const;
 
   public:
     Cassette(

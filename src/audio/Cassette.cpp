@@ -176,6 +176,114 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
 //   }
 // };
 
+int Cassette::setupJack(AudioData& audioData) const {
+  int setProcessResult = jack_set_process_callback(
+    jackClient,
+    &Cassette::jackProcessCallback,
+    &audioData
+  );
+  if ( setProcessResult == 0) {
+    Logging::write(
+      Info,
+      "Cassette::setupJack",
+      "Set Jack process callback"
+    );
+  } else {
+    Logging::write(
+      Error,
+      "Cassette::setupJack",
+      "Unable to set process callback - status: " + std::to_string(setProcessStatus)
+    );
+    return 1;
+  }
+
+  if (outPortL == nullptr) {
+      outPortL = jack_port_register(
+        jackClient,
+        "out_port_L",
+        JACK_DEFAULT_AUDIO_TYPE,
+        JackPortIsOutput,
+        0
+      );
+  }
+
+  if (outPortL == nullptr) {
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "Unable to create Jack outPortL"
+    );
+    return 2;
+  }
+
+  if (outPortR == nullptr) {
+    outPortR = jack_port_register(
+      jackClient,
+      "out_port_R",
+      JACK_DEFAULT_AUDIO_TYPE,
+      JackPortIsOutput,
+      0
+    );
+  }
+  if (outPortR == nullptr) {
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "Unable to create Jack outPortR"
+    );
+    return 3;
+  }
+
+  int jackActivateStatus = jack_activate(jackClient);
+  if (jackActivateStatus == 0) {
+    Logging::write(
+      Info,
+      "Cassette::play",
+      "Jack activated successfully"
+    );
+  } else {
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "Unable to activate jack - status: " + std::to_string(jackActivateStatus)
+    );
+    return 4;
+  }
+
+  int connectStatusL = jack_connect(jackClient, jack_port_name(outPortL), "system:playback_1");
+  if (connectStatusL != 0) {
+    Logging::write(
+      Error,
+      "Cassette::play()",
+      "Unable to connect out_port_L - status: " + std::to_string(connectStatusL)
+    );
+    return 5;
+  }
+
+  int connectStatusR = jack_connect(jackClient, jack_port_name(outPortR), "system:playback_2");
+  if (connectStatusR != 0) {
+      Logging::write(
+        Error,
+        "Cassette::play()",
+        "Unable to connect out_port_R - status: " + std::to_string(connectStatusR)
+      );
+      return 6;
+  }
+
+  // TESTING SHOW PORTS
+  const char** ports = jack_get_ports(jackClient, nullptr, nullptr, 0);
+  if (ports == nullptr) {
+    printf("No ports found.\n");
+  } else {
+    for (int i = 0; ports[i] != nullptr; i++) {
+      printf("Port: %s\n", ports[i]);
+    }
+  }
+  // TESTING SHOW PORTS
+
+  return 0;
+}
+
 int Cassette::play() const {
   Logging::write(
     Info,
@@ -234,8 +342,6 @@ int Cassette::play() const {
 
   // setup jack
   AudioData audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
-  int setProcessStatus;
-  int jackActivateStatus;
 
   // update plugin effects with info about audio to be processed
   if (!mixer->setSampleRate(sfinfo.samplerate)) {
@@ -244,100 +350,25 @@ int Cassette::play() const {
       "Cassette::play",
       "Unable to set sample rate: " + std::to_string(sfinfo.samplerate)
     );
-    // goto error;
+    goto error;
   }
 
-  setProcessStatus = jack_set_process_callback(
-    jackClient,
-    &Cassette::jackProcessCallback,
-    &audioData
-  );
-  if (setProcessStatus != 0) {
-    Logging::write(
-      Error,
-      "Cassette::play",
-      "Unable to set process callback - status: " + std::to_string(setProcessStatus)
-    );
-  }
-
-  if (outPortL == nullptr) {
-      outPortL = jack_port_register(
-        jackClient,
-        "out_port_L",
-        JACK_DEFAULT_AUDIO_TYPE,
-        JackPortIsOutput,
-        0
-      );
-  }
-
-  if (outPortL == nullptr) {
-    Logging::write(
-      Error,
-      "Cassette::play",
-      "Unable to create Jack outPortL"
-    );
-  }
-
-  if (outPortR == nullptr) {
-    outPortR = jack_port_register(
-      jackClient,
-      "out_port_R",
-      JACK_DEFAULT_AUDIO_TYPE,
-      JackPortIsOutput,
-      0
-    );
-  }
-  if (outPortR == nullptr) {
-    Logging::write(
-      Error,
-      "Cassette::play",
-      "Unable to create Jack outPortR"
-    );
-  }
-
-  jackActivateStatus = jack_activate(jackClient);
-  if (jackActivateStatus != 0) {
-    Logging::write(
-      Error,
-      "Cassette::play",
-      "Unable to activate jack - status: " + std::to_string(jackActivateStatus)
-    );
-  } else {
+  int setupJackStatus = setupJack(audioData);
+  if (setupJackStatus == 0) {
     Logging::write(
       Info,
-      "Cassette::play",
-      "Jack activated successfully"
+      "Cassette::play()",
+      "Setup Jack"
     );
-  }
-
-  int connectStatusL = jack_connect(jackClient, jack_port_name(outPortL), "system:playback_1");
-  if (connectStatusL != 0) {
+  } else {
     Logging::write(
       Error,
       "Cassette::play()",
-      "Unable to connect out_port_L - status: " + std::to_string(connectStatusL)
+      "Unable to setup Jack - status: " + std::to_string(setupJackStatus)
     );
+    goto error;
   }
 
-  int connectStatusR = jack_connect(jackClient, jack_port_name(outPortR), "system:playback_2");
-  if (connectStatusR != 0) {
-      Logging::write(
-        Error,
-        "Cassette::play()",
-        "Unable to connect out_port_R - status: " + std::to_string(connectStatusR)
-      );
-  }
-
-  // TESTING SHOW PORTS
-  const char** ports = jack_get_ports(jackClient, nullptr, nullptr, 0);
-  if (ports == nullptr) {
-    printf("No ports found.\n");
-  } else {
-    for (int i = 0; ports[i] != nullptr; i++) {
-      printf("Port: %s\n", ports[i]);
-    }
-  }
-  // TESTING SHOW PORTS
 
   while(
           audioData.playState != Gj::PlayState::STOP
