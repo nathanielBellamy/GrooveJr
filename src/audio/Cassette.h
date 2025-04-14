@@ -6,6 +6,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <variant>
 
 #include <sndfile.hh>
 #include <jack/jack.h>
@@ -21,6 +22,8 @@ using namespace caf;
 namespace Gj {
 namespace Audio {
 
+typedef std::variant<AudioData, int> AudioDataResult;
+
 class Cassette
 {
   actor_system& actorSystem;
@@ -31,6 +34,7 @@ class Cassette
   jack_client_t* jackClient;
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);
+  AudioDataResult setupAudioData() const;
   int setupJack(AudioData& audioData) const;
 
   public:

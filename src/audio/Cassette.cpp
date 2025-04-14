@@ -1,7 +1,5 @@
 #include "./Cassette.h"
 
-#define PA_SAMPLE_TYPE      paFloat32
-
 typedef float SAMPLE;
 
 using namespace caf;
@@ -176,13 +174,55 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
 //   }
 // };
 
+AudioDataResult Cassette::setupAudioData() const {
+  // initialize data needed for audio playback
+  SF_INFO sfinfo;
+  // https://svn.ict.usc.edu/svn_vh_public/trunk/lib/vhcl/libsndfile/doc/api.html
+  // > When opening a file for read, the format field should be set to zero before calling sf_open().
+  sfinfo.format = 0;
+  SNDFILE *file;
+
+  if (! (file = sf_open(fileName, SFM_READ, &sfinfo))) {
+    Logging::write(
+      Error,
+      "Cassette::play()",
+      "Unable to open input file : sf : " + std::string(sf_strerror(NULL))
+    );
+    return 1;
+  };
+
+  // Allocate memory for data
+  float* buffer = static_cast<float *>(malloc(sfinfo.frames * sfinfo.channels * sizeof(float)));
+  if (!buffer) {
+      Logging::write(
+        Error,
+        "Cassette::play()",
+        "Cannot allocate memory for audioDataBuffer"
+      );
+    return 2;
+  }
+
+  // Read the audio data into buffer
+  long readcount = sf_read_float(file, buffer, sfinfo.frames * sfinfo.channels);
+  if (readcount == 0) {
+    Logging::write(
+      Error,
+      "Cassette::play",
+      "Unable to read file: " + std::string(fileName)
+    );
+    return 3;
+  }
+
+  return AudioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
+}
+
 int Cassette::setupJack(AudioData& audioData) const {
-  int setProcessResult = jack_set_process_callback(
+  int setProcessStatus = jack_set_process_callback(
     jackClient,
     &Cassette::jackProcessCallback,
     &audioData
   );
-  if ( setProcessResult == 0) {
+  if ( setProcessStatus == 0) {
     Logging::write(
       Info,
       "Cassette::setupJack",
@@ -287,70 +327,38 @@ int Cassette::setupJack(AudioData& audioData) const {
 int Cassette::play() const {
   Logging::write(
     Info,
-    "Cassette::play()",
+    "Cassette::play",
     "Playing Cassette..."
   );
 
   if (jackClient == nullptr) {
     Logging::write(
       Error,
-      "Cassette::play()",
+      "Cassette::play",
       "jackClient is null"
     );
+    return 1;
   }
 
-  // initialize data needed for audio playback
-  sf_count_t index = 0;
-
-  SF_INFO sfinfo;
-  // https://svn.ict.usc.edu/svn_vh_public/trunk/lib/vhcl/libsndfile/doc/api.html
-  // > When opening a file for read, the format field should be set to zero before calling sf_open().
-  sfinfo.format = 0;
-  SNDFILE *file;
-
-  if (! (file = sf_open(fileName, SFM_READ, &sfinfo))) {
-    Logging::write(
-      Info,
-      "Cassette::play()",
-      "Unable to open input file : sf : " + std::string(sf_strerror(NULL))
-    );
-    return 1 ;
-  };
-
-  // Allocate memory for data
-  float *buffer;
-  buffer = (float *) malloc(sfinfo.frames * sfinfo.channels * sizeof(float));
-  if (!buffer) {
-      Logging::write(
-        Info,
-        "Cassette::play()",
-        "Cannot allocate memory for audioDataBuffer"
-      );
-      return 1;
-  }
-
-  // Read the audio data into buffer
-  long readcount = sf_read_float(file, buffer, sfinfo.frames * sfinfo.channels);
-  if (readcount == 0) {
+  AudioDataResult audioDataRes = setupAudioData();
+  if (std::holds_alternative<int>(audioDataRes)) {
     Logging::write(
       Error,
       "Cassette::play",
-      "Unable to read file: " + std::string(fileName)
+      "Unable to setup AudioData - status: " + std::to_string(std::get<int>(audioDataRes))
     );
-      return 1;
+    return 1;
   }
-
-  // setup jack
-  AudioData audioData(buffer, file, sfinfo, initialFrameId, readcount, Gj::PlayState::PLAY, mixer);
+  auto audioData = std::get<AudioData>(audioDataRes);
 
   // update plugin effects with info about audio to be processed
-  if (!mixer->setSampleRate(sfinfo.samplerate)) {
+  if (!mixer->setSampleRate(audioData.sfinfo.samplerate)) {
     Logging::write(
       Error,
       "Cassette::play",
-      "Unable to set sample rate: " + std::to_string(sfinfo.samplerate)
+      "Unable to set sample rate: " + std::to_string(audioData.sfinfo.samplerate)
     );
-    goto error;
+    return 1;
   }
 
   int setupJackStatus = setupJack(audioData);
@@ -366,17 +374,15 @@ int Cassette::play() const {
       "Cassette::play()",
       "Unable to setup Jack - status: " + std::to_string(setupJackStatus)
     );
-    goto error;
+    return 1;
   }
-
 
   while(
           audioData.playState != Gj::PlayState::STOP
             && audioData.playState != Gj::PlayState::PAUSE
             && audioData.index > -1
             && audioData.index < audioData.sfinfo.frames * audioData.sfinfo.channels - 1
-  ) // 0: STOP, 1: PLAY, 2: PAUSE, 3: RW, 4: FF
-  {
+  ) {
     // hold thread open until stopped
 
     // here is our chance to pull data out of the application
@@ -425,25 +431,8 @@ int Cassette::play() const {
   }
 
   jack_deactivate(jackClient);
-  // err = Pa_StopStream( stream );
-  // if( err != paNoError ) goto error;
-  //
-  // err = Pa_CloseStream( stream );
-  // if( err != paNoError ) goto error;
-  // Pa_Terminate();
   freeAudioData(&audioData);
   return 0;
-
-  error:
-    Pa_Terminate();
-    ThreadStatics::setPlayState(Gj::PlayState::STOP);
-    freeAudioData(&audioData);
-    Logging::write(
-      Error,
-      "Cassette::play",
-      "An Error occurred during audio playback"
-    );
-    return 1;
 };
 
 } // Audio
