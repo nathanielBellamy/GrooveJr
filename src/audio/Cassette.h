@@ -32,10 +32,13 @@ class Cassette
   long initialFrameId;
   Mixer* mixer;
   jack_client_t* jackClient;
+  float* buffer;
+  SNDFILE* file;
+  AudioData audioData;
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);
-  AudioDataResult setupAudioData() const;
-  int setupJack(AudioData& audioData) const;
+  AudioDataResult setupAudioData();
+  int setupJack();
 
   public:
     Cassette(
@@ -45,10 +48,10 @@ class Cassette
         long initialFrameId,
         Mixer* mixer
     );
+    ~Cassette();
 
-    int play() const;
-
-    void freeAudioData(AudioData *audioData) const;
+    int play();
+    void cleanup() const;
 
     // static int callback(const void *inputBuffer, void *outputBuffer,
     //                     unsigned long framesPerBuffer,

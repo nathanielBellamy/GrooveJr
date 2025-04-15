@@ -19,6 +19,7 @@
 
 #include "../audio/Mixer.h"
 #include "../audio/Cassette.h"
+#include "../Logging.h"
 
 using namespace caf;
 
@@ -53,15 +54,27 @@ struct AudioThreadState {
        return {
            [this](audio_thread_init_a) {
              std::cout << "AudioThread : audio_thread_init_a " << std::endl;
-             Gj::Audio::Cassette cassette (
-                self->system(),
-                Gj::Audio::ThreadStatics::incrThreadId(),
-                Gj::Audio::ThreadStatics::getFilePath(),
-                Gj::Audio::ThreadStatics::getFrameId(),
-                mixer
+             Logging::write(
+               Info,
+               "AudioThread : audio_thread_init_a",
+               "Will instantiate Cassette for file: " + std::string(Audio::ThreadStatics::getFilePath())
              );
-             std::cout << "AudioThread :  cassette instantiated " << std::endl;
-             cassette.play();
+             try {
+               Audio::Cassette cassette (
+                  self->system(),
+                  Audio::ThreadStatics::incrThreadId(),
+                  Audio::ThreadStatics::getFilePath(),
+                  Audio::ThreadStatics::getFrameId(),
+                  mixer
+               );
+               cassette.play();
+             } catch (std::runtime_error& e) {
+               Logging::write(
+                 Error,
+                 "AudioThread : audio_thread_init_a",
+                 "Error instantiating or playing Cassette: " + std::string(e.what())
+               );
+             }
            },
        };
      };

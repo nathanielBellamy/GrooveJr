@@ -22,6 +22,8 @@ class AudioData {
     float                            fadeOut;
     Mixer*                           mixer;
 
+    AudioData(){};
+
     AudioData(float* buffer, SNDFILE* file, SF_INFO sfinfo, sf_count_t index, long readcount, PlayState playState, Mixer* mixer)
         : index(index)
         , buffer(buffer)
