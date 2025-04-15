@@ -28,15 +28,20 @@ class EffectsChannel {
   float** buffersB;
   std::vector<std::unique_ptr<Vst3::Plugin>> vst3Plugins;
 
-  void allocateBuffers();
-  void freeBuffers() const;
   [[nodiscard]] float** determineInputBuffers(int index) const;
   [[nodiscard]] float** determineOutputBuffers(int index) const;
 
   public:
     Channel channel;
 
-    EffectsChannel(AppState* gAppState, std::shared_ptr<JackClient> jackClient, int index, float** inputBuffers);
+    EffectsChannel(
+      AppState* gAppState,
+      std::shared_ptr<JackClient> jackClient,
+      int index,
+      float** inputBuffers,
+      float** buffersA,
+      float** buffersB
+    );
     ~EffectsChannel();
 
     void process() const;

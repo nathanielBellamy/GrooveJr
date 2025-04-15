@@ -11,14 +11,20 @@ namespace Effects {
 
 using namespace Steinberg;
 
-EffectsChannel::EffectsChannel(AppState* gAppState, std::shared_ptr<JackClient> jackClient, const int index, float** inputBuffers)
-  : gAppState(gAppState)
+EffectsChannel::EffectsChannel(
+	AppState* gAppState,
+	std::shared_ptr<JackClient> jackClient,
+	const int index,
+	float** inputBuffers,
+	float** buffersA,
+	float** buffersB
+  ) : gAppState(gAppState)
 	, jackClient(jackClient)
 	, index(index)
 	, inputBuffers(inputBuffers)
-	, buffersA()
-	, buffersB()
-  , channel({ 1.0f, 0.0f })
+	, buffersA(buffersA)
+	, buffersB(buffersB)
+    , channel({ 1.0f, 0.0f })
   {
 
   Logging::write(
@@ -26,59 +32,14 @@ EffectsChannel::EffectsChannel(AppState* gAppState, std::shared_ptr<JackClient> 
   	"EffectsChannel::ctor",
   	"Instantiating EffectsChannel: " + std::to_string(index)
   );
-
-	allocateBuffers();
-
-	Logging::write(
-		Info,
-		"EffectsChannel::ctor",
-		"Allocated input buffers for EffectsChannel: " + std::to_string(index)
-	);
 }
 
 EffectsChannel::~EffectsChannel() {
-	freeBuffers();
-}
-
-void EffectsChannel::allocateBuffers() {
-	buffersA = static_cast<float**>(
-		malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
-	);
-	buffersB = static_cast<float**>(
-		malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
-	);
-
-	if (buffersA == nullptr || buffersB == nullptr) {
-		Logging::write(
-			Error,
-			"EffectsChannel::allocateBuffers",
-			"Unable to allocate memory for buffersIn or buffersOut."
-		);
-		throw std::runtime_error ("Unable to allocate memory for EffectsChannel buffers.");
-	}
-
-	for (int c = 0; c < 2; c++) {
-		buffersA[c] = new float[gAppState->audioFramesPerBuffer];
-		buffersB[c] = new float[gAppState->audioFramesPerBuffer];
-	}
-}
-
-void EffectsChannel::freeBuffers() const {
-	try {
-		for (int i = 0; i < 2; i++) {
-			delete buffersA[i];
-			delete buffersB[i];
-		}
-
-		free(buffersA);
-		free(buffersB);
-	} catch (...) {
-		Logging::write(
-			Error,
-			"EffectsChannel::freeBuffers",
-			"An error occurred while attempting to free buffers for EffectsChannel " + std::to_string(index)
-		);
-	}
+  Logging::write(
+  	Info,
+  	"EffectsChannel::dtor",
+  	"Destroying EffectsChannel: " + std::to_string(index)
+  );
 }
 
 float** EffectsChannel::determineInputBuffers(const int index) const {

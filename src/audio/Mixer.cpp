@@ -16,6 +16,8 @@ Mixer::Mixer(AppState* gAppState)
   , dryChannel({ 1.0f, 0.0f })
   , channelCount(1.0f)
   , inputBuffers(nullptr)
+  , buffersA(nullptr)
+  , buffersB(nullptr)
   {
 
   Logging::write(
@@ -40,7 +42,7 @@ Mixer::Mixer(AppState* gAppState)
     );
   }
 
-  allocateInputBuffers();
+  allocateBuffers();
 
   Logging::write(
     Info,
@@ -85,7 +87,7 @@ Mixer::~Mixer() {
     );
   }
 
-  if (!freeInputBuffers()) {
+  if (!freeBuffers()) {
     Logging::write(
       Error,
       "Mixer::~Mixer",
@@ -106,8 +108,7 @@ Mixer::~Mixer() {
   );
 }
 
-bool Mixer::allocateInputBuffers() {
-  // TODO: don't assume stereo
+bool Mixer::allocateBuffers() {
   inputBuffers = static_cast<float**>(
       malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
   );
@@ -123,16 +124,50 @@ bool Mixer::allocateInputBuffers() {
     inputBuffers[c] = new float[gAppState->audioFramesPerBuffer];
   }
 
+  buffersA = static_cast<float**>(
+  	malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
+  );
+  buffersB = static_cast<float**>(
+	malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
+  );
+
+  if (buffersA == nullptr || buffersB == nullptr) {
+	Logging::write(
+		Error,
+		"EffectsChannel::allocateBuffers",
+		"Unable to allocate memory for buffersA or buffersB."
+	);
+	throw std::runtime_error ("Unable to allocate memory for Mixer buffers.");
+  }
+
+  for (int c = 0; c < 2; c++) {
+  	buffersA[c] = new float[gAppState->audioFramesPerBuffer];
+	buffersB[c] = new float[gAppState->audioFramesPerBuffer];
+  }
+
   return true;
 }
 
-bool Mixer::freeInputBuffers() const {
+bool Mixer::freeBuffers() const {
   try {
     for (auto i = 0; i < 2; i++) {
       delete inputBuffers[i];
     }
     free(inputBuffers);
+
+    for (int i = 0; i < 2; i++) {
+        delete buffersA[i];
+        delete buffersB[i];
+    }
+
+    free(buffersA);
+    free(buffersB);
   } catch (...) {
+    Logging::write(
+        Error,
+        "Mixer::freeBuffers",
+        "Unable to free memory for Mixer buffers"
+    );
     return false;
   }
 
@@ -145,7 +180,9 @@ bool Mixer::addEffectsChannel() {
         gAppState,
         jackClient,
         static_cast<int>(effectsChannels.size()),
-        inputBuffers
+        inputBuffers,
+        buffersA,
+        buffersB
       )
     );
     channelCount++;

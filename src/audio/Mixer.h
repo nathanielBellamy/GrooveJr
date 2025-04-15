@@ -27,6 +27,8 @@ class Mixer {
     Channel dryChannel;
     float channelCount;
     std::vector<Effects::EffectsChannel*> effectsChannels;
+    float** buffersA;
+    float** buffersB;
 
     void incorporateLatencySamples(int latencySamples) const;
 
@@ -41,11 +43,13 @@ class Mixer {
       return jackClient.get()->getJackClient();
     };
 
-    bool allocateInputBuffers();
-    bool freeInputBuffers() const;
+    bool allocateBuffers();
+    [[nodiscard]]
+    bool freeBuffers() const;
 
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);
+    [[nodiscard]]
     int effectsOnChannelCount(int idx) const;
 
     bool addEffectToChannel(int idx, const std::string& effectPath) const;
