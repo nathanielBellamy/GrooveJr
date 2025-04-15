@@ -52,12 +52,6 @@ class Cassette
 
     int play();
     void cleanup() const;
-
-    // static int callback(const void *inputBuffer, void *outputBuffer,
-    //                     unsigned long framesPerBuffer,
-    //                     const PaStreamCallbackTimeInfo* timeInfo,
-    //                     PaStreamCallbackFlags statusFlags,
-    //                     void *userData );
 };
 
 } // Audio
