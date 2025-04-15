@@ -43,8 +43,10 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
   }
   audioData = std::get<AudioData>(audioDataRes);
 
-  int setupJackStatus = setupJack();
-  if (setupJackStatus == 0) {
+  if (
+    const int setupJackStatus = setupJack();
+    setupJackStatus == 0
+  ) {
     Logging::write(
       Info,
       "Cassette::play()",
@@ -106,7 +108,7 @@ AudioDataResult Cassette::setupAudioData() {
   if (! (file = sf_open(fileName, SFM_READ, &sfinfo))) {
     Logging::write(
       Error,
-      "Cassette::play()",
+      "Cassette::setupAudioData",
       "Unable to open input file : sf : " + std::string(sf_strerror(NULL))
     );
     return 1;
@@ -116,7 +118,7 @@ AudioDataResult Cassette::setupAudioData() {
   if (!mixer->setSampleRate(sfinfo.samplerate)) {
     Logging::write(
       Error,
-      "Cassette::play",
+      "Cassette::setupAudioData",
       "Unable to set sample rate: " + std::to_string(sfinfo.samplerate)
     );
   }
@@ -126,7 +128,7 @@ AudioDataResult Cassette::setupAudioData() {
   if (!buffer) {
       Logging::write(
         Error,
-        "Cassette::play()",
+        "Cassette::setupAudioData",
         "Cannot allocate memory for audioDataBuffer"
       );
     return 2;
@@ -137,7 +139,7 @@ AudioDataResult Cassette::setupAudioData() {
   if (readcount == 0) {
     Logging::write(
       Error,
-      "Cassette::play",
+      "Cassette::setupAudioData",
       "Unable to read file: " + std::string(fileName)
     );
     return 3;
@@ -147,7 +149,7 @@ AudioDataResult Cassette::setupAudioData() {
 }
 
 int Cassette::setupJack() {
-  int setProcessStatus = jack_set_process_callback(
+  const int setProcessStatus = jack_set_process_callback(
     jackClient,
     &Cassette::jackProcessCallback,
     &audioData
@@ -180,7 +182,7 @@ int Cassette::setupJack() {
   if (outPortL == nullptr) {
     Logging::write(
       Error,
-      "Cassette::play",
+      "Cassette::setupJack",
       "Unable to create Jack outPortL"
     );
     return 2;
@@ -198,7 +200,7 @@ int Cassette::setupJack() {
   if (outPortR == nullptr) {
     Logging::write(
       Error,
-      "Cassette::play",
+      "Cassette::setupJack",
       "Unable to create Jack outPortR"
     );
     return 3;
@@ -208,13 +210,13 @@ int Cassette::setupJack() {
   if (jackActivateStatus == 0) {
     Logging::write(
       Info,
-      "Cassette::play",
+      "Cassette::setupJack",
       "Jack activated successfully"
     );
   } else {
     Logging::write(
       Error,
-      "Cassette::play",
+      "Cassette::setupJack",
       "Unable to activate jack - status: " + std::to_string(jackActivateStatus)
     );
     return 4;
@@ -226,7 +228,7 @@ int Cassette::setupJack() {
   ) {
     Logging::write(
       Error,
-      "Cassette::play()",
+      "Cassette::setupJack",
       "Unable to connect out_port_L - status: " + std::to_string(connectStatusL)
     );
     return 5;
@@ -238,7 +240,7 @@ int Cassette::setupJack() {
   ) {
       Logging::write(
         Error,
-        "Cassette::play()",
+        "Cassette::setupJack",
         "Unable to connect out_port_R - status: " + std::to_string(connectStatusR)
       );
       return 6;

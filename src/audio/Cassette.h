@@ -32,8 +32,8 @@ class Cassette
   long initialFrameId;
   Mixer* mixer;
   jack_client_t* jackClient;
-  float* buffer;
-  SNDFILE* file;
+  float* buffer{};
+  SNDFILE* file{};
   AudioData audioData;
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);
