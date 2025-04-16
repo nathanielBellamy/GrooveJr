@@ -102,12 +102,12 @@ AudioDataResult Cassette::setupAudioData() {
   // https://svn.ict.usc.edu/svn_vh_public/trunk/lib/vhcl/libsndfile/doc/api.html
   // > When opening a file for read, the format field should be set to zero before calling sf_open().
   sfInfo.format = 0;
-
-  if (! (file = sf_open(fileName, SFM_READ, &sfInfo))) {
+  file = sf_open(fileName, SFM_READ, &sfInfo);
+  if (file == nullptr) {
     Logging::write(
       Error,
       "Cassette::setupAudioData",
-      "Unable to open input file : sf : " + std::string(sf_strerror(NULL))
+      "Unable to open input file : sf : " + std::string(sf_strerror(nullptr))
     );
     return 1;
   };

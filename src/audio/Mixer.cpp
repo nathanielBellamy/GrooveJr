@@ -144,17 +144,37 @@ bool Mixer::allocateInputBuffers(const sf_count_t frames) {
   return true;
 }
 
-bool Mixer::populateInputBuffers(const sf_count_t frames, float* audioDataBuffer) {
+bool Mixer::populateInputBuffers(const sf_count_t frames, const float* audioDataBuffer) const {
+  if (inputBuffers == nullptr || inputBuffers[0] == nullptr || inputBuffers[1] == nullptr) {
+    Logging::write(
+      Error,
+      "Mixer::populateInputBuffers",
+      "Unable to populate input buffers - buffers are null"
+    );
+    return false;
+  }
+
   // de-interlace audio into shared input buffers
-  for (int i = 0; i < frames; i++) {
+  for (int i = 0; i < frames / 2; i++) {
     inputBuffers[0][i] = audioDataBuffer[2 * i];
     inputBuffers[1][i] = audioDataBuffer[2 * i + 1];
   }
+
+  return true;
 }
 
 bool Mixer::setupInputBuffers(sf_count_t frames, float *audioDataBuffer) {
   allocateInputBuffers(frames);
-  populateInputBuffers(frames, audioDataBuffer);
+  if (!populateInputBuffers(frames, audioDataBuffer)) {
+    Logging::write(
+      Error,
+      "Mixer::setupInputBuffers",
+      "Unable to populate input buffers."
+    );
+    return false;
+  };
+
+  return true;
 }
 
 
