@@ -235,6 +235,10 @@ bool Mixer::addEffectsChannel() {
         gAppState,
         jackClient,
         static_cast<int>(effectsChannels.size()),
+        // TODO:
+        // - can I read the entire file into Mixer.inputBuffers while simultaneously
+        //   1 - avoiding copying into a subBuffer in the real-time thread
+        //   2 - processing vsts
         inputBuffers,
         buffersA,
         buffersB

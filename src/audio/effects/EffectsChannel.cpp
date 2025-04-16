@@ -63,6 +63,9 @@ float** EffectsChannel::determineOutputBuffers(const int index) const {
 
 // output read by Mixer after processing
 float** EffectsChannel::getBuffersWriteOut() const {
+	if (vst3Plugins.empty())
+		return inputBuffers;
+
 	if (vst3Plugins.size() % 2 == 0)
 		return buffersB;
 
