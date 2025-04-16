@@ -9,6 +9,7 @@
 #include <cmath>
 #include <algorithm>
 #include <memory>
+#include <sndfile.hh>
 
 #include "../AppState.h"
 #include "../Logging.h"
@@ -32,6 +33,13 @@ class Mixer {
 
     void incorporateLatencySamples(int latencySamples) const;
 
+    bool allocateInputBuffers(sf_count_t frames);
+    bool populateInputChannels(sf_count_t frames, float* audioDataBuffer);
+
+    bool allocateBuffersAB();
+    [[nodiscard]]
+    bool freeBuffers() const;
+
   public:
     float** inputBuffers;
 
@@ -43,9 +51,7 @@ class Mixer {
       return jackClient.get()->getJackClient();
     };
 
-    bool allocateBuffers();
-    [[nodiscard]]
-    bool freeBuffers() const;
+    bool setupInputBuffers(sf_count_t frames, float* audioDataBuffer);
 
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);

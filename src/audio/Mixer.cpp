@@ -42,7 +42,7 @@ Mixer::Mixer(AppState* gAppState)
     );
   }
 
-  allocateBuffers();
+  allocateBuffersAB();
 
   Logging::write(
     Info,
@@ -108,10 +108,16 @@ Mixer::~Mixer() {
   );
 }
 
-bool Mixer::allocateBuffers() {
-  inputBuffers = static_cast<float**>(
-      malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
-  );
+bool Mixer::allocateInputBuffers(const sf_count_t frames) {
+  if (inputBuffers == nullptr) {
+    inputBuffers = static_cast<float**>(
+        malloc(2 * frames * sizeof(float))
+    );
+  } else {
+    inputBuffers = static_cast<float**>(
+      realloc(inputBuffers, 2 * frames * sizeof(float*))
+    );
+  }
 
   if (inputBuffers == nullptr)
     Logging::write(
@@ -121,9 +127,25 @@ bool Mixer::allocateBuffers() {
     );
 
   for (int c = 0; c < 2; c++) {
-    inputBuffers[c] = new float[gAppState->audioFramesPerBuffer];
+    inputBuffers[c] = new float[frames];
   }
+}
 
+bool Mixer::populateInputChannels(const sf_count_t frames, float* audioDataBuffer) {
+  // de-interlace audio into shared input buffers
+  for (int i = 0; i < frames; i++) {
+    inputBuffers[0][i] = audioDataBuffer[2 * i];
+    inputBuffers[1][i] = audioDataBuffer[2 * i + 1];
+  }
+}
+
+bool Mixer::setupInputBuffers(sf_count_t frames, float *audioDataBuffer) {
+  allocateInputBuffers(frames);
+  populateInputChannels(frames, audioDataBuffer);
+}
+
+
+bool Mixer::allocateBuffersAB() {
   buffersA = static_cast<float**>(
   	malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
   );
@@ -247,10 +269,12 @@ bool Mixer::mixDown(
     outL[i] = (dryChannel.gain * valL) / channelCount;
     outR[i] = (dryChannel.gain * valR ) / channelCount;
 
-    // de-interlace audio into shared effects input buffers
+    // de-interlace audio into shared input buffers
     inputBuffers[0][i] = valL;
     inputBuffers[1][i] = valR;
   }
+
+  return true;
 
   for (const auto effectsChannel : effectsChannels) {
     effectsChannel->process();

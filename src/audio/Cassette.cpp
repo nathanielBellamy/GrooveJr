@@ -49,7 +49,7 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
   ) {
     Logging::write(
       Info,
-      "Cassette::play()",
+      "Cassette::Cassette",
       "Setup Jack"
     );
   } else {
@@ -144,6 +144,11 @@ AudioDataResult Cassette::setupAudioData() {
     );
     return 3;
   }
+
+  // TODO:
+  // - logging
+  // - trim AudioData fields
+  mixer->setupInputBuffers(sfinfo.frames, buffer);
 
   return AudioData(buffer, file, sfinfo, initialFrameId, readcount, PLAY, mixer);
 }

@@ -115,8 +115,8 @@ extern "C" {
         );
 
         Mixer->addEffectsChannel();
-        Mixer->addEffectsChannel();
-        Mixer->addEffectsChannel();
+        // Mixer->addEffectsChannel();
+        // Mixer->addEffectsChannel();
 
         // init actor system
         // Initialize the global type information before anything else.
