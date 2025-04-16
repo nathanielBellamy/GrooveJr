@@ -33,6 +33,7 @@ class Cassette
   Mixer* mixer;
   jack_client_t* jackClient;
   float* buffer{};
+  SF_INFO sfInfo;
   SNDFILE* file{};
   AudioData audioData;
 

@@ -17,6 +17,7 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
   , initialFrameId(initialFrameId)
   , mixer(mixer)
   , jackClient(mixer->getJackClient())
+  , sfInfo()
   {
 
   if (jackClient == nullptr) {
@@ -91,21 +92,18 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   );
 
   auto *audioData = static_cast<AudioData*>(arg);
-  const int channelCount = audioData->sfinfo.channels;
-  audioData->mixer->mixDown(outL, outR, audioData->index, audioData->buffer, channelCount, nframes);
+  audioData->mixer->mixDown(outL, outR, audioData->index, nframes);
 
-  audioData->index += nframes * channelCount;
+  audioData->index += nframes;
   return 0;
 }
 
 AudioDataResult Cassette::setupAudioData() {
-  // initialize data needed for audio playback
-  SF_INFO sfinfo;
   // https://svn.ict.usc.edu/svn_vh_public/trunk/lib/vhcl/libsndfile/doc/api.html
   // > When opening a file for read, the format field should be set to zero before calling sf_open().
-  sfinfo.format = 0;
+  sfInfo.format = 0;
 
-  if (! (file = sf_open(fileName, SFM_READ, &sfinfo))) {
+  if (! (file = sf_open(fileName, SFM_READ, &sfInfo))) {
     Logging::write(
       Error,
       "Cassette::setupAudioData",
@@ -115,16 +113,16 @@ AudioDataResult Cassette::setupAudioData() {
   };
 
   // update plugin effects with info about audio to be processed
-  if (!mixer->setSampleRate(sfinfo.samplerate)) {
+  if (!mixer->setSampleRate(sfInfo.samplerate)) {
     Logging::write(
       Error,
       "Cassette::setupAudioData",
-      "Unable to set sample rate: " + std::to_string(sfinfo.samplerate)
+      "Unable to set sample rate: " + std::to_string(sfInfo.samplerate)
     );
   }
 
   // Allocate memory for data
-  buffer = static_cast<float *>(malloc(sfinfo.frames * sfinfo.channels * sizeof(float)));
+  buffer = static_cast<float *>(malloc(sfInfo.frames * sfInfo.channels * sizeof(float)));
   if (!buffer) {
       Logging::write(
         Error,
@@ -135,7 +133,7 @@ AudioDataResult Cassette::setupAudioData() {
   }
 
   // Read the audio data into buffer
-  long readcount = sf_read_float(file, buffer, sfinfo.frames * sfinfo.channels);
+  long readcount = sf_read_float(file, buffer, sfInfo.frames * sfInfo.channels);
   if (readcount == 0) {
     Logging::write(
       Error,
@@ -145,12 +143,16 @@ AudioDataResult Cassette::setupAudioData() {
     return 3;
   }
 
-  // TODO:
-  // - logging
-  // - trim AudioData fields
-  mixer->setupInputBuffers(sfinfo.frames, buffer);
+  if (!mixer->setupInputBuffers(sfInfo.frames, buffer)) {
+    Logging::write(
+      Error,
+      "Cassette::setupAudioData",
+      "Unable to setup inputBuffers"
+    );
+    return 4;
+  };
 
-  return AudioData(buffer, file, sfinfo, initialFrameId, readcount, PLAY, mixer);
+  return AudioData(initialFrameId, PLAY, mixer);
 }
 
 int Cassette::setupJack() {
@@ -278,7 +280,7 @@ int Cassette::play() {
           audioData.playState != STOP
             && audioData.playState != PAUSE
             && audioData.index > -1
-            && audioData.index < audioData.sfinfo.frames * audioData.sfinfo.channels - 1
+            && audioData.index < sfInfo.frames
   ) {
     // hold thread open until stopped
 
@@ -287,7 +289,7 @@ int Cassette::play() {
     // make it accessible to our running audio callback through the audioData obj
 
     if (audioData.readComplete) { // reached end of input file
-        ThreadStatics::setPlayState(Gj::PlayState::STOP);
+        ThreadStatics::setPlayState(STOP);
         ThreadStatics::setReadComplete(true);
         Logging::write(
           Info,

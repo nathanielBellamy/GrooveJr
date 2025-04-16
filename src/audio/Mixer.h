@@ -34,7 +34,7 @@ class Mixer {
     void incorporateLatencySamples(int latencySamples) const;
 
     bool allocateInputBuffers(sf_count_t frames);
-    bool populateInputChannels(sf_count_t frames, float* audioDataBuffer);
+    bool populateInputBuffers(sf_count_t frames, float* audioDataBuffer);
 
     bool allocateBuffersAB();
     [[nodiscard]]
@@ -67,9 +67,7 @@ class Mixer {
     bool mixDown(
       jack_default_audio_sample_t* outL,
       jack_default_audio_sample_t* outR,
-      int audioDataIndex,
-      const float* audioDataBuffer,
-      int audioDataSfChannels,
+      sf_count_t audioDataIndex,
       jack_nframes_t nframes) const;
 
     // TODO

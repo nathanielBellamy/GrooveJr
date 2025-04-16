@@ -119,19 +119,32 @@ bool Mixer::allocateInputBuffers(const sf_count_t frames) {
     );
   }
 
-  if (inputBuffers == nullptr)
+  if (inputBuffers == nullptr) {
     Logging::write(
       Error,
       "Mixer::allocateInputBuffers",
       "Unable to allocate memory for Mixer.inputBuffers"
     );
+    return false;
+  }
 
   for (int c = 0; c < 2; c++) {
     inputBuffers[c] = new float[frames];
   }
+
+  if (inputBuffers[0] == nullptr || inputBuffers[1] == nullptr) {
+    Logging::write(
+      Error,
+      "Mixer::allocateInputBuffers",
+      "Unable to allocate memory for individual Mixer.inputBuffers"
+    );
+    return false;
+  }
+
+  return true;
 }
 
-bool Mixer::populateInputChannels(const sf_count_t frames, float* audioDataBuffer) {
+bool Mixer::populateInputBuffers(const sf_count_t frames, float* audioDataBuffer) {
   // de-interlace audio into shared input buffers
   for (int i = 0; i < frames; i++) {
     inputBuffers[0][i] = audioDataBuffer[2 * i];
@@ -141,7 +154,7 @@ bool Mixer::populateInputChannels(const sf_count_t frames, float* audioDataBuffe
 
 bool Mixer::setupInputBuffers(sf_count_t frames, float *audioDataBuffer) {
   allocateInputBuffers(frames);
-  populateInputChannels(frames, audioDataBuffer);
+  populateInputBuffers(frames, audioDataBuffer);
 }
 
 
@@ -254,24 +267,16 @@ bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) con
 bool Mixer::mixDown(
   jack_default_audio_sample_t* outL,
   jack_default_audio_sample_t* outR,
-  const int audioDataIndex,
-  const float* audioDataBuffer,
-  const int audioDataSfChannels,
+  const sf_count_t audioDataIndex,
   const jack_nframes_t nframes
   ) const {
 
   // TODO: handle pan/gain
 
   for (int i = 0; i < nframes; i++) {
-    const auto valL = audioDataBuffer[audioDataIndex + 2 * i];
-    const auto valR = audioDataBuffer[audioDataIndex + 2 * i + 1];
     // write dry channel output buffer
-    outL[i] = (dryChannel.gain * valL) / channelCount;
-    outR[i] = (dryChannel.gain * valR ) / channelCount;
-
-    // de-interlace audio into shared input buffers
-    inputBuffers[0][i] = valL;
-    inputBuffers[1][i] = valR;
+    outL[i] = (dryChannel.gain * inputBuffers[0][audioDataIndex + i]) / channelCount;
+    outR[i] = (dryChannel.gain * inputBuffers[1][audioDataIndex + i]) / channelCount;
   }
 
   return true;

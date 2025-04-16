@@ -10,10 +10,6 @@ namespace Audio {
 class AudioData {
   public:
     sf_count_t                       index;
-    float                            *buffer;
-    SNDFILE                          *file;
-    SF_INFO                          sfinfo;
-    long                             readcount;
     PlayState                        playState;
     float                            playbackSpeed;
     bool                             readComplete;
@@ -24,12 +20,8 @@ class AudioData {
 
     AudioData(){};
 
-    AudioData(float* buffer, SNDFILE* file, SF_INFO sfinfo, sf_count_t index, long readcount, PlayState playState, Mixer* mixer)
+    AudioData(sf_count_t index, PlayState playState, Mixer* mixer)
         : index(index)
-        , buffer(buffer)
-        , file(file)
-        , sfinfo(sfinfo)
-        , readcount(readcount)
         , playState(playState)
         , readComplete(false)
         , volume(0.0)
