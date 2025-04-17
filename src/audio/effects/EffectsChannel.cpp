@@ -18,13 +18,15 @@ EffectsChannel::EffectsChannel(
 	float** inputBuffers,
 	float** buffersA,
 	float** buffersB
-  ) : gAppState(gAppState)
+  )
+	: gAppState(gAppState)
 	, jackClient(jackClient)
 	, index(index)
 	, inputBuffers(inputBuffers)
+	, inputBuffersProcessHead(new float*[2])
 	, buffersA(buffersA)
 	, buffersB(buffersB)
-    , channel({ 1.0f, 0.0f })
+	, channel({ 1.0f, 0.0f })
   {
 
   Logging::write(
@@ -40,6 +42,25 @@ EffectsChannel::~EffectsChannel() {
   	"EffectsChannel::dtor",
   	"Destroying EffectsChannel: " + std::to_string(index)
   );
+
+	delete[] inputBuffersProcessHead;
+
+	Logging::write(
+  	Info,
+  	"EffectsChannel::dtor",
+  	"Destroyed EffectsChannel: " + std::to_string(index)
+  );
+}
+
+void EffectsChannel::updateProcessHeads(const sf_count_t audioDataIndex) const {
+	// inputBuffersProcessHead[0] = inputBuffers[0] + audioDataIndex;
+	// inputBuffersProcessHead[1] = inputBuffers[1] + audioDataIndex;
+
+	if (vst3Plugins.empty())
+		return;
+
+	// only first plugin reads from audio data
+	vst3Plugins.front()->updateProcesHead(audioDataIndex);
 }
 
 float** EffectsChannel::determineInputBuffers(const int index) const {
@@ -64,7 +85,7 @@ float** EffectsChannel::determineOutputBuffers(const int index) const {
 // output read by Mixer after processing
 float** EffectsChannel::getBuffersWriteOut() const {
 	if (vst3Plugins.empty())
-		return inputBuffers;
+		return inputBuffersProcessHead;
 
 	if (vst3Plugins.size() % 2 == 0)
 		return buffersB;

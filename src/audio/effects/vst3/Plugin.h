@@ -5,6 +5,8 @@
 #ifndef VST3PLUGIN_H
 #define VST3PLUGIN_H
 
+#include <sndfile.h>
+
 #include "../../../Logging.h"
 #include "../../../AppState.h"
 #include "../../JackClient.h"
@@ -38,6 +40,8 @@ struct Plugin {
     Steinberg::FUnknownPtr<Steinberg::Vst::IAudioProcessor> getProcesser() {
         return audioHost->audioClient->getComponent();
     }
+
+    void updateProcesHead(sf_count_t audioDataIndex) const;
 
     void initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window);
     void terminateEditorHost();

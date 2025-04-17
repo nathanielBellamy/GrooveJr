@@ -238,10 +238,6 @@ bool Mixer::addEffectsChannel() {
         gAppState,
         jackClient,
         static_cast<int>(effectsChannels.size()),
-        // TODO:
-        // - can I read the entire file into Mixer.inputBuffers while simultaneously
-        //   1 - avoiding copying into a subBuffer in the real-time thread
-        //   2 - processing vsts
         inputBuffers,
         buffersA,
         buffersB
@@ -295,6 +291,10 @@ void Mixer::updateProcessHeads(const sf_count_t audioDataIndex) const {
   // - update everyone here
   inputBuffersProcessHead[0] = inputBuffers[0] + audioDataIndex;
   inputBuffersProcessHead[1] = inputBuffers[1] + audioDataIndex;
+
+  for (const auto effectsChannel : effectsChannels ) {
+    effectsChannel->updateProcessHeads(audioDataIndex);
+  }
 }
 
 // called from audio thread
@@ -316,20 +316,21 @@ bool Mixer::mixDown(
     outR[i] = (dryChannel.gain * inputBuffersProcessHead[1][i]) / channelCount;
   }
 
-  return true;
+  // return true;
+
+  if (channelCount == 1.0f) // dry channel only
+    return true;
 
   for (const auto effectsChannel : effectsChannels) {
-    effectsChannel->process();
-    if (channelCount == 1.0f) // dry channel only
-      break;
+    // effectsChannel->process();
 
-    const auto effectsChannelBuffersWriteOut = effectsChannel->getBuffersWriteOut();
+    // const auto effectsChannelBuffersWriteOut = effectsChannel->getBuffersWriteOut();
 
     // write processed audio to outputBuffer
-    for (int i = 0; i < nframes; i++) {
-      outL[i] += ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[0][i] ) / channelCount;
-      outR[i] += ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[1][i] ) / channelCount;
-    }
+    // for (int i = 0; i < nframes; i++) {
+    //   outL[i] += ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[0][i] ) / channelCount;
+    //   outR[i] += ( effectsChannel->channel.gain * effectsChannelBuffersWriteOut[1][i] ) / channelCount;
+    // }
   }
 
   return true;

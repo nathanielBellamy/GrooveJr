@@ -71,6 +71,7 @@ App::App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackCli
 	: gAppState(gAppState)
 	, jackClient(jackClient)
 	, inputBuffers(inputBuffers)
+	, inputBufferProcessHead(new float*[2])
 	, outputBuffers(outputBuffers)
 	{
 
@@ -86,6 +87,13 @@ App::App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackCli
 //------------------------------------------------------------------------
 App::~App () noexcept
 {
+	delete[] inputBufferProcessHead;
+}
+
+void App::updateProcessHead(sf_count_t audioDataIndex) {
+	inputBufferProcessHead[0] = inputBuffers[0] + audioDataIndex;
+	inputBufferProcessHead[1] = inputBuffers[1] + audioDataIndex;
+	buffers.inputs = inputBufferProcessHead;
 }
 
 //------------------------------------------------------------------------

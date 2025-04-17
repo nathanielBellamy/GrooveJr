@@ -6,6 +6,7 @@
 #define EFFECTSCHANNEL_H
 
 #include <memory>
+#include <sndfile.h>
 
 #include "./vst3/Plugin.h"
 #include "../Channel.h"
@@ -24,6 +25,7 @@ class EffectsChannel {
   std::shared_ptr<JackClient> jackClient;
   int index;
   float** inputBuffers;
+  float** inputBuffersProcessHead;
   float** buffersA;
   float** buffersB;
   std::vector<std::unique_ptr<Vst3::Plugin>> vst3Plugins;
@@ -44,6 +46,7 @@ class EffectsChannel {
     );
     ~EffectsChannel();
 
+    void updateProcessHeads(sf_count_t audioDataIndex) const;
     void process() const;
 
     [[nodiscard]] int getIndex() const { return index; }
