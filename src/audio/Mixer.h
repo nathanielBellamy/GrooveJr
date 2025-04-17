@@ -33,6 +33,7 @@ class Mixer {
 
     void incorporateLatencySamples(int latencySamples) const;
 
+    void updateProcessHeads(sf_count_t index) const;
     bool allocateInputBuffers(sf_count_t frames);
     bool populateInputBuffers(sf_count_t frames, const float* audioDataBuffer) const;
 
@@ -41,7 +42,8 @@ class Mixer {
     bool freeBuffers() const;
 
   public:
-    float** inputBuffers;
+    float** inputBuffers; // full song audio data
+    float** inputBuffersProcessHead; // where jack process callback should start
 
     explicit Mixer(AppState*);
     ~Mixer();

@@ -16,6 +16,7 @@ Mixer::Mixer(AppState* gAppState)
   , dryChannel({ 1.0f, 0.0f })
   , channelCount(1.0f)
   , inputBuffers(nullptr)
+  , inputBuffersProcessHead(new float*[2])
   , buffersA(nullptr)
   , buffersB(nullptr)
   {
@@ -86,6 +87,8 @@ Mixer::~Mixer() {
       "Closed JackClient"
     );
   }
+
+  delete[] inputBuffersProcessHead;
 
   if (!freeBuffers()) {
     Logging::write(
@@ -286,6 +289,14 @@ bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) con
   return effectsChannels.at(idx)->addEffect(effectPath);
 }
 
+void Mixer::updateProcessHeads(const sf_count_t audioDataIndex) const {
+  // TODO:
+  // - get everyone doing processing an inputBuffersProcessHead
+  // - update everyone here
+  inputBuffersProcessHead[0] = inputBuffers[0] + audioDataIndex;
+  inputBuffersProcessHead[1] = inputBuffers[1] + audioDataIndex;
+}
+
 // called from audio thread
 // do not allocate/free memory!
 bool Mixer::mixDown(
@@ -297,10 +308,12 @@ bool Mixer::mixDown(
 
   // TODO: handle pan/gain
 
+  updateProcessHeads(audioDataIndex);
+
   for (int i = 0; i < nframes; i++) {
     // write dry channel output buffer
-    outL[i] = (dryChannel.gain * inputBuffers[0][audioDataIndex + i]) / channelCount;
-    outR[i] = (dryChannel.gain * inputBuffers[1][audioDataIndex + i]) / channelCount;
+    outL[i] = (dryChannel.gain * inputBuffersProcessHead[0][i]) / channelCount;
+    outR[i] = (dryChannel.gain * inputBuffersProcessHead[1][i]) / channelCount;
   }
 
   return true;
