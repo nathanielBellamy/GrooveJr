@@ -42,7 +42,6 @@
 #include "./media/audioclient.h"
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/iapplication.h"
 // #include "public.sdk/samples/vst-hosting/audiohost/source/media/audioclient.h"
-#include <sndfile.h>
 
 #include "../../../../../JackClient.h"
 #include "public.sdk/source/vst/hosting/module.h"
@@ -60,7 +59,6 @@ class App : public EditorHost::IApplication
 	Gj::AppState* gAppState;
 	std::shared_ptr<Gj::Audio::JackClient> jackClient;
 	float** inputBuffers;
-	float** inputBufferProcessHead;
 	float** outputBuffers;
 
 public:
@@ -69,14 +67,14 @@ public:
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;
 	IPtr<PlugProvider> plugProvider {nullptr};
-	Steinberg::Vst::IAudioClient::Buffers buffers;
+	IAudioClient::Buffers buffers;
 	void setModule(VST3::Hosting::Module::Ptr module);
 	OPtr<IComponent> component;
 	OPtr<IEditController> editController;
 	AudioClientPtr audioClient;
 	int channelCount = {2}; // TODO: access info from libsndfile
 
-	void updateProcessHead(sf_count_t audioDataIndex);
+	void updateInputBuffers(float** processHead);
 
 private:
 	enum OpenFlags

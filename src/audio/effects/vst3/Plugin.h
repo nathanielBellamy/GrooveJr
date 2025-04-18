@@ -41,7 +41,7 @@ struct Plugin {
         return audioHost->audioClient->getComponent();
     }
 
-    void updateProcesHead(sf_count_t audioDataIndex) const;
+    void updateInputBuffers(float** processHead) const;
 
     void initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window);
     void terminateEditorHost();

@@ -67,8 +67,8 @@ Plugin::~Plugin() {
   editorHost->terminate();
 }
 
-void Plugin::updateProcesHead(sf_count_t audioDataIndex) const {
-	audioHost->updateProcessHead(audioDataIndex);
+void Plugin::updateInputBuffers(float** processHead) const {
+	audioHost->updateInputBuffers(processHead);
 }
 
 void Plugin::initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window) {

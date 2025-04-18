@@ -293,7 +293,7 @@ void Mixer::updateProcessHeads(const sf_count_t audioDataIndex) const {
   inputBuffersProcessHead[1] = inputBuffers[1] + audioDataIndex;
 
   for (const auto effectsChannel : effectsChannels ) {
-    effectsChannel->updateProcessHeads(audioDataIndex);
+    effectsChannel->updateInputBuffers(inputBuffersProcessHead);
   }
 }
 
