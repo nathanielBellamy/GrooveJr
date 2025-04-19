@@ -28,22 +28,10 @@ class Mixer {
     Channel dryChannel;
     float channelCount;
     std::vector<Effects::EffectsChannel*> effectsChannels;
-    float** buffersA;
-    float** buffersB;
 
     void incorporateLatencySamples(int latencySamples) const;
 
-    void updateProcessHeads(sf_count_t index) const;
-    bool allocateInputBuffers(sf_count_t frames);
-    bool populateInputBuffers(sf_count_t frames, const float* audioDataBuffer) const;
-
-    bool allocateBuffersAB();
-    [[nodiscard]]
-    bool freeBuffers() const;
-
-  public:
-    float** inputBuffers; // full song audio data
-    float** inputBuffersProcessHead; // where jack process callback should start
+public:
 
     explicit Mixer(AppState*);
     ~Mixer();
@@ -52,8 +40,6 @@ class Mixer {
     jack_client_t* getJackClient() const {
       return jackClient.get()->getJackClient();
     };
-
-    bool setupInputBuffers(sf_count_t frames, float* audioDataBuffer);
 
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);
@@ -65,12 +51,6 @@ class Mixer {
     void terminateEditorHostsOnChannel(int idx) const;
 
     bool setSampleRate(int sampleRate) const;
-
-    bool mixDown(
-      jack_default_audio_sample_t* outL,
-      jack_default_audio_sample_t* outR,
-      sf_count_t audioDataIndex,
-      jack_nframes_t nframes) const;
 
     // TODO
     bool removeEffectFromChannel(int channelIdx, int effectIdx);

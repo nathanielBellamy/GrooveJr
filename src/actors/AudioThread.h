@@ -41,10 +41,12 @@ struct AudioThreadState {
      static long id;
 
      AudioThread::pointer self;
+     AppState* gAppState;
      Audio::Mixer* mixer;
 
-     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor, Audio::Mixer* mixer) :
+     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor, AppState* gAppState, Audio::Mixer* mixer) :
          self(self)
+       , gAppState(gAppState)
        , mixer(mixer)
        {
            self->link_to(supervisor);
@@ -65,6 +67,7 @@ struct AudioThreadState {
                   Audio::ThreadStatics::incrThreadId(),
                   Audio::ThreadStatics::getFilePath(),
                   Audio::ThreadStatics::getFrameId(),
+                  gAppState,
                   mixer
                );
                cassette.play();

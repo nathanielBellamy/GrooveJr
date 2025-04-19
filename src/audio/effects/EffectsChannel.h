@@ -23,13 +23,7 @@ class EffectsChannel {
   AppState* gAppState;
   std::shared_ptr<JackClient> jackClient;
   int index;
-  float** inputBuffers;
-  float** buffersA;
-  float** buffersB;
   std::vector<std::unique_ptr<Vst3::Plugin>> vst3Plugins;
-
-  [[nodiscard]] float** determineInputBuffers(int index) const;
-  [[nodiscard]] float** determineOutputBuffers(int index) const;
 
   public:
     Channel channel;
@@ -37,15 +31,9 @@ class EffectsChannel {
     EffectsChannel(
       AppState* gAppState,
       std::shared_ptr<JackClient> jackClient,
-      int index,
-      float** inputBuffers,
-      float** buffersA,
-      float** buffersB
+      int index
     );
     ~EffectsChannel();
-
-    void updateInputBuffers(float** processHead);
-    void process() const;
 
     [[nodiscard]] int getIndex() const { return index; }
 
@@ -56,7 +44,6 @@ class EffectsChannel {
     void setPan(float pan);
 
     bool addEffect(const std::string& effectPath);
-    [[nodiscard]] float** getBuffersWriteOut() const;
     void setSampleRate(int sampleRate) const;
 
     int effectCount() const;

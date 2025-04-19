@@ -70,27 +70,12 @@ void App::setModule (VST3::Hosting::Module::Ptr module_) {
 App::App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackClient, float** inputBuffers, float** outputBuffers)
 	: gAppState(gAppState)
 	, jackClient(jackClient)
-	, inputBuffers(inputBuffers)
-	, outputBuffers(outputBuffers)
 	{
-
-	buffers = { // Steinberg::Vst::IAudioClient::Buffers
-		inputBuffers,
-		channelCount,
-		outputBuffers,
-		channelCount,
-		gAppState->audioFramesPerBuffer
-	};
 }
 
 //------------------------------------------------------------------------
 App::~App () noexcept
 {
-}
-
-void App::updateInputBuffers(float** processHead) {
-	inputBuffers = processHead;
-	buffers.inputs = processHead;
 }
 
 //------------------------------------------------------------------------

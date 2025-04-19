@@ -58,8 +58,6 @@ class App : public EditorHost::IApplication
 {
 	Gj::AppState* gAppState;
 	std::shared_ptr<Gj::Audio::JackClient> jackClient;
-	float** inputBuffers;
-	float** outputBuffers;
 
 public:
 	App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackClient, float** inputBuffers, float** outputBuffers);
@@ -67,14 +65,11 @@ public:
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;
 	IPtr<PlugProvider> plugProvider {nullptr};
-	IAudioClient::Buffers buffers;
 	void setModule(VST3::Hosting::Module::Ptr module);
 	OPtr<IComponent> component;
 	OPtr<IEditController> editController;
 	AudioClientPtr audioClient;
 	int channelCount = {2}; // TODO: access info from libsndfile
-
-	void updateInputBuffers(float** processHead);
 
 private:
 	enum OpenFlags

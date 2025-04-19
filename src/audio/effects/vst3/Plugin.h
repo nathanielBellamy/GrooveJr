@@ -25,15 +25,13 @@ struct Plugin {
     const std::string                   name;
     const std::string                   path;
     VST3::Hosting::Module::Ptr          module;
-    Steinberg::Vst::AudioHost::App*     audioHost;
-    Steinberg::Vst::EditorHost::App*    editorHost;
+    AudioHost::App*                     audioHost;
+    EditorHost::App*                    editorHost;
 
     Plugin(
         std::string path,
         AppState* gAppState,
-        std::shared_ptr<JackClient> jackClient,
-        float** inputBuffers,
-        float** outputBuffers
+        std::shared_ptr<JackClient> jackClient
     );
     ~Plugin();
 
@@ -41,10 +39,8 @@ struct Plugin {
         return audioHost->audioClient->getComponent();
     }
 
-    void updateInputBuffers(float** processHead) const;
-
     void initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window);
-    void terminateEditorHost();
+    void terminateEditorHost() const;
 };
 
 } // Vst3

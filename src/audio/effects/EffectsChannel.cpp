@@ -14,17 +14,11 @@ using namespace Steinberg;
 EffectsChannel::EffectsChannel(
 	AppState* gAppState,
 	std::shared_ptr<JackClient> jackClient,
-	const int index,
-	float** inputBuffers,
-	float** buffersA,
-	float** buffersB
-  )
+	const int index
+	)
 	: gAppState(gAppState)
 	, jackClient(jackClient)
 	, index(index)
-	, inputBuffers(inputBuffers)
-	, buffersA(buffersA)
-	, buffersB(buffersB)
 	, channel({ 1.0f, 0.0f })
   {
 
@@ -49,45 +43,6 @@ EffectsChannel::~EffectsChannel() {
   );
 }
 
-void EffectsChannel::updateInputBuffers(float** processHead) {
-	inputBuffers = processHead;
-
-	if (vst3Plugins.empty())
-		return;
-
-	vst3Plugins.front()->updateInputBuffers(processHead);
-}
-
-float** EffectsChannel::determineInputBuffers(const int index) const {
-	if (index == 0)
-		return inputBuffers;
-
-	if (index % 2 == 0)
-		return buffersB;
-
-	// index % 2 == 1
-	return buffersA;
-}
-
-// output for plugin at index
-float** EffectsChannel::determineOutputBuffers(const int index) const {
-	if (index % 2 == 0)
-		return buffersA;
-
-	return buffersB;
-}
-
-// output read by Mixer after processing
-float** EffectsChannel::getBuffersWriteOut() const {
-	if (vst3Plugins.empty())
-		return inputBuffers;
-
-	if (vst3Plugins.size() % 2 == 0)
-		return buffersB;
-
-	return buffersA;
-}
-
 bool EffectsChannel::addEffect(const std::string& effectPath) {
 	Logging::write(
 		Info,
@@ -95,17 +50,11 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
 		"Adding effect: " + effectPath + " to channel " + std::to_string(index)
 	);
 
-	const int effectIndex = static_cast<int>(vst3Plugins.size());
-	float** in = determineInputBuffers(effectIndex);
-	float** out = determineOutputBuffers(effectIndex);
-
   auto effect =
   	std::make_unique<Vst3::Plugin>(
   		effectPath,
   		gAppState,
-  		jackClient,
-  		in,
-  		out
+  		jackClient
   	);
 
 	Logging::write(

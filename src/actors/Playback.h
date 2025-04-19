@@ -16,6 +16,7 @@
 #include "../messaging/EnvelopeQtPtr.h"
 #include "./AudioThread.h"
 
+#include "../AppState.h"
 #include "../audio/Mixer.h"
 #include "../enums/PlayState.h"
 
@@ -43,9 +44,10 @@ struct PlaybackState {
      Playback::pointer self;
      AudioThread::pointer audioThread;
 
+     AppState* gAppState;
      Audio::Mixer* mixer;
 
-     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, Audio::Mixer* mixer) :
+     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, AppState* gAppState, Audio::Mixer* mixer) :
           self(self)
         , mixer(mixer)
         , audioThread(nullptr)
@@ -67,21 +69,26 @@ struct PlaybackState {
            [this](strong_actor_ptr reply_to, tc_trig_play_a) {
              std::cout << "Playback : tc_trig_play_a : " << std::endl;
 
-             Gj::PlayState playState = Gj::Audio::ThreadStatics::getPlayState();
-             if (playState == Gj::PlayState::PLAY)
+             const PlayState playState = Audio::ThreadStatics::getPlayState();
+             if (playState == PLAY)
                return;
 
-             if (playState == Gj::PlayState::STOP) {
-               Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::STOP);
+             if (playState == STOP) {
+               Audio::ThreadStatics::setPlayState(STOP);
                clearAudioThread();
              }
 
              bool success = true;
-             Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::PLAY);
-             const char* filePath = Gj::Audio::ThreadStatics::getFilePath();
+             Audio::ThreadStatics::setPlayState(PLAY);
+             const char* filePath = Audio::ThreadStatics::getFilePath();
              if ( filePath != nullptr ) {
                if ( audioThread == nullptr ) {
-                   auto audioThreadActor = self->system().spawn(actor_from_state<AudioThreadState>, actor_cast<strong_actor_ptr>(self), mixer);
+                   auto audioThreadActor = self->system().spawn(
+                     actor_from_state<AudioThreadState>,
+                     actor_cast<strong_actor_ptr>(self),
+                     gAppState,
+                     mixer
+                   );
                    audioThread = actor_cast<AudioThread::pointer>(audioThreadActor);
                    self->anon_send(
                        audioThreadActor,
@@ -100,10 +107,10 @@ struct PlaybackState {
            },
            [this](strong_actor_ptr reply_to, tc_trig_pause_a) {
              std::cout << "Playback : tc_trig_pause_a : " << std::endl;
-             Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::PAUSE);
+             Audio::ThreadStatics::setPlayState(PAUSE);
 
              clearAudioThread();
-             actor replyToActor = actor_cast<actor>(reply_to);
+             const actor replyToActor = actor_cast<actor>(reply_to);
              self->anon_send(
                  replyToActor,
                  actor_cast<strong_actor_ptr>(self),
@@ -115,8 +122,8 @@ struct PlaybackState {
              std::cout << "Playback : tc_trig_stop_a : " << std::endl;
 
              clearAudioThread();
-             Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::STOP);
-             actor replyToActor = actor_cast<actor>(reply_to);
+             Audio::ThreadStatics::setPlayState(STOP);
+             const actor replyToActor = actor_cast<actor>(reply_to);
              self->anon_send(
                  replyToActor,
                  actor_cast<strong_actor_ptr>(self),
@@ -139,8 +146,8 @@ struct PlaybackState {
            [this](strong_actor_ptr reply_to, tc_trig_ff_a) {
              std::cout << "Playback : tc_trig_ff_a : " << std::endl;
 
-             Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::FF);
-             actor replyToActor = actor_cast<actor>(reply_to);
+             Audio::ThreadStatics::setPlayState(Gj::PlayState::FF);
+             const actor replyToActor = actor_cast<actor>(reply_to);
              self->anon_send(
                  replyToActor,
                  actor_cast<strong_actor_ptr>(self),

@@ -9,7 +9,7 @@ namespace Audio {
 namespace Effects {
 namespace Vst3 {
 
-Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient> jackClient, float** inputBuffers, float** outputBuffers)
+Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
 	: gAppState(gAppState)
 	, name(path)
 	, path(path)
@@ -38,11 +38,9 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 	const auto& cmdArgs = std::vector<std::string> { path };
 
 	try {
-		audioHost = new Steinberg::Vst::AudioHost::App(
+		audioHost = new AudioHost::App(
 			gAppState,
-			jackClient,
-			inputBuffers,
-			outputBuffers
+			jackClient
 		);
 		audioHost->setModule(module);
 		audioHost->init(cmdArgs);
@@ -67,11 +65,7 @@ Plugin::~Plugin() {
   editorHost->terminate();
 }
 
-void Plugin::updateInputBuffers(float** processHead) const {
-	audioHost->updateInputBuffers(processHead);
-}
-
-void Plugin::initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window) {
+void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 	try {
 		Logging::write(
 			Info,
@@ -79,7 +73,7 @@ void Plugin::initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window) {
 			"Initializing editorHost for " + this->path
 		);
 		const auto& cmdArgs = std::vector { path };
-		editorHost = new Steinberg::Vst::EditorHost::App(window);
+		editorHost = new EditorHost::App(window);
 		editorHost->setModule(module);
 		editorHost->plugProvider = audioHost->plugProvider;
 		editorHost->editController = audioHost->editController;
@@ -101,10 +95,9 @@ void Plugin::initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window) {
 	);
 }
 
-void Plugin::terminateEditorHost() {
+void Plugin::terminateEditorHost() const {
 	editorHost->terminate();
 }
-
 
 } // Vst3
 } // Effects

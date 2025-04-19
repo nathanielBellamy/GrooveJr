@@ -10,11 +10,12 @@ namespace Audio {
 jack_port_t* outPortL;
 jack_port_t* outPortR;
 
-Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileName, long initialFrameId, Mixer* mixer)
+Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileName, long initialFrameId, AppState* gAppState, Mixer* mixer)
   : actorSystem(actorSystem)
   , threadId(threadId)
   , fileName(fileName)
   , initialFrameId(initialFrameId)
+  , gAppState(gAppState)
   , mixer(mixer)
   , jackClient(mixer->getJackClient())
   , sfInfo()
@@ -71,7 +72,7 @@ Cassette::~Cassette() {
 
 void Cassette::cleanup() const {
   jack_deactivate(jackClient);
-  free(buffer);
+  freeBuffers();
   sf_close(file);
   Logging::write(
     Info,
@@ -177,7 +178,7 @@ AudioDataResult Cassette::setupAudioData() {
     return 3;
   }
 
-  if (!mixer->setupInputBuffers(sfInfo.frames, buffer)) {
+  if (!setupInputBuffers()) {
     Logging::write(
       Error,
       "Cassette::setupAudioData",
@@ -299,6 +300,151 @@ int Cassette::setupJack() {
   // TESTING SHOW PORTS
 
   return 0;
+}
+
+bool Cassette::allocateProcessBuffers() {
+  buffersA = static_cast<float**>(
+  	malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
+  );
+  buffersB = static_cast<float**>(
+	malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float))
+  );
+
+  if (buffersA == nullptr || buffersB == nullptr) {
+    Logging::write(
+      Error,
+      "Cassette::allocateProcessBuffers",
+      "Unable to allocate memory for buffersA or buffersB."
+    );
+    throw std::runtime_error ("Unable to allocate memory for Cassette buffers.");
+  }
+
+  for (int c = 0; c < 2; c++) {
+  	buffersA[c] = new float[gAppState->audioFramesPerBuffer];
+	  buffersB[c] = new float[gAppState->audioFramesPerBuffer];
+  }
+
+  effectsChannelsWriteOutBuffer = static_cast<float***>(
+  	malloc(2 * gAppState->audioFramesPerBuffer * sizeof(float) * MAX_EFFECTS_CHANNELS)
+  );
+
+  for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
+    effectsChannelsWriteOutBuffer[i][0] = new float[gAppState->audioFramesPerBuffer];
+    effectsChannelsWriteOutBuffer[i][1] = new float[gAppState->audioFramesPerBuffer];
+  }
+
+  return true;
+}
+
+bool Cassette::allocateInputBuffers() {
+  if (inputBuffers == nullptr) {
+    inputBuffers = static_cast<float**>(
+        malloc(2 * sfInfo.frames * sizeof(float))
+    );
+  } else {
+    inputBuffers = static_cast<float**>(
+      realloc(inputBuffers, 2 * sfInfo.frames * sizeof(float*))
+    );
+  }
+
+  if (inputBuffers == nullptr) {
+    Logging::write(
+      Error,
+      "Cassette::allocateInputBuffers",
+      "Unable to allocate memory for Cassette.inputBuffers"
+    );
+    return false;
+  }
+
+  for (int c = 0; c < 2; c++) {
+    inputBuffers[c] = new float[sfInfo.frames];
+  }
+
+  if (inputBuffers[0] == nullptr || inputBuffers[1] == nullptr) {
+    Logging::write(
+      Error,
+      "Cassette::allocateInputBuffers",
+      "Unable to allocate memory for individual Cassette.inputBuffers"
+    );
+    return false;
+  }
+
+  return true;
+}
+
+bool Cassette::populateInputBuffers() const {
+  if (inputBuffers == nullptr || inputBuffers[0] == nullptr || inputBuffers[1] == nullptr) {
+    Logging::write(
+      Error,
+      "Cassette::populateInputBuffers",
+      "Unable to populate input buffers - buffers are null"
+    );
+    return false;
+  }
+
+  // de-interlace audio into shared input buffers
+  for (int i = 0; i < sfInfo.frames / 2; i++) {
+    inputBuffers[0][i] = buffer[2 * i];
+    inputBuffers[1][i] = buffer[2 * i + 1];
+  }
+
+  return true;
+}
+
+bool Cassette::setupInputBuffers() {
+  if (!allocateInputBuffers()) {
+    Logging::write(
+      Error,
+      "Cassette::setupInputBuffers",
+      "Unable to allocate input buffers."
+    );
+  }
+
+  if (!populateInputBuffers()) {
+    Logging::write(
+      Error,
+      "Cassette::setupInputBuffers",
+      "Unable to populate input buffers."
+    );
+    return false;
+  };
+
+  return true;
+}
+
+bool Cassette::freeBuffers() const {
+  try {
+    free(buffer);
+
+    for (auto i = 0; i < 2; i++) {
+      delete inputBuffers[i];
+    }
+    free(inputBuffers);
+
+    for (int i = 0; i < 2; i++) {
+        delete buffersA[i];
+        delete buffersB[i];
+    }
+
+    free(buffersA);
+    free(buffersB);
+
+    for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
+      delete effectsChannelsWriteOutBuffer[i][0];
+      delete effectsChannelsWriteOutBuffer[i][1];
+    }
+
+    free(effectsChannelsWriteOutBuffer);
+  } catch (...) {
+    Logging::write(
+        Error,
+        "Cassette::freeBuffers",
+        "Unable to free memory for Cassette buffers"
+    );
+    return false;
+  }
+
+  return true;
 }
 
   // TODO:

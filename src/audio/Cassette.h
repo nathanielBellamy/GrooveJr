@@ -6,18 +6,20 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <array>
 #include <variant>
 
 #include <sndfile.hh>
 #include <jack/jack.h>
-#include <portaudio.h>
 
 #include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 #include "caf/actor_system.hpp"
 
 #include "./AudioData.h"
+#include "./Constants.h"
 #include "./Mixer.h"
 #include "./ThreadStatics.h"
+#include "../AppState.h"
 #include "Logging.h"
 
 using namespace caf;
@@ -33,16 +35,30 @@ class Cassette
   long threadId;
   char const* fileName;
   long initialFrameId;
+  AppState* gAppState;
   Mixer* mixer;
   jack_client_t* jackClient;
   float* buffer{};
   SF_INFO sfInfo;
   SNDFILE* file{};
+  float** inputBuffers; // full song audio data
+  float** inputBuffersProcessHead; // where jack process callback should start
+  float** buffersA;
+  float** buffersB;
+  float*** effectsChannelsWriteOutBuffer;
   AudioData audioData;
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);
   AudioDataResult setupAudioData();
   int setupJack();
+
+  bool allocateInputBuffers();
+  bool populateInputBuffers() const;
+  bool setupInputBuffers();
+
+  bool allocateProcessBuffers();
+  [[nodiscard]]
+  bool freeBuffers() const;
 
   public:
     Cassette(
@@ -50,6 +66,7 @@ class Cassette
         long threadId,
         const char* fileName,
         long initialFrameId,
+        AppState* gAppState,
         Mixer* mixer
     );
     ~Cassette();

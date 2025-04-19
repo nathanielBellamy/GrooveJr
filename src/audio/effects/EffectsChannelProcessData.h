@@ -10,6 +10,7 @@
 #include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 
 #include "../Channel.h"
+#include "../Constants.h"
 
 namespace Gj {
 namespace Audio {
@@ -18,8 +19,8 @@ namespace Effects {
 struct EffectsChannelProcessData {
   // NOTE: handles at most 100 effects per channel
   int effectCount;
-  std::array<void* (*)(Steinberg::Vst::IAudioClient::Buffers, sf_count_t frames), 100> processFuncs;
-  std::array<Steinberg::Vst::IAudioClient::Buffers, 100> buffers;
+  std::array<void* (*)(Steinberg::Vst::IAudioClient::Buffers, sf_count_t frames), MAX_PLUGINS_PER_CHANNEL> processFuncs;
+  std::array<Steinberg::Vst::IAudioClient::Buffers, MAX_PLUGINS_PER_CHANNEL> buffers;
   Channel channelSettings;
 };
 

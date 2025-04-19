@@ -75,10 +75,12 @@ add_library(GjAudio SHARED
         Channel.h
         Logging.h
         Logging.cpp
+        Constants.h
         effects/vst3/Plugin.h
         effects/vst3/Plugin.cpp
         effects/EffectsChannel.h
         effects/EffectsChannel.cpp
+        effects/EffectsChannelProcessData.h
 )
 target_compile_options(GjAudio PRIVATE ${INCLUDE_FLAGS})
 add_definitions(-DQT_NO_VERSION_TAGGING)

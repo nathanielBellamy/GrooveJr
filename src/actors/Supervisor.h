@@ -44,7 +44,7 @@ struct SupervisorState {
      Gj::Gui::MainWindow* mainWindowPtr;
      bool running;
 
-     SupervisorState(Supervisor::pointer self, Gj::AppState* gAppState, Gj::Gui::MainWindow* mainWindowPtr, Audio::Mixer* mixer)
+     SupervisorState(Supervisor::pointer self, AppState* gAppState, Gui::MainWindow* mainWindowPtr, Audio::Mixer* mixer)
        : self(self)
        , mainWindowPtr(mainWindowPtr)
        , running(false)
@@ -52,7 +52,11 @@ struct SupervisorState {
            self->system().registry().put(ActorIds::SUPERVISOR, actor_cast<strong_actor_ptr>(self));
 //           auto gs_app_state_manager = sys.spawn(actor_from_state<gs_app_state_manager_state>);
 //           auto gs_controller = sys.spawn(actor_from_state<gs_controller_state
-           auto playback = self->system().spawn(actor_from_state<PlaybackState>, actor_cast<strong_actor_ptr>(self), mixer);
+           auto playback = self->system().spawn(
+             actor_from_state<PlaybackState>,
+             actor_cast<strong_actor_ptr>(self),
+             gAppState,
+             mixer);
            playbackActorPtr = actor_cast<strong_actor_ptr>(playback);
 
            auto effectsManager = self->system().spawn(actor_from_state<EffectsManagerState>, actor_cast<strong_actor_ptr>(self), mixer);
