@@ -187,7 +187,7 @@ AudioDataResult Cassette::setupAudioData() {
     return 4;
   };
 
-  return AudioData(initialFrameId, PLAY, mixer);
+  return AudioData(initialFrameId, PLAY, inputBuffers, buffersA, buffersB, effectsChannelsWriteOutBuffer);
 }
 
 int Cassette::setupJack() {
