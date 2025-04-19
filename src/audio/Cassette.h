@@ -11,7 +11,10 @@
 #include <sndfile.hh>
 #include <jack/jack.h>
 #include <portaudio.h>
+
+#include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 #include "caf/actor_system.hpp"
+
 #include "./AudioData.h"
 #include "./Mixer.h"
 #include "./ThreadStatics.h"

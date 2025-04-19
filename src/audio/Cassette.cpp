@@ -84,6 +84,7 @@ void Cassette::cleanup() const {
 // do not allocate/free memory within this method
 // as it may be called at system-interrupt level
 int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
+  // get port buffers
   auto* outL = static_cast<jack_default_audio_sample_t*>(
     jack_port_get_buffer(outPortL, nframes)
   );
@@ -91,8 +92,41 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
     jack_port_get_buffer(outPortR, nframes)
   );
 
-  auto *audioData = static_cast<AudioData*>(arg);
-  audioData->mixer->mixDown(outL, outR, audioData->index, nframes);
+  // retrieve AudioData
+  const auto audioData = static_cast<AudioData*>(arg);
+  const sf_count_t audioDataIndex = audioData->index;
+
+  // update process head
+  audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioDataIndex;
+  audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioDataIndex;
+  float** processHead = audioData->inputBuffersProcessHead;
+
+  // process effects
+  for (int effectsChannelIdx = 0; effectsChannelIdx < audioData->effectsChannelCount; effectsChannelIdx++) {
+    auto [effectCount, processFuncs, buffers, channelSettings] = audioData->effectsChannelsProcessData[effectsChannelIdx];
+    if (effectCount > 0) { // update leading buffer reading direct from audio source
+      buffers[0].inputs = processHead;
+    }
+    for (int effectIdx = 0; effectIdx < effectCount; effectIdx++) {
+      processFuncs[effectIdx](
+        buffers[effectIdx],
+        nframes
+      );
+    }
+  }
+
+  // sum down into output buffer
+  const float channelCount = audioData->channelCount;
+  for (int i = 0; i < nframes; i++) {
+    outL[i] = audioData->dryChannel.gain * processHead[0][i] / channelCount;
+    outR[i] = audioData->dryChannel.gain * processHead[1][i] / channelCount;
+
+    for (int effectsChannelIdx = 0; effectsChannelIdx < audioData->effectsChannelCount; effectsChannelIdx++) {
+      auto channel = audioData->effectsChannelsProcessData[effectsChannelIdx].channelSettings;
+      outL[i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
+      outR[i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
+    }
+  }
 
   audioData->index += nframes;
   return 0;

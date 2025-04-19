@@ -1,8 +1,9 @@
 #ifndef GJAUDIOAUDIODATA_H
 #define GJAUDIOAUDIODATA_H
 #include <sndfile.hh>
-#include "./Mixer.h"
 #include "../enums/PlayState.h"
+#include "./effects/EffectsChannelProcessData.h"
+#include "./Channel.h"
 
 namespace Gj {
 namespace Audio {
@@ -16,7 +17,18 @@ class AudioData {
     float                            volume;
     float                            fadeIn;
     float                            fadeOut;
-    Mixer*                           mixer;
+    float**                          inputBuffers;
+    float**                          inputBuffersProcessHead;
+    float**                          buffersA;
+    float**                          buffersB;
+    Channel                          dryChannel;
+    float                            channelCount;
+    int                              effectsChannelCount;
+    std::array<Effects::EffectsChannelProcessData, 100> effectsChannelsProcessData;
+    std::array<float**, 100>         effectsChannelsWriteOut;
+    int32_t                          framesPerBuffer_32_t;
+    int64_t                          framesPerBuffer_64_t;
+
 
     AudioData(){};
 
