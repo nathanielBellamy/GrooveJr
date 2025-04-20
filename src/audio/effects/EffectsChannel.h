@@ -39,8 +39,8 @@ class EffectsChannel {
     int getIndex() const { return index; }
 
     [[nodiscard]]
-    std::vector<std::unique_ptr<Vst3::Plugin>> getVst3Plugins() {
-      return vst3Plugins;
+    Vst3::Plugin* getPluginAtIdx(const int idx) const {
+      return vst3Plugins.at(idx).get();
     };
 
     float getGain();

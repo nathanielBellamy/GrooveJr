@@ -51,7 +51,7 @@ class Cassette
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);
   AudioDataResult setupAudioData();
-  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int pluginIdx, const AudioData &audioData) const;
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int channelIdx, int pluginIdx, const AudioData &audioData) const;
   int setupJack();
 
   bool allocateInputBuffers();
