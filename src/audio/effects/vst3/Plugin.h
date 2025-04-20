@@ -35,11 +35,11 @@ struct Plugin {
     );
     ~Plugin();
 
-    Steinberg::FUnknownPtr<Steinberg::Vst::IAudioProcessor> getProcesser() {
+    Steinberg::FUnknownPtr<IAudioProcessor> getProcesser() {
         return audioHost->audioClient->getComponent();
     }
 
-    void initEditorHost(Steinberg::Vst::EditorHost::WindowPtr window);
+    void initEditorHost(EditorHost::WindowPtr window);
     void terminateEditorHost() const;
 };
 

@@ -60,7 +60,7 @@ class App : public EditorHost::IApplication
 	std::shared_ptr<Gj::Audio::JackClient> jackClient;
 
 public:
-	App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackClient, float** inputBuffers, float** outputBuffers);
+	App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackClient);
 	~App () noexcept override;
 	void init (const std::vector<std::string>& cmdArgs) override;
 	void terminate () override;

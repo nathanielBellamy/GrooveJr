@@ -15,10 +15,6 @@ Mixer::Mixer(AppState* gAppState)
   , mainChannel({ 1.0f, 0.0f })
   , dryChannel({ 1.0f, 0.0f })
   , channelCount(1.0f)
-  , inputBuffers(nullptr)
-  , inputBuffersProcessHead(new float*[2])
-  , buffersA(nullptr)
-  , buffersB(nullptr)
   {
 
   Logging::write(
@@ -42,14 +38,6 @@ Mixer::Mixer(AppState* gAppState)
       "Initialized GrooveJr JackClient."
     );
   }
-
-  allocateBuffersAB();
-
-  Logging::write(
-    Info,
-    "Mixer::Mixer()",
-    "Allocated Buffers."
-  );
 
   Logging::write(
     Info,
@@ -85,22 +73,6 @@ Mixer::~Mixer() {
       Error,
       "Mixer::~Mixer",
       "Closed JackClient"
-    );
-  }
-
-  delete[] inputBuffersProcessHead;
-
-  if (!freeBuffers()) {
-    Logging::write(
-      Error,
-      "Mixer::~Mixer",
-      "An error occurred while freeing buffers."
-    );
-  } else {
-    Logging::write(
-      Info,
-      "Mixer::~Mixer",
-      "Done freeing buffers."
     );
   }
 

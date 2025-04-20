@@ -19,7 +19,7 @@ class AudioData {
     float                            fadeIn;
     float                            fadeOut;
     float**                          inputBuffers;
-    std::array<float*, 2>            inputBuffersProcessHead{};
+    float**                          inputBuffersProcessHead;
     float**                          buffersA;
     float**                          buffersB;
     Channel                          dryChannel;
@@ -47,6 +47,7 @@ class AudioData {
         , fadeIn(1.0)
         , fadeOut(1.0)
         , inputBuffers(inputBuffers)
+        , inputBuffersProcessHead(inputBuffers)
         , buffersA(buffersA)
         , buffersB(buffersB)
         {

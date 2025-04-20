@@ -107,13 +107,6 @@ void EffectsChannel::setSampleRate(int sampleRate) const {
 	}
 }
 
-void EffectsChannel::process() const {
-	for (auto&& plugin : vst3Plugins) {
-		const auto audioHost = plugin->audioHost;
-		audioHost->audioClient->process(audioHost->buffers, gAppState->audioFramesPerBuffer);
-	}
-}
-
 int EffectsChannel::effectCount() const {
 	return static_cast<int>(vst3Plugins.size());
 }

@@ -67,7 +67,7 @@ void App::setModule (VST3::Hosting::Module::Ptr module_) {
   module = module_;
 }
 
-App::App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackClient, float** inputBuffers, float** outputBuffers)
+App::App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackClient)
 	: gAppState(gAppState)
 	, jackClient(jackClient)
 	{
