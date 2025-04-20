@@ -6,6 +6,7 @@
 #define EFFECTSCHANNELPROCESSDATA_H
 
 #include <array>
+#include <functional>
 #include <sndfile.hh>
 #include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 
@@ -19,9 +20,11 @@ namespace Effects {
 struct EffectsChannelProcessData {
   // NOTE: handles at most 100 effects per channel
   int effectCount;
-  std::array<void* (*)(Steinberg::Vst::IAudioClient::Buffers, sf_count_t frames), MAX_PLUGINS_PER_CHANNEL> processFuncs;
+  std::array<std::function<bool(Steinberg::Vst::IAudioClient::Buffers&, int64_t frames)>, MAX_PLUGINS_PER_CHANNEL> processFuncs;
   std::array<Steinberg::Vst::IAudioClient::Buffers, MAX_PLUGINS_PER_CHANNEL> buffers;
-  Channel channelSettings;
+  Channel* channelSettings;
+
+  EffectsChannelProcessData();
 };
 
 } // Effects

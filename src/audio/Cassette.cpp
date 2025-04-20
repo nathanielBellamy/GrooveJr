@@ -187,7 +187,30 @@ AudioDataResult Cassette::setupAudioData() {
     return 4;
   };
 
-  return AudioData(initialFrameId, PLAY, inputBuffers, buffersA, buffersB, effectsChannelsWriteOutBuffer);
+  AudioData audioData(initialFrameId, PLAY, inputBuffers, buffersA, buffersB, effectsChannelsWriteOutBuffer);
+
+  int effectsChannelIdx = 0;
+  for (const auto effectsChannel : mixer->getEffectsChannels()) {
+    audioData.effectsChannelsProcessData[effectsChannelIdx].channelSettings = &effectsChannel->channel;
+    audioData.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
+    int pluginIdx = 0;
+    for (const auto plugin : effectsChannel->getVst3Plugins()) {
+      audioData.effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
+        std::bind(&AudioClient::process, plugin->audioHost->audioClient, std::placeholders::_1, std::placeholders::_2);
+
+      audioData.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, pluginIdx, audioData);
+
+      pluginIdx++;
+    }
+
+    effectsChannelIdx++;
+  }
+
+  return audioData;
+}
+
+IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int pluginIdx, const AudioData& audioData) const {
+  // TODO
 }
 
 int Cassette::setupJack() {

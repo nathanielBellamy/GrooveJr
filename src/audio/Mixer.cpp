@@ -83,7 +83,6 @@ Mixer::~Mixer() {
   );
 }
 
-
 bool Mixer::addEffectsChannel() {
     effectsChannels.push_back(
       new Effects::EffectsChannel(

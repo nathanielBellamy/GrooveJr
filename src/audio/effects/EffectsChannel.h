@@ -35,7 +35,13 @@ class EffectsChannel {
     );
     ~EffectsChannel();
 
-    [[nodiscard]] int getIndex() const { return index; }
+    [[nodiscard]]
+    int getIndex() const { return index; }
+
+    [[nodiscard]]
+    std::vector<std::unique_ptr<Vst3::Plugin>> getVst3Plugins() {
+      return vst3Plugins;
+    };
 
     float getGain();
     void setGain(float gain);

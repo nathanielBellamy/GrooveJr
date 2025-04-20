@@ -41,6 +41,11 @@ public:
       return jackClient.get()->getJackClient();
     };
 
+    [[nodiscard]]
+    std::vector<Effects::EffectsChannel*> getEffectsChannels() const {
+      return effectsChannels;
+    }
+
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);
     [[nodiscard]]

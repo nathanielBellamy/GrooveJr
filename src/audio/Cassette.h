@@ -7,6 +7,7 @@
 #include <thread>
 #include <chrono>
 #include <array>
+#include <vector>
 #include <variant>
 
 #include <sndfile.hh>
@@ -50,6 +51,7 @@ class Cassette
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);
   AudioDataResult setupAudioData();
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int pluginIdx, const AudioData &audioData) const;
   int setupJack();
 
   bool allocateInputBuffers();

@@ -9,8 +9,7 @@
 namespace Gj {
 namespace Audio {
 
-class AudioData {
-  public:
+struct AudioData {
     sf_count_t                       index;
     PlayState                        playState;
     float                            playbackSpeed;
@@ -22,14 +21,13 @@ class AudioData {
     float**                          inputBuffersProcessHead;
     float**                          buffersA;
     float**                          buffersB;
-    Channel                          dryChannel;
+    Channel*                         dryChannel;
     float                            channelCount;
     int                              effectsChannelCount;
     std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
     std::array<float**, MAX_EFFECTS_CHANNELS> effectsChannelsWriteOut{};
     int32_t                          framesPerBuffer_32_t;
     int64_t                          framesPerBuffer_64_t;
-
 
     AudioData(){};
 
