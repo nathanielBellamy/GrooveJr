@@ -140,6 +140,12 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
 }
 
 AudioDataResult Cassette::setupAudioData() {
+  Logging::write(
+    Info,
+    "Cassette::setupAudioData",
+    "Setting up Cassette AudioData"
+  );
+
   // https://svn.ict.usc.edu/svn_vh_public/trunk/lib/vhcl/libsndfile/doc/api.html
   // > When opening a file for read, the format field should be set to zero before calling sf_open().
   sfInfo.format = 0;
@@ -193,18 +199,24 @@ AudioDataResult Cassette::setupAudioData() {
     return 4;
   };
 
-  AudioData audioData(initialFrameId, PLAY, inputBuffers, buffersA, buffersB, effectsChannelsWriteOutBuffer);
+  AudioData audioDataPre(initialFrameId, PLAY, inputBuffers, buffersA, buffersB, effectsChannelsWriteOutBuffer);
+
+  Logging::write(
+    Info,
+    "Cassette::setupAudioData",
+    "Instantiated Cassette AudioData object."
+  );
 
   int effectsChannelIdx = 0;
   for (const auto effectsChannel : mixer->getEffectsChannels()) {
-    audioData.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
-    audioData.effectsChannelsProcessData[effectsChannelIdx].channelSettings = effectsChannel->channel;
+    audioDataPre.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
+    audioDataPre.effectsChannelsProcessData[effectsChannelIdx].channelSettings = effectsChannel->channel;
     for (int pluginIdx = 0; pluginIdx < effectsChannel->effectCount(); pluginIdx++) {
       const auto plugin = effectsChannel->getPluginAtIdx(pluginIdx);
-      audioData.effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
+      audioDataPre.effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
         std::bind(&AudioClient::process, plugin->audioHost->audioClient, std::placeholders::_1, std::placeholders::_2);
 
-      audioData.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioData);
+      audioDataPre.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioData);
 
       pluginIdx++;
     }
@@ -212,7 +224,19 @@ AudioDataResult Cassette::setupAudioData() {
     effectsChannelIdx++;
   }
 
-  return audioData;
+  Logging::write(
+    Info,
+    "Cassette::setupAudioData",
+    "Setup Effects on AudioData."
+  );
+
+  Logging::write(
+    Info,
+    "Cassette::setupAudioData",
+    "Successfully setup AudioData."
+  );
+
+  return audioDataPre;
 }
 
 IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, const AudioData& audioData) const {
@@ -396,6 +420,7 @@ bool Cassette::allocateProcessBuffers() {
   );
 
   for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
+    effectsChannelsWriteOutBuffer[i] = new float*[2];
     effectsChannelsWriteOutBuffer[i][0] = new float[gAppState->audioFramesPerBuffer];
     effectsChannelsWriteOutBuffer[i][1] = new float[gAppState->audioFramesPerBuffer];
   }
@@ -497,8 +522,9 @@ bool Cassette::freeBuffers() const {
     free(buffersB);
 
     for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-      delete effectsChannelsWriteOutBuffer[i][0];
-      delete effectsChannelsWriteOutBuffer[i][1];
+      delete[] effectsChannelsWriteOutBuffer[i][0];
+      delete[] effectsChannelsWriteOutBuffer[i][1];
+      delete[] effectsChannelsWriteOutBuffer[i];
     }
 
     free(effectsChannelsWriteOutBuffer);
