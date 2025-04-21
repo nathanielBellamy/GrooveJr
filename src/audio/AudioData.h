@@ -79,7 +79,7 @@ struct AudioData {
         //     "effectsChannelsWriteOutBuffer null row: " + std::to_string(i)
         //   );
         // } else {
-        //   // effectsChannelsWriteOut[i] = effectsChannelsWriteOutBuffer[i];
+        effectsChannelsWriteOut[i] = effectsChannelsWriteOutBuffer[i];
         // }
       }
 
