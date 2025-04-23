@@ -33,28 +33,29 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
     );
   }
 
-  float* buffersAPtrPre[2];
-  buffersAPtrPre[0] = &buffersA[0];
-  buffersAPtrPre[1] = &buffersA[MAX_AUDIO_FRAMES_PER_BUFFER];
+  float* buffersAPtrPre[2] = { &buffersA[0], &buffersA[MAX_AUDIO_FRAMES_PER_BUFFER] };
   buffersAPtr = buffersAPtrPre;
 
-  float* buffersBPtrPre[2];
-  buffersBPtrPre[0] = &buffersB[0];
-  buffersBPtrPre[1] = &buffersB[MAX_AUDIO_FRAMES_PER_BUFFER];
+  float* buffersBPtrPre[2] = { &buffersB[0], &buffersB[MAX_AUDIO_FRAMES_PER_BUFFER] };
   buffersBPtr = buffersBPtrPre;
 
-  AudioDataResult audioDataRes = setupAudioData();
-  if (std::holds_alternative<int>(audioDataRes)) {
+  int audioDataRes = setupAudioData();
+  if (audioDataRes > 0) {
     Logging::write(
       Error,
       "Cassette::Cassette",
-      "Unable to setup AudioData - status: " + std::to_string(std::get<int>(audioDataRes))
+      "Unable to setup AudioData - status: " + std::to_string(audioDataRes)
     );
     throw std::runtime_error(
-      "Unable to instantiate Cassette - AudioData status: " + std::to_string(std::get<int>(audioDataRes))
+      "Unable to instantiate Cassette - AudioData status: " + std::to_string(audioDataRes)
     );
   }
-  audioData = std::get<AudioData>(audioDataRes);
+
+  Logging::write(
+    Info,
+    "Cassette::Cassette",
+    "Initialized AudioData with index: " + std::to_string(audioData.index)
+  );
 
   if (
     const int setupJackStatus = setupJack();
@@ -161,7 +162,7 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   return 0;
 }
 
-AudioDataResult Cassette::setupAudioData() {
+int Cassette::setupAudioData() {
   Logging::write(
     Info,
     "Cassette::setupAudioData",
@@ -245,7 +246,7 @@ AudioDataResult Cassette::setupAudioData() {
     "Will instantiate AudioData object."
   );
 
-  AudioData audioDataPre(
+  audioData = AudioData(
     initialFrameId,
     PLAY,
     1.0,
@@ -253,8 +254,8 @@ AudioDataResult Cassette::setupAudioData() {
     effectsChannelsCount,
     inputBuffers,
     effectsChannelsWriteOutBuffer,
-    gAppState->audioFramesPerBuffer,
-    gAppState->audioFramesPerBuffer
+    static_cast<int32_t>(gAppState->audioFramesPerBuffer),
+    static_cast<int64_t>(gAppState->audioFramesPerBuffer)
   );
 
   Logging::write(
@@ -265,14 +266,14 @@ AudioDataResult Cassette::setupAudioData() {
 
   int effectsChannelIdx = 0;
   for (const auto effectsChannel : mixer->getEffectsChannels()) {
-    audioDataPre.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
-    audioDataPre.effectsChannelsProcessData[effectsChannelIdx].channelSettings = effectsChannel->channel;
+    audioData.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
+    audioData.effectsChannelsProcessData[effectsChannelIdx].channelSettings = effectsChannel->channel;
     for (int pluginIdx = 0; pluginIdx < effectsChannel->effectCount(); pluginIdx++) {
       const auto plugin = effectsChannel->getPluginAtIdx(pluginIdx);
-      audioDataPre.effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
+      audioData.effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
         [ObjectPtr = plugin->audioHost->audioClient](auto && PH1, auto && PH2) { return ObjectPtr->process(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2)); };
 
-      audioDataPre.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioData);
+      audioData.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioData);
 
       pluginIdx++;
     }
@@ -292,7 +293,7 @@ AudioDataResult Cassette::setupAudioData() {
     "Successfully setup AudioData."
   );
 
-  return audioDataPre;
+  return 0;
 }
 
 IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, const AudioData& audioData) const {

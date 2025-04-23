@@ -28,8 +28,6 @@ using namespace caf;
 namespace Gj {
 namespace Audio {
 
-typedef std::variant<AudioData, int> AudioDataResult;
-
 class Cassette
 {
   actor_system& actorSystem;
@@ -53,7 +51,7 @@ class Cassette
   AudioData audioData;
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);
-  AudioDataResult setupAudioData();
+  int setupAudioData();
   IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int channelIdx, int pluginIdx, const AudioData &audioData) const;
   int setupJack();
 
