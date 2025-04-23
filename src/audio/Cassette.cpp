@@ -230,12 +230,26 @@ AudioDataResult Cassette::setupAudioData() {
     return 4;
   }
 
+  Logging::write(
+    Info,
+    "Cassette::setupAudioData",
+    "Allocated process buffers"
+  );
+
   const int effectsChannelsCount = mixer->getEffectsChannelsCount();
+  const float channelCount = static_cast<float>(effectsChannelsCount + 1);
+
+  Logging::write(
+    Info,
+    "Cassette::setupAudioData",
+    "Will instantiate AudioData object."
+  );
+
   AudioData audioDataPre(
     initialFrameId,
     PLAY,
     1.0,
-    static_cast<float>(effectsChannelsCount + 1),
+    channelCount,
     effectsChannelsCount,
     inputBuffers,
     effectsChannelsWriteOutBuffer,

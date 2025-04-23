@@ -53,14 +53,15 @@ struct AudioData {
         , framesPerBuffer_32_t(framesPerBuffer_32_t)
         , framesPerBuffer_64_t(framesPerBuffer_64_t)
         {
-      inputBuffers[0] = inputBuffersIn[0];
-      inputBuffers[1] = inputBuffersIn[1];
 
       Logging::write(
         Info,
         "AudioData::AudioData",
         "Instantiating AudioData"
       );
+
+      inputBuffers[0] = inputBuffersIn[0];
+      inputBuffers[1] = inputBuffersIn[1];
 
       inputBuffersProcessHead[0] = inputBuffers[0] + index;
       inputBuffersProcessHead[1] = inputBuffers[1] + index;
