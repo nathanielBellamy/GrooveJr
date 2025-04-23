@@ -46,6 +46,11 @@ public:
       return effectsChannels;
     }
 
+  [[nodiscard]]
+    int getEffectsChannelsCount() const {
+      return effectsChannels.size();
+    }
+
     bool addEffectsChannel();
     bool removeEffectsChannel(int idx);
     [[nodiscard]]

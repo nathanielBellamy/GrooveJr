@@ -8,8 +8,9 @@
 namespace Gj {
 namespace Audio {
 
-  constexpr int MAX_EFFECTS_CHANNELS = 50;
-  constexpr int MAX_PLUGINS_PER_CHANNEL = 50;
+  constexpr unsigned int MAX_EFFECTS_CHANNELS = 50;
+  constexpr unsigned int MAX_PLUGINS_PER_CHANNEL = 50;
+  constexpr unsigned int MAX_AUDIO_FRAMES_PER_BUFFER = 1024;
 
 } // Audio
 } // Gj

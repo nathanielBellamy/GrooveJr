@@ -42,11 +42,14 @@ class Cassette
   float* buffer{};
   SF_INFO sfInfo;
   SNDFILE* file{};
-  float** inputBuffers; // full song audio data
-  float** inputBuffersProcessHead; // where jack process callback should start
-  float** buffersA;
-  float** buffersB;
-  float*** effectsChannelsWriteOutBuffer;
+  float* inputBuffer{};
+  float* inputBuffers[2]{}; // full song audio data
+  float* inputBuffersProcessHead[2]{}; // where jack process callback should start
+  float buffersA[2 * MAX_AUDIO_FRAMES_PER_BUFFER]{};
+  float buffersB[2 * MAX_AUDIO_FRAMES_PER_BUFFER]{};
+  float** buffersAPtr;
+  float** buffersBPtr;
+  float* effectsChannelsWriteOutBuffer;
   AudioData audioData;
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);

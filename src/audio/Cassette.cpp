@@ -19,9 +19,6 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
   , mixer(mixer)
   , jackClient(mixer->getJackClient())
   , sfInfo()
-  , inputBuffers(nullptr)
-  , buffersA(nullptr)
-  , buffersB(nullptr)
   , effectsChannelsWriteOutBuffer(nullptr)
   {
 
@@ -35,6 +32,16 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
       "Unable to instantiate Cassette - null jackClient"
     );
   }
+
+  float* buffersAPtrPre[2];
+  buffersAPtrPre[0] = &buffersA[0];
+  buffersAPtrPre[1] = &buffersA[MAX_AUDIO_FRAMES_PER_BUFFER];
+  buffersAPtr = buffersAPtrPre;
+
+  float* buffersBPtrPre[2];
+  buffersBPtrPre[0] = &buffersB[0];
+  buffersBPtrPre[1] = &buffersB[MAX_AUDIO_FRAMES_PER_BUFFER];
+  buffersBPtr = buffersBPtrPre;
 
   AudioDataResult audioDataRes = setupAudioData();
   if (std::holds_alternative<int>(audioDataRes)) {
@@ -75,8 +82,19 @@ Cassette::~Cassette() {
 }
 
 void Cassette::cleanup() const {
+  Logging::write(
+    Info,
+    "Cassette::cleanup",
+    "Freeing resources for file" + std::string(fileName)
+  );
   jack_deactivate(jackClient);
-  freeBuffers();
+  if (!freeBuffers()) {
+    Logging::write(
+      Error,
+      "Cassette::cleanup",
+      "Unable to free buffers"
+    );
+  }
   sf_close(file);
   Logging::write(
     Info,
@@ -173,12 +191,12 @@ AudioDataResult Cassette::setupAudioData() {
   }
 
   // Allocate memory for data
-  buffer = static_cast<float *>(malloc(sfInfo.frames * sfInfo.channels * sizeof(float)));
+  buffer = new float[sfInfo.frames * sfInfo.channels];
   if (!buffer) {
       Logging::write(
         Error,
         "Cassette::setupAudioData",
-        "Cannot allocate memory for audioDataBuffer"
+        "Cannot allocate memory for raw audio buffer"
       );
     return 2;
   }
@@ -212,7 +230,18 @@ AudioDataResult Cassette::setupAudioData() {
     return 4;
   }
 
-  AudioData audioDataPre(initialFrameId, PLAY, inputBuffers, buffersA, buffersB, effectsChannelsWriteOutBuffer);
+  const int effectsChannelsCount = mixer->getEffectsChannelsCount();
+  AudioData audioDataPre(
+    initialFrameId,
+    PLAY,
+    1.0,
+    static_cast<float>(effectsChannelsCount + 1),
+    effectsChannelsCount,
+    inputBuffers,
+    effectsChannelsWriteOutBuffer,
+    gAppState->audioFramesPerBuffer,
+    gAppState->audioFramesPerBuffer
+  );
 
   Logging::write(
     Info,
@@ -227,7 +256,7 @@ AudioDataResult Cassette::setupAudioData() {
     for (int pluginIdx = 0; pluginIdx < effectsChannel->effectCount(); pluginIdx++) {
       const auto plugin = effectsChannel->getPluginAtIdx(pluginIdx);
       audioDataPre.effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
-        std::bind(&AudioClient::process, plugin->audioHost->audioClient, std::placeholders::_1, std::placeholders::_2);
+        [ObjectPtr = plugin->audioHost->audioClient](auto && PH1, auto && PH2) { return ObjectPtr->process(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2)); };
 
       audioDataPre.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioData);
 
@@ -257,7 +286,7 @@ IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* 
   if (pluginIdx % 2 == 0) {
     if (pluginIdx == effectsCount - 1) {
       return {
-        audioData.buffersB,
+        buffersBPtr,
         2,
         audioData.effectsChannelsWriteOut[channelIdx],
         2,
@@ -265,9 +294,9 @@ IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* 
       };
     } else {
       return {
-        audioData.buffersB,
+        buffersBPtr,
         2,
-        audioData.buffersA,
+        buffersAPtr,
         2,
         gAppState->audioFramesPerBuffer
       };
@@ -277,7 +306,7 @@ IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* 
   // pluginIdx % 2 == 1
   if (pluginIdx == effectsCount - 1) {
     return {
-      audioData.buffersA,
+      buffersAPtr,
       2,
       audioData.effectsChannelsWriteOut[channelIdx],
       2,
@@ -286,9 +315,9 @@ IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* 
   }
 
   return {
-    audioData.buffersA,
+    buffersAPtr,
     2,
-    audioData.buffersB,
+    buffersBPtr,
     2,
     gAppState->audioFramesPerBuffer
   };
@@ -413,44 +442,7 @@ bool Cassette::allocateProcessBuffers() {
     "Allocating process buffers."
   );
 
-  buffersA = new float*[2];
-  buffersB = new float*[2];
-
-  Logging::write(
-    Info,
-    "Cassette::allocateProcessBuffers",
-    "Allocating inner buffersA and buffersB"
-  );
-
-  for (int c = 0; c < 2; c++) {
-  	buffersA[c] = new float[gAppState->audioFramesPerBuffer];
-	  buffersB[c] = new float[gAppState->audioFramesPerBuffer];
-  }
-
-  Logging::write(
-    Info,
-    "Cassette::allocateProcessBuffers",
-    "Allocated buffersA and buffersB"
-  );
-
-  effectsChannelsWriteOutBuffer = new float**[MAX_EFFECTS_CHANNELS];
-
-  for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-    effectsChannelsWriteOutBuffer[i] = new float*[2];
-    effectsChannelsWriteOutBuffer[i][0] = new float[gAppState->audioFramesPerBuffer];
-    effectsChannelsWriteOutBuffer[i][1] = new float[gAppState->audioFramesPerBuffer];
-  }
-
-  if (effectsChannelsWriteOutBuffer == nullptr
-        || effectsChannelsWriteOutBuffer[0] == nullptr
-        || effectsChannelsWriteOutBuffer[0][0] == nullptr) {
-    Logging::write(
-      Error,
-      "Cassette::allocateProcessBuffers",
-      "Unable to allocate memory for effectsChannelsWriteOutBuffer."
-    );
-    return false;
-  }
+  effectsChannelsWriteOutBuffer = new float[2 * MAX_EFFECTS_CHANNELS * MAX_AUDIO_FRAMES_PER_BUFFER];
 
   Logging::write(
     Info,
@@ -462,20 +454,10 @@ bool Cassette::allocateProcessBuffers() {
 }
 
 bool Cassette::allocateInputBuffers() {
-  inputBuffers = new float*[2];
-
-  if (inputBuffers == nullptr) {
-    Logging::write(
-      Error,
-      "Cassette::allocateInputBuffers",
-      "Unable to allocate memory for Cassette.inputBuffers"
-    );
-    return false;
-  }
-
-  for (int c = 0; c < 2; c++) {
-    inputBuffers[c] = new float[sfInfo.frames];
-  }
+  // left and right channels held in contiguous memory
+  inputBuffer = new float[2 * sfInfo.frames];
+  inputBuffers[0] = inputBuffer;
+  inputBuffers[1] = inputBuffer + sfInfo.frames;
 
   if (inputBuffers[0] == nullptr || inputBuffers[1] == nullptr) {
     Logging::write(
@@ -490,7 +472,16 @@ bool Cassette::allocateInputBuffers() {
 }
 
 bool Cassette::populateInputBuffers() const {
-  if (inputBuffers == nullptr || inputBuffers[0] == nullptr || inputBuffers[1] == nullptr) {
+  if (buffer == nullptr) {
+    Logging::write(
+      Error,
+      "Cassette::populateInputBuffers",
+      "Unable to populate input buffers - raw audio buffer is null"
+    );
+    return false;
+  }
+
+  if (inputBuffers[0] == nullptr || inputBuffers[1] == nullptr) {
     Logging::write(
       Error,
       "Cassette::populateInputBuffers",
@@ -537,26 +528,8 @@ bool Cassette::freeBuffers() const {
   );
 
   try {
-    free(buffer);
-
-    for (auto i = 0; i < 2; i++) {
-      delete[] inputBuffers[i];
-    }
-    delete[] inputBuffers;
-
-    for (int i = 0; i < 2; i++) {
-        delete buffersA[i];
-        delete buffersB[i];
-    }
-
-    delete[] buffersA;
-    delete[] buffersB;
-
-    for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-      delete[] effectsChannelsWriteOutBuffer[i][0];
-      delete[] effectsChannelsWriteOutBuffer[i][1];
-      delete[] effectsChannelsWriteOutBuffer[i];
-    }
+    delete buffer;
+    delete inputBuffer;
 
     delete[] effectsChannelsWriteOutBuffer;
   } catch (...) {

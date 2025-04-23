@@ -19,38 +19,42 @@ struct AudioData {
     float                            volume;
     float                            fadeIn;
     float                            fadeOut;
-    float**                          inputBuffers;
-    float**                          inputBuffersProcessHead;
-    float**                          buffersA;
-    float**                          buffersB;
+    float*                           inputBuffers[2]{};
+    float*                           inputBuffersProcessHead[2]{};
     Channel                          dryChannel;
     float                            channelCount;
     int                              effectsChannelCount;
     std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
-    std::array<float**, MAX_EFFECTS_CHANNELS> effectsChannelsWriteOut{};
+    float**                          effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS]{};
     int32_t                          framesPerBuffer_32_t;
     int64_t                          framesPerBuffer_64_t;
 
     AudioData(){};
 
     AudioData(
-      sf_count_t index,
-      PlayState playState,
-      float** inputBuffers,
-      float** buffersA,
-      float** buffersB,
-      float*** effectsChannelsWriteOutBuffer)
+      const sf_count_t index,
+      const PlayState playState,
+      const float playbackSpeed,
+      const float channelCount,
+      const int effectsChannelCount,
+      float* inputBuffersIn[2],
+      float* effectsChannelsWriteOutBuffer,
+      const int32_t framesPerBuffer_32_t,
+      const int64_t framesPerBuffer_64_t)
         : index(index)
         , playState(playState)
+        , playbackSpeed(playbackSpeed)
         , readComplete(false)
         , volume(0.0)
         , fadeIn(1.0)
         , fadeOut(1.0)
-        , inputBuffers(inputBuffers)
-        , inputBuffersProcessHead(new float*[2])
-        , buffersA(buffersA)
-        , buffersB(buffersB)
+        , channelCount(channelCount)
+        , effectsChannelCount(effectsChannelCount)
+        , framesPerBuffer_32_t(framesPerBuffer_32_t)
+        , framesPerBuffer_64_t(framesPerBuffer_64_t)
         {
+      inputBuffers[0] = inputBuffersIn[0];
+      inputBuffers[1] = inputBuffersIn[1];
 
       Logging::write(
         Info,
@@ -68,19 +72,10 @@ struct AudioData {
       );
 
       for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-        // TODO: debug access effectsChannelsWriteOutBuffer
-        // effectsChannelsWriteOut[i] = new float*[2];
-        // effectsChannelsWriteOut[i][0] = new float[512];
-        // effectsChannelsWriteOut[i][1] = new float[512];
-        // if (effectsChannelsWriteOutBuffer[i] == nullptr) {
-        //   Logging::write(
-        //     Error,
-        //     "AudioData::AudioData",
-        //     "effectsChannelsWriteOutBuffer null row: " + std::to_string(i)
-        //   );
-        // } else {
-        effectsChannelsWriteOut[i] = effectsChannelsWriteOutBuffer[i];
-        // }
+        float* effectsChannelWriteOutPre[2];
+        effectsChannelWriteOutPre[0] = effectsChannelsWriteOutBuffer + (2 * i * MAX_AUDIO_FRAMES_PER_BUFFER);
+        effectsChannelWriteOutPre[1] = effectsChannelsWriteOutBuffer + ((2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER);
+        effectsChannelsWriteOut[i] = effectsChannelWriteOutPre;
       }
 
       Logging::write(
@@ -97,7 +92,6 @@ struct AudioData {
         "Destroying AudioData"
       );
 
-      delete[] inputBuffersProcessHead;
 
       Logging::write(
         Info,
