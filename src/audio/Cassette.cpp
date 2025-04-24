@@ -310,6 +310,7 @@ int Cassette::setupAudioData() {
 }
 
 IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, const AudioData& audioData) const {
+  // TODO: debug/verify
   const int effectsCount = effectsChannel->effectCount(); // should always be >0
   if (pluginIdx % 2 == 0) {
     if (pluginIdx == effectsCount - 1) {

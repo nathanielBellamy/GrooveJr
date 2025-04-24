@@ -24,7 +24,7 @@ struct AudioData {
     Channel                          dryChannel;
     float                            channelCount;
     int                              effectsChannelCount;
-    std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData;
+    std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
     float**                          effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS]{};
 
     AudioData(
@@ -43,13 +43,6 @@ struct AudioData {
         , channelCount(channelCount)
         , effectsChannelCount(effectsChannelCount)
         {
-
-      Logging::write(
-        Info,
-        "AudioData::AudioData",
-        "Instantiating AudioData"
-      );
-
       Logging::write(
         Info,
         "AudioData::AudioData",
@@ -58,13 +51,6 @@ struct AudioData {
     }
 
     ~AudioData() {
-      Logging::write(
-        Info,
-        "AudioData::~AudioData",
-        "Destroying AudioData"
-      );
-
-
       Logging::write(
         Info,
         "AudioData::~AudioData",
