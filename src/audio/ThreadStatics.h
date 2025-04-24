@@ -16,7 +16,7 @@ class ThreadStatics {
   private:
     static const char* filePath;
     static long frameId;
-    static Gj::PlayState playState;
+    static PlayState playState;
     static float playbackSpeed;
     static bool readComplete;
     static long threadId;
@@ -35,8 +35,8 @@ class ThreadStatics {
     static void setPlaybackSpeed(float playbackSpeed);
 
     static std::mutex playStateMutex;
-    static Gj::PlayState getPlayState();
-    static void setPlayState(Gj::PlayState playState);
+    static PlayState getPlayState();
+    static void setPlayState(PlayState playState);
 
     static std::mutex readCompleteMutex;
     static bool getReadComplete();

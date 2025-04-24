@@ -20,6 +20,13 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
   , jackClient(mixer->getJackClient())
   , sfInfo()
   , effectsChannelsWriteOutBuffer(nullptr)
+  , audioData(
+      0,
+      PLAY,
+      1.0,
+      static_cast<float>(mixer->getEffectsChannelsCount() + 1),
+      mixer->getEffectsChannelsCount()
+    )
   {
 
   if (jackClient == nullptr) {
@@ -238,31 +245,36 @@ int Cassette::setupAudioData() {
     "Allocated process buffers"
   );
 
-  const int effectsChannelsCount = mixer->getEffectsChannelsCount();
-  const float channelCount = static_cast<float>(effectsChannelsCount + 1);
+  Logging::write(
+    Info,
+    "Cassette::setupAudioData",
+    "Setting up AudioData buffers"
+  );
+
+  audioData.inputBuffers[0] = inputBuffers[0];
+  audioData.inputBuffers[1] = inputBuffers[1];
+
+  audioData.inputBuffersProcessHead[0] = inputBuffers[0] + audioData.index;
+  audioData.inputBuffersProcessHead[1] = inputBuffers[1] + audioData.index;
+
+  for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
+    float* effectsChannelWriteOutPre[2] = {
+      effectsChannelsWriteOutBuffer + (2 * i * MAX_AUDIO_FRAMES_PER_BUFFER),
+      effectsChannelsWriteOutBuffer + ((2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER)
+    };
+    audioData.effectsChannelsWriteOut[i] = effectsChannelWriteOutPre;
+  }
 
   Logging::write(
     Info,
     "Cassette::setupAudioData",
-    "Will instantiate AudioData object."
-  );
-
-  audioData = AudioData(
-    initialFrameId,
-    PLAY,
-    1.0,
-    channelCount,
-    effectsChannelsCount,
-    inputBuffers,
-    effectsChannelsWriteOutBuffer,
-    static_cast<int32_t>(gAppState->audioFramesPerBuffer),
-    static_cast<int64_t>(gAppState->audioFramesPerBuffer)
+    "Successfully setup AudioData buffers."
   );
 
   Logging::write(
     Info,
     "Cassette::setupAudioData",
-    "Instantiated Cassette AudioData object."
+    "Setting up AudioData effects processing..."
   );
 
   int effectsChannelIdx = 0;
@@ -285,7 +297,7 @@ int Cassette::setupAudioData() {
   Logging::write(
     Info,
     "Cassette::setupAudioData",
-    "Setup Effects on AudioData."
+    "Setup AudioData Effects processing."
   );
 
   Logging::write(
