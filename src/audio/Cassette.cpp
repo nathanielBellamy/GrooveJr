@@ -152,9 +152,10 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
       if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
         outL[i] = channel.gain * processHead[0][i] / channelCount;
         outR[i] = channel.gain * processHead[1][i] / channelCount;
+      } else {
+        outL[i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
+        outR[i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
       }
-      outL[i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
-      outR[i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
     }
   }
 
