@@ -258,11 +258,8 @@ int Cassette::setupAudioData() {
   audioData.inputBuffersProcessHead[1] = inputBuffers[1] + audioData.index;
 
   for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-    float* effectsChannelWriteOutPre[2] = {
-      effectsChannelsWriteOutBuffer + (2 * i * MAX_AUDIO_FRAMES_PER_BUFFER),
-      effectsChannelsWriteOutBuffer + ((2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER)
-    };
-    audioData.effectsChannelsWriteOut[i] = effectsChannelWriteOutPre;
+    audioData.effectsChannelsWriteOut[i][0] = effectsChannelsWriteOutBuffer + (2 * i * MAX_AUDIO_FRAMES_PER_BUFFER);
+    audioData.effectsChannelsWriteOut[i][1] = effectsChannelsWriteOutBuffer + ((2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER);
   }
 
   Logging::write(
@@ -281,6 +278,7 @@ int Cassette::setupAudioData() {
   for (const auto effectsChannel : mixer->getEffectsChannels()) {
     audioData.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
     audioData.effectsChannelsProcessData[effectsChannelIdx].channelSettings = effectsChannel->channel;
+
     for (int pluginIdx = 0; pluginIdx < effectsChannel->effectCount(); pluginIdx++) {
       const auto plugin = effectsChannel->getPluginAtIdx(pluginIdx);
       audioData.effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
@@ -310,46 +308,52 @@ int Cassette::setupAudioData() {
 }
 
 IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, const AudioData& audioData) const {
-  // TODO: debug/verify
+  constexpr int32_t audioFramesPerBuffer = 512; // TODO: debug retrieving from gAppState
   const int effectsCount = effectsChannel->effectCount(); // should always be >0
   if (pluginIdx % 2 == 0) {
     if (pluginIdx == effectsCount - 1) {
-      return {
+      const auto writeOut = const_cast<float**>(audioData.effectsChannelsWriteOut[channelIdx]);
+      const IAudioClient::Buffers buffers = {
         buffersBPtr,
         2,
-        audioData.effectsChannelsWriteOut[channelIdx],
+        writeOut,
         2,
-        gAppState->audioFramesPerBuffer
+        audioFramesPerBuffer
       };
-    } else {
-      return {
-        buffersBPtr,
-        2,
-        buffersAPtr,
-        2,
-        gAppState->audioFramesPerBuffer
-      };
+      return buffers;
     }
+
+    const IAudioClient::Buffers buffers = {
+      buffersBPtr,
+      2,
+      buffersAPtr,
+      2,
+      audioFramesPerBuffer
+    };
+    return buffers;
   }
 
   // pluginIdx % 2 == 1
   if (pluginIdx == effectsCount - 1) {
-    return {
+    const auto writeOut = const_cast<float**>(audioData.effectsChannelsWriteOut[channelIdx]);
+    const IAudioClient::Buffers buffers = {
       buffersAPtr,
       2,
-      audioData.effectsChannelsWriteOut[channelIdx],
+      writeOut,
       2,
-      gAppState->audioFramesPerBuffer
+      audioFramesPerBuffer
     };
+    return buffers;
   }
 
-  return {
+  const IAudioClient::Buffers buffers = {
     buffersAPtr,
     2,
     buffersBPtr,
     2,
-    gAppState->audioFramesPerBuffer
+    audioFramesPerBuffer
   };
+  return buffers;
 }
 
 int Cassette::setupJack() {
@@ -471,7 +475,7 @@ bool Cassette::allocateProcessBuffers() {
     "Allocating process buffers."
   );
 
-  effectsChannelsWriteOutBuffer = new float[2 * MAX_EFFECTS_CHANNELS * MAX_AUDIO_FRAMES_PER_BUFFER];
+  effectsChannelsWriteOutBuffer = new float[2 * MAX_AUDIO_FRAMES_PER_BUFFER * MAX_EFFECTS_CHANNELS];
 
   Logging::write(
     Info,

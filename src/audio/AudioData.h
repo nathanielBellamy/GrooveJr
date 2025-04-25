@@ -25,7 +25,7 @@ struct AudioData {
     float                            channelCount;
     int                              effectsChannelCount;
     std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
-    float**                          effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS]{};
+    float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
 
     AudioData(
       const sf_count_t index,
