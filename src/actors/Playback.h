@@ -11,6 +11,7 @@
 #include "caf/caf_main.hpp"
 #include "caf/event_based_actor.hpp"
 
+#include "../Logging.h"
 #include "./ActorIds.h"
 #include "../messaging/atoms.h"
 #include "../messaging/EnvelopeQtPtr.h"
@@ -53,21 +54,29 @@ struct PlaybackState {
         , audioThread(nullptr)
         {
            self->link_to(supervisor);
-           self->system().registry().put(ActorIds::PLAYBACK, actor_cast<strong_actor_ptr>(self));
+           self->system().registry().put(PLAYBACK, actor_cast<strong_actor_ptr>(self));
         }
 
     void clearAudioThread() {
         if (audioThread != nullptr) {
-            std::cout << "Playback : non-null audioThread : " << std::endl;
-            audioThread->quit();
-            audioThread = nullptr;
+          Logging::write(
+            Info,
+            "Playback::clearAudioThread",
+            "Clearing audio thread"
+          );
+          audioThread->quit();
+          audioThread = nullptr;
         }
     }
 
      Playback::behavior_type make_behavior() {
        return {
            [this](strong_actor_ptr reply_to, tc_trig_play_a) {
-             std::cout << "Playback : tc_trig_play_a : " << std::endl;
+             Logging::write(
+               Info,
+               "Playback::tc_trig_play_a",
+               "Received TC Trig Play"
+             );
 
              const PlayState playState = Audio::ThreadStatics::getPlayState();
              if (playState == PLAY)
@@ -106,7 +115,11 @@ struct PlaybackState {
              );
            },
            [this](strong_actor_ptr reply_to, tc_trig_pause_a) {
-             std::cout << "Playback : tc_trig_pause_a : " << std::endl;
+             Logging::write(
+               Info,
+               "Playback::tc_trig_pause_a",
+               "Received TC Pause Trig"
+             );
              Audio::ThreadStatics::setPlayState(PAUSE);
 
              clearAudioThread();
@@ -119,7 +132,11 @@ struct PlaybackState {
              );
            },
            [this](strong_actor_ptr reply_to, tc_trig_stop_a) {
-             std::cout << "Playback : tc_trig_stop_a : " << std::endl;
+             Logging::write(
+               Info,
+               "Playback::tc_trig_stop_a",
+               "Received TC Stop Trig"
+             );
 
              clearAudioThread();
              Audio::ThreadStatics::setPlayState(STOP);
@@ -132,9 +149,13 @@ struct PlaybackState {
              );
            },
            [this](strong_actor_ptr reply_to, tc_trig_rw_a) {
-             std::cout << "Playback : tc_trig_rw_a : " << std::endl;
+             Logging::write(
+               Info,
+               "Playback::tc_trig_rw_a",
+               "Received TC RW Trig"
+             );
 
-             Gj::Audio::ThreadStatics::setPlayState(Gj::PlayState::RW);
+             Audio::ThreadStatics::setPlayState(RW);
              actor replyToActor = actor_cast<actor>(reply_to);
              self->anon_send(
                  replyToActor,
@@ -144,9 +165,13 @@ struct PlaybackState {
              );
            },
            [this](strong_actor_ptr reply_to, tc_trig_ff_a) {
-             std::cout << "Playback : tc_trig_ff_a : " << std::endl;
+             Logging::write(
+               Info,
+               "Playback::tc_trig_ff_a",
+               "Received TC FF Trig"
+             );
 
-             Audio::ThreadStatics::setPlayState(Gj::PlayState::FF);
+             Audio::ThreadStatics::setPlayState(FF);
              const actor replyToActor = actor_cast<actor>(reply_to);
              self->anon_send(
                  replyToActor,

@@ -11,6 +11,7 @@
 #include "caf/caf_main.hpp"
 #include "caf/event_based_actor.hpp"
 
+#include "../Logging.h"
 #include "./ActorIds.h"
 #include "../messaging/atoms.h"
 #include "./AppStateManager.h"
@@ -50,7 +51,11 @@ struct DisplayState {
      Display::behavior_type make_behavior() {
        return {
            [this](strong_actor_ptr replyToPtr, hydrate_display_a) {
-             std::cout << "Display : hydrate_display_a " << std::endl;
+             Logging::write(
+               Info,
+               "Display::hydrate_display_a",
+               "Received hydrate_display_a"
+             );
              strong_actor_ptr appStateManager = self->system().registry().get(APP_STATE_MANAGER);
              self->anon_send(
                  actor_cast<actor>(appStateManager),
@@ -59,9 +64,17 @@ struct DisplayState {
              );
            },
            [this](strong_actor_ptr replyToPtr, AppStatePacket appStatePacket, current_state_a) {
-             std::cout << "Display : current_state_a " << std::endl;
+             Logging::write(
+               Info,
+               "Display::current_state_a",
+               "Received request for current state"
+             );
              if ( mainWindow->hydrateState(appStatePacket) )
-               std::cout << "Display : Error : unable to hydrate state " << std::endl;
+               Logging::write(
+                 Error,
+                 "Display::current_state_a",
+                 "Unable to hydrate state to main window"
+               );
            },
        };
      };

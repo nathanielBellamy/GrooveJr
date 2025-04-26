@@ -451,14 +451,14 @@ int Cassette::setupJack() {
   }
 
   // TESTING SHOW PORTS
-  const char** ports = jack_get_ports(jackClient, nullptr, nullptr, 0);
-  if (ports == nullptr) {
-    printf("No ports found.\n");
-  } else {
-    for (int i = 0; ports[i] != nullptr; i++) {
-      printf("Port: %s\n", ports[i]);
-    }
-  }
+  // const char** ports = jack_get_ports(jackClient, nullptr, nullptr, 0);
+  // if (ports == nullptr) {
+  //   printf("No ports found.\n");
+  // } else {
+  //   for (int i = 0; ports[i] != nullptr; i++) {
+  //     printf("Port: %s\n", ports[i]);
+  //   }
+  // }
   // TESTING SHOW PORTS
 
   return 0;

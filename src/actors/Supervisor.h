@@ -11,6 +11,7 @@
 #include "caf/caf_main.hpp"
 #include "caf/event_based_actor.hpp"
 
+#include "../Logging.h"
 #include "./ActorIds.h"
 #include "../messaging/atoms.h"
 #include "./AppStateManager.h"
@@ -82,7 +83,12 @@ struct SupervisorState {
      Supervisor::behavior_type make_behavior() {
        return {
            [this](strong_actor_ptr replyToPtr, supervisor_status_a) {
-             std::cout << "Supervisor running : " << this->running << std::endl;
+             Logging::write(
+               Info,
+               "Supervisor::supervisor_status_a",
+               "Supervisor running status - " + std::to_string(running)
+              );
+
 //             self->anon_send(
 //                 actor_cast<strong_actor_ptr>(replyToPtr),
 //                 this->running

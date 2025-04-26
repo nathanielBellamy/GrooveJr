@@ -55,7 +55,6 @@ struct AudioThreadState {
      AudioThread::behavior_type make_behavior() {
        return {
            [this](audio_thread_init_a) {
-             std::cout << "AudioThread : audio_thread_init_a " << std::endl;
              Logging::write(
                Info,
                "AudioThread : audio_thread_init_a",
