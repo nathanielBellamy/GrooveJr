@@ -70,7 +70,7 @@ Mixer::~Mixer() {
     );
   } else {
     Logging::write(
-      Error,
+      Info,
       "Mixer::~Mixer",
       "Closed JackClient"
     );

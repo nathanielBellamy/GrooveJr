@@ -15,6 +15,7 @@
 #include "caf/caf_main.hpp"
 #include "caf/event_based_actor.hpp"
 
+#include "../Logging.h"
 #include "./ActorIds.h"
 #include "../messaging/atoms.h"
 #include "../enums/PlayState.h"
@@ -40,7 +41,6 @@ struct AppStateManagerTrait {
                                  result<void>(strong_actor_ptr, bool, tc_trig_ff_ar),
                                  result<void>(strong_actor_ptr, read_state_a)
                                >;
-
 };
 
 using AppStateManager = typed_actor<AppStateManagerTrait>;
@@ -48,13 +48,19 @@ using AppStateManager = typed_actor<AppStateManagerTrait>;
 struct AppStateManagerState {
 
      AppStateManager::pointer self;
-     Gj::AppState* gAppState;
-     Gj::AppState appState;
+     AppState* gAppState;
+     AppState appState;
      strong_actor_ptr playback;
      strong_actor_ptr display;
 
      void hydrateStateToDisplay() {
-         strong_actor_ptr displayPtr = self->system().registry().get(ActorIds::DISPLAY);
+         Logging::write(
+           Info,
+           "AppStateManagerState::hydrateStateToDisplay",
+           "Will send state to display"
+         );
+
+         strong_actor_ptr displayPtr = self->system().registry().get(DISPLAY);
          self->anon_send(
            actor_cast<actor>(displayPtr),
            actor_cast<strong_actor_ptr>(self),
@@ -63,22 +69,26 @@ struct AppStateManagerState {
          );
      };
 
-     AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor, Gj::AppState* gAppState)
+     AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor, AppState* gAppState)
         : self(self)
         , gAppState(gAppState)
-        , appState(Gj::AppState { gAppState->audioFramesPerBuffer, gAppState->playState } )
+        , appState(AppState { gAppState->audioFramesPerBuffer, gAppState->playState } )
         {
            self->link_to(supervisor);
-           self->system().registry().put(ActorIds::APP_STATE_MANAGER, actor_cast<strong_actor_ptr>(self));
+           self->system().registry().put(APP_STATE_MANAGER, actor_cast<strong_actor_ptr>(self));
 
-           playback = self->system().registry().get(ActorIds::PLAYBACK);
-           display = self->system().registry().get(ActorIds::DISPLAY);
+           playback = self->system().registry().get(PLAYBACK);
+           display = self->system().registry().get(DISPLAY);
         }
 
      AppStateManager::behavior_type make_behavior() {
        return {
            [this](strong_actor_ptr replyTo, read_state_a) {
-             std::cout << "AppStateManager : read_state_a : " << std::endl;
+             Logging::write(
+               Info,
+               "AppStateManager::read_state_a",
+               "Received read state message"
+             );
              self->anon_send(
                  actor_cast<actor>(replyTo),
                  actor_cast<strong_actor_ptr>(self),
@@ -87,7 +97,11 @@ struct AppStateManagerState {
              );
            },
            [this](tc_trig_play_a) {
-             std::cout << "AppStateManager : tc_trig_play_a : " << std::endl;
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_play_a",
+               "Received TC Play Trig"
+             );
 
              self->anon_send(
                  actor_cast<actor>(playback),
@@ -96,21 +110,34 @@ struct AppStateManagerState {
              );
            },
            [this](strong_actor_ptr, bool success, tc_trig_play_ar) {
-             std::cout << "AppStateManager : tc_trig_play_ar : " << std::endl;
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_play_ar",
+               "Received TC Play Trig Response - status " + std::to_string(success)
+             );
 
              if (success) {
-               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::PLAY);
+               appState = AppState::setPlayState(appState, PLAY);
              } else {
-               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
+               appState = AppState::setPlayState(appState, STOP);
              }
 
-             std::cout << "AppStateManager : tc_trig_play_ar : 2 " << std::endl;
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_play_ar",
+               "Updated state. Will HydrateStateToDisplay"
+             );
+
              hydrateStateToDisplay();
-             std::cout << "AppStateManager : tc_trig_play_ar : 3 " << std::endl;
            },
            [this](tc_trig_pause_a) {
-             std::cout << "Gj::AppStateManager : tc_trig_pause_a : " << std::endl;
-             appState = Gj::AppState::setPlayState(appState, Gj::PlayState::PAUSE);
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_pause_a",
+               "Received TC Pause Trig"
+             );
+
+             appState = AppState::setPlayState(appState, PAUSE);
 
              self->anon_send(
                  actor_cast<actor>(playback),
@@ -119,17 +146,32 @@ struct AppStateManagerState {
              );
            },
            [this](strong_actor_ptr, bool success, tc_trig_pause_ar) {
-             std::cout << "Gj::AppStateManager : tc_trig_pause_ar : " << std::endl;
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_pause_a",
+               "Received TC Pause Trig Response - status: " + std::to_string(success)
+             );
 
              if (success) {
-               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::PAUSE);
+               appState = AppState::setPlayState(appState, PAUSE);
              } else {
-               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
+               appState = AppState::setPlayState(appState, STOP);
              }
+
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_play_ar",
+               "Updated state. Will HydrateStateToDisplay"
+             );
+
              hydrateStateToDisplay();
            },
            [this](tc_trig_stop_a) {
-             std::cout << "Gj::AppStateManager : tc_trig_stop_a : " << std::endl;
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_stop_a",
+               "Received TC Stop Trig"
+             );
 
              self->anon_send(
                  actor_cast<actor>(playback),
@@ -138,12 +180,28 @@ struct AppStateManagerState {
              );
            },
            [this](strong_actor_ptr, bool success, tc_trig_stop_ar) {
-             std::cout << "Gj::AppStateManager : tc_trig_stop_ar : " << std::endl;
-             appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_stop_ar",
+               "Received TC Stop Trig Response - status: " + std::to_string(success)
+             );
+
+             appState = AppState::setPlayState(appState, STOP);
+
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_stop_ar",
+               "Updated state. Will HydrateStateToDisplay"
+             );
+
              hydrateStateToDisplay();
            },
            [this](tc_trig_rw_a) {
-             std::cout << "Gj::AppStateManager : tc_trig_rw_a : " << std::endl;
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_rw_a",
+               "Received TC RW Trig"
+             );
 
              self->anon_send(
                  actor_cast<actor>(playback),
@@ -152,17 +210,32 @@ struct AppStateManagerState {
              );
            },
            [this](strong_actor_ptr, bool success, tc_trig_rw_ar) {
-             std::cout << "Gj::AppStateManager : tc_trig_rw_ar : " << std::endl;
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_rw_a",
+               "Received TC RW Trig Response - status: " + std::to_string(success)
+             );
 
              if (success) {
-               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::RW);
+               appState = AppState::setPlayState(appState, RW);
              } else {
-               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
+               appState = AppState::setPlayState(appState, STOP);
              }
+
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_rw_ar",
+               "Updated state. Will HydrateStateToDisplay"
+             );
+
              hydrateStateToDisplay();
            },
            [this](tc_trig_ff_a) {
-             std::cout << "Gj::AppStateManager : tc_trig_ff_a : " << std::endl;
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_ff_a",
+               "Received TC FF Trig"
+             );
 
              self->anon_send(
                  actor_cast<actor>(playback),
@@ -171,13 +244,24 @@ struct AppStateManagerState {
              );
            },
            [this](strong_actor_ptr, bool success, tc_trig_ff_ar) {
-             std::cout << "Gj::AppStateManager : tc_trig_ff_ar : " << std::endl;
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_ff_a",
+               "Received TC FF Trig Response - status: " + std::to_string(success)
+             );
 
              if (success) {
-               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::FF);
+               appState = AppState::setPlayState(appState, FF);
              } else {
-               appState = Gj::AppState::setPlayState(appState, Gj::PlayState::STOP);
+               appState = AppState::setPlayState(appState, STOP);
              }
+
+             Logging::write(
+               Info,
+               "AppStateManager::tc_trig_ff_ar",
+               "Updated state. Will HydrateStateToDisplay"
+             );
+
              hydrateStateToDisplay();
            }
        };
