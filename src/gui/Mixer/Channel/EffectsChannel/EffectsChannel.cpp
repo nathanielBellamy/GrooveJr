@@ -79,7 +79,6 @@ void EffectsChannel::connectActions() {
   });
 
   connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl& url) {
-    std::cout << "selecting vst for channel " << channelIndex << std::endl;
     Logging::write(
       Info,
       "EffectsChannel::vstSelect",
