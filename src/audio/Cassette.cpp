@@ -304,7 +304,7 @@ int Cassette::setupAudioData() {
 }
 
 IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, const AudioData& audioData) const {
-  constexpr int32_t audioFramesPerBuffer = 512; // TODO: debug retrieving from gAppState
+  const int32_t audioFramesPerBuffer = gAppState->audioFramesPerBuffer;
   const int effectsCount = effectsChannel->effectCount(); // should always be >0
   if (pluginIdx % 2 == 0) {
     if (pluginIdx == effectsCount - 1) {

@@ -48,9 +48,8 @@ struct SupervisorState {
        , mainWindowPtr(mainWindowPtr)
        , running(false)
          {
-           self->system().registry().put(ActorIds::SUPERVISOR, actor_cast<strong_actor_ptr>(self));
-//           auto gs_app_state_manager = sys.spawn(actor_from_state<gs_app_state_manager_state>);
-//           auto gs_controller = sys.spawn(actor_from_state<gs_controller_state
+           self->system().registry().put(SUPERVISOR, actor_cast<strong_actor_ptr>(self));
+
            auto playback = self->system().spawn(
              actor_from_state<PlaybackState>,
              actor_cast<strong_actor_ptr>(self),

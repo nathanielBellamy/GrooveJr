@@ -50,6 +50,7 @@ struct PlaybackState {
 
      PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, AppState* gAppState, Audio::Mixer* mixer) :
           self(self)
+        , gAppState(gAppState)
         , mixer(mixer)
         , audioThread(nullptr)
         {

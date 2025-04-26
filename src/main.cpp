@@ -106,8 +106,9 @@ extern "C" {
 
         // setup Audio
         initVst3PluginContext();
-        gAppState = new AppState(512, PlayState::STOP);
+        gAppState = new AppState(512, STOP);
         Mixer = new Audio::Mixer(gAppState);
+
         Logging::write(
           Info,
           "main",
