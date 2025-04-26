@@ -1,6 +1,6 @@
 # GrooveJr
 ### Music Library, Player, and VST3 Host Built With
-- portaudio
+- JACK
 - libsndfile
 - vst3sdk
 - CAF (C++ Actor Framework)
