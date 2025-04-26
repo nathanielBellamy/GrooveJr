@@ -12,7 +12,6 @@ namespace Gui {
 TransportControl::TransportControl(QWidget* parent, actor_system& sys)
     : QToolBar(parent)
     , sys(sys)
-    , title()
     {
 
   title.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -32,7 +31,11 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
   connect(&playTrigAction, &QAction::triggered, [&] {
-    std::cout << "TransportControl : playTrigAction" << std::endl;
+    Logging::write(
+      Info,
+      "Gui::TransportControl",
+      "playTrigAction"
+    );
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
@@ -43,7 +46,11 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   });
 
   connect(&pauseTrigAction, &QAction::triggered, [&] {
-    std::cout << "TransportControl : pauseTrigAction" << std::endl;
+    Logging::write(
+      Info,
+      "Gui::TransportControl",
+      "pauseTrigAction"
+    );
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     const scoped_actor self{sys};
@@ -54,7 +61,11 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   });
 
   connect(&stopTrigAction, &QAction::triggered, [&] {
-    std::cout << "TransportControl : stopTrigAction" << std::endl;
+    Logging::write(
+      Info,
+      "Gui::TransportControl",
+      "stopTrigAction"
+    );
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
@@ -65,7 +76,11 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   });
 
   connect(&rwTrigAction, &QAction::triggered, [&] {
-    std::cout << "TransportControl : rwTrigAction" << std::endl;
+    Logging::write(
+      Info,
+      "Gui::TransportControl",
+      "rwTrigAction"
+    );
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
@@ -76,7 +91,11 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
   });
 
   connect(&ffTrigAction, &QAction::triggered, [&] {
-    std::cout << "TransportControl : ffTrigAction" << std::endl;
+    Logging::write(
+      Info,
+      "Gui::TransportControl",
+      "ffTrigAction"
+    );
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
@@ -90,15 +109,19 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
 
 
 int TransportControl::hydrateState(const Gj::AppStatePacket& appStatePacket) {
-    std::cout << "TransportControl : hydrateState: " << std::endl;
-    AppState appState = AppState::fromPacket(appStatePacket);
-    setPlayState(appState.playState);
-    return 0;
+  AppState appState = AppState::fromPacket(appStatePacket);
+  Logging::write(
+    Info,
+    "Gui::TransportControl::hydrateState",
+    "Received app state with playState - " + std::to_string(appState.playState)
+  );
+
+  setPlayState(appState.playState);
+  return 0;
 }
 
 void TransportControl::setPlayState(Gj::PlayState newState) {
   playState = newState;
-  std::cout << "New State :" << newState << std::endl;
 }
 
 } // Gui

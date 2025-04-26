@@ -31,7 +31,6 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
 }
 
 int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
-    std::cout << "MainWindow : hydrateState: " << std::endl;
     transportControl.hydrateState(appStatePacket);
     return 0;
 }

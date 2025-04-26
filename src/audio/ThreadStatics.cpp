@@ -13,7 +13,7 @@ std::mutex ThreadStatics::filePathMutex;
 long ThreadStatics::frameId = 0;
 std::mutex ThreadStatics::frameIdMutex;
 
-Gj::PlayState ThreadStatics::playState = Gj::PlayState::STOP;
+PlayState ThreadStatics::playState = STOP;
 std::mutex ThreadStatics::playStateMutex;
 
 float ThreadStatics::playbackSpeed = 0.f;
@@ -36,7 +36,6 @@ void ThreadStatics::setFilePath(const char* newFilePath) {
 }
 
 long ThreadStatics::getFrameId() {
-  std::cout << "ThreadStatics : getFrameId" << std::endl;
   std::lock_guard<std::mutex> guard(frameIdMutex);
   return frameId;
 }
@@ -61,12 +60,17 @@ Gj::PlayState ThreadStatics::getPlayState() {
   return playState;
 }
 
-void ThreadStatics::setPlayState(Gj::PlayState newState) {
+void ThreadStatics::setPlayState(PlayState newState) {
   std::lock_guard<std::mutex> guard(playStateMutex);
-  std::cout << "ThreadStatics : setPlayState : " << newState << std::endl;
-  if (playState == Gj::PlayState::STOP)
+  Logging::write(
+    Info,
+    "ThreadStatics::setPlayState",
+    "New state: " + std::to_string(newState)
+  );
+
+  if (playState == STOP)
     setFrameId(0);
-  if (playState == Gj::PlayState::PLAY)
+  if (playState == PLAY)
     setReadComplete(false);
   playState = newState;
 }
@@ -82,15 +86,19 @@ void ThreadStatics::setReadComplete(bool val) {
 }
 
 long ThreadStatics::incrThreadId() {
-  std::cout << "ThreadStatics : incrThreadId" << std::endl;
   std::lock_guard<std::mutex> guard(threadIdMutex);
+  Logging::write(
+    Info,
+    "ThreadStatics::incrThreadId",
+    "Old ThreadId: " + std::to_string(threadId)
+  );
   threadId += 1;
   return threadId;
 }
 
 long ThreadStatics::getThreadId() {
   std::lock_guard<std::mutex> guard(threadIdMutex);
-  return ThreadStatics::threadId;
+  return threadId;
 }
 
 } // Audio

@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <mutex>
+
+#include "Logging.h"
 #include "../enums/PlayState.h"
 
 namespace Gj {

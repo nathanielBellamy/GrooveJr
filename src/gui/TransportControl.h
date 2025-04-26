@@ -5,8 +5,6 @@
 #ifndef TRANSPORTCONTROL_H
 #define TRANSPORTCONTROL_H
 
-#include <iostream>
-
 #include "caf/actor_from_state.hpp"
 #include "caf/actor_ostream.hpp"
 #include "caf/actor_registry.hpp"
@@ -15,6 +13,7 @@
 #include "caf/event_based_actor.hpp"
 #include "caf/scoped_actor.hpp"
 
+#include "../Logging.h"
 #include "../actors/ActorIds.h"
 #include "../messaging/atoms.h"
 #include "../messaging/EnvelopeQtPtr.h"
