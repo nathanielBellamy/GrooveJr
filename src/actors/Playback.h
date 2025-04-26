@@ -61,7 +61,7 @@ struct PlaybackState {
         if (audioThread != nullptr) {
           Logging::write(
             Info,
-            "Playback::clearAudioThread",
+            "Act::Playback::clearAudioThread",
             "Clearing audio thread"
           );
           audioThread->quit();
@@ -74,7 +74,7 @@ struct PlaybackState {
            [this](strong_actor_ptr reply_to, tc_trig_play_a) {
              Logging::write(
                Info,
-               "Playback::tc_trig_play_a",
+               "Act::Playback::tc_trig_play_a",
                "Received TC Trig Play"
              );
 
@@ -117,7 +117,7 @@ struct PlaybackState {
            [this](strong_actor_ptr reply_to, tc_trig_pause_a) {
              Logging::write(
                Info,
-               "Playback::tc_trig_pause_a",
+               "Act::Playback::tc_trig_pause_a",
                "Received TC Pause Trig"
              );
              Audio::ThreadStatics::setPlayState(PAUSE);
@@ -134,7 +134,7 @@ struct PlaybackState {
            [this](strong_actor_ptr reply_to, tc_trig_stop_a) {
              Logging::write(
                Info,
-               "Playback::tc_trig_stop_a",
+               "Act::Playback::tc_trig_stop_a",
                "Received TC Stop Trig"
              );
 
@@ -151,7 +151,7 @@ struct PlaybackState {
            [this](strong_actor_ptr reply_to, tc_trig_rw_a) {
              Logging::write(
                Info,
-               "Playback::tc_trig_rw_a",
+               "Act::Playback::tc_trig_rw_a",
                "Received TC RW Trig"
              );
 
@@ -167,7 +167,7 @@ struct PlaybackState {
            [this](strong_actor_ptr reply_to, tc_trig_ff_a) {
              Logging::write(
                Info,
-               "Playback::tc_trig_ff_a",
+               "Act::Playback::tc_trig_ff_a",
                "Received TC FF Trig"
              );
 

@@ -30,7 +30,6 @@ struct DisplayTrait {
                                   result<void>(strong_actor_ptr, hydrate_display_a),
                                   result<void>(strong_actor_ptr, AppStatePacket, current_state_a)
                                 >;
-
 };
 
 using Display = typed_actor<DisplayTrait>;
@@ -53,7 +52,7 @@ struct DisplayState {
            [this](strong_actor_ptr replyToPtr, hydrate_display_a) {
              Logging::write(
                Info,
-               "Display::hydrate_display_a",
+               "Act::Display::hydrate_display_a",
                "Received hydrate_display_a"
              );
              strong_actor_ptr appStateManager = self->system().registry().get(APP_STATE_MANAGER);
@@ -66,13 +65,13 @@ struct DisplayState {
            [this](strong_actor_ptr replyToPtr, AppStatePacket appStatePacket, current_state_a) {
              Logging::write(
                Info,
-               "Display::current_state_a",
+               "Act::Display::current_state_a",
                "Received request for current state"
              );
              if ( mainWindow->hydrateState(appStatePacket) )
                Logging::write(
                  Error,
-                 "Display::current_state_a",
+                 "Act::Display::current_state_a",
                  "Unable to hydrate state to main window"
                );
            },

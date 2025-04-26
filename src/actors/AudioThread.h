@@ -57,7 +57,7 @@ struct AudioThreadState {
            [this](audio_thread_init_a) {
              Logging::write(
                Info,
-               "AudioThread : audio_thread_init_a",
+               "Act::AudioThread::audio_thread_init_a",
                "Will instantiate Cassette for file: " + std::string(Audio::ThreadStatics::getFilePath())
              );
              try {
@@ -73,7 +73,7 @@ struct AudioThreadState {
              } catch (std::runtime_error& e) {
                Logging::write(
                  Error,
-                 "AudioThread : audio_thread_init_a",
+                 "Act::AudioThread::audio_thread_init_a",
                  "Error instantiating or playing Cassette: " + std::string(e.what())
                );
              }

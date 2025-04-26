@@ -24,18 +24,15 @@ namespace Gj {
 namespace Act {
 
 struct EffectsManagerTrait {
-
     using signatures = type_list<
                                   result<void>(strong_actor_ptr,  int /*channel*/, std::string /*path*/, add_effect_a),
                                   result<void>(strong_actor_ptr,  int /*channel*/, int /*effect index*/, remove_effect_a)
                                 >;
-
 };
 
 using EffectsManager = typed_actor<EffectsManagerTrait>;
 
 struct EffectsManagerState {
-
      EffectsManager::pointer self;
      Audio::Mixer* mixer;
 
@@ -52,7 +49,7 @@ struct EffectsManagerState {
            [this](strong_actor_ptr replyToPtr, int channel, std::string path, add_effect_a) {
              Logging::write(
                Info,
-               "EffectsManager::add_effect_a",
+               "Act::EffectsManager::add_effect_a",
                "Adding effect " + path + " to channel " + std::to_string(channel)
              );
 
@@ -62,26 +59,30 @@ struct EffectsManagerState {
                  // mixer->showEditor(channel, index);
                  Logging::write(
                    Info,
-                   "EffectsManager::add_effect_a",
+                   "Act::EffectsManager::add_effect_a",
                    "Effect added " + path.substr(7) + " to channel " + std::to_string(channel)
                  );
                } else {
                  Logging::write(
                    Warning,
-                   "EffectsManager::add_effect_a",
+                   "Act::EffectsManager::add_effect_a",
                    "Failed to add effect " + path.substr(7)
                  );
                };
              } catch (...) {
                Logging::write(
                  Error,
-                 "EffectsManager::add_effect_a",
+                 "Act::EffectsManager::add_effect_a",
                  "An error occurred while adding effect " + path.substr(7) + " to channel " + std::to_string(channel)
                );
              }
            },
            [this](strong_actor_ptr replyToPtr, int channel, int effectIndex, remove_effect_a) {
-             std::cout << "EffectsManager : current_state_a " << std::endl;
+             Logging::write(
+               Error,
+               "Act::EffectsManager::remove_effect_a",
+               "Removing effect " + std::to_string(effectIndex) + " from channel " + std::to_string(channel)
+             );
            },
        };
      };
@@ -89,6 +90,5 @@ struct EffectsManagerState {
 
 } // Act
 } // Gj
-
 
 #endif //EFFECTSMANAGER_H

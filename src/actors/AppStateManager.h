@@ -86,7 +86,7 @@ struct AppStateManagerState {
            [this](strong_actor_ptr replyTo, read_state_a) {
              Logging::write(
                Info,
-               "AppStateManager::read_state_a",
+               "Act::AppStateManager::read_state_a",
                "Received read state message"
              );
              self->anon_send(
@@ -99,7 +99,7 @@ struct AppStateManagerState {
            [this](tc_trig_play_a) {
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_play_a",
+               "Act::AppStateManager::tc_trig_play_a",
                "Received TC Play Trig"
              );
 
@@ -112,7 +112,7 @@ struct AppStateManagerState {
            [this](strong_actor_ptr, bool success, tc_trig_play_ar) {
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_play_ar",
+               "Act::AppStateManager::tc_trig_play_ar",
                "Received TC Play Trig Response - status " + std::to_string(success)
              );
 
@@ -124,7 +124,7 @@ struct AppStateManagerState {
 
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_play_ar",
+               "Act::AppStateManager::tc_trig_play_ar",
                "Updated state. Will HydrateStateToDisplay"
              );
 
@@ -133,7 +133,7 @@ struct AppStateManagerState {
            [this](tc_trig_pause_a) {
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_pause_a",
+               "Act::AppStateManager::tc_trig_pause_a",
                "Received TC Pause Trig"
              );
 
@@ -148,7 +148,7 @@ struct AppStateManagerState {
            [this](strong_actor_ptr, bool success, tc_trig_pause_ar) {
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_pause_a",
+               "Act::AppStateManager::tc_trig_pause_a",
                "Received TC Pause Trig Response - status: " + std::to_string(success)
              );
 
@@ -160,7 +160,7 @@ struct AppStateManagerState {
 
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_play_ar",
+               "Act::AppStateManager::tc_trig_play_ar",
                "Updated state. Will HydrateStateToDisplay"
              );
 
@@ -169,7 +169,7 @@ struct AppStateManagerState {
            [this](tc_trig_stop_a) {
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_stop_a",
+               "Act::AppStateManager::tc_trig_stop_a",
                "Received TC Stop Trig"
              );
 
@@ -182,7 +182,7 @@ struct AppStateManagerState {
            [this](strong_actor_ptr, bool success, tc_trig_stop_ar) {
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_stop_ar",
+               "Act::AppStateManager::tc_trig_stop_ar",
                "Received TC Stop Trig Response - status: " + std::to_string(success)
              );
 
@@ -190,7 +190,7 @@ struct AppStateManagerState {
 
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_stop_ar",
+               "Act::AppStateManager::tc_trig_stop_ar",
                "Updated state. Will HydrateStateToDisplay"
              );
 
@@ -199,7 +199,7 @@ struct AppStateManagerState {
            [this](tc_trig_rw_a) {
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_rw_a",
+               "Act::AppStateManager::tc_trig_rw_a",
                "Received TC RW Trig"
              );
 
@@ -212,7 +212,7 @@ struct AppStateManagerState {
            [this](strong_actor_ptr, bool success, tc_trig_rw_ar) {
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_rw_a",
+               "Act::AppStateManager::tc_trig_rw_a",
                "Received TC RW Trig Response - status: " + std::to_string(success)
              );
 
@@ -224,7 +224,7 @@ struct AppStateManagerState {
 
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_rw_ar",
+               "Act::AppStateManager::tc_trig_rw_ar",
                "Updated state. Will HydrateStateToDisplay"
              );
 
@@ -233,7 +233,7 @@ struct AppStateManagerState {
            [this](tc_trig_ff_a) {
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_ff_a",
+               "Act::AppStateManager::tc_trig_ff_a",
                "Received TC FF Trig"
              );
 
@@ -246,7 +246,7 @@ struct AppStateManagerState {
            [this](strong_actor_ptr, bool success, tc_trig_ff_ar) {
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_ff_a",
+               "Act::AppStateManager::tc_trig_ff_a",
                "Received TC FF Trig Response - status: " + std::to_string(success)
              );
 
@@ -258,7 +258,7 @@ struct AppStateManagerState {
 
              Logging::write(
                Info,
-               "AppStateManager::tc_trig_ff_ar",
+               "Act::AppStateManager::tc_trig_ff_ar",
                "Updated state. Will HydrateStateToDisplay"
              );
 

@@ -28,9 +28,7 @@ namespace Gj {
 namespace Act {
 
 struct SupervisorTrait {
-
     using signatures = type_list<result<void>(strong_actor_ptr, supervisor_status_a)>;
-
 };
 
 using Supervisor = typed_actor<SupervisorTrait>;
@@ -85,7 +83,7 @@ struct SupervisorState {
            [this](strong_actor_ptr replyToPtr, supervisor_status_a) {
              Logging::write(
                Info,
-               "Supervisor::supervisor_status_a",
+               "Act::Supervisor::supervisor_status_a",
                "Supervisor running status - " + std::to_string(running)
               );
 
