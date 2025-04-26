@@ -274,8 +274,8 @@ int Cassette::setupAudioData() {
     "Setting up AudioData effects processing..."
   );
 
-  int effectsChannelIdx = 0;
   for (const auto effectsChannel : mixer->getEffectsChannels()) {
+    const auto effectsChannelIdx = effectsChannel->getIndex();
     audioData.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
     audioData.effectsChannelsProcessData[effectsChannelIdx].channelSettings = effectsChannel->channel;
 
@@ -285,11 +285,7 @@ int Cassette::setupAudioData() {
         [ObjectPtr = plugin->audioHost->audioClient](auto && PH1, auto && PH2) { return ObjectPtr->process(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2)); };
 
       audioData.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioData);
-
-      pluginIdx++;
     }
-
-    effectsChannelIdx++;
   }
 
   Logging::write(
@@ -314,7 +310,7 @@ IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* 
     if (pluginIdx == effectsCount - 1) {
       const auto writeOut = const_cast<float**>(audioData.effectsChannelsWriteOut[channelIdx]);
       const IAudioClient::Buffers buffers = {
-        buffersBPtr,
+        buffersBPtr, // if pluginIdx == 0, this will be updated to processHead in jackProcessCallBAck
         2,
         writeOut,
         2,
