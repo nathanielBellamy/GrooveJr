@@ -86,16 +86,46 @@ Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileNam
 }
 
 Cassette::~Cassette() {
+  Logging::write(
+    Info,
+    "Cassette::~Cassette",
+    "Destroying Cassette"
+  );
+
   cleanup();
+
+  Logging::write(
+    Info,
+    "Cassette::~Cassette",
+    "Destroyed Cassette"
+  );
 }
 
-void Cassette::cleanup() const {
+void Cassette::cleanup() {
   Logging::write(
     Info,
     "Cassette::cleanup",
-    "Freeing resources for file" + std::string(fileName)
+    "Freeing resources for file " + std::string(fileName)
   );
-  jack_deactivate(jackClient);
+
+  if (jackClientIsActive) {
+    if (jack_deactivate(jackClient)) {
+      std::cerr << "Unable to deactivate jack client" << std::endl;
+      Logging::write(
+        Error,
+        "Cassette::cleanup",
+        "Unable to deactivate JackClient"
+      );
+    };
+  }
+  jackClientIsActive = false;
+
+  Logging::write(
+    Info,
+    "Cassette::cleanup",
+    "Deactivated JackClient"
+  );
+
   if (!deleteBuffers()) {
     Logging::write(
       Error,
@@ -416,6 +446,7 @@ int Cassette::setupJack() {
   }
 
   int jackActivateStatus = jack_activate(jackClient);
+  jackClientIsActive = true;
   if (jackActivateStatus == 0) {
     Logging::write(
       Info,
@@ -644,6 +675,11 @@ int Cassette::play() {
       }
       ThreadStatics::setReadComplete(true);
   }
+
+  if (jackClientIsActive)
+    jack_deactivate(jackClient);
+
+  jackClientIsActive = false;
 
   return 0;
 };

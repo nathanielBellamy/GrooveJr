@@ -37,6 +37,7 @@ class Cassette
   AppState* gAppState;
   Mixer* mixer;
   jack_client_t* jackClient;
+  bool jackClientIsActive;
   float* buffer{};
   SF_INFO sfInfo;
   SNDFILE* file{};
@@ -75,7 +76,7 @@ class Cassette
     ~Cassette();
 
     int play();
-    void cleanup() const;
+    void cleanup();
 };
 
 } // Audio
