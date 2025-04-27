@@ -16,14 +16,15 @@
   cd GrooveJr/src
   vim CMakeLists.txt
   ```
-  - it may be helpful to run: 
-    ```bash
-      brew services restart jack
-    ```
-  - blackhole-2ch is required for devices without built-in input and/or output audio devices
-    - blackhole-2ch creates virtual inputs and outputs
-    - without these the jack server will not be able to run 
-- update `GJ_BASE_DIR` to be the directory containing the `GrooveJr` repo
+  - update `GJ_BASE_DIR` to be the directory containing the `GrooveJr` repo
+ 
+- it may be helpful to run: 
+  ```bash
+    brew services restart jack
+  ```
+- blackhole-2ch is required for devices without built-in input and/or output audio devices
+  - blackhole-2ch creates virtual inputs and outputs
+  - without these the jack server will not be able to run 
 
 - build the following from source in `GJ_BASE_DIR`
   - [CAF](https://www.actor-framework.org/)
