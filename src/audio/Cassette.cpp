@@ -96,13 +96,18 @@ void Cassette::cleanup() const {
     "Freeing resources for file" + std::string(fileName)
   );
   jack_deactivate(jackClient);
-  if (!freeBuffers()) {
+  if (!deleteBuffers()) {
     Logging::write(
       Error,
       "Cassette::cleanup",
       "Unable to free buffers"
     );
   }
+  Logging::write(
+    Info,
+    "Cassette::cleanup",
+    "Deleted buffers"
+  );
   sf_close(file);
   Logging::write(
     Info,
@@ -549,23 +554,22 @@ bool Cassette::setupInputBuffers() {
   return true;
 }
 
-bool Cassette::freeBuffers() const {
+bool Cassette::deleteBuffers() const {
   Logging::write(
     Info,
-    "Cassette::freeBuffers",
-    "Freeing memory for Cassette."
+    "Cassette::deleteBuffers",
+    "Deleting Cassette buffers."
   );
 
   try {
-    delete buffer;
-    delete inputBuffer;
-
+    delete[] buffer;
+    delete[] inputBuffer;
     delete[] effectsChannelsWriteOutBuffer;
   } catch (...) {
     Logging::write(
         Error,
         "Cassette::freeBuffers",
-        "Unable to free memory for Cassette buffers"
+        "Unable to delete Cassette buffers"
     );
     return false;
   }
@@ -573,7 +577,7 @@ bool Cassette::freeBuffers() const {
   Logging::write(
     Info,
     "Cassette::freeBuffers",
-    "Done freeing Cassette buffers."
+    "Done delete Cassette buffers."
   );
 
   return true;

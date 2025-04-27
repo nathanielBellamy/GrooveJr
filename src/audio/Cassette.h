@@ -61,7 +61,7 @@ class Cassette
 
   bool allocateProcessBuffers();
   [[nodiscard]]
-  bool freeBuffers() const;
+  bool deleteBuffers() const;
 
   public:
     Cassette(
