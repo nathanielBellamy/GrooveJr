@@ -10,11 +10,14 @@
 #include <memory>
 #include <vector>
 
+#include <QAction>
 #include <QGridLayout>
 #include <QWidget>
 
+#include "../../../../Logging.h"
 #include "../../../../audio/Mixer.h"
 #include "EffectsChannel.h"
+#include "AddEffectsChannelButton.h"
 
 using namespace caf;
 
@@ -32,6 +35,10 @@ class EffectsChannelsContainer final : public QWidget {
     QGridLayout grid;
     QWidget spacer;
     std::vector<std::unique_ptr<EffectsChannel>> channels;
+    QAction addEffectsChannelAction;
+    AddEffectsChannelButton addEffectsChannelButton;
+    void addEffectsChannel();
+    void connectActions();
     void setStyle();
     void setupGrid();
 
