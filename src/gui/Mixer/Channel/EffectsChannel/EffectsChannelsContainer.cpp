@@ -42,7 +42,7 @@ void EffectsChannelsContainer::connectActions() {
     );
     mixer->addEffectsChannel();
     addEffectsChannel();
-    repaint();
+    update();
   });
 }
 
