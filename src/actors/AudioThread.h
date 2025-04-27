@@ -15,7 +15,6 @@
 #include "./AppStateManager.h"
 #include "./Playback.h"
 #include "../AppState.h"
-#include "../audio/ThreadStatics.h"
 
 #include "../audio/Mixer.h"
 #include "../audio/Cassette.h"
@@ -58,14 +57,11 @@ struct AudioThreadState {
              Logging::write(
                Info,
                "Act::AudioThread::audio_thread_init_a",
-               "Will instantiate Cassette for file: " + std::string(Audio::ThreadStatics::getFilePath())
+               "Instantiating Cassette"
              );
              try {
                Audio::Cassette cassette (
                   self->system(),
-                  Audio::ThreadStatics::incrThreadId(),
-                  Audio::ThreadStatics::getFilePath(),
-                  Audio::ThreadStatics::getFrameId(),
                   gAppState,
                   mixer
                );

@@ -67,9 +67,6 @@ class Cassette
   public:
     Cassette(
         actor_system& actorSystem,
-        long threadId,
-        const char* fileName,
-        long initialFrameId,
         AppState* gAppState,
         Mixer* mixer
     );

@@ -10,20 +10,19 @@ namespace Audio {
 jack_port_t* outPortL;
 jack_port_t* outPortR;
 
-Cassette::Cassette(actor_system& actorSystem, long threadId, const char* fileName, long initialFrameId, AppState* gAppState, Mixer* mixer)
+Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
   : actorSystem(actorSystem)
-  , threadId(threadId)
-  , fileName(fileName)
-  , initialFrameId(initialFrameId)
+  , threadId(ThreadStatics::incrThreadId())
+  , fileName(ThreadStatics::getFilePath())
   , gAppState(gAppState)
   , mixer(mixer)
   , jackClient(mixer->getJackClient())
   , sfInfo()
   , effectsChannelsWriteOutBuffer(nullptr)
   , audioData(
-      0,
+      ThreadStatics::getFrameId(),
       PLAY,
-      1.0,
+      ThreadStatics::getPlaybackSpeed(),
       static_cast<float>(mixer->getEffectsChannelsCount() + 1),
       mixer->getEffectsChannelsCount()
     )
