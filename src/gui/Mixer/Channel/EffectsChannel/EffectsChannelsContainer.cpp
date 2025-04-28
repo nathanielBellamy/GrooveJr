@@ -40,7 +40,14 @@ void EffectsChannelsContainer::connectActions() {
       "EffectsChannelsContainer::addEffectsChannelAction trig",
       "Adding Effects Channel"
     );
-    mixer->addEffectsChannel();
+    strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+
+    scoped_actor self{ actorSystem };
+    self->anon_send(
+        actor_cast<actor>(appStateManagerPtr),
+        mix_add_effects_channel_a_v
+    );
+
     addEffectsChannel();
     update();
   });

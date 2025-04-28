@@ -20,6 +20,7 @@
 #include "../messaging/atoms.h"
 #include "../enums/PlayState.h"
 #include "../AppState.h"
+#include "../audio/Mixer.h"
 
 using namespace caf;
 
@@ -29,6 +30,10 @@ namespace Act {
 struct AppStateManagerTrait {
 
     using signatures = type_list<
+                                 // Mixer
+                                 result<void>(mix_add_effects_channel_a),
+
+                                 // Transport control
                                  result<void>(tc_trig_play_a),
                                  result<void>(strong_actor_ptr, bool, tc_trig_play_ar),
                                  result<void>(tc_trig_pause_a),
@@ -39,6 +44,8 @@ struct AppStateManagerTrait {
                                  result<void>(strong_actor_ptr, bool, tc_trig_rw_ar),
                                  result<void>(tc_trig_ff_a),
                                  result<void>(strong_actor_ptr, bool, tc_trig_ff_ar),
+
+                                 // Read state
                                  result<void>(strong_actor_ptr, read_state_a)
                                >;
 };
@@ -49,6 +56,7 @@ struct AppStateManagerState {
 
      AppStateManager::pointer self;
      AppState* gAppState;
+     Audio::Mixer* mixer;
      AppState appState;
      strong_actor_ptr playback;
      strong_actor_ptr display;
@@ -69,9 +77,10 @@ struct AppStateManagerState {
          );
      };
 
-     AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor, AppState* gAppState)
+     AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor, AppState* gAppState, Audio::Mixer* mixer)
         : self(self)
         , gAppState(gAppState)
+        , mixer(mixer)
         , appState(AppState { gAppState->audioFramesPerBuffer, gAppState->playState } )
         {
            self->link_to(supervisor);
@@ -83,6 +92,14 @@ struct AppStateManagerState {
 
      AppStateManager::behavior_type make_behavior() {
        return {
+           [this](mix_add_effects_channel_a) {
+             Logging::write(
+               Info,
+               "Act::AppStateManager::mix_add_effects_channel_a",
+               "Received Add Mixer Effects Channel"
+             );
+             mixer->addEffectsChannel();
+           },
            [this](strong_actor_ptr replyTo, read_state_a) {
              Logging::write(
                Info,

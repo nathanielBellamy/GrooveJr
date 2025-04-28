@@ -36,7 +36,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
       "Gui::TransportControl",
       "playTrigAction"
     );
-    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
+    strong_actor_ptr appStateManagerPtr = sys.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
     self->anon_send(
@@ -51,7 +51,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
       "Gui::TransportControl",
       "pauseTrigAction"
     );
-    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
+    strong_actor_ptr appStateManagerPtr = sys.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
     const scoped_actor self{sys};
     self->anon_send(
@@ -66,7 +66,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
       "Gui::TransportControl",
       "stopTrigAction"
     );
-    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
+    strong_actor_ptr appStateManagerPtr = sys.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
     self->anon_send(
@@ -81,7 +81,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
       "Gui::TransportControl",
       "rwTrigAction"
     );
-    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
+    strong_actor_ptr appStateManagerPtr = sys.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
     self->anon_send(
@@ -96,7 +96,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
       "Gui::TransportControl",
       "ffTrigAction"
     );
-    strong_actor_ptr appStateManagerPtr = sys.registry().get(Gj::Act::ActorIds::APP_STATE_MANAGER);
+    strong_actor_ptr appStateManagerPtr = sys.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{sys};
     self->anon_send(
@@ -108,7 +108,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
 } // constructor
 
 
-int TransportControl::hydrateState(const Gj::AppStatePacket& appStatePacket) {
+int TransportControl::hydrateState(const AppStatePacket& appStatePacket) {
   AppState appState = AppState::fromPacket(appStatePacket);
   Logging::write(
     Info,
@@ -120,7 +120,7 @@ int TransportControl::hydrateState(const Gj::AppStatePacket& appStatePacket) {
   return 0;
 }
 
-void TransportControl::setPlayState(Gj::PlayState newState) {
+void TransportControl::setPlayState(PlayState newState) {
   playState = newState;
 }
 

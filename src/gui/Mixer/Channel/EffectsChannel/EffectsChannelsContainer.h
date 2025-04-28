@@ -6,6 +6,8 @@
 #define EFFECTSCHANNELCONTAINER_H
 
 #include "caf/actor_system.hpp"
+#include "caf/scoped_actor.hpp"
+#include "../../../../messaging/atoms.h"
 
 #include <memory>
 #include <vector>

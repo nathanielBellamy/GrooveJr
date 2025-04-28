@@ -18,6 +18,10 @@ CAF_BEGIN_TYPE_ID_BLOCK(groovejr, first_custom_type_id)
   CAF_ADD_ATOM(groovejr, hydrate_display_a)
   CAF_ADD_ATOM(groovejr, read_state_a)
 
+  // Mixer
+  CAF_ADD_ATOM(groovejr, mix_add_effects_channel_a)
+
+  // Transport Control
   CAF_ADD_ATOM(groovejr, tc_trig_play_a)
   CAF_ADD_ATOM(groovejr, tc_trig_play_ar)
   CAF_ADD_ATOM(groovejr, tc_trig_pause_a)
