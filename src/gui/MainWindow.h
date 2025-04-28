@@ -8,17 +8,13 @@
 #include <iostream>
 #include <format>
 
-#include "caf/actor_from_state.hpp"
-#include "caf/actor_ostream.hpp"
-#include "caf/actor_registry.hpp"
 #include "caf/actor_system.hpp"
-#include "caf/caf_main.hpp"
-#include "caf/event_based_actor.hpp"
-#include "caf/scoped_actor.hpp"
 
 #include "../actors/ActorIds.h"
 #include "../messaging/atoms.h"
 #include "../messaging/EnvelopeQtPtr.h"
+
+#include "../Logging.h"
 
 #include "./MenuBar/MenuBar.h"
 #include "./Mixer/MixerWindow.h"

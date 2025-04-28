@@ -51,7 +51,11 @@ void MainWindow::initGrid() {
 }
 
 void MainWindow::closeEvent (QCloseEvent* e) {
-  std::cout << "MainWindow::closeEvent " << std::endl;
+  Logging::write(
+    Info,
+    "Gui::MainWindow::closeEvent",
+    "Closing GroveJr"
+  );
   shutdown_handler(3);
 }
 

@@ -22,11 +22,7 @@ namespace Host {
 	}
 
 	tresult App::terminate() {
-		std::cout << "Terminating Gj::Effects::Vst3::Host::App..." << std::endl;
-
 		this->release();
-
-		std::cout << "Finished Terminating Gj::Effects::Vst3::Host::App..." << std::endl;
 		return kResultOk;
 	}
 
