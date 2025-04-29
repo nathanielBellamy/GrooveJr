@@ -28,12 +28,14 @@ EffectsChannelsContainer::EffectsChannelsContainer(QWidget* parent, actor_system
 }
 
 void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
+  Logging::write(
+    Info,
+    "EffectsChannelsContainer::hydrateState",
+    "Hydrating effects channels state"
+  );
+
   const int channelsCountDiff = mixer->getEffectsChannelsCount() - static_cast<int>(channels.size());
-  if (channelsCountDiff > 0) {
-    for (int i = 0; i < channelsCountDiff; i++) {
-      addEffectsChannel();
-    }
-  } else if (channelsCountDiff < 0) {
+  if (channelsCountDiff < 0) {
     channels.erase(channels.begin() + mixer->getEffectsChannelsCount(), channels.end());
   }
 
@@ -61,6 +63,14 @@ void EffectsChannelsContainer::connectActions() {
         actor_cast<actor>(appStateManagerPtr),
         mix_add_effects_channel_a_v
     );
+
+    //TODO:
+    // - evaluate if gui->act->gui loop is worth it
+    // - we cannot create Qt objects from within hydrateState as that puts the child object
+    //   on a different thread than the parent (which Qt does not like)
+    addEffectsChannel();
+    setupGrid();
+    update();
   });
 }
 

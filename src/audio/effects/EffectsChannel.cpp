@@ -32,13 +32,13 @@ EffectsChannel::EffectsChannel(
 EffectsChannel::~EffectsChannel() {
   Logging::write(
   	Info,
-  	"EffectsChannel::dtor",
+  	"Audio::EffectsChannel::dtor",
   	"Destroying EffectsChannel: " + std::to_string(index)
   );
 
 	Logging::write(
   	Info,
-  	"EffectsChannel::dtor",
+  	"Audio::EffectsChannel::dtor",
   	"Destroyed EffectsChannel: " + std::to_string(index)
   );
 }
@@ -46,7 +46,7 @@ EffectsChannel::~EffectsChannel() {
 bool EffectsChannel::addEffect(const std::string& effectPath) {
 	Logging::write(
 		Info,
-		"EffectsChannel::addEffect",
+		"Audio::EffectsChannel::addEffect",
 		"Adding effect: " + effectPath + " to channel " + std::to_string(index)
 	);
 
@@ -59,7 +59,7 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
 
 	Logging::write(
 		Info,
-		"EffectsChannel::addEffect",
+		"Audio::EffectsChannel::addEffect",
 		"Instantiated plugin " + effect->path + " for channel " + std::to_string(index)
 	);
 
@@ -70,7 +70,7 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
   if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer)) {
 		Logging::write(
 			Warning,
-			"EffectsChannel::addEffect",
+			"Audio::EffectsChannel::addEffect",
 			"Processor for " + effectPath + " on channel " + std::to_string(index) + " cannot process sample size " + std::to_string(gAppState->audioFramesPerBuffer)
 		);
   	return false;
@@ -93,7 +93,7 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
 
 	Logging::write(
 		Info,
-		"EffectsChannel::addEffect",
+		"Audio::EffectsChannel::addEffect",
 		"Effect " + effectPath + " added on channel " + std::to_string(index)
 	);
 
@@ -114,14 +114,14 @@ int EffectsChannel::effectCount() const {
 void EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
 	Logging::write(
 		Info,
-		"EffectsChannel::initEditorHosts",
+		"Audio::EffectsChannel::initEditorHosts",
 		"Initializing Editor Hosts on channel " + std::to_string(index)
 	);
 	int i = 0;
 	for (const auto& plugin : vst3Plugins) {
 		Logging::write(
 			Info,
-			"EffectsChannel::initEditorHosts",
+			"Audio::EffectsChannel::initEditorHosts",
 			"Initializing Editor Host for effect " + plugin->path + " on channel " + std::to_string(index)
 		);
 		plugin->initEditorHost(vstWindows.at(i));

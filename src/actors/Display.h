@@ -66,7 +66,7 @@ struct DisplayState {
              Logging::write(
                Info,
                "Act::Display::current_state_a",
-               "Received request for current state"
+               "Received current state, will hydrate display."
              );
              if ( mainWindow->hydrateState(appStatePacket) )
                Logging::write(
