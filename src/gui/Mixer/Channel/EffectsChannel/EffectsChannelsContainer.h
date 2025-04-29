@@ -17,6 +17,7 @@
 #include <QWidget>
 
 #include "../../../../Logging.h"
+#include "../../../../AppState.h"
 #include "../../../../audio/Mixer.h"
 #include "EffectsChannel.h"
 #include "AddEffectsChannelButton.h"
@@ -30,6 +31,7 @@ class EffectsChannelsContainer final : public QWidget {
 
   public:
     EffectsChannelsContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer);
+    void hydrateState(const AppStatePacket& appState);
 
   private:
     actor_system& actorSystem;

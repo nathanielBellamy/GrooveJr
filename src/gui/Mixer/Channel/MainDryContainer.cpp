@@ -20,6 +20,11 @@ MainDryContainer::MainDryContainer(QWidget* parent, actor_system& actorSystem, A
   setStyle();
 }
 
+void MainDryContainer::hydrateState(const AppStatePacket &appState) {
+  // todo
+}
+
+
 void MainDryContainer::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet("background-color: red; border: 2px solid white; border-radius: 5px;");

@@ -27,6 +27,11 @@ EffectsChannelsContainer::EffectsChannelsContainer(QWidget* parent, actor_system
   setupGrid();
 }
 
+void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
+  // todo
+}
+
+
 void EffectsChannelsContainer::addEffectsChannel() {
   auto effectsChannel = std::make_unique<EffectsChannel>(this, actorSystem, mixer, channels.size() + 1);
   channels.push_back(std::move(effectsChannel));

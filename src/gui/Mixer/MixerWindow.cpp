@@ -25,6 +25,11 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
   setupGrid();
 }
 
+void MixerWindow::hydrateState(const AppStatePacket &appStatePacket) {
+  mainDryContainer.hydrateState(appStatePacket);
+  effectsChannelsContainer.hydrateState(appStatePacket);
+}
+
 void MixerWindow::setStyle() {
   setStyleSheet("background-color: green;");
 }

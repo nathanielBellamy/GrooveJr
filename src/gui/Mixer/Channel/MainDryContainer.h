@@ -10,6 +10,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
+#include "../../../AppState.h"
 #include "DryChannel.h"
 #include "EffectsChannel/EffectsChannel.h"
 #include "../../../audio/Mixer.h"
@@ -23,6 +24,7 @@ class MainDryContainer final : public QWidget {
 
   public:
     MainDryContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer);
+    void hydrateState(const AppStatePacket& appState);
 
   private:
     actor_system& actorSystem;

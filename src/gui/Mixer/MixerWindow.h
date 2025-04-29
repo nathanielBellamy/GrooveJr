@@ -14,6 +14,7 @@
 #include "./Channel/MainDryContainer.h"
 #include "./Channel/EffectsChannel/EffectsChannelsContainer.h"
 
+#include "../../AppState.h"
 #include "../../audio/Mixer.h"
 
 using namespace caf;
@@ -24,6 +25,7 @@ namespace Gui {
 class MixerWindow final : public QWidget {
   public:
     explicit MixerWindow(QWidget *parent, actor_system& actorSystem, Audio::Mixer* mixer);
+    void hydrateState(const AppStatePacket& appStatePacket);
 
   private:
     actor_system& actorSystem;

@@ -22,9 +22,10 @@ bool inspect(Inspector& f, AppStatePacket& x) {
 class AppState {
 
   public:
-    AppState(int audioFramesPerBuffer, Gj::PlayState playState);
+    AppState(int audioFramesPerBuffer, PlayState playState);
     int audioFramesPerBuffer;
-    Gj::PlayState playState;
+    PlayState playState;
+
 
     AppStatePacket toPacket() const;
      // TODO?
@@ -32,7 +33,7 @@ class AppState {
 
     // mutations
     static AppState setAudioFramesPerBuffer(AppState appState, int audioFramesPerBuffer);
-    static AppState setPlayState(AppState appState, Gj::PlayState playState);
+    static AppState setPlayState(AppState appState, PlayState playState);
 };
 
 } // Gj
