@@ -8,6 +8,7 @@
 //
 // Created by ns on 11/11/24.
 //
+#include <string>
 
 #include "caf/actor_ostream.hpp"
 #include "caf/actor_registry.hpp"
@@ -32,6 +33,7 @@ struct AppStateManagerTrait {
     using signatures = type_list<
                                  // Mixer
                                  result<void>(mix_add_effects_channel_a),
+                                 result<void>(int, std::string, mix_add_effect_to_channel_a),
 
                                  // Transport control
                                  result<void>(tc_trig_play_a),
@@ -99,6 +101,20 @@ struct AppStateManagerState {
                "Received Add Mixer Effects Channel"
              );
              mixer->addEffectsChannel();
+           },
+           [this](const int channelIdx, std::string effectPath, mix_add_effect_to_channel_a) {
+             Logging::write(
+               Info,
+               "Act::AppStateManager::mix_add_effects_channel_a",
+               "Received Add Mixer Effects Channel"
+             );
+             if (!mixer->addEffectToChannel(channelIdx, effectPath)) {
+               Logging::write(
+                 Error,
+                 "EffectsChannel::addEffectAction",
+                 "Unable to add effect: " + effectPath + " to channel " + std::to_string(channelIdx)
+               );
+             }
            },
            [this](strong_actor_ptr replyTo, read_state_a) {
              Logging::write(

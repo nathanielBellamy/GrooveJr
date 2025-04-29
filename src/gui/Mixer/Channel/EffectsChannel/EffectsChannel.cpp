@@ -89,17 +89,22 @@ void EffectsChannel::connectActions() {
 
   connect(&addEffectAction, &QAction::triggered, [&]() {
     if (vstSelect.exec() == QDialog::Accepted) {
+      const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
         Info,
         "EffectsChannel::addEffectAction",
-        "Adding effect: " + vstUrl.toDisplayString().toStdString() + " to channel " + std::to_string(channelIndex)
+        "Adding effect: " + effectPath + " to channel " + std::to_string(channelIndex)
       );
-      if (!mixer->addEffectToChannel(channelIndex, vstUrl.toDisplayString().toStdString().substr(7)))
-        Logging::write(
-          Error,
-          "EffectsChannel::addEffectAction",
-          "Unable to add effect: " + vstUrl.toDisplayString().toStdString() + " to channel " + std::to_string(channelIndex)
-        );
+
+      strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+
+      const scoped_actor self{ actorSystem };
+      self->anon_send(
+          actor_cast<actor>(appStateManagerPtr),
+          channelIndex,
+          effectPath,
+          mix_add_effect_to_channel_a_v
+      );
     }
   });
 }

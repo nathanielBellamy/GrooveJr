@@ -6,6 +6,8 @@
 #define GUIEFFECTSCHANNEL_H
 
 #include "caf/actor_system.hpp"
+#include "caf/scoped_actor.hpp"
+#include "../../../../messaging/atoms.h"
 
 #include <QAction>
 #include <QGridLayout>
