@@ -11,7 +11,6 @@ AddEffectsChannelButton::AddEffectsChannelButton(QWidget* parent, QAction* actio
   : QPushButton("&+", parent)
   , addEffectsChannelAction(action)
   {
-    setCursor(Qt::PointingHandCursor);
     setStyle();
 }
 
@@ -20,6 +19,7 @@ void AddEffectsChannelButton::mousePressEvent(QMouseEvent* event){
 }
 
 void AddEffectsChannelButton::setStyle(){
+  setCursor(Qt::PointingHandCursor);
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet("min-width: 40px; max-width: 40px; background-color: pink;");
 }

@@ -13,20 +13,8 @@ EffectsSlots::EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mi
   , mixer(mixer)
   , channelIndex(channelIndex)
   , grid(this)
+  , addEffectSlotButton(this, addEffectAction)
   {
-
-  auto slot0 = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 0, addEffectAction, false);
-  auto slot1 = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 1, addEffectAction, false);
-  auto slot2 = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 2, addEffectAction, false);
-  auto slot3 = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 3, addEffectAction, false);
-  auto slot4 = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 4, addEffectAction, false);
-
-  effectsSlots.push_back(std::move(slot0));
-  effectsSlots.push_back(std::move(slot1));
-  effectsSlots.push_back(std::move(slot2));
-  effectsSlots.push_back(std::move(slot3));
-  effectsSlots.push_back(std::move(slot4));
-
   setupGrid();
 }
 
@@ -38,6 +26,7 @@ void EffectsSlots::setupGrid() {
     grid.addWidget(effectSlot.get(), row, 0, 1, 1);
     row++;
   }
+  grid.addWidget(&addEffectSlotButton, row, 0, 1, 1);
 }
 
 } // Gui

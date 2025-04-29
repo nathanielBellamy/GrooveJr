@@ -13,6 +13,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
+#include "AddEffectSlotButton.h"
 #include "EffectSlot.h"
 #include "../../../../audio/Mixer.h"
 
@@ -32,6 +33,7 @@ class EffectsSlots final : public QWidget {
     int channelIndex;
     QGridLayout grid;
     std::vector<std::unique_ptr<EffectSlot>> effectsSlots;
+    AddEffectSlotButton addEffectSlotButton;
     void setupGrid();
 
 };
