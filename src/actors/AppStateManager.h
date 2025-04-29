@@ -101,6 +101,7 @@ struct AppStateManagerState {
                "Received Add Mixer Effects Channel"
              );
              mixer->addEffectsChannel();
+             hydrateStateToDisplay();
            },
            [this](const int channelIdx, std::string effectPath, mix_add_effect_to_channel_a) {
              Logging::write(
@@ -115,6 +116,7 @@ struct AppStateManagerState {
                  "Unable to add effect: " + effectPath + " to channel " + std::to_string(channelIdx)
                );
              }
+             hydrateStateToDisplay();
            },
            [this](strong_actor_ptr replyTo, read_state_a) {
              Logging::write(
