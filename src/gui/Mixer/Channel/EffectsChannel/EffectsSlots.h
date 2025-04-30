@@ -13,6 +13,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
+#include "../../../../AppState.h"
 #include "AddEffectSlotButton.h"
 #include "EffectSlot.h"
 #include "../../../../audio/Mixer.h"
@@ -27,6 +28,7 @@ class EffectsSlots final : public QWidget {
   public:
     EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, QAction* addEffectAction);
     void addEffectSlot();
+    void hydrateState(const AppStatePacket& appState) const;
 
   private:
     actor_system& actorSystem;

@@ -27,6 +27,11 @@ EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer*
   setupGrid();
 }
 
+void EffectSlot::hydrateState(const AppStatePacket& appState) {
+  pluginName.setText("&hydrated");
+  update();
+}
+
 void EffectSlot::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setMinimumSize(QSize(100, 50));

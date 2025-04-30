@@ -31,6 +31,10 @@ EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio
   setupGrid();
 }
 
+void EffectsChannel::hydrateState(const AppStatePacket& appState) {
+  effectsSlots.hydrateState(appState);
+}
+
 void EffectsChannel::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet("background-color: orange;");

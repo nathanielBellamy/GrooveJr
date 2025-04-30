@@ -18,6 +18,12 @@ EffectsSlots::EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mi
   setupGrid();
 }
 
+void EffectsSlots::hydrateState(const AppStatePacket& appState) const {
+  for (const auto& effectSlot : effectsSlots) {
+    effectSlot->hydrateState(appState);
+  }
+}
+
 void EffectsSlots::addEffectSlot() {
   auto slot = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 0, false);
   effectsSlots.push_back(std::move(slot));

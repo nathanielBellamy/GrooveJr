@@ -16,6 +16,7 @@
 #include <QLabel>
 #include <QWidget>
 
+#include "../../../../AppState.h"
 #include "AddSwapButton.h"
 #include "../../../Shared/VstSelect.h"
 #include "../../../../actors/ActorIds.h"
@@ -31,6 +32,7 @@ class EffectSlot final : public QWidget {
 
   public:
     EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, int slotIndex, bool occupied);
+    void hydrateState(const AppStatePacket& appState);
 
   private:
     actor_system& actorSystem;
