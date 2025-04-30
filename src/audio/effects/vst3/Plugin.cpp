@@ -11,7 +11,6 @@ namespace Vst3 {
 
 Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
 	: gAppState(gAppState)
-	, name(path)
 	, path(path)
 	{
 
@@ -29,13 +28,16 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 		reason += "\nError: ";
 		reason += error;
 		Logging::write(
-			LogSeverityLevel::Error,
+			Error,
 			"Plugin::Plugin()",
 			reason
 		);
 	}
 
-	const auto& cmdArgs = std::vector<std::string> { path };
+	const auto moduleName = module->getName();
+	name = moduleName.substr(0, moduleName.find_last_of('.'));
+
+	const auto& cmdArgs = std::vector { path };
 
 	try {
 		audioHost = new AudioHost::App(
