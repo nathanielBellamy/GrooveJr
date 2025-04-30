@@ -25,7 +25,14 @@ void EffectsSlots::hydrateState(const AppStatePacket& appState) const {
 }
 
 void EffectsSlots::addEffectSlot() {
-  auto slot = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 0, false);
+  auto slot = std::make_unique<EffectSlot>(
+    this,
+    actorSystem,
+    mixer,
+    channelIndex,
+    effectsSlots.size(),
+    false
+  );
   effectsSlots.push_back(std::move(slot));
   setupGrid();
   update();

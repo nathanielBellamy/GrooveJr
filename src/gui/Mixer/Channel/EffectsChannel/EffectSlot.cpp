@@ -19,7 +19,6 @@ EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer*
   , addSwapButton(this, channelIndex, slotIndex, occupied, nullptr)
   , pluginName(this)
   {
-
   title.setText(QString::number(slotIndex + 1));
   title.setFont({title.font().family(), 12});
   pluginName.setFont({pluginName.font().family(), 12});
@@ -29,7 +28,8 @@ EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer*
 }
 
 void EffectSlot::hydrateState(const AppStatePacket& appState) {
-  pluginName.setText("Hydrated");
+  const auto name = mixer->getEffectsChannels().at(channelIndex)->getPluginAtIdx(slotIndex)->name;
+  pluginName.setText(name.data());
   update();
 }
 
