@@ -31,7 +31,7 @@ EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio
   setupGrid();
 }
 
-void EffectsChannel::hydrateState(const AppStatePacket& appState) {
+void EffectsChannel::hydrateState(const AppStatePacket& appState) const {
   effectsSlots.hydrateState(appState);
 }
 

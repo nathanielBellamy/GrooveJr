@@ -15,15 +15,13 @@ MainDryContainer::MainDryContainer(QWidget* parent, actor_system& actorSystem, A
   , dryChannel(this, actorSystem)
   , mainChannel(this, actorSystem, mixer, 0)
   {
-
   setupGrid();
   setStyle();
 }
 
 void MainDryContainer::hydrateState(const AppStatePacket &appState) {
-  // todo
+  mainChannel.hydrateState(appState);
 }
-
 
 void MainDryContainer::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
@@ -31,7 +29,6 @@ void MainDryContainer::setStyle() {
 }
 
 void MainDryContainer::setupGrid() {
-
   grid.addWidget(&mainChannel, 0, 0, -1, 1);
   grid.addWidget(&dryChannel, 0, 1, -1, 1);
 }

@@ -22,13 +22,14 @@ EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer*
 
   title.setText(QString::number(slotIndex + 1));
   title.setFont({title.font().family(), 12});
+  pluginName.setFont({pluginName.font().family(), 12});
 
   setStyle();
   setupGrid();
 }
 
 void EffectSlot::hydrateState(const AppStatePacket& appState) {
-  pluginName.setText("&hydrated");
+  pluginName.setText("Hydrated");
   update();
 }
 

@@ -52,6 +52,4 @@ class EffectSlot final : public QWidget {
 } // Gui
 } // Gj
 
-
-
 #endif //EFFECTSLOT_H

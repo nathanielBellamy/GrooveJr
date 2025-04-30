@@ -39,6 +39,10 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
     channels.erase(channels.begin() + mixer->getEffectsChannelsCount(), channels.end());
   }
 
+  for (const auto& channel : channels) {
+    channel->hydrateState(appState);
+  }
+
   setupGrid();
   update();
 }
