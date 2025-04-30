@@ -26,6 +26,7 @@ class EffectsSlots final : public QWidget {
 
   public:
     EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, QAction* addEffectAction);
+    void addEffectSlot();
 
   private:
     actor_system& actorSystem;

@@ -18,6 +18,13 @@ EffectsSlots::EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mi
   setupGrid();
 }
 
+void EffectsSlots::addEffectSlot() {
+  auto slot = std::make_unique<EffectSlot>(this, actorSystem, mixer, channelIndex, 0, false);
+  effectsSlots.push_back(std::move(slot));
+  setupGrid();
+  update();
+}
+
 void EffectsSlots::setupGrid() {
   grid.setVerticalSpacing(0);
 

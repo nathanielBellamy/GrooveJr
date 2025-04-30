@@ -30,7 +30,7 @@ namespace Gui {
 class EffectSlot final : public QWidget {
 
   public:
-    EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, int slotIndex, QAction* addEffectAction, bool occupied);
+    EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, int slotIndex, bool occupied);
 
   private:
     actor_system& actorSystem;

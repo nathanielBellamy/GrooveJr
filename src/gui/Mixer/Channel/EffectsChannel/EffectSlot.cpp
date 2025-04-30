@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, const int channelIndex, const int slotIndex, QAction* addEffectAction, const bool occupied)
+EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, const int channelIndex, const int slotIndex, const bool occupied)
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
@@ -16,7 +16,7 @@ EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer*
   , occupied(occupied)
   , grid(this)
   , title(this)
-  , addSwapButton(this, channelIndex, slotIndex, occupied, addEffectAction)
+  , addSwapButton(this, channelIndex, slotIndex, occupied, nullptr)
   , pluginName(this)
   {
 

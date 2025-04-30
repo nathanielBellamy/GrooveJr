@@ -105,6 +105,7 @@ void EffectsChannel::connectActions() {
           effectPath,
           mix_add_effect_to_channel_a_v
       );
+      effectsSlots.addEffectSlot();
     }
   });
 }
