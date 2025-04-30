@@ -17,7 +17,7 @@
 #include <QWidget>
 
 #include "../../../../AppState.h"
-#include "AddSwapButton.h"
+#include "ReplaceEffectButton.h"
 #include "../../../Shared/VstSelect.h"
 #include "../../../../actors/ActorIds.h"
 #include "../../../../messaging/atoms.h"
@@ -42,7 +42,7 @@ class EffectSlot final : public QWidget {
     bool occupied;
     QGridLayout grid;
     QLabel title;
-    AddSwapButton addSwapButton;
+    ReplaceEffectButton replaceEffectButton;
     QUrl vstUrl;
     QLabel pluginName;
     void setStyle();

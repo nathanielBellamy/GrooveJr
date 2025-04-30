@@ -8,16 +8,18 @@
 #include <iostream>
 
 #include <QAction>
+#include <QIcon>
 #include <QPoint>
 #include <QPushButton>
+#include <QStyle>
 
 namespace Gj {
 namespace Gui {
 
-class AddSwapButton final : public QPushButton {
+class ReplaceEffectButton final : public QPushButton {
 
   public:
-    AddSwapButton(QWidget* parent, int channelIndex, int slotIndex, bool occupied, QAction* action);
+    ReplaceEffectButton(QWidget* parent, int channelIndex, int slotIndex, bool occupied, QAction* action);
 
   private:
     int channelIndex;
