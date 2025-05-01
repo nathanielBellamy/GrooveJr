@@ -62,7 +62,7 @@ public:
 
     bool setSampleRate(int sampleRate) const;
 
-    // TODO
+    bool replaceEffectOnChannel(int channelIdx, int effectIdx, std::string effectPath);
     bool removeEffectFromChannel(int channelIdx, int effectIdx);
 
     int getAudioFramesPerBuffer() const { return gAppState->audioFramesPerBuffer; };

@@ -33,7 +33,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
 int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
     Logging::write(
       Info,
-      "MainWindow::hydrateState",
+      "Gui::MainWindow::hydrateState",
       "Hydrating app state to Gui."
     );
     transportControl.hydrateState(appStatePacket);

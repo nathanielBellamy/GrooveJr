@@ -45,7 +45,7 @@ struct AudioData {
         {
       Logging::write(
         Info,
-        "AudioData::AudioData",
+        "Audio::AudioData::AudioData",
         "Instantiated AudioData"
       );
     }
@@ -53,7 +53,7 @@ struct AudioData {
     ~AudioData() {
       Logging::write(
         Info,
-        "AudioData::~AudioData",
+        "Audio::AudioData::~AudioData",
         "Destroyed AudioData"
       );
     }

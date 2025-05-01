@@ -87,7 +87,7 @@ void EffectsChannel::connectActions() {
   connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl& url) {
     Logging::write(
       Info,
-      "EffectsChannel::vstSelect",
+      "Gui::EffectsChannel::vstSelect",
       "Selecting VST for channel " + std::to_string(channelIndex)
     );
     vstUrl = url;
@@ -98,7 +98,7 @@ void EffectsChannel::connectActions() {
       const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
         Info,
-        "EffectsChannel::addEffectAction",
+        "Gui::EffectsChannel::addEffectAction",
         "Adding effect: " + effectPath + " to channel " + std::to_string(channelIndex)
       );
 
@@ -121,8 +121,8 @@ void EffectsChannel::connectActions() {
       const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
         Info,
-        "EffectsChannel::replaceEffectAction",
-        "Replacing effect with: " + effectPath + " to channel " + std::to_string(channelIndex)
+        "Gui::EffectsChannel::replaceEffectAction",
+        "Replacing effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) + " with " + effectPath
       );
 
       strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
@@ -142,7 +142,7 @@ void EffectsChannel::connectActions() {
     const int pluginIdx = removeEffectAction.data().toInt();
     Logging::write(
       Info,
-      "EffectsChannel::removeEffectAction",
+      "Gui::EffectsChannel::removeEffectAction",
       "Removing effect: " + std::to_string(pluginIdx) + " from channel " + std::to_string(channelIndex)
     );
 

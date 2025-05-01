@@ -56,6 +56,9 @@ class EffectsChannel {
     void initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
     void terminateEditorHosts() const;
 
+    bool replaceEffect(int effectIdx, std::string effectPath);
+    bool removeEffect(int effectIdx);
+
 };
 
 } // Effects

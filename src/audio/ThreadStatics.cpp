@@ -64,7 +64,7 @@ void ThreadStatics::setPlayState(PlayState newState) {
   std::lock_guard<std::mutex> guard(playStateMutex);
   Logging::write(
     Info,
-    "ThreadStatics::setPlayState",
+    "Audio::ThreadStatics::setPlayState",
     "New state: " + std::to_string(newState)
   );
 
@@ -89,7 +89,7 @@ long ThreadStatics::incrThreadId() {
   std::lock_guard<std::mutex> guard(threadIdMutex);
   Logging::write(
     Info,
-    "ThreadStatics::incrThreadId",
+    "Audio::ThreadStatics::incrThreadId",
     "Old ThreadId: " + std::to_string(threadId)
   );
   threadId += 1;

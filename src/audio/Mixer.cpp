@@ -19,7 +19,7 @@ Mixer::Mixer(AppState* gAppState)
 
   Logging::write(
     Info,
-    "Mixer::Mixer()",
+    "Audio::Mixer::Mixer()",
     "Instantiating Mixer..."
   );
 
@@ -28,20 +28,20 @@ Mixer::Mixer(AppState* gAppState)
   if (jackClient->getJackClient() == nullptr) {
     Logging::write(
       Error,
-      "Mixer::Mixer()",
+      "Audio::Mixer::Mixer()",
       "Failed to initialize JackClient"
     );
   } else {
     Logging::write(
       Info,
-      "Mixer::Mixer()",
+      "Audio::Mixer::Mixer()",
       "Initialized GrooveJr JackClient."
     );
   }
 
   Logging::write(
     Info,
-    "Mixer::Mixer()",
+    "Audio::Mixer::Mixer()",
     "Initialized Mixer."
   );
 }
@@ -49,7 +49,7 @@ Mixer::Mixer(AppState* gAppState)
 Mixer::~Mixer() {
   Logging::write(
     Info,
-    "Mixer::~Mixer",
+    "Audio::Mixer::~Mixer",
     "Destroying Mixer."
   );
 
@@ -58,27 +58,27 @@ Mixer::~Mixer() {
   }
   Logging::write(
     Info,
-    "Mixer::~Mixer",
+    "Audio::Mixer::~Mixer",
     "Mixer done delete effectsChannels"
   );
 
   if (jack_client_close(jackClient->getJackClient())) {
     Logging::write(
       Error,
-      "Mixer::~Mixer",
+      "Audio::Mixer::~Mixer",
       "Failed to close JackClient"
     );
   } else {
     Logging::write(
       Info,
-      "Mixer::~Mixer",
+      "Audio::Mixer::~Mixer",
       "Closed JackClient"
     );
   }
 
   Logging::write(
     Info,
-    "Mixer::~Mixer",
+    "Audio::Mixer::~Mixer",
     "Destroyed Mixer."
   );
 }
@@ -119,13 +119,13 @@ void Mixer::incorporateLatencySamples(const int latencySamples) const {
 bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) const {
   Logging::write(
     Info,
-    "Mixer::addEffectToChannel",
+    "Audio::Mixer::addEffectToChannel",
     "Adding effect " + effectPath + " to channel " + std::to_string(idx)
   );
   if (effectsChannels.at(idx) == nullptr) {
     Logging::write(
       Error,
-      "Mixer::addEffectToChannel",
+      "Audio::Mixer::addEffectToChannel",
       "No channel found at idx: " + std::to_string(idx)
     );
     return false;
@@ -145,6 +145,14 @@ void Mixer::terminateEditorHostsOnChannel(int idx) const {
   return effectsChannels.at(idx)->terminateEditorHosts();
 }
 
+bool Mixer::replaceEffectOnChannel(int channelIdx, int effectIdx, std::string effectPath) {
+  return effectsChannels.at(channelIdx)->replaceEffect(effectIdx, effectPath);
+}
+
+
+bool Mixer::removeEffectFromChannel(const int channelIdx, const int effectIdx) {
+  return effectsChannels.at(channelIdx)->removeEffect(effectIdx);
+}
 
 } // Audio
 } // Gj

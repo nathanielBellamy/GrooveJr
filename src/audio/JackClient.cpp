@@ -87,7 +87,7 @@ JackClient::~JackClient ()
 {
 	Logging::write(
 		Info,
-		"JackClient::~JackClient()",
+		"Audio::JackClient::~JackClient()",
 		"Destroying JackClient"
 	);
 	//! We do not need to "unregister" ports. It is done automatically with "jack_client_close"
@@ -96,13 +96,13 @@ JackClient::~JackClient ()
 
 	// Logging::write(
 	// 	Info,
-	// 	"JackClient::~JackClient()",
+	// 	"Audio::JackClient::~JackClient()",
 	// 	"jackClient closed"
 	// );
 
 	Logging::write(
 		Info,
-		"JackClient::~JackClient()",
+		"Audio::JackClient::~JackClient()",
 		"Destroyed JackClient"
 	);
 }
@@ -158,7 +158,7 @@ bool JackClient::initialize (JackClient::JackName name)
 {
 	Logging::write(
 		Info,
-		"JackClient::initialize",
+		"Audio::JackClient::initialize",
 		"Initializing JackClient"
 	);
 	try {
@@ -166,7 +166,7 @@ bool JackClient::initialize (JackClient::JackName name)
 	} catch (...) {
 		Logging::write(
 			Error,
-			"JackClient::initialize",
+			"Audio::JackClient::initialize",
 			"An error occurred while attempting to Register JackClient"
 		);
 	}
@@ -174,7 +174,7 @@ bool JackClient::initialize (JackClient::JackName name)
 	if (!jackClient) {
 		Logging::write(
 			Error,
-			"JackClient::initialize",
+			"Audio::JackClient::initialize",
 			"Unable to Register JackClient"
 		);
 		return false;
@@ -332,7 +332,7 @@ jack_client_t* JackClient::registerClient (JackClient::JackName name)
 {
 	Logging::write(
 		Info,
-		"JackClient::registerClient",
+		"Audio::JackClient::registerClient",
 		"Registering JackClient: " + name
 	);
 	constexpr jack_options_t options = JackServerName;
@@ -343,20 +343,20 @@ jack_client_t* JackClient::registerClient (JackClient::JackName name)
 	} catch(...) {
 		Logging::write(
 			Error,
-			"JackClient::registerClient",
+			"Audio::JackClient::registerClient",
 			"An error occurred while attempting to open jack client - jack_client_open: " + name
 		);
 	}
 	if (!jackClient) {
 		Logging::write(
 			Error,
-			"JackClient::registerClient",
+			"Audio::JackClient::registerClient",
 			"Unable to open JackClient: " + name + " - status: " + std::to_string (status)
 		);
 	} else {
 		Logging::write(
 			Info,
-			"JackClient::registerClient",
+			"Audio::JackClient::registerClient",
 			"Opened JackClient: " + name
 		);
 	}

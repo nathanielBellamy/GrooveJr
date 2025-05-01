@@ -31,7 +31,7 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
   if (jackClient == nullptr) {
     Logging::write(
       Error,
-      "Cassette::Cassette",
+      "Audio::Cassette::Cassette",
       "jackClient is null"
     );
     throw std::runtime_error(
@@ -49,7 +49,7 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
   if (audioDataRes > 0) {
     Logging::write(
       Error,
-      "Cassette::Cassette",
+      "Audio::Cassette::Cassette",
       "Unable to setup AudioData - status: " + std::to_string(audioDataRes)
     );
     throw std::runtime_error(
@@ -59,7 +59,7 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
 
   Logging::write(
     Info,
-    "Cassette::Cassette",
+    "Audio::Cassette::Cassette",
     "Initialized AudioData with index: " + std::to_string(audioData.index)
   );
 
@@ -69,13 +69,13 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
   ) {
     Logging::write(
       Info,
-      "Cassette::Cassette",
+      "Audio::Cassette::Cassette",
       "Setup Jack"
     );
   } else {
     Logging::write(
       Error,
-      "Cassette::Cassette",
+      "Audio::Cassette::Cassette",
       "Unable to setup Jack - status: " + std::to_string(setupJackStatus)
     );
     throw std::runtime_error(
@@ -87,7 +87,7 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
 Cassette::~Cassette() {
   Logging::write(
     Info,
-    "Cassette::~Cassette",
+    "Audio::Cassette::~Cassette",
     "Destroying Cassette"
   );
 
@@ -95,7 +95,7 @@ Cassette::~Cassette() {
 
   Logging::write(
     Info,
-    "Cassette::~Cassette",
+    "Audio::Cassette::~Cassette",
     "Destroyed Cassette"
   );
 }
@@ -103,7 +103,7 @@ Cassette::~Cassette() {
 void Cassette::cleanup() {
   Logging::write(
     Info,
-    "Cassette::cleanup",
+    "Audio::Cassette::cleanup",
     "Freeing resources for file " + std::string(fileName)
   );
 
@@ -112,7 +112,7 @@ void Cassette::cleanup() {
       std::cerr << "Unable to deactivate jack client" << std::endl;
       Logging::write(
         Error,
-        "Cassette::cleanup",
+        "Audio::Cassette::cleanup",
         "Unable to deactivate JackClient"
       );
     };
@@ -121,26 +121,26 @@ void Cassette::cleanup() {
 
   Logging::write(
     Info,
-    "Cassette::cleanup",
+    "Audio::Cassette::cleanup",
     "Deactivated JackClient"
   );
 
   if (!deleteBuffers()) {
     Logging::write(
       Error,
-      "Cassette::cleanup",
+      "Audio::Cassette::cleanup",
       "Unable to free buffers"
     );
   }
   Logging::write(
     Info,
-    "Cassette::cleanup",
+    "Audio::Cassette::cleanup",
     "Deleted buffers"
   );
   sf_close(file);
   Logging::write(
     Info,
-    "Cassette::cleanup",
+    "Audio::Cassette::cleanup",
     "Done freeing resources for file" + std::string(fileName)
   );
 };
@@ -207,7 +207,7 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
 int Cassette::setupAudioData() {
   Logging::write(
     Info,
-    "Cassette::setupAudioData",
+    "Audio::Cassette::setupAudioData",
     "Setting up Cassette AudioData"
   );
 
@@ -218,7 +218,7 @@ int Cassette::setupAudioData() {
   if (file == nullptr) {
     Logging::write(
       Error,
-      "Cassette::setupAudioData",
+      "Audio::Cassette::setupAudioData",
       "Unable to open input file : sf : " + std::string(sf_strerror(nullptr))
     );
     return 1;
@@ -228,7 +228,7 @@ int Cassette::setupAudioData() {
   if (!mixer->setSampleRate(sfInfo.samplerate)) {
     Logging::write(
       Error,
-      "Cassette::setupAudioData",
+      "Audio::Cassette::setupAudioData",
       "Unable to set sample rate: " + std::to_string(sfInfo.samplerate)
     );
   }
@@ -238,7 +238,7 @@ int Cassette::setupAudioData() {
   if (!buffer) {
       Logging::write(
         Error,
-        "Cassette::setupAudioData",
+        "Audio::Cassette::setupAudioData",
         "Cannot allocate memory for raw audio buffer"
       );
     return 2;
@@ -249,7 +249,7 @@ int Cassette::setupAudioData() {
   if (readcount == 0) {
     Logging::write(
       Error,
-      "Cassette::setupAudioData",
+      "Audio::Cassette::setupAudioData",
       "Unable to read file: " + std::string(fileName)
     );
     return 3;
@@ -258,7 +258,7 @@ int Cassette::setupAudioData() {
   if (!setupInputBuffers()) {
     Logging::write(
       Error,
-      "Cassette::setupAudioData",
+      "Audio::Cassette::setupAudioData",
       "Unable to setup inputBuffers"
     );
     return 4;
@@ -267,7 +267,7 @@ int Cassette::setupAudioData() {
   if (!allocateProcessBuffers()) {
     Logging::write(
       Error,
-      "Cassette::setupAudioData",
+      "Audio::Cassette::setupAudioData",
       "Unable to allocate processBuffers"
     );
     return 4;
@@ -275,13 +275,13 @@ int Cassette::setupAudioData() {
 
   Logging::write(
     Info,
-    "Cassette::setupAudioData",
+    "Audio::Cassette::setupAudioData",
     "Allocated process buffers"
   );
 
   Logging::write(
     Info,
-    "Cassette::setupAudioData",
+    "Audio::Cassette::setupAudioData",
     "Setting up AudioData buffers"
   );
 
@@ -298,13 +298,13 @@ int Cassette::setupAudioData() {
 
   Logging::write(
     Info,
-    "Cassette::setupAudioData",
+    "Audio::Cassette::setupAudioData",
     "Successfully setup AudioData buffers."
   );
 
   Logging::write(
     Info,
-    "Cassette::setupAudioData",
+    "Audio::Cassette::setupAudioData",
     "Setting up AudioData effects processing..."
   );
 
@@ -324,13 +324,13 @@ int Cassette::setupAudioData() {
 
   Logging::write(
     Info,
-    "Cassette::setupAudioData",
+    "Audio::Cassette::setupAudioData",
     "Setup AudioData Effects processing."
   );
 
   Logging::write(
     Info,
-    "Cassette::setupAudioData",
+    "Audio::Cassette::setupAudioData",
     "Successfully setup AudioData."
   );
 
@@ -395,13 +395,13 @@ int Cassette::setupJack() {
   if ( setProcessStatus == 0) {
     Logging::write(
       Info,
-      "Cassette::setupJack",
+      "Audio::Cassette::setupJack",
       "Set Jack process callback"
     );
   } else {
     Logging::write(
       Error,
-      "Cassette::setupJack",
+      "Audio::Cassette::setupJack",
       "Unable to set process callback - status: " + std::to_string(setProcessStatus)
     );
     return 1;
@@ -420,7 +420,7 @@ int Cassette::setupJack() {
   if (outPortL == nullptr) {
     Logging::write(
       Error,
-      "Cassette::setupJack",
+      "Audio::Cassette::setupJack",
       "Unable to create Jack outPortL"
     );
     return 2;
@@ -438,7 +438,7 @@ int Cassette::setupJack() {
   if (outPortR == nullptr) {
     Logging::write(
       Error,
-      "Cassette::setupJack",
+      "Audio::Cassette::setupJack",
       "Unable to create Jack outPortR"
     );
     return 3;
@@ -449,13 +449,13 @@ int Cassette::setupJack() {
   if (jackActivateStatus == 0) {
     Logging::write(
       Info,
-      "Cassette::setupJack",
+      "Audio::Cassette::setupJack",
       "Jack activated successfully"
     );
   } else {
     Logging::write(
       Error,
-      "Cassette::setupJack",
+      "Audio::Cassette::setupJack",
       "Unable to activate jack - status: " + std::to_string(jackActivateStatus)
     );
     return 4;
@@ -467,7 +467,7 @@ int Cassette::setupJack() {
   ) {
     Logging::write(
       Error,
-      "Cassette::setupJack",
+      "Audio::Cassette::setupJack",
       "Unable to connect out_port_L - status: " + std::to_string(connectStatusL)
     );
     return 5;
@@ -479,7 +479,7 @@ int Cassette::setupJack() {
   ) {
       Logging::write(
         Error,
-        "Cassette::setupJack",
+        "Audio::Cassette::setupJack",
         "Unable to connect out_port_R - status: " + std::to_string(connectStatusR)
       );
       return 6;
@@ -502,7 +502,7 @@ int Cassette::setupJack() {
 bool Cassette::allocateProcessBuffers() {
   Logging::write(
     Info,
-    "Cassette::allocateProcessBuffers",
+    "Audio::Cassette::allocateProcessBuffers",
     "Allocating process buffers."
   );
 
@@ -510,7 +510,7 @@ bool Cassette::allocateProcessBuffers() {
 
   Logging::write(
     Info,
-    "Cassette::allocateProcessBuffers",
+    "Audio::Cassette::allocateProcessBuffers",
     "Allocated process buffers."
   );
 
@@ -526,7 +526,7 @@ bool Cassette::allocateInputBuffers() {
   if (inputBuffers[0] == nullptr || inputBuffers[1] == nullptr) {
     Logging::write(
       Error,
-      "Cassette::allocateInputBuffers",
+      "Audio::Cassette::allocateInputBuffers",
       "Unable to allocate memory for individual Cassette.inputBuffers"
     );
     return false;
@@ -539,7 +539,7 @@ bool Cassette::populateInputBuffers() const {
   if (buffer == nullptr) {
     Logging::write(
       Error,
-      "Cassette::populateInputBuffers",
+      "Audio::Cassette::populateInputBuffers",
       "Unable to populate input buffers - raw audio buffer is null"
     );
     return false;
@@ -548,7 +548,7 @@ bool Cassette::populateInputBuffers() const {
   if (inputBuffers[0] == nullptr || inputBuffers[1] == nullptr) {
     Logging::write(
       Error,
-      "Cassette::populateInputBuffers",
+      "Audio::Cassette::populateInputBuffers",
       "Unable to populate input buffers - buffers are null"
     );
     return false;
@@ -567,7 +567,7 @@ bool Cassette::setupInputBuffers() {
   if (!allocateInputBuffers()) {
     Logging::write(
       Error,
-      "Cassette::setupInputBuffers",
+      "Audio::Cassette::setupInputBuffers",
       "Unable to allocate input buffers."
     );
   }
@@ -575,7 +575,7 @@ bool Cassette::setupInputBuffers() {
   if (!populateInputBuffers()) {
     Logging::write(
       Error,
-      "Cassette::setupInputBuffers",
+      "Audio::Cassette::setupInputBuffers",
       "Unable to populate input buffers."
     );
     return false;
@@ -587,7 +587,7 @@ bool Cassette::setupInputBuffers() {
 bool Cassette::deleteBuffers() const {
   Logging::write(
     Info,
-    "Cassette::deleteBuffers",
+    "Audio::Cassette::deleteBuffers",
     "Deleting Cassette buffers."
   );
 
@@ -598,7 +598,7 @@ bool Cassette::deleteBuffers() const {
   } catch (...) {
     Logging::write(
         Error,
-        "Cassette::freeBuffers",
+        "Audio::Cassette::freeBuffers",
         "Unable to delete Cassette buffers"
     );
     return false;
@@ -606,7 +606,7 @@ bool Cassette::deleteBuffers() const {
 
   Logging::write(
     Info,
-    "Cassette::freeBuffers",
+    "Audio::Cassette::freeBuffers",
     "Done delete Cassette buffers."
   );
 
@@ -618,7 +618,7 @@ bool Cassette::deleteBuffers() const {
 int Cassette::play() {
   Logging::write(
     Info,
-    "Cassette::play",
+    "Audio::Cassette::play",
     "Playing Cassette..."
   );
 
@@ -639,7 +639,7 @@ int Cassette::play() {
         ThreadStatics::setReadComplete(true);
         Logging::write(
           Info,
-          "Cassette::play",
+          "Audio::Cassette::play",
           "Read complete"
         );
         break;

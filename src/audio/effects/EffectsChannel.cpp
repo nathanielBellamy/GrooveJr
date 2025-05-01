@@ -24,7 +24,7 @@ EffectsChannel::EffectsChannel(
 
   Logging::write(
   	Info,
-  	"EffectsChannel::ctor",
+  	"Audio::EffectsChannel::ctor",
   	"Instantiating EffectsChannel: " + std::to_string(index)
   );
 }
@@ -135,6 +135,23 @@ void EffectsChannel::terminateEditorHosts() const {
 	}
 }
 
+bool EffectsChannel::replaceEffect(int effectIdx, std::string effectPath) {
+	Logging::write(
+		Info,
+		"Audio::EffectsChannel::replaceEffect",
+		"Replacing effect " + std::to_string(effectIdx) + " on channel " + std::to_string(index) + " with " + effectPath
+	);
+	return true;
+}
+
+bool EffectsChannel::removeEffect(int effectIdx) {
+	Logging::write(
+		Info,
+		"Audio::EffectsChannel::replaceEffect",
+		"Removing effect " + std::to_string(effectIdx) + " from channel " + std::to_string(index)
+	);
+	return true;
+}
 
 } // Effects
 } // Audio
