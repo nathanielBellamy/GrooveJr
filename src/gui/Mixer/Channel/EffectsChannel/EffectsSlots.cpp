@@ -7,13 +7,21 @@
 namespace Gj {
 namespace Gui {
 
-EffectsSlots::EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, QAction* addEffectAction)
+EffectsSlots::EffectsSlots(QWidget* parent,
+                           actor_system& actorSystem,
+                           Audio::Mixer* mixer,
+                           int channelIndex,
+                           QAction* addEffectAction,
+                           QAction* replaceEffectAction,
+                           QAction* removeEffectAction)
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , channelIndex(channelIndex)
   , grid(this)
   , addEffectSlotButton(this, addEffectAction)
+  , replaceEffectAction(replaceEffectAction)
+  , removeEffectAction(removeEffectAction)
   {
   setupGrid();
 }
@@ -31,9 +39,17 @@ void EffectsSlots::addEffectSlot() {
     mixer,
     channelIndex,
     effectsSlots.size(),
-    false
+    false,
+    replaceEffectAction,
+    removeEffectAction
   );
   effectsSlots.push_back(std::move(slot));
+  setupGrid();
+  update();
+}
+
+void EffectsSlots::removeEffectSlot() {
+  effectsSlots.pop_back();
   setupGrid();
   update();
 }

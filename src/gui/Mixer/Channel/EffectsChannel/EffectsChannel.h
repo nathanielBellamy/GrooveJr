@@ -46,6 +46,8 @@ class EffectsChannel final : public QWidget {
     VstSelect vstSelect;
     QUrl vstUrl;
     QAction addEffectAction;
+    QAction replaceEffectAction;
+    QAction removeEffectAction;
     QGridLayout grid;
     QLabel title;
     QSlider slider;

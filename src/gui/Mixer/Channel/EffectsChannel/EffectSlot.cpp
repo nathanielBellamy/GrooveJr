@@ -7,7 +7,14 @@
 namespace Gj {
 namespace Gui {
 
-EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, const int channelIndex, const int slotIndex, const bool occupied)
+EffectSlot::EffectSlot(QWidget* parent,
+                       actor_system& actorSystem,
+                       Audio::Mixer* mixer,
+                       const int channelIndex,
+                       const int slotIndex,
+                       const bool occupied,
+                       QAction* replaceEffectAction,
+                       QAction* removeEffectAction)
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
@@ -16,8 +23,8 @@ EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer*
   , occupied(occupied)
   , grid(this)
   , title(this)
-  , removeEffectButton(this, channelIndex, slotIndex, occupied, nullptr)
-  , replaceEffectButton(this, channelIndex, slotIndex, occupied, nullptr)
+  , replaceEffectButton(this, channelIndex, slotIndex, occupied, replaceEffectAction)
+  , removeEffectButton(this, channelIndex, slotIndex, occupied, removeEffectAction)
   , pluginName(this)
   {
   title.setText(QString::number(slotIndex + 1));

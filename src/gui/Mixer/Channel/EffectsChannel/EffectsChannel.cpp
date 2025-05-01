@@ -16,10 +16,12 @@ EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio
   , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Effects"), this)
   , vstSelect(this)
   , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
+  , replaceEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentRevert), tr("&Replace Effect"), this)
+  , removeEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Effect"), this)
   , grid(this)
   , title(this)
   , slider(Qt::Vertical, this)
-  , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction)
+  , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction, &replaceEffectAction, &removeEffectAction)
   , muteSoloContainer(this, &openEffectsContainer)
   {
 
@@ -111,6 +113,47 @@ void EffectsChannel::connectActions() {
       );
       effectsSlots.addEffectSlot();
     }
+  });
+
+  connect(&replaceEffectAction, &QAction::triggered, [&](int pluginIdx) {
+    if (vstSelect.exec() == QDialog::Accepted) {
+      const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
+      Logging::write(
+        Info,
+        "EffectsChannel::replaceEffectAction",
+        "Replacing effect with: " + effectPath + " to channel " + std::to_string(channelIndex)
+      );
+
+      strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+
+      const scoped_actor self{ actorSystem };
+      self->anon_send(
+          actor_cast<actor>(appStateManagerPtr),
+          channelIndex,
+          pluginIdx,
+          effectPath,
+          mix_replace_effect_on_channel_a_v
+      );
+    }
+  });
+
+  connect(&removeEffectAction, &QAction::triggered, [&](int pluginIdx) {
+    Logging::write(
+      Info,
+      "EffectsChannel::removeEffectAction",
+      "Removing effect: " + std::to_string(pluginIdx) + " from channel " + std::to_string(channelIndex)
+    );
+
+    strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+
+    const scoped_actor self{ actorSystem };
+    self->anon_send(
+        actor_cast<actor>(appStateManagerPtr),
+        channelIndex,
+        pluginIdx,
+        mix_replace_effect_on_channel_a_v
+    );
+    effectsSlots.removeEffectSlot();
   });
 }
 

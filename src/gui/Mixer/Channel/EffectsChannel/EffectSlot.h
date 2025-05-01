@@ -32,7 +32,14 @@ namespace Gui {
 class EffectSlot final : public QWidget {
 
   public:
-    EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, int slotIndex, bool occupied);
+    EffectSlot(QWidget* parent,
+               actor_system& actorSystem,
+               Audio::Mixer* mixer,
+               int channelIndex,
+               int slotIndex,
+               bool occupied,
+               QAction* replaceEffectAction,
+               QAction* removeEffectAction);
     void hydrateState(const AppStatePacket& appState);
 
   private:
@@ -43,8 +50,8 @@ class EffectSlot final : public QWidget {
     bool occupied;
     QGridLayout grid;
     QLabel title;
-    RemoveEffectButton removeEffectButton;
     ReplaceEffectButton replaceEffectButton;
+    RemoveEffectButton removeEffectButton;
     QUrl vstUrl;
     QLabel pluginName;
     void setStyle();

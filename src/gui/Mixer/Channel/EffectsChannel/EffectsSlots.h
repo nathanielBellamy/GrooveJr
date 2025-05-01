@@ -26,8 +26,17 @@ namespace Gui {
 class EffectsSlots final : public QWidget {
 
   public:
-    EffectsSlots(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, QAction* addEffectAction);
+    EffectsSlots(
+      QWidget* parent,
+      actor_system& actorSystem,
+      Audio::Mixer* mixer,
+      int channelIndex,
+      QAction* addEffectAction,
+      QAction* replaceEffectAction,
+      QAction* removeEffectAction
+    );
     void addEffectSlot();
+    void removeEffectSlot();
     void hydrateState(const AppStatePacket& appState) const;
 
   private:
@@ -37,6 +46,8 @@ class EffectsSlots final : public QWidget {
     QGridLayout grid;
     std::vector<std::unique_ptr<EffectSlot>> effectsSlots;
     AddEffectSlotButton addEffectSlotButton;
+    QAction* replaceEffectAction;
+    QAction* removeEffectAction;
     void setupGrid();
 
 };
