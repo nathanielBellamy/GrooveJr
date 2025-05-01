@@ -10,6 +10,7 @@
 #include <QPoint>
 #include <QPushButton>
 #include <QStyle>
+#include <QVariant>
 
 namespace Gj {
 namespace Gui {

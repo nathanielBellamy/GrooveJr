@@ -19,6 +19,7 @@ RemoveEffectButton::RemoveEffectButton(QWidget *parent, int channelIndex, int sl
 }
 
 void RemoveEffectButton::mousePressEvent(QMouseEvent* event) {
+  removeEffectAction->setData(QVariant(slotIndex));
   removeEffectAction->activate(QAction::Trigger);
 }
 

@@ -10,6 +10,7 @@
 #include <QPoint>
 #include <QPushButton>
 #include <QStyle>
+#include <QVariant>
 
 namespace Gj {
 namespace Gui {
@@ -23,7 +24,7 @@ class ReplaceEffectButton final : public QPushButton {
     int channelIndex;
     int slotIndex;
     bool occupied;
-    QAction* addEffectAction;
+    QAction* replaceEffectAction;
     void mousePressEvent(QMouseEvent* event) override;
     void setStyle();
 

@@ -115,7 +115,8 @@ void EffectsChannel::connectActions() {
     }
   });
 
-  connect(&replaceEffectAction, &QAction::triggered, [&](int pluginIdx) {
+  connect(&replaceEffectAction, &QAction::triggered, [&]() {
+    const int pluginIdx = replaceEffectAction.data().toInt();
     if (vstSelect.exec() == QDialog::Accepted) {
       const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
@@ -137,7 +138,8 @@ void EffectsChannel::connectActions() {
     }
   });
 
-  connect(&removeEffectAction, &QAction::triggered, [&](int pluginIdx) {
+  connect(&removeEffectAction, &QAction::triggered, [&]() {
+    const int pluginIdx = removeEffectAction.data().toInt();
     Logging::write(
       Info,
       "EffectsChannel::removeEffectAction",
