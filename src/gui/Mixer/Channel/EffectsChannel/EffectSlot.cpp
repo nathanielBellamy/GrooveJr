@@ -16,6 +16,7 @@ EffectSlot::EffectSlot(QWidget* parent, actor_system& actorSystem, Audio::Mixer*
   , occupied(occupied)
   , grid(this)
   , title(this)
+  , removeEffectButton(this, channelIndex, slotIndex, occupied, nullptr)
   , replaceEffectButton(this, channelIndex, slotIndex, occupied, nullptr)
   , pluginName(this)
   {
@@ -41,7 +42,8 @@ void EffectSlot::setStyle() {
 
 void EffectSlot::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, 1);
-  grid.addWidget(&replaceEffectButton, 0, 1, 1, 1);
+  grid.addWidget(&replaceEffectButton, 0, 2, 1, 1);
+  grid.addWidget(&removeEffectButton, 0, 3, 1, 1);
   grid.addWidget(&pluginName, 1, 0, -1, -1);
 
   grid.setColumnMinimumWidth(1, 30);

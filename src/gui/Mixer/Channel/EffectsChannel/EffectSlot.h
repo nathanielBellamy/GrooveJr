@@ -17,6 +17,7 @@
 #include <QWidget>
 
 #include "../../../../AppState.h"
+#include "RemoveEffectButton.h"
 #include "ReplaceEffectButton.h"
 #include "../../../Shared/VstSelect.h"
 #include "../../../../actors/ActorIds.h"
@@ -42,6 +43,7 @@ class EffectSlot final : public QWidget {
     bool occupied;
     QGridLayout grid;
     QLabel title;
+    RemoveEffectButton removeEffectButton;
     ReplaceEffectButton replaceEffectButton;
     QUrl vstUrl;
     QLabel pluginName;

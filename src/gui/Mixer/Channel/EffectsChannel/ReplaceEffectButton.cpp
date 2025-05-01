@@ -15,10 +15,17 @@ ReplaceEffectButton::ReplaceEffectButton(QWidget *parent, int channelIndex, int 
   , addEffectAction(action) {
   setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_BrowserReload));
   setCursor(Qt::PointingHandCursor);
+  setStyle();
 }
 
 void ReplaceEffectButton::mousePressEvent(QMouseEvent* event) {
   addEffectAction->activate(QAction::Trigger);
+}
+
+void ReplaceEffectButton::setStyle() {
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  setMinimumSize(QSize(20, 20));
+  setStyleSheet("padding: 2px;");
 }
 
 } // Gui

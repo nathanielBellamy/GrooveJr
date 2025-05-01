@@ -1,9 +1,9 @@
 //
-// Created by ns on 3/8/25.
+// Created by ns on 4/30/25.
 //
 
-#ifndef ADDSWAPBUTTON_H
-#define ADDSWAPBUTTON_H
+#ifndef REMOVEEFFECTBUTTON_H
+#define REMOVEEFFECTBUTTON_H
 
 #include <QAction>
 #include <QIcon>
@@ -14,16 +14,16 @@
 namespace Gj {
 namespace Gui {
 
-class ReplaceEffectButton final : public QPushButton {
+class RemoveEffectButton final : public QPushButton {
 
   public:
-    ReplaceEffectButton(QWidget* parent, int channelIndex, int slotIndex, bool occupied, QAction* action);
+    RemoveEffectButton(QWidget* parent, int channelIndex, int slotIndex, bool occupied, QAction* action);
 
   private:
     int channelIndex;
     int slotIndex;
     bool occupied;
-    QAction* addEffectAction;
+    QAction* removeEffectAction;
     void mousePressEvent(QMouseEvent* event) override;
     void setStyle();
 
@@ -32,6 +32,4 @@ class ReplaceEffectButton final : public QPushButton {
 } // Gui
 } // Gj
 
-
-
-#endif //ADDSWAPBUTTON_H
+#endif //REMOVEEFFECTBUTTON_H
