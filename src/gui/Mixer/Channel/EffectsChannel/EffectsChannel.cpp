@@ -153,7 +153,7 @@ void EffectsChannel::connectActions() {
         actor_cast<actor>(appStateManagerPtr),
         channelIndex,
         pluginIdx,
-        mix_replace_effect_on_channel_a_v
+        mix_remove_effect_on_channel_a_v
     );
     effectsSlots.removeEffectSlot();
   });

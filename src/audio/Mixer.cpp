@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Audio {
 
-  using namespace Steinberg;
+using namespace Steinberg;
 
 Mixer::Mixer(AppState* gAppState)
   : gAppState(gAppState)
@@ -130,7 +130,7 @@ bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) con
     );
     return false;
   }
-  return effectsChannels.at(idx)->addEffect(effectPath);
+  return effectsChannels.at(idx)->addReplaceEffect(-1, effectPath);
 }
 
 int Mixer::effectsOnChannelCount(int idx) const {
@@ -145,10 +145,9 @@ void Mixer::terminateEditorHostsOnChannel(int idx) const {
   return effectsChannels.at(idx)->terminateEditorHosts();
 }
 
-bool Mixer::replaceEffectOnChannel(int channelIdx, int effectIdx, std::string effectPath) {
-  return effectsChannels.at(channelIdx)->replaceEffect(effectIdx, effectPath);
+bool Mixer::replaceEffectOnChannel(int channelIdx, int effectIdx, std::string effectPath) const {
+  return effectsChannels.at(channelIdx)->addReplaceEffect(effectIdx, effectPath);
 }
-
 
 bool Mixer::removeEffectFromChannel(const int channelIdx, const int effectIdx) {
   return effectsChannels.at(channelIdx)->removeEffect(effectIdx);

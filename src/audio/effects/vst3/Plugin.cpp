@@ -16,7 +16,7 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 
 	Logging::write(
 		Info,
-		"Audio::Plugin::Plugin()",
+		"Audio::Plugin::Plugin",
 		"Instantiating plugin " + path
 	);
 
@@ -29,7 +29,7 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 		reason += error;
 		Logging::write(
 			Error,
-			"Audio::Plugin::Plugin()",
+			"Audio::Plugin::Plugin",
 			reason
 		);
 	}
@@ -49,7 +49,7 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 	} catch (...) {
 		Logging::write(
 			Error,
-			"Audio::Plugin::Plugin()",
+			"Audio::Plugin::Plugin",
 			"An error occurred while initialiazing audioHost for " + path
 		);
 		return;
@@ -57,7 +57,7 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 
 	Logging::write(
 		Info,
-		"Audio::Plugin::Plugin()",
+		"Audio::Plugin::Plugin",
 		"Initialized audioHost for " + path
 	);
 }
@@ -71,7 +71,7 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 	try {
 		Logging::write(
 			Info,
-			"Audio::Plugin::initEditorHost()",
+			"Audio::Plugin::initEditorHost",
 			"Initializing editorHost for " + this->path
 		);
 		const auto& cmdArgs = std::vector { path };
@@ -84,7 +84,7 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 	} catch (...) {
 		Logging::write(
 			Warning,
-			"Audio::Plugin::Plugin()",
+			"Audio::Plugin::Plugin",
 			"An error occured while initiating editorhost for " + path
 		);
 		return;
@@ -92,7 +92,7 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 
 	Logging::write(
 		Info,
-		"Audio::Plugin::Plugin()",
+		"Audio::Plugin::Plugin",
 		"Initialized editorHost for " + path
 	);
 }

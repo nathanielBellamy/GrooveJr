@@ -49,14 +49,13 @@ class EffectsChannel {
     float getPan();
     void setPan(float pan);
 
-    bool addEffect(const std::string& effectPath);
+    bool addReplaceEffect(int effectIdx, const std::string& effectPath);
     void setSampleRate(int sampleRate) const;
 
     int effectCount() const;
     void initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
     void terminateEditorHosts() const;
 
-    bool replaceEffect(int effectIdx, std::string effectPath);
     bool removeEffect(int effectIdx);
 
 };

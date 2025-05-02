@@ -26,42 +26,42 @@ long ThreadStatics::threadId = 0;
 std::mutex ThreadStatics::threadIdMutex;
 
 const char* ThreadStatics::getFilePath() {
-  std::lock_guard<std::mutex> guard(filePathMutex);
+  std::lock_guard guard(filePathMutex);
   return filePath;
 }
 
 void ThreadStatics::setFilePath(const char* newFilePath) {
-  std::lock_guard<std::mutex> guard(filePathMutex);
+  std::lock_guard guard(filePathMutex);
   filePath = newFilePath;
 }
 
 long ThreadStatics::getFrameId() {
-  std::lock_guard<std::mutex> guard(frameIdMutex);
+  std::lock_guard guard(frameIdMutex);
   return frameId;
 }
 
 void ThreadStatics::setFrameId(long newId) {
-  std::lock_guard<std::mutex> guard(frameIdMutex);
+  std::lock_guard guard(frameIdMutex);
   frameId = newId;
 }
 
 void ThreadStatics::setPlaybackSpeed(float newSpeed) {
-  std::lock_guard<std::mutex> guard(playbackSpeedMutex);
+  std::lock_guard guard(playbackSpeedMutex);
   playbackSpeed = newSpeed;
 }
 
 float ThreadStatics::getPlaybackSpeed() {
-  std::lock_guard<std::mutex> guard(playbackSpeedMutex);
+  std::lock_guard guard(playbackSpeedMutex);
   return playbackSpeed;
 }
 
 Gj::PlayState ThreadStatics::getPlayState() {
-  std::lock_guard<std::mutex> guard(playStateMutex);
+  std::lock_guard guard(playStateMutex);
   return playState;
 }
 
 void ThreadStatics::setPlayState(PlayState newState) {
-  std::lock_guard<std::mutex> guard(playStateMutex);
+  std::lock_guard guard(playStateMutex);
   Logging::write(
     Info,
     "Audio::ThreadStatics::setPlayState",
@@ -76,17 +76,17 @@ void ThreadStatics::setPlayState(PlayState newState) {
 }
 
 bool ThreadStatics::getReadComplete() {
-  std::lock_guard<std::mutex> guard(readCompleteMutex);
+  std::lock_guard guard(readCompleteMutex);
   return readComplete;
 }
 
 void ThreadStatics::setReadComplete(bool val) {
-  std::lock_guard<std::mutex> guard(readCompleteMutex);
+  std::lock_guard guard(readCompleteMutex);
   readComplete = val;
 }
 
 long ThreadStatics::incrThreadId() {
-  std::lock_guard<std::mutex> guard(threadIdMutex);
+  std::lock_guard guard(threadIdMutex);
   Logging::write(
     Info,
     "Audio::ThreadStatics::incrThreadId",
@@ -97,7 +97,7 @@ long ThreadStatics::incrThreadId() {
 }
 
 long ThreadStatics::getThreadId() {
-  std::lock_guard<std::mutex> guard(threadIdMutex);
+  std::lock_guard guard(threadIdMutex);
   return threadId;
 }
 

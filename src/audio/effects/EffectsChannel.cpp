@@ -43,7 +43,8 @@ EffectsChannel::~EffectsChannel() {
   );
 }
 
-bool EffectsChannel::addEffect(const std::string& effectPath) {
+// an effectIdx of -1 indicates to push_back
+bool EffectsChannel::addReplaceEffect(const int effectIdx, const std::string& effectPath) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::addEffect",
@@ -63,7 +64,7 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
 		"Instantiated plugin " + effect->path + " for channel " + std::to_string(index)
 	);
 
-  const FUnknownPtr<Vst::IAudioProcessor> processor = effect->getProcesser();
+  const FUnknownPtr<IAudioProcessor> processor = effect->getProcesser();
   // int latencySamples = processor->getLatencySamples();
   // incorporateLatencySamples(latencySamples);
 
@@ -82,14 +83,18 @@ bool EffectsChannel::addEffect(const std::string& effectPath) {
   // processor->getBusArrangement(busDirection, index, arrangement);
 
   const int32 maxSamplesPerBlock = gAppState->audioFramesPerBuffer;
-  Vst::ProcessSetup setup = {
+  ProcessSetup setup = {
     Vst::kRealtime,
     Vst::kSample64,
     maxSamplesPerBlock,
     44100.0
   };
   processor->setupProcessing(setup);
-  vst3Plugins.push_back(std::move(effect));
+	if (effectIdx < 0) {
+		vst3Plugins.push_back(std::move(effect));
+	} else {
+		vst3Plugins.at(effectIdx) = std::move(effect);
+	}
 
 	Logging::write(
 		Info,
@@ -135,21 +140,15 @@ void EffectsChannel::terminateEditorHosts() const {
 	}
 }
 
-bool EffectsChannel::replaceEffect(int effectIdx, std::string effectPath) {
-	Logging::write(
-		Info,
-		"Audio::EffectsChannel::replaceEffect",
-		"Replacing effect " + std::to_string(effectIdx) + " on channel " + std::to_string(index) + " with " + effectPath
-	);
-	return true;
-}
-
 bool EffectsChannel::removeEffect(int effectIdx) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::replaceEffect",
 		"Removing effect " + std::to_string(effectIdx) + " from channel " + std::to_string(index)
 	);
+	if (effectIdx < vst3Plugins.size()) {
+		vst3Plugins.erase(vst3Plugins.begin() + effectIdx);
+	}
 	return true;
 }
 
