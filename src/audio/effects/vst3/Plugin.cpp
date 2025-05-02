@@ -63,8 +63,34 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 }
 
 Plugin::~Plugin() {
+	Logging::write(
+		Info
+		, "Audio::Plugin::~Plugin",
+		"Destroying Plugin: " + name
+	);
   audioHost->terminate();
-  editorHost->terminate();
+
+	Logging::write(
+		Info,
+		"Audio::Plugin::~Plugin",
+		"Destroyed audioHost for Plugin: " + name
+	);
+
+	if (editorHost != nullptr) {
+		delete editorHost;
+
+		Logging::write(
+			Info
+			, "Audio::Plugin::~Plugin",
+			"Destroyed editorHost for Plugin: " + name
+		);
+	}
+
+	Logging::write(
+		Info,
+		"Audio::Plugin::~Plugin",
+		"Destroyed Plugin: " + name
+	);
 }
 
 void Plugin::initEditorHost(EditorHost::WindowPtr window) {

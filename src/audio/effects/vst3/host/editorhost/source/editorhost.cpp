@@ -307,7 +307,7 @@ options:
 //------------------------------------------------------------------------
 void App::terminate ()
 {
-    PluginContextFactory::instance ().setPluginContext (nullptr);
+	PluginContextFactory::instance().setPluginContext (nullptr);
 	if (windowController)
 		windowController->closePlugView ();
 	windowController.reset ();

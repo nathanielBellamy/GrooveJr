@@ -23,7 +23,7 @@ class EffectsChannel {
   AppState* gAppState;
   std::shared_ptr<JackClient> jackClient;
   int index;
-  std::vector<std::unique_ptr<Vst3::Plugin>> vst3Plugins;
+  std::vector<Vst3::Plugin*> vst3Plugins;
 
   public:
     Channel channel;
@@ -40,7 +40,7 @@ class EffectsChannel {
 
     [[nodiscard]]
     Vst3::Plugin* getPluginAtIdx(const int idx) const {
-      return vst3Plugins.at(idx).get();
+      return vst3Plugins.at(idx);
     };
 
     float getGain();
