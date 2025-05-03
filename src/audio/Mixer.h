@@ -46,7 +46,7 @@ public:
 
   [[nodiscard]]
     int getEffectsChannelsCount() const {
-      return static_cast<int>(effectsChannels.size());
+      return static_cast<int>(effectsChannels.size() - 1);
     }
 
     bool addEffectsChannel();

@@ -23,7 +23,7 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
       ThreadStatics::getFrameId(),
       PLAY,
       ThreadStatics::getPlaybackSpeed(),
-      static_cast<float>(mixer->getEffectsChannelsCount() + 1),
+      static_cast<float>(mixer->getEffectsChannelsCount()),
       mixer->getEffectsChannelsCount()
     )
   {
@@ -44,9 +44,6 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
 
   float* buffersBPtrPre[2] = { &buffersB[0], &buffersB[MAX_AUDIO_FRAMES_PER_BUFFER] };
   buffersBPtr = buffersBPtrPre;
-
-  float* buffersMainInPtrPre[2] = { &buffersMainIn[0], &buffersMainIn[MAX_AUDIO_FRAMES_PER_BUFFER] };
-  buffersMainInPtr = buffersMainInPtrPre;
 
   int audioDataRes = setupAudioData();
   if (audioDataRes > 0) {
@@ -169,8 +166,9 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioDataIndex;
   float** processHead = audioData->inputBuffersProcessHead;
 
-  // process effects
-  for (int effectsChannelIdx = 0; effectsChannelIdx < audioData->effectsChannelCount; effectsChannelIdx++) {
+  // process effects channels
+  // main channel is effectsChannelIdx 0
+  for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount; effectsChannelIdx++) {
     auto [effectCount, processFuncs, buffers, channelSettings] = audioData->effectsChannelsProcessData[effectsChannelIdx];
     for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
       if (pluginIdx == 0) {
@@ -185,19 +183,36 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
     }
   }
 
-  // sum down into mainInBuffer
+  // sum down into mainInBuffers
   const float channelCount = audioData->channelCount;
   for (int i = 0; i < nframes; i++) {
-    for (int effectsChannelIdx = 0; effectsChannelIdx < audioData->effectsChannelCount; effectsChannelIdx++) {
+    for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount; effectsChannelIdx++) {
       const auto channel = audioData->effectsChannelsProcessData[effectsChannelIdx].channelSettings;
       if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-        outL[i] = channel.gain * processHead[0][i] / channelCount;
-        outR[i] = channel.gain * processHead[1][i] / channelCount;
+        audioData->mainInBuffers[0][i] += channel.gain * processHead[0][i] / channelCount;
+        audioData->mainInBuffers[1][i] += channel.gain * processHead[1][i] / channelCount;
       } else {
-        outL[i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
-        outR[i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
+        audioData->mainInBuffers[0][i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
+        audioData->mainInBuffers[1][i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
       }
     }
+  }
+
+  // process summed down mix through main effects
+  auto [effectCount, processFuncs, buffers, channelSettings] = audioData->effectsChannelsProcessData[0];
+  for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
+    buffers[pluginIdx].numSamples = nframes;
+
+    processFuncs[pluginIdx](
+      buffers[pluginIdx],
+      nframes
+    );
+  }
+
+  // write out processed main channel to audio out
+  for (int i = 0; i < nframes; i++) {
+    outL[i] = audioData->mainOutBuffers[0][i];
+    outR[i] = audioData->mainOutBuffers[1][i];
   }
 
   audioData->index += nframes;
@@ -291,6 +306,9 @@ int Cassette::setupAudioData() {
   audioData.inputBuffersProcessHead[0] = inputBuffers[0] + audioData.index;
   audioData.inputBuffersProcessHead[1] = inputBuffers[1] + audioData.index;
 
+  audioData.mainInBuffers[0] = buffersAPtr[0];
+  audioData.mainInBuffers[1] = buffersAPtr[1];
+
   for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
     audioData.effectsChannelsWriteOut[i][0] = effectsChannelsWriteOutBuffer + (2 * i * MAX_AUDIO_FRAMES_PER_BUFFER);
     audioData.effectsChannelsWriteOut[i][1] = effectsChannelsWriteOutBuffer + ((2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER);
@@ -314,14 +332,11 @@ int Cassette::setupAudioData() {
     audioData.effectsChannelsProcessData[effectsChannelIdx].channelSettings = effectsChannel->channel;
 
     if (effectsChannelIdx == 0) {
-      int effectCount = effectsChannel->effectCount();
-      if (effectCount == 0) {
-        audioData.mainOutBuffers[0] = buffersMainInPtr[0];
-        audioData.mainOutBuffers[1] = buffersMainInPtr[1];
-      } else if (effectCount % 2 == 1) {
+      if (audioData.effectsChannelsProcessData[0].effectCount % 2 == 0) {
         audioData.mainOutBuffers[0] = buffersAPtr[0];
         audioData.mainOutBuffers[1] = buffersAPtr[1];
-      } else { // effectCount % 2 == 0 and effectCount > 0
+      } else {
+        // effectCount % 2 == 1
         audioData.mainOutBuffers[0] = buffersBPtr[0];
         audioData.mainOutBuffers[1] = buffersBPtr[1];
       }
@@ -333,7 +348,7 @@ int Cassette::setupAudioData() {
         [ObjectPtr = plugin->audioHost->audioClient](auto && PH1, auto && PH2) { return ObjectPtr->process(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2)); };
 
       if (effectsChannelIdx == 0) { // main channel
-        audioData.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffersMain(effectsChannel, effectsChannelIdx, pluginIdx, audioData);
+        audioData.effectsChannelsProcessData[0].buffers[pluginIdx] = getPluginBuffersMain(pluginIdx);
       } else {
         audioData.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioData);
       }
@@ -355,22 +370,11 @@ int Cassette::setupAudioData() {
   return 0;
 }
 
-IAudioClient::Buffers Cassette::getPluginBuffersMain(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, const AudioData& audioData) const {
+IAudioClient::Buffers Cassette::getPluginBuffersMain(const int pluginIdx) const {
   const int32_t audioFramesPerBuffer = gAppState->audioFramesPerBuffer;
-  if (pluginIdx == 0) {
+  if (pluginIdx % 2 == 0) {
     const IAudioClient::Buffers buffers = {
-      buffersMainInPtr, // if pluginIdx == 0, this will be updated to processHead in jackProcessCallBAck
-      2,
       buffersAPtr,
-      2,
-      audioFramesPerBuffer
-    };
-    return buffers;
-  }
-
-  if (pluginIdx % 2 == 1) {
-    const IAudioClient::Buffers buffers = {
-      buffersAPtr, // if pluginIdx == 0, this will be updated to processHead in jackProcessCallBAck
       2,
       buffersBPtr,
       2,
@@ -379,9 +383,9 @@ IAudioClient::Buffers Cassette::getPluginBuffersMain(const Effects::EffectsChann
     return buffers;
   }
 
-  // pluginIdx % 2 == 0 and pluginIdx > 0
+  // pluginIdx % 2 == 1
   const IAudioClient::Buffers buffers = {
-    buffersBPtr, // if pluginIdx == 0, this will be updated to processHead in jackProcessCallBAck
+    buffersBPtr,
     2,
     buffersAPtr,
     2,
