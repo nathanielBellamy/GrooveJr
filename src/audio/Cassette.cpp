@@ -168,7 +168,7 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
 
   // process effects channels
   // main channel is effectsChannelIdx 0
-  for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount; effectsChannelIdx++) {
+  for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
     auto [effectCount, processFuncs, buffers, channelSettings] = audioData->effectsChannelsProcessData[effectsChannelIdx];
     for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
       if (pluginIdx == 0) {
@@ -186,7 +186,7 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   // sum down into mainInBuffers
   const float channelCount = audioData->channelCount;
   for (int i = 0; i < nframes; i++) {
-    for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount; effectsChannelIdx++) {
+    for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
       const auto channel = audioData->effectsChannelsProcessData[effectsChannelIdx].channelSettings;
       if (effectsChannelIdx == 1) {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {

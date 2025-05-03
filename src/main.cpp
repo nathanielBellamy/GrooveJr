@@ -116,7 +116,7 @@ extern "C" {
         );
 
         Mixer->addEffectsChannel(); // main
-        // Mixer->addEffectsChannel(); // channel 1
+        Mixer->addEffectsChannel(); // channel 1
         // Mixer->addEffectsChannel();
 
         // init actor system

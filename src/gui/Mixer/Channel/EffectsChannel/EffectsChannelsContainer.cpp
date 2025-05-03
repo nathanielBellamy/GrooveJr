@@ -17,7 +17,7 @@ EffectsChannelsContainer::EffectsChannelsContainer(QWidget* parent, actor_system
   , addEffectsChannelButton(this, &addEffectsChannelAction)
   {
 
-  for (int i = 1; i < mixer->getEffectsChannelsCount(); i++) {
+  for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
     addEffectsChannel();
   }
 
