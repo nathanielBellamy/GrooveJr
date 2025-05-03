@@ -12,7 +12,7 @@ MainChannelContainer::MainChannelContainer(QWidget* parent, actor_system& actorS
   , actorSystem(actorSystem)
   , mixer(mixer)
   , grid(this)
-  , mainChannel(this, actorSystem, mixer, 0)
+  , mainChannel(this, actorSystem, mixer, 0, nullptr)
   {
   setupGrid();
   setStyle();

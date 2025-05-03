@@ -33,6 +33,7 @@ struct AppStateManagerTrait {
     using signatures = type_list<
                                  // Mixer
                                  result<void>(mix_add_effects_channel_a),
+                                 result<void>(int, mix_remove_effects_channel_a),
                                  result<void>(int, std::string, mix_add_effect_to_channel_a),
                                  result<void>(int, int, std::string, mix_replace_effect_on_channel_a),
                                  result<void>(int, int, mix_remove_effect_on_channel_a),
@@ -103,6 +104,15 @@ struct AppStateManagerState {
                "Received Add Mixer Effects Channel"
              );
              mixer->addEffectsChannel();
+             hydrateStateToDisplay();
+           },
+           [this](const int channelIdx, mix_remove_effects_channel_a) {
+             Logging::write(
+               Info,
+               "Act::AppStateManager::mix_remove_effects_channel_a",
+               "Removing Mixer Effects Channel " + std::to_string(channelIdx)
+             );
+             mixer->removeEffectsChannel(channelIdx);
              hydrateStateToDisplay();
            },
            [this](const int channelIdx, std::string effectPath, mix_add_effect_to_channel_a) {

@@ -7,11 +7,19 @@
 namespace Gj {
 namespace Gui {
 
-EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, const int channelIndex)
+EffectsChannel::EffectsChannel(
+  QWidget* parent,
+  actor_system& actorSystem,
+  Audio::Mixer* mixer,
+  const int channelIndex,
+  QAction* removeEffectsChannelAction
+  )
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , channelIndex(channelIndex)
+  , removeEffectsChannelAction(removeEffectsChannelAction)
+  , removeEffectsChannelButton(this, channelIndex, removeEffectsChannelAction)
   , effectsContainer(nullptr, mixer, channelIndex)
   , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Effects"), this)
   , vstSelect(this)
@@ -25,6 +33,13 @@ EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio
   , muteSoloContainer(this, &openEffectsContainer)
   {
 
+  if (channelIndex > 0 && mixer->getEffectsChannelsCount() > 1) {
+    // can't remove main, must have at least one non-main effects channel
+    removeEffectsChannelButton.show();
+  } else {
+    removeEffectsChannelButton.hide();
+  }
+
   connectActions();
 
   setupTitle();
@@ -33,8 +48,15 @@ EffectsChannel::EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio
   setupGrid();
 }
 
-void EffectsChannel::hydrateState(const AppStatePacket& appState) const {
+void EffectsChannel::hydrateState(const AppStatePacket& appState) {
   effectsSlots.hydrateState(appState);
+  if (channelIndex > 0 && mixer->getEffectsChannelsCount() > 1) {
+    // can't remove main, must have at least one non-main effects channel
+    removeEffectsChannelButton.show();
+  } else {
+    removeEffectsChannelButton.hide();
+  }
+  setupGrid();
 }
 
 void EffectsChannel::setStyle() {
@@ -45,7 +67,10 @@ void EffectsChannel::setStyle() {
 void EffectsChannel::setupGrid() {
   grid.setVerticalSpacing(1);
 
-  grid.addWidget(&title, 0, 0, 1, -1);
+  grid.addWidget(&title, 0, 0, 1, 1);
+
+  // can't delete main, must have at least one non-main channel
+  grid.addWidget(&removeEffectsChannelButton, 0, 3, 1, 1);
   grid.addWidget(&slider, 1, 0, -1, -1);
   grid.addWidget(&effectsSlots, 1, 1, 1, 1);
   grid.addWidget(&muteSoloContainer, 2, 1, 1, 1);
@@ -54,7 +79,6 @@ void EffectsChannel::setupGrid() {
   grid.setHorizontalSpacing(2);
 
   grid.setColumnMinimumWidth(0, 20);
-  grid.setRowStretch(0, 1);
   grid.setRowMinimumHeight(0, 20);
   grid.setRowMinimumHeight(1, 100);
   grid.setRowStretch(1, 10);

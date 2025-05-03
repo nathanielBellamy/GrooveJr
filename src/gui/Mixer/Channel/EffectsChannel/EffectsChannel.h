@@ -21,6 +21,7 @@
 #include "../../../../audio/Mixer.h"
 #include "EffectsSlots.h"
 #include "MuteSoloContainer.h"
+#include "RemoveEffectsChannelButton.h"
 #include "./Effects/EffectsContainer.h"
 #include "../../../Shared/VstSelect.h"
 
@@ -34,13 +35,15 @@ namespace Gui {
 class EffectsChannel final : public QWidget {
 
   public:
-    EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex);
-    void hydrateState(const AppStatePacket& appStatePacket) const;
+    EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, QAction* removeEffectsChannelAction);
+    void hydrateState(const AppStatePacket& appStatePacket);
 
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;
     int channelIndex;
+    QAction* removeEffectsChannelAction;
+    RemoveEffectsChannelButton removeEffectsChannelButton;
     EffectsContainer effectsContainer;
     QAction openEffectsContainer;
     VstSelect vstSelect;

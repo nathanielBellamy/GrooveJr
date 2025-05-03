@@ -40,8 +40,10 @@ class EffectsChannelsContainer final : public QWidget {
     QWidget spacer;
     std::vector<std::unique_ptr<EffectsChannel>> channels;
     QAction addEffectsChannelAction;
+    QAction removeEffectsChannelAction;
     AddEffectsChannelButton addEffectsChannelButton;
     void addEffectsChannel();
+    void removeEffectsChannel(int channelIdx);
     void connectActions();
     void setStyle();
     void setupGrid();

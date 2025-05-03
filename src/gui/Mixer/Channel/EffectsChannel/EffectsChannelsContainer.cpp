@@ -14,6 +14,7 @@ EffectsChannelsContainer::EffectsChannelsContainer(QWidget* parent, actor_system
   , grid(this)
   , spacer(this)
   , addEffectsChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListAdd), tr("&AddEffectsChannel"), this)
+  , removeEffectsChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListRemove), tr("&RemoveEffectsChannel"), this)
   , addEffectsChannelButton(this, &addEffectsChannelAction)
   {
 
@@ -34,11 +35,6 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
     "Hydrating effects channels state"
   );
 
-  const int channelsCountDiff = mixer->getEffectsChannelsCount() - static_cast<int>(channels.size());
-  if (channelsCountDiff < 0) {
-    channels.erase(channels.begin() + mixer->getEffectsChannelsCount(), channels.end());
-  }
-
   for (const auto& channel : channels) {
     channel->hydrateState(appState);
   }
@@ -47,10 +43,15 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
   update();
 }
 
-
 void EffectsChannelsContainer::addEffectsChannel() {
-  auto effectsChannel = std::make_unique<EffectsChannel>(this, actorSystem, mixer, channels.size() + 1);
+  auto effectsChannel = std::make_unique<EffectsChannel>(
+    this, actorSystem, mixer, channels.size() + 1, &removeEffectsChannelAction
+  );
   channels.push_back(std::move(effectsChannel));
+}
+
+void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
+  channels.erase(channels.begin() + channelIdx);
 }
 
 void EffectsChannelsContainer::connectActions() {
@@ -69,6 +70,27 @@ void EffectsChannelsContainer::connectActions() {
     );
 
     addEffectsChannel();
+    setupGrid();
+    update();
+  });
+
+  connect(&removeEffectsChannelAction, &QAction::triggered, [&]() {
+    const int channelIdx = removeEffectsChannelAction.data().toInt();
+    Logging::write(
+      Info,
+      "Gui::EffectsChannelsContainer::removeEffectsChannelAction trig",
+      "Removing Effects Channel " + std::to_string(channelIdx)
+    );
+    strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+
+    scoped_actor self{ actorSystem };
+    self->anon_send(
+        actor_cast<actor>(appStateManagerPtr),
+        channelIdx,
+        mix_remove_effects_channel_a_v
+    );
+
+    removeEffectsChannel(channelIdx);
     setupGrid();
     update();
   });
