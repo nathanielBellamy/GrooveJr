@@ -24,8 +24,6 @@ namespace Audio {
 class Mixer {
     AppState* gAppState;
     std::shared_ptr<JackClient> jackClient;
-    Channel mainChannel;
-    Channel dryChannel;
     float channelCount;
     std::vector<Effects::EffectsChannel*> effectsChannels;
 
@@ -63,7 +61,7 @@ public:
     bool setSampleRate(int sampleRate) const;
 
     bool replaceEffectOnChannel(int channelIdx, int effectIdx, std::string effectPath) const;
-    bool removeEffectFromChannel(int channelIdx, int effectIdx);
+    bool removeEffectFromChannel(int channelIdx, int effectIdx) const;
 
     int getAudioFramesPerBuffer() const { return gAppState->audioFramesPerBuffer; };
     void setAudioFramesPerBuffer(int framesPerBuffer) const { gAppState->audioFramesPerBuffer = framesPerBuffer; };

@@ -74,7 +74,6 @@ void EffectsChannelsContainer::connectActions() {
   });
 }
 
-
 void EffectsChannelsContainer::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet("background-color: yellow; border-radius: 5px;");

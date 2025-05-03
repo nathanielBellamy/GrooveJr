@@ -21,7 +21,7 @@ struct AudioData {
     float                            fadeOut;
     float*                           inputBuffers[2]{nullptr, nullptr};
     float*                           inputBuffersProcessHead[2]{nullptr, nullptr};
-    Channel                          dryChannel;
+    float*                           mainOutBuffers[2]{nullptr, nullptr};
     float                            channelCount;
     int                              effectsChannelCount;
     std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};

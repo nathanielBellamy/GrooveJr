@@ -12,8 +12,6 @@ using namespace Steinberg;
 Mixer::Mixer(AppState* gAppState)
   : gAppState(gAppState)
   , jackClient(new JackClient())
-  , mainChannel({ 1.0f, 0.0f })
-  , dryChannel({ 1.0f, 0.0f })
   , channelCount(1.0f)
   {
 
@@ -149,7 +147,7 @@ bool Mixer::replaceEffectOnChannel(int channelIdx, int effectIdx, std::string ef
   return effectsChannels.at(channelIdx)->addReplaceEffect(effectIdx, effectPath);
 }
 
-bool Mixer::removeEffectFromChannel(const int channelIdx, const int effectIdx) {
+bool Mixer::removeEffectFromChannel(const int channelIdx, const int effectIdx) const {
   return effectsChannels.at(channelIdx)->removeEffect(effectIdx);
 }
 

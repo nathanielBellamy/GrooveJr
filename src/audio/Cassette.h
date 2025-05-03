@@ -46,14 +46,17 @@ class Cassette
   float* inputBuffersProcessHead[2]{}; // where jack process callback should start
   float buffersA[2 * MAX_AUDIO_FRAMES_PER_BUFFER]{};
   float buffersB[2 * MAX_AUDIO_FRAMES_PER_BUFFER]{};
+  float buffersMainIn[2 * MAX_AUDIO_FRAMES_PER_BUFFER]{};
   float** buffersAPtr;
   float** buffersBPtr;
+  float** buffersMainInPtr;
   float* effectsChannelsWriteOutBuffer;
   AudioData audioData;
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);
   int setupAudioData();
   IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int channelIdx, int pluginIdx, const AudioData &audioData) const;
+  IAudioClient::Buffers getPluginBuffersMain(const Effects::EffectsChannel* effectsChannel, int channelIdx, int pluginIdx, const AudioData &audioData) const;
   int setupJack();
 
   bool allocateInputBuffers();
