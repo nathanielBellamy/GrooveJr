@@ -38,10 +38,8 @@ qt_add_library(GjGui STATIC
         Shared/VstSelect.cpp
         Mixer/MixerWindow.h
         Mixer/MixerWindow.cpp
-        Mixer/Channel/DryChannel.h
-        Mixer/Channel/DryChannel.cpp
-        Mixer/Channel/MainDryContainer.h
-        Mixer/Channel/MainDryContainer.cpp
+        Mixer/Channel/MainChannelContainer.h
+        Mixer/Channel/MainChannelContainer.cpp
         Mixer/Channel/MuteButton.h
         Mixer/Channel/MuteButton.cpp
         Mixer/Channel/SoloButton.h

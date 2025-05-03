@@ -11,7 +11,6 @@
 #include <QWidget>
 
 #include "../../../AppState.h"
-#include "DryChannel.h"
 #include "EffectsChannel/EffectsChannel.h"
 #include "../../../audio/Mixer.h"
 
@@ -20,17 +19,16 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 
-class MainDryContainer final : public QWidget {
+class MainChannelContainer final : public QWidget {
 
   public:
-    MainDryContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer);
+    MainChannelContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer);
     void hydrateState(const AppStatePacket& appState);
 
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;
     QGridLayout grid;
-    DryChannel dryChannel;
     EffectsChannel mainChannel;
     void setStyle();
     void setupGrid();

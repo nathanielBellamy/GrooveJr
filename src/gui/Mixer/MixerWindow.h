@@ -11,7 +11,7 @@
 #include <QLabel>
 #include <QWidget>
 
-#include "./Channel/MainDryContainer.h"
+#include "./Channel/MainChannelContainer.h"
 #include "./Channel/EffectsChannel/EffectsChannelsContainer.h"
 
 #include "../../AppState.h"
@@ -32,7 +32,7 @@ class MixerWindow final : public QWidget {
     Audio::Mixer* mixer;
     QGridLayout grid;
     QLabel title;
-    MainDryContainer mainDryContainer;
+    MainChannelContainer mainDryContainer;
     EffectsChannelsContainer effectsChannelsContainer;
 
     void setStyle();
