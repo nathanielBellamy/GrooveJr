@@ -188,12 +188,22 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   for (int i = 0; i < nframes; i++) {
     for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount; effectsChannelIdx++) {
       const auto channel = audioData->effectsChannelsProcessData[effectsChannelIdx].channelSettings;
-      if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-        audioData->mainInBuffers[0][i] += channel.gain * processHead[0][i] / channelCount;
-        audioData->mainInBuffers[1][i] += channel.gain * processHead[1][i] / channelCount;
+      if (effectsChannelIdx == 1) {
+        if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
+          audioData->mainInBuffers[0][i] = channel.gain * processHead[0][i] / channelCount;
+          audioData->mainInBuffers[1][i] = channel.gain * processHead[1][i] / channelCount;
+        } else {
+          audioData->mainInBuffers[0][i] = channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
+          audioData->mainInBuffers[1][i] = channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
+        }
       } else {
-        audioData->mainInBuffers[0][i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
-        audioData->mainInBuffers[1][i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
+        if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
+          audioData->mainInBuffers[0][i] += channel.gain * processHead[0][i] / channelCount;
+          audioData->mainInBuffers[1][i] += channel.gain * processHead[1][i] / channelCount;
+        } else {
+          audioData->mainInBuffers[0][i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
+          audioData->mainInBuffers[1][i] += channel.gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
+        }
       }
     }
   }
