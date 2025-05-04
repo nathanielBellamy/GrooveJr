@@ -30,6 +30,14 @@ EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int cha
   hide();
 }
 
+EffectsContainer::~EffectsContainer() {
+  Logging::write(
+    Info,
+    "Gui::EffectsContainer::~EffectsContainer",
+    "Destroying Effects Container for Channel : " + std::to_string(channelIndex)
+  );
+}
+
 void EffectsContainer::setStyle() {
   setMinimumSize(QSize(600, 600));
   setStyleSheet("background-color: aqua;");

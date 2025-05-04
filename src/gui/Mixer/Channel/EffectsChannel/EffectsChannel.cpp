@@ -48,14 +48,24 @@ EffectsChannel::EffectsChannel(
   setupGrid();
 }
 
+EffectsChannel::~EffectsChannel() {
+  Logging::write(
+    Info,
+    "Gui::EffectsChannel::~EffectsChannel",
+    "Destroying Effects Channel - channelIdx: " + std::to_string(channelIndex)
+  );
+}
+
+
 void EffectsChannel::hydrateState(const AppStatePacket& appState) {
+  Logging::write(
+    Info,
+    "Gui::EffectsChannel::hydrateState",
+    "Hydrating effects channel state to channel: " + std::to_string(channelIndex)
+  );
+
   effectsSlots.hydrateState(appState);
-  if (channelIndex > 0 && mixer->getEffectsChannelsCount() > 1) {
-    // can't remove main, must have at least one non-main effects channel
-    removeEffectsChannelButton.show();
-  } else {
-    removeEffectsChannelButton.hide();
-  }
+
   setupGrid();
 }
 

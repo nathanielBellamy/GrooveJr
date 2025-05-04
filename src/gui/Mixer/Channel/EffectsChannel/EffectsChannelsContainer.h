@@ -38,7 +38,7 @@ class EffectsChannelsContainer final : public QWidget {
     Audio::Mixer* mixer;
     QGridLayout grid;
     QWidget spacer;
-    std::vector<std::unique_ptr<EffectsChannel>> channels;
+    std::vector<EffectsChannel*> channels;
     QAction addEffectsChannelAction;
     QAction removeEffectsChannelAction;
     AddEffectsChannelButton addEffectsChannelButton;

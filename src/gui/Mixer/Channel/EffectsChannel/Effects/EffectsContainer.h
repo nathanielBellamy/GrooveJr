@@ -26,6 +26,7 @@ class EffectsContainer final : public QWidget {
 
   public:
      EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex);
+     ~EffectsContainer();
 
   private:
     Audio::Mixer* mixer;

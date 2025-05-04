@@ -44,14 +44,18 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
 }
 
 void EffectsChannelsContainer::addEffectsChannel() {
-  auto effectsChannel = std::make_unique<EffectsChannel>(
+  auto effectsChannel = new EffectsChannel(
     this, actorSystem, mixer, channels.size() + 1, &removeEffectsChannelAction
   );
-  channels.push_back(std::move(effectsChannel));
+  channels.push_back(effectsChannel);
 }
 
 void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
-  channels.erase(channels.begin() + channelIdx);
+  std::cout << "foo 1 -- " << channels.size() << "  -  " << channelIdx - 1 << std::endl;
+  // delete channels.at(channelIdx - 1);
+  std::cout << "foo 2" << std::endl;
+  channels.erase(channels.begin() + channelIdx - 1);
+  std::cout << "foo 3" << std::endl;
 }
 
 void EffectsChannelsContainer::connectActions() {
@@ -81,6 +85,8 @@ void EffectsChannelsContainer::connectActions() {
       "Gui::EffectsChannelsContainer::removeEffectsChannelAction trig",
       "Removing Effects Channel " + std::to_string(channelIdx)
     );
+    removeEffectsChannel(channelIdx);
+
     strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
     scoped_actor self{ actorSystem };
@@ -90,9 +96,8 @@ void EffectsChannelsContainer::connectActions() {
         mix_remove_effects_channel_a_v
     );
 
-    removeEffectsChannel(channelIdx);
-    setupGrid();
-    update();
+    // setupGrid();
+    // update();
   });
 }
 
@@ -104,7 +109,7 @@ void EffectsChannelsContainer::setStyle() {
 void EffectsChannelsContainer::setupGrid() {
   int col = 0;
   for (auto &effectsChannel : channels) {
-    grid.addWidget(effectsChannel.get(), 1, col, -1, 1);
+    grid.addWidget(effectsChannel, 1, col, -1, 1);
     col++;
   }
   grid.addWidget(&addEffectsChannelButton, 1, col + 1, 1, 1);

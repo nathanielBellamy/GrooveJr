@@ -36,6 +36,7 @@ class EffectsChannel final : public QWidget {
 
   public:
     EffectsChannel(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer, int channelIndex, QAction* removeEffectsChannelAction);
+    ~EffectsChannel();
     void hydrateState(const AppStatePacket& appStatePacket);
 
   private:
