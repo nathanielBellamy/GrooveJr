@@ -9,6 +9,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
+#include "../../../../Logging.h"
 #include "../MuteButton.h"
 #include "../SoloButton.h"
 #include "EffectsButton.h"
@@ -19,6 +20,7 @@ namespace Gui {
 class MuteSoloContainer final : public QWidget {
   public:
     MuteSoloContainer(QWidget* parent, QAction* openEffectsContainer);
+    ~MuteSoloContainer();
 
   private:
     QGridLayout grid;

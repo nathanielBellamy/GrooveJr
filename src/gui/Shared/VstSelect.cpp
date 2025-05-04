@@ -9,7 +9,11 @@ namespace Gj {
 namespace Gui {
 
 VstSelect::~VstSelect() {
-  delete this;
+  Logging::write(
+    Info,
+    "Gui::VstSelect::~VstSelect",
+    "Destroying VstSelect"
+  );
 }
 
 VstSelect::VstSelect(QWidget* parent)

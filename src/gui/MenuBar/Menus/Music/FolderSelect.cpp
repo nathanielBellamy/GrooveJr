@@ -15,7 +15,6 @@ FolderSelect::FolderSelect(QWidget* parent)
 }
 
 FolderSelect::~FolderSelect() {
-  delete this;
 }
 
 } // Gui

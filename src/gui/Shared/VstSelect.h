@@ -5,6 +5,8 @@
 #ifndef VSTSELECT_H
 #define VSTSELECT_H
 
+#include "../../Logging.h"
+
 #include <QFileDialog>
 #include <QUrl>
 

@@ -18,6 +18,13 @@ MuteSoloContainer::MuteSoloContainer(QWidget* parent, QAction* openEffectsContai
   setupGrid();
 }
 
+MuteSoloContainer::~MuteSoloContainer() {
+  Logging::write(
+    Info,
+    "Gui::MuteSoloContainer::~MuteSoloContainer",
+    "Destroying MuteSoloContainer"
+  );
+}
 
 void MuteSoloContainer::setupGrid() {
   grid.setVerticalSpacing(0);
@@ -27,7 +34,6 @@ void MuteSoloContainer::setupGrid() {
   grid.addWidget(&solo, 0, 1, 1, 1);
   grid.addWidget(&effects, 0, 2, 1, 1);
 }
-
 
 } // Gui
 } // Gj

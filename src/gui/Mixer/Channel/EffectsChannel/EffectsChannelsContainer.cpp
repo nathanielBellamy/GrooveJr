@@ -51,11 +51,8 @@ void EffectsChannelsContainer::addEffectsChannel() {
 }
 
 void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
-  std::cout << "foo 1 -- " << channels.size() << "  -  " << channelIdx - 1 << std::endl;
-  // delete channels.at(channelIdx - 1);
-  std::cout << "foo 2" << std::endl;
+  delete channels.at(channelIdx - 1);
   channels.erase(channels.begin() + channelIdx - 1);
-  std::cout << "foo 3" << std::endl;
 }
 
 void EffectsChannelsContainer::connectActions() {

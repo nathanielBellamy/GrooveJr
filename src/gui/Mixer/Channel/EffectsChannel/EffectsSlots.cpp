@@ -26,6 +26,14 @@ EffectsSlots::EffectsSlots(QWidget* parent,
   setupGrid();
 }
 
+EffectsSlots::~EffectsSlots() {
+  Logging::write(
+    Info,
+    "Gui::EffectsSlots::~EffectsSlots",
+    "Destroying EffectsSlots on Channel " + std::to_string(channelIndex)
+  );
+}
+
 void EffectsSlots::hydrateState(const AppStatePacket& appState) const {
   for (const auto& effectSlot : effectsSlots) {
     effectSlot->hydrateState(appState);

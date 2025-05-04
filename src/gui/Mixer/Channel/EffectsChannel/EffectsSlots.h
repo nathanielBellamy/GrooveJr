@@ -13,6 +13,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
+#include "../../../../Logging.h"
 #include "../../../../AppState.h"
 #include "AddEffectSlotButton.h"
 #include "EffectSlot.h"
@@ -35,6 +36,7 @@ class EffectsSlots final : public QWidget {
       QAction* replaceEffectAction,
       QAction* removeEffectAction
     );
+    ~EffectsSlots();
     void addEffectSlot();
     void removeEffectSlot();
     void hydrateState(const AppStatePacket& appState) const;
