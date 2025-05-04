@@ -33,7 +33,7 @@ EffectsChannel::EffectsChannel(
   , muteSoloContainer(this, &openEffectsContainer, channelIndex)
   {
 
-  if (channelIndex > 0 && mixer->getEffectsChannelsCount() > 1) {
+  if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
     // can't remove main, must have at least one non-main effects channel
     removeEffectsChannelButton.show();
   } else {
@@ -72,6 +72,15 @@ void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newC
   setupTitle();
   setupGrid();
 }
+
+void EffectsChannel::updateShowRemoveEffectsChannelButton(bool val) {
+  if (val) {
+    removeEffectsChannelButton.show();
+  } else {
+    removeEffectsChannelButton.hide();
+  }
+}
+
 
 void EffectsChannel::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);

@@ -48,13 +48,19 @@ void EffectsChannelsContainer::addEffectsChannel() {
     this, actorSystem, mixer, channels.size() + 1, &removeEffectsChannelAction
   );
   channels.push_back(effectsChannel);
+
+  if (channels.size() > 1) {
+    channels.front()->updateShowRemoveEffectsChannelButton(true);
+  }
 }
 
 void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
-  std::cout << "gui fx channels count " << channels.size() << std::endl;
-  std::cout << "removing at idx " << channelIdx - 1 << std::endl;
   delete channels.at(channelIdx - 1);
   channels.erase(channels.begin() + channelIdx - 1);
+
+  if (channels.size() == 1) {
+    channels.front()->updateShowRemoveEffectsChannelButton(false);
+  }
 }
 
 void EffectsChannelsContainer::connectActions() {

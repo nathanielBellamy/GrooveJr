@@ -94,9 +94,6 @@ bool Mixer::addEffectsChannel() {
 }
 
 bool Mixer::removeEffectsChannel(const int idx) {
-  std::cout << "effectsChannels count: " << effectsChannels.size() << std::endl;
-  std::cout << "removing at idx: " << idx << std::endl;
-
   delete effectsChannels.at(idx);
   effectsChannels.erase(effectsChannels.begin() + idx);
   channelCount--;
