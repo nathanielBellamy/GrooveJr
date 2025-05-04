@@ -19,7 +19,7 @@ MainChannelContainer::MainChannelContainer(QWidget* parent, actor_system& actorS
 }
 
 void MainChannelContainer::hydrateState(const AppStatePacket &appState) {
-  mainChannel.hydrateState(appState);
+  mainChannel.hydrateState(appState, 0);
 }
 
 void MainChannelContainer::setStyle() {

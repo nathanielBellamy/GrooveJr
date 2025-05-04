@@ -39,7 +39,7 @@ class EffectsSlots final : public QWidget {
     ~EffectsSlots();
     void addEffectSlot();
     void removeEffectSlot();
-    void hydrateState(const AppStatePacket& appState) const;
+    void hydrateState(const AppStatePacket& appState, int newChannelIndex);
 
   private:
     actor_system& actorSystem;

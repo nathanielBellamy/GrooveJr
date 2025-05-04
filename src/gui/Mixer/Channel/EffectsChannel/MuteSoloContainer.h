@@ -9,6 +9,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
+#include "../../../../AppState.h"
 #include "../../../../Logging.h"
 #include "../MuteButton.h"
 #include "../SoloButton.h"
@@ -19,10 +20,12 @@ namespace Gui {
 
 class MuteSoloContainer final : public QWidget {
   public:
-    MuteSoloContainer(QWidget* parent, QAction* openEffectsContainer);
+    MuteSoloContainer(QWidget* parent, QAction* openEffectsContainer, int channelIndex);
     ~MuteSoloContainer();
+    void hydrateState(const AppStatePacket& appState, int newChannelIdx);
 
   private:
+    int channelIndex;
     QGridLayout grid;
     MuteButton mute;
     SoloButton solo;

@@ -18,6 +18,10 @@ RemoveEffectButton::RemoveEffectButton(QWidget *parent, int channelIndex, int sl
   setStyle();
 }
 
+void RemoveEffectButton::hydrateState(const AppStatePacket &appState, int newChannelIdx) {
+  channelIndex = newChannelIdx;
+}
+
 void RemoveEffectButton::mousePressEvent(QMouseEvent* event) {
   removeEffectAction->setData(QVariant(slotIndex));
   removeEffectAction->activate(QAction::Trigger);

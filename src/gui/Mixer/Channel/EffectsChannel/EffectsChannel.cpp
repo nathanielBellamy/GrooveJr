@@ -30,7 +30,7 @@ EffectsChannel::EffectsChannel(
   , title(this)
   , slider(Qt::Vertical, this)
   , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction, &replaceEffectAction, &removeEffectAction)
-  , muteSoloContainer(this, &openEffectsContainer)
+  , muteSoloContainer(this, &openEffectsContainer, channelIndex)
   {
 
   if (channelIndex > 0 && mixer->getEffectsChannelsCount() > 1) {
@@ -57,15 +57,19 @@ EffectsChannel::~EffectsChannel() {
 }
 
 
-void EffectsChannel::hydrateState(const AppStatePacket& appState) {
+void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
   Logging::write(
     Info,
     "Gui::EffectsChannel::hydrateState",
-    "Hydrating effects channel state to channel: " + std::to_string(channelIndex)
+    "Hydrating effects channel state to channel: " + std::to_string(newChannelIndex)
   );
 
-  effectsSlots.hydrateState(appState);
+  channelIndex = newChannelIndex;
 
+  removeEffectsChannelButton.hydrateState(appState, channelIndex);
+  effectsSlots.hydrateState(appState, channelIndex);
+
+  setupTitle();
   setupGrid();
 }
 

@@ -7,8 +7,9 @@
 namespace Gj {
 namespace Gui {
 
-MuteSoloContainer::MuteSoloContainer(QWidget* parent, QAction* openEffectsContainer)
+MuteSoloContainer::MuteSoloContainer(QWidget* parent, QAction* openEffectsContainer, const int channelIndex)
   : QWidget(parent)
+  , channelIndex(channelIndex)
   , grid(this)
   , mute(this)
   , solo(this)
@@ -25,6 +26,11 @@ MuteSoloContainer::~MuteSoloContainer() {
     "Destroying MuteSoloContainer"
   );
 }
+
+void MuteSoloContainer::hydrateState(const AppStatePacket &appState, int newChannelIdx) {
+  channelIndex = newChannelIdx;
+}
+
 
 void MuteSoloContainer::setupGrid() {
   grid.setVerticalSpacing(0);

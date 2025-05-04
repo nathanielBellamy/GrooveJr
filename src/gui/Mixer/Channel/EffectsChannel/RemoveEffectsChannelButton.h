@@ -12,6 +12,8 @@
 #include <QStyle>
 #include <QVariant>
 
+#include "../../../../AppState.h"
+
 namespace Gj {
 namespace Gui {
 
@@ -19,6 +21,7 @@ class RemoveEffectsChannelButton final : public QPushButton {
 
   public:
     RemoveEffectsChannelButton(QWidget* parent, int channelIndex, QAction* action);
+    void hydrateState(const AppStatePacket& appState, int newChannelIdx);
 
   private:
     int channelIndex;

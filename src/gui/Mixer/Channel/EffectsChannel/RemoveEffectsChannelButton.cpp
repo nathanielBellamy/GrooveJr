@@ -16,6 +16,11 @@ RemoveEffectsChannelButton::RemoveEffectsChannelButton(QWidget *parent, int chan
   setStyle();
 }
 
+void RemoveEffectsChannelButton::hydrateState(const AppStatePacket &appState, const int newChannelIdx) {
+  channelIndex = newChannelIdx;
+}
+
+
 void RemoveEffectsChannelButton::mousePressEvent(QMouseEvent* event) {
   removeEffectsChannelAction->setData(QVariant(channelIndex));
   removeEffectsChannelAction->activate(QAction::Trigger);

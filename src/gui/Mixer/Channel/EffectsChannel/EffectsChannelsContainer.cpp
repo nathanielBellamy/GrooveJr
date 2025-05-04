@@ -35,8 +35,8 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
     "Hydrating effects channels state"
   );
 
-  for (const auto& channel : channels) {
-    channel->hydrateState(appState);
+  for (int i = 0; i < channels.size(); i++) {
+    channels.at(i)->hydrateState(appState, i+1);
   }
 
   setupGrid();
@@ -51,6 +51,8 @@ void EffectsChannelsContainer::addEffectsChannel() {
 }
 
 void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
+  std::cout << "gui fx channels count " << channels.size() << std::endl;
+  std::cout << "removing at idx " << channelIdx - 1 << std::endl;
   delete channels.at(channelIdx - 1);
   channels.erase(channels.begin() + channelIdx - 1);
 }

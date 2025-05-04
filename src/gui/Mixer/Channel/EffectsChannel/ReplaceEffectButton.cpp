@@ -18,6 +18,11 @@ ReplaceEffectButton::ReplaceEffectButton(QWidget *parent, int channelIndex, int 
   setStyle();
 }
 
+void ReplaceEffectButton::hydrateState(const AppStatePacket &appState, int newChannelIdx) {
+  channelIndex = newChannelIdx;
+}
+
+
 void ReplaceEffectButton::mousePressEvent(QMouseEvent* event) {
   replaceEffectAction->setData(QVariant(slotIndex));
   replaceEffectAction->activate(QAction::Trigger);
