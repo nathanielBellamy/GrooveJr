@@ -25,6 +25,8 @@ CAF_BEGIN_TYPE_ID_BLOCK(groovejr, first_custom_type_id)
   CAF_ADD_ATOM(groovejr, mix_replace_effect_on_channel_a)
   CAF_ADD_ATOM(groovejr, mix_remove_effect_on_channel_a)
 
+  CAF_ADD_ATOM(groovejr, mix_set_channel_gain_a)
+
   // Transport Control
   CAF_ADD_ATOM(groovejr, tc_trig_play_a)
   CAF_ADD_ATOM(groovejr, tc_trig_play_ar)

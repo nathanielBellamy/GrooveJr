@@ -42,6 +42,7 @@ class EffectsChannel final : public QWidget {
 
   private:
     actor_system& actorSystem;
+    strong_actor_ptr appStateManagerPtr;
     Audio::Mixer* mixer;
     int channelIndex;
     QAction* removeEffectsChannelAction;

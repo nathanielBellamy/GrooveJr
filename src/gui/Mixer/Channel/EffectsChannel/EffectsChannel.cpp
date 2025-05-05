@@ -16,6 +16,7 @@ EffectsChannel::EffectsChannel(
   )
   : QWidget(parent)
   , actorSystem(actorSystem)
+  , appStateManagerPtr(actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER))
   , mixer(mixer)
   , channelIndex(channelIndex)
   , removeEffectsChannelAction(removeEffectsChannelAction)
@@ -124,6 +125,15 @@ void EffectsChannel::setupSlider() {
   slider.setTickInterval(1);
   slider.setValue(63);
   slider.setTickPosition(QSlider::NoTicks);
+  connect(&slider, &QSlider::valueChanged, [this](int gain) {
+    const scoped_actor self{ actorSystem };
+    self->anon_send(
+        actor_cast<actor>(appStateManagerPtr),
+        channelIndex,
+        gain,
+        mix_set_channel_gain_a_v
+    );
+  });
 }
 
 void EffectsChannel::connectActions() {
@@ -149,7 +159,7 @@ void EffectsChannel::connectActions() {
         "Adding effect: " + effectPath + " to channel " + std::to_string(channelIndex)
       );
 
-      strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+      appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
       const scoped_actor self{ actorSystem };
       self->anon_send(
@@ -172,7 +182,7 @@ void EffectsChannel::connectActions() {
         "Replacing effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) + " with " + effectPath
       );
 
-      strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+      appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
       const scoped_actor self{ actorSystem };
       self->anon_send(
@@ -193,7 +203,7 @@ void EffectsChannel::connectActions() {
       "Removing effect: " + std::to_string(pluginIdx) + " from channel " + std::to_string(channelIndex)
     );
 
-    strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
     const scoped_actor self{ actorSystem };
     self->anon_send(

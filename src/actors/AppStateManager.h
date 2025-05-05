@@ -37,6 +37,7 @@ struct AppStateManagerTrait {
                                  result<void>(int, std::string, mix_add_effect_to_channel_a),
                                  result<void>(int, int, std::string, mix_replace_effect_on_channel_a),
                                  result<void>(int, int, mix_remove_effect_on_channel_a),
+                                 result<void>(int, int, mix_set_channel_gain_a),
 
                                  // Transport control
                                  result<void>(tc_trig_play_a),
@@ -156,6 +157,16 @@ struct AppStateManagerState {
                  Error,
                  "Act::AppStateManager::mix_remove_effect_on_channel_a",
                  "Unable to add remove effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx)
+               );
+             }
+             hydrateStateToDisplay();
+           },
+           [this](const int channelIdx, const int gain, mix_set_channel_gain_a) {
+             if (!mixer->setChannelGain(channelIdx, gain)) {
+               Logging::write(
+                 Error,
+                 "Act::AppStateManager::mix_remove_effect_on_channel_a",
+                 "Unable to set gain of " + std::to_string(gain) + " on channel " + std::to_string(channelIdx)
                );
              }
              hydrateStateToDisplay();
