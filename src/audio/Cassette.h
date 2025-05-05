@@ -65,6 +65,8 @@ class Cassette
   [[nodiscard]]
   bool deleteBuffers() const;
 
+  int updateAudioDataFromMixer();
+
   public:
     Cassette(
         actor_system& actorSystem,
