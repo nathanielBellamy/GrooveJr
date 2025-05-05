@@ -43,8 +43,8 @@ class EffectsChannel {
       return vst3Plugins.at(idx);
     };
 
-    float getGain();
-    void setGain(float gain);
+    float getGain() { return channel.gain; };
+    bool setGain(float gain) { channel.gain = gain; return true; };
 
     float getPan();
     void setPan(float pan);

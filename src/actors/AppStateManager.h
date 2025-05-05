@@ -37,7 +37,7 @@ struct AppStateManagerTrait {
                                  result<void>(int, std::string, mix_add_effect_to_channel_a),
                                  result<void>(int, int, std::string, mix_replace_effect_on_channel_a),
                                  result<void>(int, int, mix_remove_effect_on_channel_a),
-                                 result<void>(int, int, mix_set_channel_gain_a),
+                                 result<void>(int, float, mix_set_channel_gain_a),
 
                                  // Transport control
                                  result<void>(tc_trig_play_a),
@@ -161,8 +161,8 @@ struct AppStateManagerState {
              }
              hydrateStateToDisplay();
            },
-           [this](const int channelIdx, const int gain, mix_set_channel_gain_a) {
-             if (!mixer->setChannelGain(channelIdx, gain)) {
+           [this](const int channelIdx, const float gain, mix_set_channel_gain_a) {
+             if (!mixer->setGainOnChannel(channelIdx, gain)) {
                Logging::write(
                  Error,
                  "Act::AppStateManager::mix_remove_effect_on_channel_a",
@@ -197,7 +197,7 @@ struct AppStateManagerState {
                  tc_trig_play_a_v
              );
            },
-           [this](strong_actor_ptr, bool success, tc_trig_play_ar) {
+           [this](strong_actor_ptr, const bool success, tc_trig_play_ar) {
              Logging::write(
                Info,
                "Act::AppStateManager::tc_trig_play_ar",

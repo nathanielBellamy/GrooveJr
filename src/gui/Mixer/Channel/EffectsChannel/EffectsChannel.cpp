@@ -123,14 +123,17 @@ void EffectsChannel::setupSlider() {
   slider.setMinimum(0);
   slider.setMaximum(127);
   slider.setTickInterval(1);
-  slider.setValue(63);
+  slider.setValue(100);
   slider.setTickPosition(QSlider::NoTicks);
   connect(&slider, &QSlider::valueChanged, [this](int gain) {
+    const float gainF = static_cast<float>(gain) / 100.0f;
+
+    appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
     const scoped_actor self{ actorSystem };
     self->anon_send(
         actor_cast<actor>(appStateManagerPtr),
         channelIndex,
-        gain,
+        gainF,
         mix_set_channel_gain_a_v
     );
   });

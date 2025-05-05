@@ -152,8 +152,8 @@ bool Mixer::removeEffectFromChannel(const int channelIdx, const int effectIdx) c
   return effectsChannels.at(channelIdx)->removeEffect(effectIdx);
 }
 
-bool Mixer::setGainOnChannel(int channelIdx, int gain) const {
-  std::cout << "Mixer::setGainOnChannel -- c " << channelIdx << "  -- g " << gain << std::endl;
+bool Mixer::setGainOnChannel(const int channelIdx, const float gain) const {
+  return effectsChannels.at(channelIdx)->setGain(gain);
 }
 
 

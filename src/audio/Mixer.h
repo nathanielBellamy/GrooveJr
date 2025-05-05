@@ -66,7 +66,7 @@ public:
     int getAudioFramesPerBuffer() const { return gAppState->audioFramesPerBuffer; };
     void setAudioFramesPerBuffer(int framesPerBuffer) const { gAppState->audioFramesPerBuffer = framesPerBuffer; };
 
-    bool setGainOnChannel(int channelIdx, int gain) const;
+    bool setGainOnChannel(int channelIdx, float gain) const;
 
 };
 
