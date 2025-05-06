@@ -339,7 +339,10 @@ int Cassette::setupAudioData() {
   for (const auto effectsChannel : mixer->getEffectsChannels()) {
     const auto effectsChannelIdx = effectsChannel->getIndex();
     audioData.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
-    audioData.effectsChannelsProcessData[effectsChannelIdx].channelSettings = effectsChannel->channel;
+    audioData.effectsChannelsProcessData[effectsChannelIdx].channelSettings = {
+      effectsChannel->getGain(),
+      effectsChannel->getPan()
+    };
 
     if (effectsChannelIdx == 0) {
       if (audioData.effectsChannelsProcessData[0].effectCount % 2 == 0) {
@@ -682,7 +685,7 @@ bool Cassette::deleteBuffers() const {
 
 int Cassette::updateAudioDataFromMixer() {
   for (int channelIdx = 0; channelIdx < mixer->getEffectsChannelsCount() + 1; channelIdx++) {
-    audioData.effectsChannelsProcessData[channelIdx].channelSettings.gain = mixer->getEffectsChannels().at(channelIdx)->channel.gain;
+    audioData.effectsChannelsProcessData[channelIdx].channelSettings.gain = mixer->getEffectsChannels().at(channelIdx)->getGain();
   }
 
   return 0;
@@ -725,7 +728,7 @@ int Cassette::play() {
         audioData.volume += 0.01;
     }
 
-    // updateAudioDataFromMixer();
+    updateAudioDataFromMixer();
 
     if ( threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
         if (audioData.fadeOut < 0.01) { // break + cleanup

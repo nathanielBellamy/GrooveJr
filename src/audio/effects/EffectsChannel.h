@@ -8,7 +8,7 @@
 #include <memory>
 
 #include "./vst3/Plugin.h"
-#include "../Channel.h"
+#include "../ChannelAtomic.h"
 #include "../../AppState.h"
 #include "../Logging.h"
 #include "../JackClient.h"
@@ -26,7 +26,7 @@ class EffectsChannel {
   std::vector<Vst3::Plugin*> vst3Plugins;
 
   public:
-    Channel channel;
+    ChannelAtomic channel;
 
     EffectsChannel(
       AppState* gAppState,
@@ -43,11 +43,23 @@ class EffectsChannel {
       return vst3Plugins.at(idx);
     };
 
-    float getGain() { return channel.gain; };
-    bool setGain(float gain) { channel.gain = gain; return true; };
+    float getGain() const {
+      return channel.gain.load();
+    };
 
-    float getPan();
-    void setPan(float pan);
+    bool setGain(float gain) {
+      channel.gain.store(gain);
+      return true;
+    };
+
+    float getPan() const {
+      return channel.pan.load();
+    };
+
+    bool setPan(float pan) {
+      channel.pan.store(pan);
+      return true;
+    };
 
     bool addReplaceEffect(int effectIdx, const std::string& effectPath);
     void setSampleRate(int sampleRate) const;

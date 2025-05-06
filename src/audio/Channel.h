@@ -10,8 +10,8 @@ namespace Gj {
 namespace Audio {
 
 struct Channel {
-    float gain = { 1.0f };
-    float pan = { 0.0f };
+  float gain = { 1.0f };
+  float pan = { 0.0f };
 };
 
 } // Audio

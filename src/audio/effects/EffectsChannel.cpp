@@ -19,7 +19,6 @@ EffectsChannel::EffectsChannel(
 	: gAppState(gAppState)
 	, jackClient(jackClient)
 	, index(index)
-	, channel({ 1.0f, 0.0f })
   {
 
   Logging::write(
