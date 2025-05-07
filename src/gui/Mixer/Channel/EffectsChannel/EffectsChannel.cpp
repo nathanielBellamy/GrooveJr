@@ -128,14 +128,22 @@ void EffectsChannel::setupSlider() {
   connect(&slider, &QSlider::valueChanged, [this](int gain) {
     const float gainF = static_cast<float>(gain) / 100.0f;
 
-    appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-    const scoped_actor self{ actorSystem };
-    self->anon_send(
-        actor_cast<actor>(appStateManagerPtr),
-        channelIndex,
-        gainF,
-        mix_set_channel_gain_a_v
-    );
+    mixer->getEffectsChannel(channelIndex)->setGain(gainF);
+
+    // TODO:
+    // - debug seg fault from rapid messages here
+    // - the actor system should be able to handle the amount of messages
+    // - but perhaps doesn't like looking in the registry as often
+    // - trying to use a stored appStateManagerPtr hasn't worked either, though
+
+    // appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    // const scoped_actor self{ actorSystem };
+    // self->anon_send(
+    //     actor_cast<actor>(appStateManagerPtr),
+    //     channelIndex,
+    //     gainF,
+    //     mix_set_channel_gain_a_v
+    // );
   });
 }
 
