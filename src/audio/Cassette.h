@@ -66,7 +66,7 @@ class Cassette
   [[nodiscard]]
   bool deleteBuffers() const;
 
-  int updateAudioDataFromMixer(const jack_ringbuffer_t* ringBuffer, size_t ringBufferSize);
+  int updateAudioDataFromMixer(const jack_ringbuffer_t* ringBuffer, size_t ringBufferSize, int channelCount) const;
 
   public:
     Cassette(

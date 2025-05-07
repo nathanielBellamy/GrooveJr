@@ -44,6 +44,11 @@ public:
       return effectsChannels;
     }
 
+    [[nodiscard]]
+    Effects::EffectsChannel* getEffectsChannel(int index) const {
+      return effectsChannels.at(index);
+    }
+
   [[nodiscard]]
     int getEffectsChannelsCount() const {
       return static_cast<int>(effectsChannels.size() - 1);
