@@ -229,9 +229,11 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   }
 
   // write out processed main channel to audio out
+  const float gain = audioData->effectsChannelsSettings[0];
+  const float pan = audioData->effectsChannelsSettings[1];
   for (int i = 0; i < nframes; i++) {
-    outL[i] = audioData->mainOutBuffers[0][i];
-    outR[i] = audioData->mainOutBuffers[1][i];
+    outL[i] = gain * audioData->mainOutBuffers[0][i];
+    outR[i] = gain * audioData->mainOutBuffers[1][i];
   }
 
   audioData->index += nframes;
