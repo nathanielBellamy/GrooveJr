@@ -50,6 +50,7 @@ class Cassette
   float** buffersAPtr;
   float** buffersBPtr;
   float* effectsChannelsWriteOutBuffer;
+  float effectsSettingsBuffer[2 * MAX_EFFECTS_CHANNELS]{};
   AudioData audioData;
 
   static int jackProcessCallback(jack_nframes_t nframes, void* arg);
@@ -66,7 +67,7 @@ class Cassette
   [[nodiscard]]
   bool deleteBuffers() const;
 
-  int updateAudioDataFromMixer(const jack_ringbuffer_t* ringBuffer, size_t ringBufferSize, int channelCount) const;
+  int updateAudioDataFromMixer(jack_ringbuffer_t *ringBuffer, int channelCount);
 
   public:
     Cassette(

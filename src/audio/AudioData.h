@@ -31,6 +31,7 @@ struct AudioData {
                                      // eCS[2k] = {gain channel k}, eCS[2k+1 = {pan channel k}
     float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 2]{};
     jack_ringbuffer_t*               effectsChannelsSettingsRB{nullptr};
+    jack_ringbuffer_data_t*          effectsChannelsSettingsReadVector[2]{nullptr, nullptr};
     float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
 
     AudioData(
