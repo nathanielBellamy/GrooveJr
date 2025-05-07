@@ -339,10 +339,8 @@ int Cassette::setupAudioData() {
   for (const auto effectsChannel : mixer->getEffectsChannels()) {
     const auto effectsChannelIdx = effectsChannel->getIndex();
     audioData.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
-    audioData.effectsChannelsProcessData[effectsChannelIdx].channelSettings = {
-      effectsChannel->getGain(),
-      effectsChannel->getPan()
-    };
+    audioData.effectsChannelsSettings[2 * effectsChannelIdx] = effectsChannel->getGain();
+    audioData.effectsChannelsSettings[2 * effectsChannelIdx + 1] = effectsChannel->getPan();
 
     if (effectsChannelIdx == 0) {
       if (audioData.effectsChannelsProcessData[0].effectCount % 2 == 0) {
@@ -683,9 +681,19 @@ bool Cassette::deleteBuffers() const {
   return true;
 }
 
-int Cassette::updateAudioDataFromMixer() {
-  for (int channelIdx = 0; channelIdx < mixer->getEffectsChannelsCount() + 1; channelIdx++) {
-    audioData.effectsChannelsProcessData[channelIdx].channelSettings.gain = mixer->getEffectsChannels().at(channelIdx)->getGain();
+int Cassette::updateAudioDataFromMixer(const jack_ringbuffer_t* effectsChannelsSettingsRB, const size_t ringBufferSize) {
+  if (jack_ringbuffer_write_space(effectsChannelsSettingsRB) > ringBufferSize) {
+    jack_ringbuffer_data_t* writeVector[2] {};
+    jack_ringbuffer_get_write_vector(effectsChannelsSettingsRB, *writeVector);
+    if (writeVector[0]->len > 0) {
+      // for (int i = 0; i < effectsChannelsCount; i++) {
+      //   write
+      // }
+    } else if (writeVector[1]->len > 0) {
+      // for (int i = 0; i < effectsChannelsCount; i++) {
+      //   write
+      // }
+    }
   }
 
   return 0;
@@ -699,6 +707,10 @@ int Cassette::play() {
     "Audio::Cassette::play",
     "Playing Cassette..."
   );
+
+  constexpr size_t ringBufferSize = 2 * MAX_EFFECTS_CHANNELS * sizeof(float);
+  jack_ringbuffer_t* effectsChannelsSettingsRB = jack_ringbuffer_create(ringBufferSize);
+  audioData.effectsChannelsSettingsRB = effectsChannelsSettingsRB;
 
   while(
           audioData.playState != STOP
@@ -728,7 +740,7 @@ int Cassette::play() {
         audioData.volume += 0.01;
     }
 
-    updateAudioDataFromMixer();
+    updateAudioDataFromMixer(effectsChannelsSettingsRB, ringBufferSize);
 
     if ( threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
         if (audioData.fadeOut < 0.01) { // break + cleanup

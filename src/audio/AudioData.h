@@ -6,6 +6,8 @@
 #include "./Channel.h"
 #include "./Constants.h"
 
+#include <jack/ringbuffer.h>
+
 #include "../Logging.h"
 
 namespace Gj {
@@ -26,6 +28,9 @@ struct AudioData {
     float                            channelCount;
     int                              effectsChannelCount;
     std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
+                                     // eCS[2k] = {gain channel k}, eCS[2k+1 = {pan channel k}
+    float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 2]{};
+    jack_ringbuffer_t*               effectsChannelsSettingsRB{nullptr};
     float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
 
     AudioData(

@@ -12,6 +12,7 @@
 
 #include <sndfile.hh>
 #include <jack/jack.h>
+#include <jack/ringbuffer.h>
 
 #include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 #include "caf/actor_system.hpp"
@@ -65,7 +66,7 @@ class Cassette
   [[nodiscard]]
   bool deleteBuffers() const;
 
-  int updateAudioDataFromMixer();
+  int updateAudioDataFromMixer(const jack_ringbuffer_t* ringBuffer, size_t ringBufferSize);
 
   public:
     Cassette(

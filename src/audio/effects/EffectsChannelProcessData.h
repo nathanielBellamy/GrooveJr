@@ -22,7 +22,6 @@ struct EffectsChannelProcessData {
   int effectCount;
   std::array<std::function<bool(Steinberg::Vst::IAudioClient::Buffers&, int64_t frames)>, MAX_PLUGINS_PER_CHANNEL> processFuncs{};
   std::array<Steinberg::Vst::IAudioClient::Buffers, MAX_PLUGINS_PER_CHANNEL> buffers{};
-  Channel channelSettings{};
 
   EffectsChannelProcessData()
     : effectCount(0)
