@@ -29,7 +29,7 @@ EffectsChannel::EffectsChannel(
   , removeEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Effect"), this)
   , grid(this)
   , title(this)
-  , slider(Qt::Vertical, this)
+  , gainSlider(Qt::Vertical, this)
   , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction, &replaceEffectAction, &removeEffectAction)
   , muteSoloContainer(this, &openEffectsContainer, channelIndex)
   {
@@ -44,7 +44,7 @@ EffectsChannel::EffectsChannel(
   connectActions();
 
   setupTitle();
-  setupSlider();
+  setupGainSlider();
   setStyle();
   setupGrid();
 }
@@ -95,7 +95,7 @@ void EffectsChannel::setupGrid() {
 
   // can't delete main, must have at least one non-main channel
   grid.addWidget(&removeEffectsChannelButton, 0, 3, 1, 1);
-  grid.addWidget(&slider, 1, 0, -1, -1);
+  grid.addWidget(&gainSlider, 1, 0, -1, -1);
   grid.addWidget(&effectsSlots, 1, 1, 1, 1);
   grid.addWidget(&muteSoloContainer, 2, 1, 1, 1);
 
@@ -119,13 +119,13 @@ void EffectsChannel::setupTitle() {
   title.setFont({title.font().family(), 16});
 }
 
-void EffectsChannel::setupSlider() {
-  slider.setMinimum(0);
-  slider.setMaximum(127);
-  slider.setTickInterval(1);
-  slider.setValue(100);
-  slider.setTickPosition(QSlider::NoTicks);
-  connect(&slider, &QSlider::valueChanged, [this](int gain) {
+void EffectsChannel::setupGainSlider() {
+  gainSlider.setMinimum(0);
+  gainSlider.setMaximum(127);
+  gainSlider.setTickInterval(1);
+  gainSlider.setValue(100);
+  gainSlider.setTickPosition(QSlider::NoTicks);
+  auto gainSliderConnection = connect(&gainSlider, &QSlider::valueChanged, [this](int gain) {
     const float gainF = static_cast<float>(gain) / 100.0f;
 
     mixer->getEffectsChannel(channelIndex)->setGain(gainF);
@@ -148,11 +148,11 @@ void EffectsChannel::setupSlider() {
 }
 
 void EffectsChannel::connectActions() {
-  connect(&openEffectsContainer, &QAction::triggered, [&]() {
+  auto openEffectsContainerConnection = connect(&openEffectsContainer, &QAction::triggered, [&]() {
     effectsContainer.show();
   });
 
-  connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl& url) {
+  auto vstSelectConnection = connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl& url) {
     Logging::write(
       Info,
       "Gui::EffectsChannel::vstSelect",
@@ -161,7 +161,7 @@ void EffectsChannel::connectActions() {
     vstUrl = url;
   });
 
-  connect(&addEffectAction, &QAction::triggered, [&]() {
+  auto addEffectConnection = connect(&addEffectAction, &QAction::triggered, [&]() {
     if (vstSelect.exec() == QDialog::Accepted) {
       const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
@@ -183,7 +183,7 @@ void EffectsChannel::connectActions() {
     }
   });
 
-  connect(&replaceEffectAction, &QAction::triggered, [&]() {
+  auto replaceEffectConnection = connect(&replaceEffectAction, &QAction::triggered, [&]() {
     const int pluginIdx = replaceEffectAction.data().toInt();
     if (vstSelect.exec() == QDialog::Accepted) {
       const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
@@ -206,7 +206,7 @@ void EffectsChannel::connectActions() {
     }
   });
 
-  connect(&removeEffectAction, &QAction::triggered, [&]() {
+  auto removeEffectConnection = connect(&removeEffectAction, &QAction::triggered, [&]() {
     const int pluginIdx = removeEffectAction.data().toInt();
     Logging::write(
       Info,
