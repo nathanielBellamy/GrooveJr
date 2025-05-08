@@ -7,7 +7,13 @@
 namespace Gj {
 namespace Gui {
 
-EffectsChannelsContainer::EffectsChannelsContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer)
+EffectsChannelsContainer::EffectsChannelsContainer(
+  QWidget* parent,
+  actor_system& actorSystem,
+  Audio::Mixer* mixer,
+  QAction* muteChannelAction,
+  QAction* soloChannelAction
+  )
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
@@ -16,6 +22,8 @@ EffectsChannelsContainer::EffectsChannelsContainer(QWidget* parent, actor_system
   , addEffectsChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListAdd), tr("&AddEffectsChannel"), this)
   , removeEffectsChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListRemove), tr("&RemoveEffectsChannel"), this)
   , addEffectsChannelButton(this, &addEffectsChannelAction)
+  , muteChannelAction(muteChannelAction)
+  , soloChannelAction(soloChannelAction)
   {
 
   for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
@@ -45,7 +53,7 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
 
 void EffectsChannelsContainer::addEffectsChannel() {
   auto effectsChannel = new EffectsChannel(
-    this, actorSystem, mixer, channels.size() + 1, &removeEffectsChannelAction
+    this, actorSystem, mixer, channels.size() + 1, &removeEffectsChannelAction, muteChannelAction, soloChannelAction
   );
   channels.push_back(effectsChannel);
 
@@ -64,7 +72,8 @@ void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
 }
 
 void EffectsChannelsContainer::connectActions() {
-  connect(&addEffectsChannelAction, &QAction::triggered, [&]() {
+
+  auto addEffectsChannelConnection = connect(&addEffectsChannelAction, &QAction::triggered, [&]() {
     Logging::write(
       Info,
       "Gui::EffectsChannelsContainer::addEffectsChannelAction trig",
@@ -83,7 +92,7 @@ void EffectsChannelsContainer::connectActions() {
     update();
   });
 
-  connect(&removeEffectsChannelAction, &QAction::triggered, [&]() {
+  auto removeEfffectsChannelConnection = connect(&removeEffectsChannelAction, &QAction::triggered, [&]() {
     const int channelIdx = removeEffectsChannelAction.data().toInt();
     Logging::write(
       Info,

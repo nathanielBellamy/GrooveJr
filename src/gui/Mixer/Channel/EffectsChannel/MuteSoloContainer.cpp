@@ -7,12 +7,17 @@
 namespace Gj {
 namespace Gui {
 
-MuteSoloContainer::MuteSoloContainer(QWidget* parent, QAction* openEffectsContainer, const int channelIndex)
+MuteSoloContainer::MuteSoloContainer(
+  QWidget* parent,
+  QAction* openEffectsContainer,
+  QAction* muteChannelAction,
+  QAction* soloChannelAction,
+  const int channelIndex)
   : QWidget(parent)
   , channelIndex(channelIndex)
   , grid(this)
-  , mute(this)
-  , solo(this)
+  , mute(this, muteChannelAction, channelIndex)
+  , solo(this, soloChannelAction, channelIndex)
   , effects(this, openEffectsContainer)
   {
 

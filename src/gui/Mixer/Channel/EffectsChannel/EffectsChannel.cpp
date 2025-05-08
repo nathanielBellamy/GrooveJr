@@ -12,7 +12,9 @@ EffectsChannel::EffectsChannel(
   actor_system& actorSystem,
   Audio::Mixer* mixer,
   const int channelIndex,
-  QAction* removeEffectsChannelAction
+  QAction* removeEffectsChannelAction,
+  QAction* muteChannelAction,
+  QAction* soloChannelAction
   )
   : QWidget(parent)
   , actorSystem(actorSystem)
@@ -32,7 +34,7 @@ EffectsChannel::EffectsChannel(
   , gainSlider(Qt::Vertical, this)
   , panSlider(Qt::Horizontal, this)
   , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction, &replaceEffectAction, &removeEffectAction)
-  , muteSoloContainer(this, &openEffectsContainer, channelIndex)
+  , muteSoloContainer(this, &openEffectsContainer, muteChannelAction, soloChannelAction, channelIndex)
   {
 
   if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {

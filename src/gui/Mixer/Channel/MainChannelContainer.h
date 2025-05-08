@@ -22,7 +22,13 @@ namespace Gui {
 class MainChannelContainer final : public QWidget {
 
   public:
-    MainChannelContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer);
+    MainChannelContainer(
+      QWidget* parent,
+      actor_system& actorSystem,
+      Audio::Mixer* mixer,
+      QAction* muteChannelAction,
+      QAction* soloChannelAction
+    );
     void hydrateState(const AppStatePacket& appState);
 
   private:

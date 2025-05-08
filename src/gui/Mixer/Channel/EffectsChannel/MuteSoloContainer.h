@@ -20,7 +20,13 @@ namespace Gui {
 
 class MuteSoloContainer final : public QWidget {
   public:
-    MuteSoloContainer(QWidget* parent, QAction* openEffectsContainer, int channelIndex);
+    MuteSoloContainer(
+      QWidget* parent,
+      QAction* openEffectsContainer,
+      QAction* muteChannelAction,
+      QAction* soloChannelAction,
+      int channelIndex
+    );
     ~MuteSoloContainer();
     void hydrateState(const AppStatePacket& appState, int newChannelIdx);
 

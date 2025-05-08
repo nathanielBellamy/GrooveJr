@@ -5,6 +5,7 @@
 #ifndef SOLOBUTTON_H
 #define SOLOBUTTON_H
 
+#include <QAction>
 #include <QPushButton>
 
 namespace Gj {
@@ -13,10 +14,13 @@ namespace Gui {
 class SoloButton final : public QPushButton {
 
   public:
-    SoloButton(QWidget* parent);
+    SoloButton(QWidget* parent, QAction* soloChannelAction, int channelIndex);
 
   private:
+    int channelIndex;
+    QAction* soloChannelAction;
     void setStyle();
+    void mousePressEvent(QMouseEvent* event) override;
 
 };
 

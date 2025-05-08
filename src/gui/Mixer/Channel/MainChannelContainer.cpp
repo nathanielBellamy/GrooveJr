@@ -7,12 +7,18 @@
 namespace Gj {
 namespace Gui {
 
-MainChannelContainer::MainChannelContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer)
+MainChannelContainer::MainChannelContainer(
+  QWidget* parent,
+  actor_system& actorSystem,
+  Audio::Mixer* mixer,
+  QAction* muteChannelAction,
+  QAction* soloChannelAction
+  )
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , grid(this)
-  , mainChannel(this, actorSystem, mixer, 0, nullptr)
+  , mainChannel(this, actorSystem, mixer, 0, nullptr, muteChannelAction, soloChannelAction)
   {
   setupGrid();
   setStyle();

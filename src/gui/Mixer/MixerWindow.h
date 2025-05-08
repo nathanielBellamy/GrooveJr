@@ -30,13 +30,16 @@ class MixerWindow final : public QWidget {
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;
+    QAction muteChannelAction;
+    QAction soloChannelAction;
     QGridLayout grid;
     QLabel title;
-    MainChannelContainer mainDryContainer;
+    MainChannelContainer mainChannelContainer;
     EffectsChannelsContainer effectsChannelsContainer;
 
     void setStyle();
     void setupGrid();
+    void connectActions();
 };
 
 } // Gui

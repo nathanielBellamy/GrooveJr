@@ -7,8 +7,10 @@
 namespace Gj {
 namespace Gui {
 
-SoloButton::SoloButton(QWidget* parent)
+SoloButton::SoloButton(QWidget* parent, QAction* soloChannelAction, const int channelIndex)
   : QPushButton("&S", parent)
+  , channelIndex(channelIndex)
+  , soloChannelAction(soloChannelAction)
   {
 
   setStyle();
@@ -17,6 +19,11 @@ SoloButton::SoloButton(QWidget* parent)
 void SoloButton::setStyle() {
   setCursor(Qt::PointingHandCursor);
   setStyleSheet("background-color: gold; border: 2px solid white; border-radius: 5px; color: black;");
+}
+
+void SoloButton::mousePressEvent(QMouseEvent* event){
+  soloChannelAction->setData(channelIndex);
+  soloChannelAction->activate(QAction::Trigger);
 }
 
 } // Gui

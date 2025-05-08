@@ -5,6 +5,7 @@
 #ifndef MUTEBUTTON_H
 #define MUTEBUTTON_H
 
+#include <QAction>
 #include <QPushButton>
 
 namespace Gj {
@@ -14,10 +15,13 @@ namespace Gui {
 class MuteButton final : public QPushButton {
 
   public:
-    MuteButton(QWidget* parent);
+    MuteButton(QWidget* parent, QAction* muteChannelAction, int channelIndex);
 
   private:
+    int channelIndex;
+    QAction* muteChannelAction;
     void setStyle();
+    void mousePressEvent(QMouseEvent* event) override;
 };
 
 } // Gui

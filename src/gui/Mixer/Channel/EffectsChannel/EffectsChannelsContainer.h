@@ -30,7 +30,13 @@ namespace Gui {
 class EffectsChannelsContainer final : public QWidget {
 
   public:
-    EffectsChannelsContainer(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer);
+    EffectsChannelsContainer(
+      QWidget* parent,
+      actor_system& actorSystem,
+      Audio::Mixer* mixer,
+      QAction* muteChannelAction,
+      QAction* soloChannelAction
+    );
     void hydrateState(const AppStatePacket& appState);
 
   private:
@@ -42,6 +48,8 @@ class EffectsChannelsContainer final : public QWidget {
     QAction addEffectsChannelAction;
     QAction removeEffectsChannelAction;
     AddEffectsChannelButton addEffectsChannelButton;
+    QAction* muteChannelAction;
+    QAction* soloChannelAction;
     void addEffectsChannel();
     void removeEffectsChannel(int channelIdx);
     void connectActions();
