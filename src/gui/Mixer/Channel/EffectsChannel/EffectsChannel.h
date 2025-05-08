@@ -57,12 +57,14 @@ class EffectsChannel final : public QWidget {
     QGridLayout grid;
     QLabel title;
     QSlider gainSlider;
+    QSlider panSlider;
     EffectsSlots effectsSlots;
     MuteSoloContainer muteSoloContainer;
     void setStyle();
     void setupGrid();
     void setupTitle();
     void setupGainSlider();
+    void setupPanSlider();
     void connectActions();
 };
 

@@ -30,6 +30,7 @@ EffectsChannel::EffectsChannel(
   , grid(this)
   , title(this)
   , gainSlider(Qt::Vertical, this)
+  , panSlider(Qt::Horizontal, this)
   , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction, &replaceEffectAction, &removeEffectAction)
   , muteSoloContainer(this, &openEffectsContainer, channelIndex)
   {
@@ -45,6 +46,7 @@ EffectsChannel::EffectsChannel(
 
   setupTitle();
   setupGainSlider();
+  setupPanSlider();
   setStyle();
   setupGrid();
 }
@@ -82,7 +84,6 @@ void EffectsChannel::updateShowRemoveEffectsChannelButton(bool val) {
   }
 }
 
-
 void EffectsChannel::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet("background-color: orange;");
@@ -98,6 +99,7 @@ void EffectsChannel::setupGrid() {
   grid.addWidget(&gainSlider, 1, 0, -1, -1);
   grid.addWidget(&effectsSlots, 1, 1, 1, 1);
   grid.addWidget(&muteSoloContainer, 2, 1, 1, 1);
+  grid.addWidget(&panSlider, 3, 1, 1, 1);
 
   grid.setVerticalSpacing(2);
   grid.setHorizontalSpacing(2);
@@ -144,6 +146,19 @@ void EffectsChannel::setupGainSlider() {
     //     gainF,
     //     mix_set_channel_gain_a_v
     // );
+  });
+}
+
+void EffectsChannel::setupPanSlider() {
+  panSlider.setMinimum(-127);
+  panSlider.setMaximum(127);
+  panSlider.setTickInterval(1);
+  panSlider.setValue(0);
+  panSlider.setTickPosition(QSlider::NoTicks);
+  auto panSliderConnection = connect(&panSlider, &QSlider::valueChanged, [this](const int pan) {
+    const float panF = static_cast<float>(pan) / 127.0f;
+
+    mixer->getEffectsChannel(channelIndex)->setPan(panF);
   });
 }
 
