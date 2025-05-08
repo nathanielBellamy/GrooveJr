@@ -197,21 +197,23 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
     for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
       const float gain = audioData->effectsChannelsSettings[2 * effectsChannelIdx];
       const float pan = audioData->effectsChannelsSettings[2 * effectsChannelIdx + 1];
+      const float panL = ((pan - 1.0f) / 2.0f);
+      const float panR = ((pan + 1.0f) / 2.0f);
       if (effectsChannelIdx == 1) {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] = gain * processHead[0][i] / channelCount;
-          audioData->mainInBuffers[1][i] = gain * processHead[1][i] / channelCount;
+          audioData->mainInBuffers[0][i] = panL * gain * processHead[0][i] / channelCount;
+          audioData->mainInBuffers[1][i] = panR *  gain * processHead[1][i] / channelCount;
         } else {
-          audioData->mainInBuffers[0][i] = gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
-          audioData->mainInBuffers[1][i] = gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
+          audioData->mainInBuffers[0][i] = panL * gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
+          audioData->mainInBuffers[1][i] = panR * gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
         }
       } else {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] += gain * processHead[0][i] / channelCount;
-          audioData->mainInBuffers[1][i] += gain * processHead[1][i] / channelCount;
+          audioData->mainInBuffers[0][i] += panL * gain * processHead[0][i] / channelCount;
+          audioData->mainInBuffers[1][i] += panR * gain * processHead[1][i] / channelCount;
         } else {
-          audioData->mainInBuffers[0][i] += gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
-          audioData->mainInBuffers[1][i] += gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
+          audioData->mainInBuffers[0][i] += panL * gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
+          audioData->mainInBuffers[1][i] += panR * gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
         }
       }
     }
@@ -231,9 +233,11 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   // write out processed main channel to audio out
   const float gain = audioData->effectsChannelsSettings[0];
   const float pan = audioData->effectsChannelsSettings[1];
+  const float panL = ((pan - 1.0f) / 2.0f);
+  const float panR = ((pan + 1.0f) / 2.0f);
   for (int i = 0; i < nframes; i++) {
-    outL[i] = gain * audioData->mainOutBuffers[0][i];
-    outR[i] = gain * audioData->mainOutBuffers[1][i];
+    outL[i] = panL * gain * audioData->mainOutBuffers[0][i];
+    outR[i] = panR * gain * audioData->mainOutBuffers[1][i];
   }
 
   audioData->index += nframes;
