@@ -30,6 +30,12 @@ class MainChannelContainer final : public QWidget {
       QAction* soloChannelAction
     );
     void hydrateState(const AppStatePacket& appState);
+    void setMute(float val) {
+      mainChannel.setMute(val);
+    };
+    void setSolo(float val) {
+      mainChannel.setSolo(val);
+    };
 
   private:
     actor_system& actorSystem;

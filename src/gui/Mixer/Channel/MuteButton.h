@@ -11,11 +11,11 @@
 namespace Gj {
 namespace Gui {
 
-
 class MuteButton final : public QPushButton {
 
   public:
     MuteButton(QWidget* parent, QAction* muteChannelAction, int channelIndex);
+    void setMute(float val);
 
   private:
     int channelIndex;

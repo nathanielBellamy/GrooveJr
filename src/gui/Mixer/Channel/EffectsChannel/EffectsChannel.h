@@ -47,6 +47,8 @@ class EffectsChannel final : public QWidget {
     ~EffectsChannel();
     void hydrateState(const AppStatePacket& appStatePacket, int newChannelIndex);
     void updateShowRemoveEffectsChannelButton(bool val);
+    void setMute(float val);
+    void setSolo(float val);
 
   private:
     actor_system& actorSystem;

@@ -16,6 +16,15 @@ MuteButton::MuteButton(QWidget* parent, QAction* muteChannelAction, const int ch
   setStyle();
 }
 
+void MuteButton::setMute(const float val) {
+  if (val == 1.0f) {
+    setStyleSheet("background-color: lightblue; border: 2px solid white; border-radius: 5px;");
+  } else {
+    setStyleSheet("background-color: grey; border: 2px solid white; border-radius: 5px;");
+  }
+}
+
+
 void MuteButton::setStyle() {
   setCursor(Qt::PointingHandCursor);
   setStyleSheet("background-color: grey; border: 2px solid white; border-radius: 5px;");

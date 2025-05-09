@@ -56,13 +56,23 @@ void MixerWindow::connectActions() {
   auto muteChannelConnection = connect(&muteChannelAction, &QAction::triggered, [&]() {
     const int channelIdx = muteChannelAction.data().toInt();
 
-    mixer->getEffectsChannel(channelIdx)->toggleMute();
+    const float newMute = mixer->getEffectsChannel(channelIdx)->toggleMute();
+    if (channelIdx == 0) {
+      mainChannelContainer.setMute(newMute);
+    } else {
+      effectsChannelsContainer.setMute(channelIdx, newMute);
+    }
   });
 
   auto soloChannelConnection = connect(&soloChannelAction, &QAction::triggered, [&]() {
     const int channelIdx = soloChannelAction.data().toInt();
 
-    mixer->getEffectsChannel(channelIdx)->toggleSolo();
+    const float newSolo = mixer->getEffectsChannel(channelIdx)->toggleSolo();
+    if (channelIdx == 0) {
+      mainChannelContainer.setSolo(newSolo);
+    } else {
+      effectsChannelsContainer.setSolo(channelIdx, newSolo);
+    }
   });
 }
 

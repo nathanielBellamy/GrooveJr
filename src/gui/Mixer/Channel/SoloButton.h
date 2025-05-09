@@ -15,6 +15,7 @@ class SoloButton final : public QPushButton {
 
   public:
     SoloButton(QWidget* parent, QAction* soloChannelAction, int channelIndex);
+    void setSolo(float val);
 
   private:
     int channelIndex;

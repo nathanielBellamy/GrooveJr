@@ -130,5 +130,13 @@ void EffectsChannelsContainer::setupGrid() {
   grid.addWidget(&spacer, 0, col, -1, -1);
 }
 
+void EffectsChannelsContainer::setMute(const int channelIdx, const float val) const {
+  channels.at(channelIdx - 1)->setMute(val);
+}
+
+  void EffectsChannelsContainer::setSolo(const int channelIdx, const float val) const {
+  channels.at(channelIdx - 1)->setSolo(val);
+}
+
 } // Gui
 } // Gj

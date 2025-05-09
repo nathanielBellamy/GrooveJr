@@ -38,6 +38,8 @@ class EffectsChannelsContainer final : public QWidget {
       QAction* soloChannelAction
     );
     void hydrateState(const AppStatePacket& appState);
+    void setMute(int channelIdx, float val) const;
+    void setSolo(int channelIdx, float val) const;
 
   private:
     actor_system& actorSystem;

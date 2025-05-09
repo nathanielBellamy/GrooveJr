@@ -18,12 +18,20 @@ SoloButton::SoloButton(QWidget* parent, QAction* soloChannelAction, const int ch
 
 void SoloButton::setStyle() {
   setCursor(Qt::PointingHandCursor);
-  setStyleSheet("background-color: gold; border: 2px solid white; border-radius: 5px; color: black;");
+  setStyleSheet("background-color: grey; border: 2px solid white; border-radius: 5px; color: black;");
 }
 
 void SoloButton::mousePressEvent(QMouseEvent* event){
   soloChannelAction->setData(channelIndex);
   soloChannelAction->activate(QAction::Trigger);
+}
+
+void SoloButton::setSolo(const float val) {
+  if (val == 1.0f) {
+    setStyleSheet("background-color: yellow; border: 2px solid white; border-radius: 5px; color: black;");
+  } else {
+    setStyleSheet("background-color: grey; border: 2px solid white; border-radius: 5px; color: black;");
+  }
 }
 
 } // Gui

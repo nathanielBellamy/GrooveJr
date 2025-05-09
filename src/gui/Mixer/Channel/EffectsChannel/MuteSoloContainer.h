@@ -29,6 +29,8 @@ class MuteSoloContainer final : public QWidget {
     );
     ~MuteSoloContainer();
     void hydrateState(const AppStatePacket& appState, int newChannelIdx);
+    void setMute(float val);
+    void setSolo(float val);
 
   private:
     int channelIndex;

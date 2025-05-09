@@ -36,7 +36,6 @@ void MuteSoloContainer::hydrateState(const AppStatePacket &appState, int newChan
   channelIndex = newChannelIdx;
 }
 
-
 void MuteSoloContainer::setupGrid() {
   grid.setVerticalSpacing(0);
   grid.setHorizontalSpacing(2);
@@ -44,6 +43,14 @@ void MuteSoloContainer::setupGrid() {
   grid.addWidget(&mute, 0, 0, 1, 1);
   grid.addWidget(&solo, 0, 1, 1, 1);
   grid.addWidget(&effects, 0, 2, 1, 1);
+}
+
+void MuteSoloContainer::setMute(const float val) {
+  mute.setMute(val);
+}
+
+void MuteSoloContainer::setSolo(const float val) {
+  solo.setSolo(val);
 }
 
 } // Gui

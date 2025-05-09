@@ -34,9 +34,7 @@ EffectsChannel::EffectsChannel(
   , gainSlider(Qt::Vertical, this)
   , panSlider(Qt::Horizontal, this)
   , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction, &replaceEffectAction, &removeEffectAction)
-  , muteSoloContainer(this, &openEffectsContainer, muteChannelAction, soloChannelAction, channelIndex)
-  {
-
+  , muteSoloContainer(this, &openEffectsContainer, muteChannelAction, soloChannelAction, channelIndex) {
   if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
     // can't remove main, must have at least one non-main effects channel
     removeEffectsChannelButton.show();
@@ -243,6 +241,15 @@ void EffectsChannel::connectActions() {
     effectsSlots.removeEffectSlot();
   });
 }
+
+void EffectsChannel::setMute(const float val) {
+  muteSoloContainer.setMute(val);
+}
+
+void EffectsChannel::setSolo(const float val) {
+  muteSoloContainer.setSolo(val);
+}
+
 
 } // Gui
 } // Gj
