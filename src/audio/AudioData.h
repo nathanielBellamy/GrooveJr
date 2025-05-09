@@ -28,8 +28,11 @@ struct AudioData {
     float                            channelCount;
     int                              effectsChannelCount;
     std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
-                                     // eCS[2k] = {gain channel k}, eCS[2k+1 = {pan channel k}
-    float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 2]{};
+                                     // eCS[4k]   = {gain channel k}
+                                     // eCS[4k+1] = {mute channel k}
+                                     // eCS[4k+2] = {solo channel k}
+                                     // eCS[4k+3] = {pan channel k}
+    float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{};
     jack_ringbuffer_t*               effectsChannelsSettingsRB{nullptr};
     jack_ringbuffer_data_t*          effectsChannelsSettingsReadVector[2]{nullptr, nullptr};
     float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};

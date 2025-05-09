@@ -52,6 +52,40 @@ class EffectsChannel {
       return true;
     };
 
+    float getMute() const {
+      return channel.mute.load();
+    }
+
+    float toggleMute() {
+      const float mute = channel.mute.load();
+      if (mute == 1.0f) {
+        channel.mute.store(0.0f);
+        return 0.0f;
+      }
+      if (mute == 0.0f) {
+        channel.mute.store(1.0f);
+        return 1.0f;
+      }
+      return 0.0f;
+    }
+
+    float getSolo() const {
+      return channel.solo.load();
+    }
+
+    float toggleSolo() {
+      const float solo = channel.solo.load();
+      if (solo == 1.0f) {
+        channel.solo.store(0.0f);
+        return 0.0f;
+      }
+      if (solo == 0.0f) {
+        channel.solo.store(1.0f);
+        return 1.0f;
+      }
+      return 0.0f;
+    }
+
     float getPan() const {
       return channel.pan.load();
     };
