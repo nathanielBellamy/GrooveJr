@@ -36,6 +36,7 @@ struct AudioData {
     jack_ringbuffer_t*               effectsChannelsSettingsRB{nullptr};
     jack_ringbuffer_data_t*          effectsChannelsSettingsReadVector[2]{nullptr, nullptr};
     float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
+    float (*mixdownFuncs[2])(float,float,float,float,float,float,float) { &AudioData::mixdownL, &AudioData::mixdownR };
 
     AudioData(
       const sf_count_t index,
@@ -67,7 +68,38 @@ struct AudioData {
         "Destroyed AudioData"
       );
     }
+
+    static float mixdownL(
+      float valL,
+      float valR,
+      float gain,
+      float mute,
+      float solo,
+      float pan,
+      float soloEngaged
+      ) {
+
+      const float panL = ((pan - 1.0f) / 2.0f);
+      const float muteVal = mute == 1.0f ? solo : 0.0f;
+      return (1.0f - soloEngaged + solo) * muteVal * panL * gain * valL;
+    }
+
+    static float mixdownR(
+      float valL,
+      float valR,
+      float gain,
+      float mute,
+      float solo,
+      float pan,
+      float soloEngaged
+      ) {
+
+      const float panR = ((pan + 1.0f) / 2.0f);
+      const float muteVal = mute == 1.0f ? solo : 0.0f;
+      return (1.0f - soloEngaged + solo) * muteVal * panR * gain * valL;
+    }
 };
+
 
 } // Audio
 } // Gj
