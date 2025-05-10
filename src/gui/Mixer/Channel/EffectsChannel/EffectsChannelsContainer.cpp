@@ -19,6 +19,11 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   , mixer(mixer)
   , grid(this)
   , spacer(this)
+  , channelsWidget(this)
+  , channelsWidgetInner(&channelsWidget)
+  , channelsScrollArea(&channelsWidget)
+  , channelsGrid(&channelsWidget)
+  , channelsGridInner(&channelsWidgetInner)
   , addEffectsChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListAdd), tr("&AddEffectsChannel"), this)
   , removeEffectsChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListRemove), tr("&RemoveEffectsChannel"), this)
   , addEffectsChannelButton(this, &addEffectsChannelAction)
@@ -118,16 +123,21 @@ void EffectsChannelsContainer::connectActions() {
 void EffectsChannelsContainer::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet("background-color: yellow; border-radius: 5px;");
+  channelsWidget.setStyleSheet("background-color: purple;");
+  channelsWidgetInner.setStyleSheet("background-color: lightblue;");
 }
 
 void EffectsChannelsContainer::setupGrid() {
   int col = 0;
-  for (auto &effectsChannel : channels) {
-    grid.addWidget(effectsChannel, 1, col, -1, 1);
+  for (const auto &effectsChannel : channels) {
+    channelsGridInner.addWidget(effectsChannel, 0, col, -1, 1);
     col++;
   }
-  grid.addWidget(&addEffectsChannelButton, 1, col + 1, 1, 1);
-  grid.addWidget(&spacer, 0, col, -1, -1);
+  channelsGrid.addWidget(&channelsWidgetInner, 0, 0, -1, -1);
+  grid.addWidget(&channelsWidget, 1, 0, 1, 1);
+  channelsScrollArea.setWidget(&channelsWidgetInner);
+  grid.addWidget(&addEffectsChannelButton, 1, 2, 1, 1);
+  // grid.addWidget(&spacer, 0, col, -1, -1);
 }
 
 void EffectsChannelsContainer::setMute(const int channelIdx, const float val) const {
