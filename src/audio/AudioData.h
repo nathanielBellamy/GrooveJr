@@ -81,8 +81,7 @@ struct AudioData {
       ) {
 
       const float panL = ((pan - 1.0f) / 2.0f);
-      const float muteVal = mute == 1.0f ? solo : 0.0f;
-      return (1.0f - soloEngaged + solo) * muteVal * panL * gain * valL / channelCount;
+      return (1.0f - soloEngaged + solo) * (1.0f - mute) * panL * gain * valL / channelCount;
     }
 
     static float mixdownR(
@@ -97,8 +96,7 @@ struct AudioData {
       ) {
 
       const float panR = ((pan + 1.0f) / 2.0f);
-      const float muteVal = mute == 1.0f ? solo : 0.0f;
-      return (1.0f - soloEngaged + solo) * muteVal * panR * gain * valL / channelCount;
+      return (1.0f - soloEngaged + solo) * (1.0f - mute) * panR * gain * valL / channelCount;
     }
 };
 

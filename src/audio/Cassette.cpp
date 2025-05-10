@@ -195,7 +195,7 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   const float channelCount = audioData->channelCount;
   float soloEngaged = 0.0f;
   for (int i = 0; i < channelCount; i++) {
-    if (audioData->effectsChannelsSettings[4 * i + 3] == 1.0f) {
+    if (audioData->effectsChannelsSettings[4 * i + 2] == 1.0f) {
       soloEngaged = 1.0f;
       break;
     }
