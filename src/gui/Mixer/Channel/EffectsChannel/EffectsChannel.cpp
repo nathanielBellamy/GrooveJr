@@ -98,8 +98,8 @@ void EffectsChannel::setupGrid() {
   grid.addWidget(&removeEffectsChannelButton, 0, 3, 1, 1);
   grid.addWidget(&gainSlider, 1, 0, -1, -1);
   grid.addWidget(&effectsSlots, 1, 1, 1, 1);
-  grid.addWidget(&muteSoloContainer, 2, 1, 1, 1);
-  grid.addWidget(&panSlider, 3, 1, 1, 1);
+  grid.addWidget(&panSlider, 2, 1, 1, 1);
+  grid.addWidget(&muteSoloContainer, 3, 1, 1, 1);
 
   grid.setVerticalSpacing(2);
   grid.setHorizontalSpacing(2);
