@@ -77,7 +77,7 @@ struct AudioData {
       const float channelCount
       ) {
 
-      const float panL = (pan - 1.0f) / 2.0f;
+      const float panL = pan <= 0.0f ? 1.0f : 1.0f - pan;
       return (1.0f - mute) * panL * gain / channelCount;
     }
 
@@ -90,7 +90,7 @@ struct AudioData {
       const float channelCount
       ) {
 
-      const float panL = (pan - 1.0f) / 2.0f;
+      const float panL = pan >= 0.0f ? pan : 0.0;
       return (1.0f - mute) * panL * gain / channelCount;
     }
 
@@ -103,7 +103,7 @@ struct AudioData {
       const float channelCount
       ) {
 
-      const float panR = (pan + 1.0f) / 2.0f;
+      const float panR = pan <= 0.0f ? -pan : 0.0f;
       return (1.0f - mute) * panR * gain / channelCount;
     }
 
@@ -116,7 +116,7 @@ struct AudioData {
       const float channelCount
       ) {
 
-      const float panR = (pan + 1.0f) / 2.0f;
+      const float panR = pan >= 0.0f ? 1.0f : 1.0f + pan;
       return (1.0f - mute) * panR * gain / channelCount;
     }
 };

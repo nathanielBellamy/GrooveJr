@@ -201,19 +201,19 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
 
       if (effectsChannelIdx == 1) {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] = factorLL * processHead[0][i] + factorLR * processHead[1][i];
-          audioData->mainInBuffers[1][i] = factorRL * processHead[0][i] + factorRR * processHead[1][i];
+          audioData->mainInBuffers[0][i] = factorLL * processHead[0][i] + factorRL * processHead[1][i];
+          audioData->mainInBuffers[1][i] = factorLR * processHead[0][i] + factorRR * processHead[1][i];
         } else {
-          audioData->mainInBuffers[0][i] = factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          audioData->mainInBuffers[1][i] = factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+          audioData->mainInBuffers[0][i] = factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+          audioData->mainInBuffers[1][i] = factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
       } else {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] += factorLL * processHead[0][i] + factorLR * processHead[1][i];
-          audioData->mainInBuffers[1][i] += factorRL * processHead[0][i] + factorRR * processHead[1][i];
+          audioData->mainInBuffers[0][i] += factorLL * processHead[0][i] + factorRL * processHead[1][i];
+          audioData->mainInBuffers[1][i] += factorLR * processHead[0][i] + factorRR * processHead[1][i];
         } else {
-          audioData->mainInBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          audioData->mainInBuffers[1][i] += factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+          audioData->mainInBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+          audioData->mainInBuffers[1][i] += factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
       }
     }
@@ -236,8 +236,8 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   const float factorRL = audioData->effectsChannelsSettings[2];
   const float factorRR = audioData->effectsChannelsSettings[3];
   for (int i = 0; i < nframes; i++) {
-    outL[i] = factorLL * audioData->mainOutBuffers[0][i] + factorLR * audioData->mainOutBuffers[1][i];
-    outR[i] = factorRL * audioData->mainOutBuffers[0][i] + factorRR * audioData->mainOutBuffers[1][i];
+    outL[i] = factorLL * audioData->mainOutBuffers[0][i] + factorRL * audioData->mainOutBuffers[1][i];
+    outR[i] = factorLR * audioData->mainOutBuffers[0][i] + factorRR * audioData->mainOutBuffers[1][i];
   }
 
   audioData->index += nframes;
