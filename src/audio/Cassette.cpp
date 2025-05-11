@@ -192,109 +192,28 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   }
 
   // sum down into mainInBuffers
-  const float channelCount = audioData->channelCount;
-  float soloEngaged = 0.0f;
-  for (int i = 0; i < channelCount; i++) {
-    if (audioData->effectsChannelsSettings[4 * i + 2] == 1.0f) {
-      soloEngaged = 1.0f;
-      break;
-    }
-  }
-
   for (int i = 0; i < nframes; i++) {
     for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
-      const float gain = audioData->effectsChannelsSettings[4 * effectsChannelIdx];
-      const float mute = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 1];
-      const float solo = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 2];
-      const float pan = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 3];
+      const float factorLL = audioData->effectsChannelsSettings[4 * effectsChannelIdx];
+      const float factorLR = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 1];
+      const float factorRL = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 2];
+      const float factorRR = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 3];
 
       if (effectsChannelIdx == 1) {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] = audioData->mixdownFuncs[0](
-            processHead[0][i],
-            processHead[1][i],
-            gain,
-            mute,
-            solo,
-            pan,
-            soloEngaged,
-            channelCount
-          ); // (1.0f - soloEngaged + solo) * (1.0f - mute + solo) * panL * gain * processHead[0][i] / channelCount;
-          audioData->mainInBuffers[1][i] = audioData->mixdownFuncs[1](
-            processHead[0][i],
-            processHead[1][i],
-            gain,
-            mute,
-            solo,
-            pan,
-            soloEngaged,
-            channelCount
-          ); // (1.0f - soloEngaged + solo) * (1.0f - mute + solo) * panR * gain * processHead[1][i] / channelCount;
+          audioData->mainInBuffers[0][i] = factorLL * processHead[0][i] + factorLR * processHead[1][i];
+          audioData->mainInBuffers[1][i] = factorRL * processHead[0][i] + factorRR * processHead[1][i];
         } else {
-          audioData->mainInBuffers[0][i] = audioData->mixdownFuncs[0](
-            audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i],
-            audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i],
-            gain,
-            mute,
-            solo,
-            pan,
-            soloEngaged,
-            channelCount
-          ); // (1.0f - soloEngaged + solo) * (1.0f - mute + solo) * panL * gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
-          audioData->mainInBuffers[1][i] = audioData->mixdownFuncs[1](
-            audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i],
-            audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i],
-            gain,
-            mute,
-            solo,
-            pan,
-            soloEngaged,
-            channelCount
-          ); // (1.0f - soloEngaged + solo) * (1.0f - mute + solo) * panR * gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
+          audioData->mainInBuffers[0][i] = factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+          audioData->mainInBuffers[1][i] = factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
       } else {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] += audioData->mixdownFuncs[0](
-            processHead[0][i],
-            processHead[1][i],
-            gain,
-            mute,
-            solo,
-            pan,
-            soloEngaged,
-            channelCount
-          ); // (1.0f - soloEngaged + solo) * (1.0f - mute + solo) * panL * gain * processHead[0][i] / channelCount;
-          audioData->mainInBuffers[1][i] += audioData->mixdownFuncs[1](
-            processHead[0][i],
-            processHead[1][i],
-            gain,
-            mute,
-            solo,
-            pan,
-            soloEngaged,
-            channelCount
-          ); // (1.0f - soloEngaged + solo) * (1.0f - mute + solo) * panR * gain * processHead[1][i] / channelCount;
+          audioData->mainInBuffers[0][i] += factorLL * processHead[0][i] + factorLR * processHead[1][i];
+          audioData->mainInBuffers[1][i] += factorRL * processHead[0][i] + factorRR * processHead[1][i];
         } else {
-          audioData->mainInBuffers[0][i] += audioData->mixdownFuncs[0](
-            audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i],
-            audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i],
-            gain,
-            mute,
-            solo,
-            pan,
-            soloEngaged,
-            channelCount
-          ); // (1.0f - soloEngaged + solo) * (1.0f - mute + solo) * panL * gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] / channelCount;
-          audioData->mainInBuffers[1][i] += audioData->mixdownFuncs[1](
-            audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i],
-            audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i],
-            gain,
-            mute,
-            solo,
-            pan,
-            soloEngaged,
-            channelCount
-          ); // (1.0f - soloEngaged + solo) * (1.0f - mute + solo) * panR * gain * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i] / channelCount;
+          audioData->mainInBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+          audioData->mainInBuffers[1][i] += factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
       }
     }
@@ -312,15 +231,13 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   }
 
   // write out processed main channel to audio out
-  const float gain = audioData->effectsChannelsSettings[0];
-  const float mute = audioData->effectsChannelsSettings[1];
-  const float solo = audioData->effectsChannelsSettings[2];
-  const float pan = audioData->effectsChannelsSettings[3];
-  const float panL = ((pan - 1.0f) / 2.0f);
-  const float panR = ((pan + 1.0f) / 2.0f);
+  const float factorLL = audioData->effectsChannelsSettings[0];
+  const float factorLR = audioData->effectsChannelsSettings[1];
+  const float factorRL = audioData->effectsChannelsSettings[2];
+  const float factorRR = audioData->effectsChannelsSettings[3];
   for (int i = 0; i < nframes; i++) {
-    outL[i] = (1.0f - soloEngaged + solo) * (1.0f - mute + solo) * panL * gain * audioData->mainOutBuffers[0][i];
-    outR[i] = (1.0f - soloEngaged + solo) * (1.0f - mute + solo) * panR * gain * audioData->mainOutBuffers[1][i];
+    outL[i] = factorLL * audioData->mainOutBuffers[0][i] + factorLR * audioData->mainOutBuffers[1][i];
+    outR[i] = factorRL * audioData->mainOutBuffers[0][i] + factorRR * audioData->mainOutBuffers[1][i];
   }
 
   audioData->index += nframes;
@@ -794,12 +711,28 @@ bool Cassette::deleteBuffers() const {
 }
 
 int Cassette::updateAudioDataFromMixer(jack_ringbuffer_t* effectsChannelsSettingsRB, const int channelCount) {
+  const float channelCountF = static_cast<float>(channelCount);
+
+  float soloVals[MAX_EFFECTS_CHANNELS] {0.0f};
+  float soloEngaged = 0.0f;
+  for (int i = 0; i < channelCount; i++) {
+    soloVals[i] = mixer->getEffectsChannel(i)->getSolo();
+    if (soloVals[i] == 1.0f)
+      soloEngaged = 1.0f;
+  }
+
   // update buffer
-  for (int i = 0; i < mixer->getEffectsChannelsCount() + 1; i++) {
-    effectsSettingsBuffer[4 * i]     = mixer->getEffectsChannel(i)->getGain();
-    effectsSettingsBuffer[4 * i + 1] = mixer->getEffectsChannel(i)->getMute();
-    effectsSettingsBuffer[4 * i + 2] = mixer->getEffectsChannel(i)->getSolo();
-    effectsSettingsBuffer[4 * i + 3] = mixer->getEffectsChannel(i)->getPan();
+  for (int i = 0; i < channelCount; i++) {
+    const auto effectsChannel = mixer->getEffectsChannel(i);
+    const float gain = effectsChannel->getGain();
+    const float mute = effectsChannel->getMute();
+    const float solo = soloVals[i];
+    const float pan  = effectsChannel->getPan();
+
+    effectsSettingsBuffer[4 * i]     = AudioData::factorLL(gain, mute, solo, pan, soloEngaged, channelCountF);
+    effectsSettingsBuffer[4 * i + 1] = AudioData::factorLR(gain, mute, solo, pan, soloEngaged, channelCountF);
+    effectsSettingsBuffer[4 * i + 2] = AudioData::factorRL(gain, mute, solo, pan, soloEngaged, channelCountF);
+    effectsSettingsBuffer[4 * i + 3] = AudioData::factorRR(gain, mute, solo, pan, soloEngaged, channelCountF);
   }
 
   // write to ring buffer

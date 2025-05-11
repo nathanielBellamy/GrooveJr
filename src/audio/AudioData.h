@@ -28,15 +28,14 @@ struct AudioData {
     float                            channelCount;
     int                              effectsChannelCount;
     std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
-                                     // eCS[4k]   = {gain channel k}
-                                     // eCS[4k+1] = {mute channel k}
-                                     // eCS[4k+2] = {solo channel k}
-                                     // eCS[4k+3] = {pan channel k}
+                                     // eCS[4k]   = {factorLL channel k}
+                                     // eCS[4k+1] = {factorLR channel k}
+                                     // eCS[4k+2] = {factorRL channel k}
+                                     // eCS[4k+3] = {factorRR channel k}
     float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{};
     jack_ringbuffer_t*               effectsChannelsSettingsRB{nullptr};
     jack_ringbuffer_data_t*          effectsChannelsSettingsReadVector[2]{nullptr, nullptr};
     float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
-    float (*mixdownFuncs[2])(float,float,float,float,float,float,float, float) { &AudioData::mixdownL, &AudioData::mixdownR };
 
     AudioData(
       const sf_count_t index,
@@ -69,37 +68,58 @@ struct AudioData {
       );
     }
 
-    static float mixdownL(
-      float valL,
-      float valR,
-      float gain,
-      float mute,
-      float solo,
-      float pan,
-      float soloEngaged,
-      float channelCount
+    static float factorLL(
+      const float gain,
+      const float mute,
+      const float solo,
+      const float pan,
+      const float soloEngaged,
+      const float channelCount
       ) {
 
-      const float panL = ((pan - 1.0f) / 2.0f);
-      return (1.0f - soloEngaged + solo) * (1.0f - mute) * panL * gain * valL / channelCount;
+      const float panL = (pan - 1.0f) / 2.0f;
+      return (1.0f - mute) * panL * gain / channelCount;
     }
 
-    static float mixdownR(
-      float valL,
-      float valR,
-      float gain,
-      float mute,
-      float solo,
-      float pan,
-      float soloEngaged,
-      float channelCount
+    static float factorLR(
+      const float gain,
+      const float mute,
+      const float solo,
+      const float pan,
+      const float soloEngaged,
+      const float channelCount
       ) {
 
-      const float panR = ((pan + 1.0f) / 2.0f);
-      return (1.0f - soloEngaged + solo) * (1.0f - mute) * panR * gain * valL / channelCount;
+      const float panL = (pan - 1.0f) / 2.0f;
+      return (1.0f - mute) * panL * gain / channelCount;
+    }
+
+    static float factorRL(
+      const float gain,
+      const float mute,
+      const float solo,
+      const float pan,
+      const float soloEngaged,
+      const float channelCount
+      ) {
+
+      const float panR = (pan + 1.0f) / 2.0f;
+      return (1.0f - mute) * panR * gain / channelCount;
+    }
+
+    static float factorRR(
+      const float gain,
+      const float mute,
+      const float solo,
+      const float pan,
+      const float soloEngaged,
+      const float channelCount
+      ) {
+
+      const float panR = (pan + 1.0f) / 2.0f;
+      return (1.0f - mute) * panR * gain / channelCount;
     }
 };
-
 
 } // Audio
 } // Gj
