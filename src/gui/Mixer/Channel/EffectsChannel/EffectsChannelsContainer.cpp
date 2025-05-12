@@ -4,6 +4,8 @@
 
 #include "EffectsChannelsContainer.h"
 
+#include "../../../../audio/Constants.h"
+
 namespace Gj {
 namespace Gui {
 
@@ -21,7 +23,7 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   , spacer(this)
   , channelsWidget(this)
   , channelsWidgetInner(&channelsWidget)
-  , channelsScrollArea(&channelsWidget)
+  , channelsScrollArea(this)
   , channelsGrid(&channelsWidget)
   , channelsGridInner(&channelsWidgetInner)
   , addEffectsChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListAdd), tr("&AddEffectsChannel"), this)
@@ -57,7 +59,10 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
 }
 
 void EffectsChannelsContainer::addEffectsChannel() {
-  auto effectsChannel = new EffectsChannel(
+  if (channels.size() > Audio::MAX_EFFECTS_CHANNELS - 2)
+    return;
+
+  const auto effectsChannel = new EffectsChannel(
     this, actorSystem, mixer, channels.size() + 1, &removeEffectsChannelAction, muteChannelAction, soloChannelAction
   );
   channels.push_back(effectsChannel);
@@ -128,6 +133,8 @@ void EffectsChannelsContainer::setStyle() {
 }
 
 void EffectsChannelsContainer::setupGrid() {
+  setupChannelsScrollArea();
+  channelsGridInner.setContentsMargins(20, 10, 20, 10);
   int col = 0;
   for (const auto &effectsChannel : channels) {
     channelsGridInner.addWidget(effectsChannel, 0, col, -1, 1);
@@ -135,7 +142,6 @@ void EffectsChannelsContainer::setupGrid() {
   }
   channelsGrid.addWidget(&channelsWidgetInner, 0, 0, -1, -1);
   grid.addWidget(&channelsWidget, 1, 0, 1, 1);
-  channelsScrollArea.setWidget(&channelsWidgetInner);
   grid.addWidget(&addEffectsChannelButton, 1, 2, 1, 1);
   // grid.addWidget(&spacer, 0, col, -1, -1);
 }
@@ -147,6 +153,17 @@ void EffectsChannelsContainer::setMute(const int channelIdx, const float val) co
   void EffectsChannelsContainer::setSolo(const int channelIdx, const float val) const {
   channels.at(channelIdx - 1)->setSolo(val);
 }
+
+void EffectsChannelsContainer::setupChannelsScrollArea() {
+  channelsWidget.setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+  channelsWidget.setMaximumWidth(1000);
+  channelsScrollArea.setWidgetResizable(true);
+  channelsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  channelsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  channelsScrollArea.setLayoutDirection(Qt::LeftToRight);
+  channelsScrollArea.setWidget(&channelsWidgetInner);
+}
+
 
 } // Gui
 } // Gj

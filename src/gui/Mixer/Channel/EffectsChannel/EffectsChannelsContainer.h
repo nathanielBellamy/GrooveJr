@@ -63,6 +63,7 @@ class EffectsChannelsContainer final : public QWidget {
     void connectActions();
     void setStyle();
     void setupGrid();
+    void setupChannelsScrollArea();
 
 };
 
