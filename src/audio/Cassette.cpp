@@ -714,10 +714,14 @@ int Cassette::updateAudioDataFromMixer(jack_ringbuffer_t* effectsChannelsSetting
   const float channelCountF = static_cast<float>(channelCount);
 
   float soloVals[MAX_EFFECTS_CHANNELS] {0.0f};
+  float soloLVals[MAX_EFFECTS_CHANNELS] {0.0f};
+  float soloRVals[MAX_EFFECTS_CHANNELS] {0.0f};
   bool soloEngaged = false;
   for (int i = 1; i < channelCount; i++) {
     soloVals[i] = mixer->getEffectsChannel(i)->getSolo();
-    if (soloVals[i] == 1.0f)
+    soloLVals[i] = mixer->getEffectsChannel(i)->getSoloL();
+    soloRVals[i] = mixer->getEffectsChannel(i)->getSoloR();
+    if (soloVals[i] == 1.0f || soloLVals[i] == 1.0f || soloRVals[i] == 1.0f)
       soloEngaged = true;
   }
 
@@ -728,17 +732,45 @@ int Cassette::updateAudioDataFromMixer(jack_ringbuffer_t* effectsChannelsSetting
     const float gainL = effectsChannel->getGainL();
     const float gainR = effectsChannel->getGainR();
     const float mute = effectsChannel->getMute();
+    const float muteL = effectsChannel->getMuteL();
+    const float muteR = effectsChannel->getMuteR();
     const float solo = i == 0 // no solo on main
                         ? 1.0f
                         : soloEngaged ? soloVals[i] : 1.0f;
+    const float soloL = soloEngaged ? soloLVals[i] : 1.0f;
+    const float soloR = soloEngaged ? soloRVals[i] : 1.0f;
     const float pan  = effectsChannel->getPan();
     const float panL = effectsChannel->getPanL();
     const float panR = effectsChannel->getPanR();
 
-    effectsSettingsBuffer[4 * i]     = AudioData::factorLL(gain, gainL, gainR, mute, solo, pan, panL, panR, channelCountF);
-    effectsSettingsBuffer[4 * i + 1] = AudioData::factorLR(gain, gainL, gainR, mute, solo, pan, panL, panR, channelCountF);
-    effectsSettingsBuffer[4 * i + 2] = AudioData::factorRL(gain, gainL, gainR, mute, solo, pan, panL, panR, channelCountF);
-    effectsSettingsBuffer[4 * i + 3] = AudioData::factorRR(gain, gainL, gainR, mute, solo, pan, panL, panR, channelCountF);
+    effectsSettingsBuffer[4 * i] = AudioData::factorLL(
+      gain, gainL, gainR,
+      mute, muteL, muteR,
+      solo, soloL, soloR,
+      pan, panL, panR,
+      channelCountF
+    );
+    effectsSettingsBuffer[4 * i + 1] = AudioData::factorLR(
+      gain, gainL, gainR,
+      mute, muteL, muteR,
+      solo, soloL, soloR,
+      pan, panL, panR,
+      channelCountF
+    );
+    effectsSettingsBuffer[4 * i + 2] = AudioData::factorRL(
+      gain, gainL, gainR,
+      mute, muteL, muteR,
+      solo, soloL, soloR,
+      pan, panL, panR,
+      channelCountF
+    );
+    effectsSettingsBuffer[4 * i + 3] = AudioData::factorRR(
+      gain, gainL, gainR,
+      mute, muteL, muteR,
+      solo, soloL, soloR,
+      pan, panL, panR,
+      channelCountF
+    );
   }
 
   // write to ring buffer
