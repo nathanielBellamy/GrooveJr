@@ -70,6 +70,8 @@ struct AudioData {
 
     static float factorLL(
       const float gain,
+      const float gainL,
+      const float gainR,
       const float mute,
       const float solo,
       const float pan,
@@ -84,6 +86,8 @@ struct AudioData {
 
     static float factorLR(
       const float gain,
+      const float gainL,
+      const float gainR,
       const float mute,
       const float solo,
       const float pan,
@@ -98,6 +102,8 @@ struct AudioData {
 
     static float factorRL(
       const float gain,
+      const float gainL,
+      const float gainR,
       const float mute,
       const float solo,
       const float pan,
@@ -112,6 +118,8 @@ struct AudioData {
 
     static float factorRR(
       const float gain,
+      const float gainL,
+      const float gainR,
       const float mute,
       const float solo,
       const float pan,

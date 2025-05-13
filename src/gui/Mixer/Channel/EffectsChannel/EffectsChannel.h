@@ -84,6 +84,8 @@ class EffectsChannel final : public QWidget {
     void setupGrid();
     void setupTitle();
     void setupGainSlider();
+    void setupGainLSlider();
+    void setupGainRSlider();
     void setupPanSlider();
     void setupPanLSlider();
     void setupPanRSlider();

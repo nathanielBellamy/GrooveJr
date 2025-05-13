@@ -56,6 +56,8 @@ EffectsChannel::EffectsChannel(
 
   setupTitle();
   setupGainSlider();
+  setupGainLSlider();
+  setupGainRSlider();
   setupPanSlider();
   setupPanLSlider();
   setupPanRSlider();
@@ -107,16 +109,21 @@ void EffectsChannel::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, 1);
 
   // can't delete main, must have at least one non-main channel
-  grid.addWidget(&removeEffectsChannelButton, 0, 3, 1, 1);
-  grid.addWidget(&gainSlider, 1, 0, -1, -1);
-  grid.addWidget(&effectsSlots, 1, 1, 1, 1);
-  grid.addWidget(&panSlider, 2, 1, 1, 1);
-  grid.addWidget(&panLabel, 2, 2, 1, 1);
-  grid.addWidget(&panLSlider, 3, 1, 1, 1);
-  grid.addWidget(&panLLabel, 3, 2, 1, 1);
-  grid.addWidget(&panRSlider, 4, 1, 1, 1);
-  grid.addWidget(&panRLabel, 4, 2, 1, 1);
-  grid.addWidget(&muteSoloContainer, 5, 1, 1, 1);
+  grid.addWidget(&removeEffectsChannelButton, 0, 4, 1, 1);
+  grid.addWidget(&gainSlider, 1, 0, 3, 1);
+  grid.addWidget(&gainLabel, 4, 0, 1, 1);
+  grid.addWidget(&gainLSlider, 1, 1, 3, 1);
+  grid.addWidget(&gainLLabel, 4, 1, 1, 1);
+  grid.addWidget(&gainRSlider, 1, 2, 3, 1);
+  grid.addWidget(&gainRLabel, 4, 2, 1, 1);
+  grid.addWidget(&effectsSlots, 1, 3, 1, 1);
+  grid.addWidget(&panSlider, 2, 3, 1, 1);
+  grid.addWidget(&panLabel, 2, 4, 1, 1);
+  grid.addWidget(&panLSlider, 3, 3, 1, 1);
+  grid.addWidget(&panLLabel, 3, 4, 1, 1);
+  grid.addWidget(&panRSlider, 4, 3, 1, 1);
+  grid.addWidget(&panRLabel, 4, 4, 1, 1);
+  grid.addWidget(&muteSoloContainer, 5, 0, 1, -1);
 
   grid.setVerticalSpacing(2);
   grid.setHorizontalSpacing(2);
@@ -148,21 +155,32 @@ void EffectsChannel::setupGainSlider() {
     const float gainF = static_cast<float>(gain) / 100.0f;
 
     mixer->getEffectsChannel(channelIndex)->setGain(gainF);
+  });
+}
 
-    // TODO:
-    // - debug seg fault from rapid messages here
-    // - the actor system should be able to handle the amount of messages
-    // - but perhaps doesn't like looking in the registry as often
-    // - trying to use a stored appStateManagerPtr hasn't worked either, though
+void EffectsChannel::setupGainLSlider() {
+  gainLSlider.setMinimum(0);
+  gainLSlider.setMaximum(127);
+  gainLSlider.setTickInterval(1);
+  gainLSlider.setValue(100);
+  gainLSlider.setTickPosition(QSlider::NoTicks);
+  auto gainSliderConnection = connect(&gainLSlider, &QSlider::valueChanged, [this](int gain) {
+    const float gainF = static_cast<float>(gain) / 100.0f;
 
-    // appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-    // const scoped_actor self{ actorSystem };
-    // self->anon_send(
-    //     actor_cast<actor>(appStateManagerPtr),
-    //     channelIndex,
-    //     gainF,
-    //     mix_set_channel_gain_a_v
-    // );
+    mixer->getEffectsChannel(channelIndex)->setGainL(gainF);
+  });
+}
+
+void EffectsChannel::setupGainRSlider() {
+  gainRSlider.setMinimum(0);
+  gainRSlider.setMaximum(127);
+  gainRSlider.setTickInterval(1);
+  gainRSlider.setValue(100);
+  gainRSlider.setTickPosition(QSlider::NoTicks);
+  auto gainSliderConnection = connect(&gainRSlider, &QSlider::valueChanged, [this](int gain) {
+    const float gainF = static_cast<float>(gain) / 100.0f;
+
+    mixer->getEffectsChannel(channelIndex)->setGainR(gainF);
   });
 }
 

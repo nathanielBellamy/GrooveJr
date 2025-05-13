@@ -52,6 +52,24 @@ class EffectsChannel {
       return true;
     };
 
+    float getGainL() const {
+      return channel.gainL.load();
+    };
+
+    bool setGainL(float gain) {
+      channel.gainL.store(gain);
+      return true;
+    };
+
+    float getGainR() const {
+      return channel.gainR.load();
+    };
+
+    bool setGainR(float gain) {
+      channel.gainR.store(gain);
+      return true;
+    };
+
     float getMute() const {
       return channel.mute.load();
     }
