@@ -95,6 +95,24 @@ class EffectsChannel {
       return true;
     };
 
+    float getPanL() const {
+      return channel.panL.load();
+    };
+
+    bool setPanL(float pan) {
+      channel.panL.store(pan);
+      return true;
+    };
+
+    float getPanR() const {
+      return channel.panR.load();
+    };
+
+    bool setPanR(float pan) {
+      channel.panR.store(pan);
+      return true;
+    };
+
     bool addReplaceEffect(int effectIdx, const std::string& effectPath);
     void setSampleRate(int sampleRate) const;
 

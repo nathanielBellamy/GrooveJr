@@ -67,7 +67,17 @@ class EffectsChannel final : public QWidget {
     QGridLayout grid;
     QLabel title;
     QSlider gainSlider;
+    QLabel  gainLabel;
+    QSlider gainLSlider;
+    QLabel  gainLLabel;
+    QSlider gainRSlider;
+    QLabel  gainRLabel;
     QSlider panSlider;
+    QLabel  panLabel;
+    QSlider panLSlider;
+    QLabel  panLLabel;
+    QSlider panRSlider;
+    QLabel  panRLabel;
     EffectsSlots effectsSlots;
     MuteSoloContainer muteSoloContainer;
     void setStyle();
@@ -75,6 +85,8 @@ class EffectsChannel final : public QWidget {
     void setupTitle();
     void setupGainSlider();
     void setupPanSlider();
+    void setupPanLSlider();
+    void setupPanRSlider();
     void connectActions();
 };
 

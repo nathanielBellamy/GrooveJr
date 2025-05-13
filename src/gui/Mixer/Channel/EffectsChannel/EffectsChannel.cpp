@@ -32,7 +32,17 @@ EffectsChannel::EffectsChannel(
   , grid(this)
   , title(this)
   , gainSlider(Qt::Vertical, this)
+  , gainLabel("Gain", this)
+  , gainLSlider(Qt::Vertical, this)
+  , gainLLabel("GainL", this)
+  , gainRSlider(Qt::Vertical, this)
+  , gainRLabel("GainR", this)
   , panSlider(Qt::Horizontal, this)
+  , panLabel("Pan", this)
+  , panLSlider(Qt::Horizontal, this)
+  , panLLabel("PanL", this)
+  , panRSlider(Qt::Horizontal, this)
+  , panRLabel("PanR", this)
   , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction, &replaceEffectAction, &removeEffectAction)
   , muteSoloContainer(this, &openEffectsContainer, muteChannelAction, soloChannelAction, channelIndex) {
   if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
@@ -47,6 +57,8 @@ EffectsChannel::EffectsChannel(
   setupTitle();
   setupGainSlider();
   setupPanSlider();
+  setupPanLSlider();
+  setupPanRSlider();
   setStyle();
   setupGrid();
 }
@@ -99,7 +111,12 @@ void EffectsChannel::setupGrid() {
   grid.addWidget(&gainSlider, 1, 0, -1, -1);
   grid.addWidget(&effectsSlots, 1, 1, 1, 1);
   grid.addWidget(&panSlider, 2, 1, 1, 1);
-  grid.addWidget(&muteSoloContainer, 3, 1, 1, 1);
+  grid.addWidget(&panLabel, 2, 2, 1, 1);
+  grid.addWidget(&panLSlider, 3, 1, 1, 1);
+  grid.addWidget(&panLLabel, 3, 2, 1, 1);
+  grid.addWidget(&panRSlider, 4, 1, 1, 1);
+  grid.addWidget(&panRLabel, 4, 2, 1, 1);
+  grid.addWidget(&muteSoloContainer, 5, 1, 1, 1);
 
   grid.setVerticalSpacing(2);
   grid.setHorizontalSpacing(2);
@@ -159,6 +176,32 @@ void EffectsChannel::setupPanSlider() {
     const float panF = static_cast<float>(pan) / 127.0f;
 
     mixer->getEffectsChannel(channelIndex)->setPan(panF);
+  });
+}
+
+void EffectsChannel::setupPanLSlider() {
+  panLSlider.setMinimum(-127);
+  panLSlider.setMaximum(127);
+  panLSlider.setTickInterval(1);
+  panLSlider.setValue(-127);
+  panLSlider.setTickPosition(QSlider::NoTicks);
+  auto panSliderConnection = connect(&panLSlider, &QSlider::valueChanged, [this](const int pan) {
+    const float panF = static_cast<float>(pan) / 127.0f;
+
+    mixer->getEffectsChannel(channelIndex)->setPanL(panF);
+  });
+}
+
+void EffectsChannel::setupPanRSlider() {
+  panRSlider.setMinimum(-127);
+  panRSlider.setMaximum(127);
+  panRSlider.setTickInterval(1);
+  panRSlider.setValue(127);
+  panRSlider.setTickPosition(QSlider::NoTicks);
+  auto panSliderConnection = connect(&panRSlider, &QSlider::valueChanged, [this](const int pan) {
+    const float panF = static_cast<float>(pan) / 127.0f;
+
+    mixer->getEffectsChannel(channelIndex)->setPanR(panF);
   });
 }
 

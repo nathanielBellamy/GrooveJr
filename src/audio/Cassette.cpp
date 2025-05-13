@@ -730,11 +730,13 @@ int Cassette::updateAudioDataFromMixer(jack_ringbuffer_t* effectsChannelsSetting
                         ? 1.0f
                         : soloEngaged ? soloVals[i] : 1.0f;
     const float pan  = effectsChannel->getPan();
+    const float panL = effectsChannel->getPanL();
+    const float panR = effectsChannel->getPanR();
 
-    effectsSettingsBuffer[4 * i]     = AudioData::factorLL(gain, mute, solo, pan, channelCountF);
-    effectsSettingsBuffer[4 * i + 1] = AudioData::factorLR(gain, mute, solo, pan, channelCountF);
-    effectsSettingsBuffer[4 * i + 2] = AudioData::factorRL(gain, mute, solo, pan, channelCountF);
-    effectsSettingsBuffer[4 * i + 3] = AudioData::factorRR(gain, mute, solo, pan, channelCountF);
+    effectsSettingsBuffer[4 * i]     = AudioData::factorLL(gain, mute, solo, pan, panL, panR, channelCountF);
+    effectsSettingsBuffer[4 * i + 1] = AudioData::factorLR(gain, mute, solo, pan, panL, panR, channelCountF);
+    effectsSettingsBuffer[4 * i + 2] = AudioData::factorRL(gain, mute, solo, pan, panL, panR, channelCountF);
+    effectsSettingsBuffer[4 * i + 3] = AudioData::factorRR(gain, mute, solo, pan, panL, panR, channelCountF);
   }
 
   // write to ring buffer
