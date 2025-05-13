@@ -27,16 +27,36 @@ class MainChannelContainer final : public QWidget {
       actor_system& actorSystem,
       Audio::Mixer* mixer,
       QAction* muteChannelAction,
-      QAction* soloChannelAction
+      QAction* muteLChannelAction,
+      QAction* muteRChannelAction,
+      QAction* soloChannelAction,
+      QAction* soloLChannelAction,
+      QAction* soloRChannelAction
     );
     void hydrateState(const AppStatePacket& appState);
     void setMute(float val) {
       mainChannel.setMute(val);
     };
+
+    void setMuteL(float val) {
+      mainChannel.setMuteL(val);
+    };
+
+    void setMuteR(float val) {
+      mainChannel.setMuteR(val);
+    };
+
     void setSolo(float val) {
       mainChannel.setSolo(val);
     };
 
+    void setSoloL(float val) {
+      mainChannel.setSoloL(val);
+    };
+
+    void setSoloR(float val) {
+      mainChannel.setSoloR(val);
+    };
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;

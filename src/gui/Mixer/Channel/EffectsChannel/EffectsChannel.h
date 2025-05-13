@@ -42,13 +42,21 @@ class EffectsChannel final : public QWidget {
       int channelIndex,
       QAction* removeEffectsChannelAction,
       QAction* muteChannelAction,
-      QAction* soloChannelAction
+      QAction* muteLChannelAction,
+      QAction* muteRChannelAction,
+      QAction* soloChannelAction,
+      QAction* soloLChannelAction,
+      QAction* soloRChannelAction
     );
     ~EffectsChannel();
     void hydrateState(const AppStatePacket& appStatePacket, int newChannelIndex);
     void updateShowRemoveEffectsChannelButton(bool val);
     void setMute(float val);
+    void setMuteL(float val);
+    void setMuteR(float val);
     void setSolo(float val);
+    void setSoloL(float val);
+    void setSoloR(float val);
 
   private:
     actor_system& actorSystem;

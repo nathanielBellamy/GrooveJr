@@ -14,7 +14,11 @@ EffectsChannel::EffectsChannel(
   const int channelIndex,
   QAction* removeEffectsChannelAction,
   QAction* muteChannelAction,
-  QAction* soloChannelAction
+  QAction* muteLChannelAction,
+  QAction* muteRChannelAction,
+  QAction* soloChannelAction,
+  QAction* soloLChannelAction,
+  QAction* soloRChannelAction
   )
   : QWidget(parent)
   , actorSystem(actorSystem)
@@ -44,7 +48,12 @@ EffectsChannel::EffectsChannel(
   , panRSlider(Qt::Horizontal, this)
   , panRLabel("PanR", this)
   , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction, &replaceEffectAction, &removeEffectAction)
-  , muteSoloContainer(this, &openEffectsContainer, muteChannelAction, soloChannelAction, channelIndex) {
+  , muteSoloContainer(
+      this, &openEffectsContainer,
+      muteChannelAction, muteLChannelAction, muteRChannelAction,
+      soloChannelAction, soloLChannelAction, soloRChannelAction,
+      channelIndex
+  ) {
   if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
     // can't remove main, must have at least one non-main effects channel
     removeEffectsChannelButton.show();
@@ -307,8 +316,24 @@ void EffectsChannel::setMute(const float val) {
   muteSoloContainer.setMute(val);
 }
 
+void EffectsChannel::setMuteL(const float val) {
+  muteSoloContainer.setMuteL(val);
+}
+
+void EffectsChannel::setMuteR(const float val) {
+  muteSoloContainer.setMuteR(val);
+}
+
 void EffectsChannel::setSolo(const float val) {
   muteSoloContainer.setSolo(val);
+}
+
+void EffectsChannel::setSoloL(const float val) {
+  muteSoloContainer.setSoloL(val);
+}
+
+void EffectsChannel::setSoloR(const float val) {
+  muteSoloContainer.setSoloR(val);
 }
 
 

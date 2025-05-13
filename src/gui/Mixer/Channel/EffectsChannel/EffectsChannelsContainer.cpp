@@ -14,7 +14,11 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   actor_system& actorSystem,
   Audio::Mixer* mixer,
   QAction* muteChannelAction,
-  QAction* soloChannelAction
+  QAction* muteLChannelAction,
+  QAction* muteRChannelAction,
+  QAction* soloChannelAction,
+  QAction* soloLChannelAction,
+  QAction* soloRChannelAction
   )
   : QWidget(parent)
   , actorSystem(actorSystem)
@@ -30,7 +34,11 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   , removeEffectsChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListRemove), tr("&RemoveEffectsChannel"), this)
   , addEffectsChannelButton(this, &addEffectsChannelAction)
   , muteChannelAction(muteChannelAction)
+  , muteLChannelAction(muteLChannelAction)
+  , muteRChannelAction(muteRChannelAction)
   , soloChannelAction(soloChannelAction)
+  , soloLChannelAction(soloLChannelAction)
+  , soloRChannelAction(soloRChannelAction)
   {
 
   for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
@@ -63,7 +71,9 @@ void EffectsChannelsContainer::addEffectsChannel() {
     return;
 
   const auto effectsChannel = new EffectsChannel(
-    this, actorSystem, mixer, channels.size() + 1, &removeEffectsChannelAction, muteChannelAction, soloChannelAction
+    this, actorSystem, mixer, channels.size() + 1, &removeEffectsChannelAction,
+    muteChannelAction, muteLChannelAction, muteRChannelAction,
+    soloChannelAction, soloLChannelAction, soloRChannelAction
   );
   channels.push_back(effectsChannel);
 
@@ -150,8 +160,24 @@ void EffectsChannelsContainer::setMute(const int channelIdx, const float val) co
   channels.at(channelIdx - 1)->setMute(val);
 }
 
-  void EffectsChannelsContainer::setSolo(const int channelIdx, const float val) const {
+void EffectsChannelsContainer::setMuteL(const int channelIdx, const float val) const {
+  channels.at(channelIdx - 1)->setMuteL(val);
+}
+
+void EffectsChannelsContainer::setMuteR(const int channelIdx, const float val) const {
+  channels.at(channelIdx - 1)->setMuteR(val);
+}
+
+void EffectsChannelsContainer::setSolo(const int channelIdx, const float val) const {
   channels.at(channelIdx - 1)->setSolo(val);
+}
+
+void EffectsChannelsContainer::setSoloL(const int channelIdx, const float val) const {
+  channels.at(channelIdx - 1)->setSoloL(val);
+}
+
+void EffectsChannelsContainer::setSoloR(const int channelIdx, const float val) const {
+  channels.at(channelIdx - 1)->setSoloR(val);
 }
 
 void EffectsChannelsContainer::setupChannelsScrollArea() {

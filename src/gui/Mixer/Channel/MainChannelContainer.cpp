@@ -12,14 +12,21 @@ MainChannelContainer::MainChannelContainer(
   actor_system& actorSystem,
   Audio::Mixer* mixer,
   QAction* muteChannelAction,
-  QAction* soloChannelAction
+  QAction* muteLChannelAction,
+  QAction* muteRChannelAction,
+  QAction* soloChannelAction,
+  QAction* soloLChannelAction,
+  QAction* soloRChannelAction
   )
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , grid(this)
-  , mainChannel(this, actorSystem, mixer, 0, nullptr, muteChannelAction, soloChannelAction)
-  {
+  , mainChannel(
+    this, actorSystem, mixer, 0, nullptr,
+    muteChannelAction, muteLChannelAction, muteRChannelAction,
+    soloChannelAction, soloLChannelAction, soloRChannelAction
+  ) {
   setupGrid();
   setStyle();
 }

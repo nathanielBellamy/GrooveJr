@@ -74,6 +74,14 @@ class EffectsChannel {
       return channel.mute.load();
     }
 
+    float getMuteL() const {
+      return channel.muteL.load();
+    }
+
+    float getMuteR() const {
+      return channel.muteR.load();
+    }
+
     float toggleMute() {
       const float mute = channel.mute.load();
       if (mute == 1.0f) {
@@ -87,8 +95,42 @@ class EffectsChannel {
       return 0.0f;
     }
 
+    float toggleMuteL() {
+      const float mute = channel.muteL.load();
+      if (mute == 1.0f) {
+        channel.muteL.store(0.0f);
+        return 0.0f;
+      }
+      if (mute == 0.0f) {
+        channel.muteL.store(1.0f);
+        return 1.0f;
+      }
+      return 0.0f;
+    }
+
+    float toggleMuteR() {
+      const float mute = channel.muteR.load();
+      if (mute == 1.0f) {
+        channel.muteR.store(0.0f);
+        return 0.0f;
+      }
+      if (mute == 0.0f) {
+        channel.muteR.store(1.0f);
+        return 1.0f;
+      }
+      return 0.0f;
+    }
+
     float getSolo() const {
       return channel.solo.load();
+    }
+
+    float getSoloL() const {
+      return channel.soloL.load();
+    }
+
+    float getSoloR() const {
+      return channel.soloR.load();
     }
 
     float toggleSolo() {
@@ -99,6 +141,32 @@ class EffectsChannel {
       }
       if (solo == 0.0f) {
         channel.solo.store(1.0f);
+        return 1.0f;
+      }
+      return 0.0f;
+    }
+
+    float toggleSoloL() {
+      const float solo = channel.soloL.load();
+      if (solo == 1.0f) {
+        channel.soloL.store(0.0f);
+        return 0.0f;
+      }
+      if (solo == 0.0f) {
+        channel.soloL.store(1.0f);
+        return 1.0f;
+      }
+      return 0.0f;
+    }
+
+    float toggleSoloR() {
+      const float solo = channel.soloR.load();
+      if (solo == 1.0f) {
+        channel.soloR.store(0.0f);
+        return 0.0f;
+      }
+      if (solo == 0.0f) {
+        channel.soloR.store(1.0f);
         return 1.0f;
       }
       return 0.0f;

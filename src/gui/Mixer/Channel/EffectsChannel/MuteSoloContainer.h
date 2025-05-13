@@ -24,19 +24,31 @@ class MuteSoloContainer final : public QWidget {
       QWidget* parent,
       QAction* openEffectsContainer,
       QAction* muteChannelAction,
+      QAction* muteLChannelAction,
+      QAction* muteRChannelAction,
       QAction* soloChannelAction,
+      QAction* soloLChannelAction,
+      QAction* soloRChannelAction,
       int channelIndex
     );
     ~MuteSoloContainer();
     void hydrateState(const AppStatePacket& appState, int newChannelIdx);
     void setMute(float val);
+    void setMuteL(float val);
+    void setMuteR(float val);
     void setSolo(float val);
+    void setSoloL(float val);
+    void setSoloR(float val);
 
   private:
     int channelIndex;
     QGridLayout grid;
     MuteButton mute;
+    MuteButton muteL;
+    MuteButton muteR;
     SoloButton solo;
+    SoloButton soloL;
+    SoloButton soloR;
     EffectsButton effects;
     void setupGrid();
 

@@ -36,11 +36,19 @@ class EffectsChannelsContainer final : public QWidget {
       actor_system& actorSystem,
       Audio::Mixer* mixer,
       QAction* muteChannelAction,
-      QAction* soloChannelAction
+      QAction* muteLChannelAction,
+      QAction* muteRChannelAction,
+      QAction* soloChannelAction,
+      QAction* soloLChannelAction,
+      QAction* soloRChannelAction
     );
     void hydrateState(const AppStatePacket& appState);
     void setMute(int channelIdx, float val) const;
+    void setMuteL(int channelIdx, float val) const;
+    void setMuteR(int channelIdx, float val) const;
     void setSolo(int channelIdx, float val) const;
+    void setSoloL(int channelIdx, float val) const;
+    void setSoloR(int channelIdx, float val) const;
 
   private:
     actor_system& actorSystem;
@@ -57,7 +65,11 @@ class EffectsChannelsContainer final : public QWidget {
     QAction removeEffectsChannelAction;
     AddEffectsChannelButton addEffectsChannelButton;
     QAction* muteChannelAction;
+    QAction* muteLChannelAction;
+    QAction* muteRChannelAction;
     QAction* soloChannelAction;
+    QAction* soloLChannelAction;
+    QAction* soloRChannelAction;
     void addEffectsChannel();
     void removeEffectsChannel(int channelIdx);
     void connectActions();
