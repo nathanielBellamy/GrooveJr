@@ -85,7 +85,7 @@ struct AudioData {
       ) {
 
       const float panVal = pan <= 0.0f ? 1.0f : 1.0f - pan;
-      return solo * (1.0f - mute) * panVal * gain / channelCount;
+      return solo * (1.0f - mute) * panVal * gain * gainL / channelCount;
     }
 
     static float factorLR(
@@ -105,7 +105,7 @@ struct AudioData {
       ) {
 
       const float panVal = pan >= 0.0f ? pan : 0.0;
-      return solo * (1.0f - mute) * panVal * gain / channelCount;
+      return solo * (1.0f - mute) * panVal * gain * gainL / channelCount;
     }
 
     static float factorRL(
@@ -125,7 +125,7 @@ struct AudioData {
       ) {
 
       const float panVal = pan <= 0.0f ? -pan : 0.0f;
-      return solo * (1.0f - mute) * panVal * gain / channelCount;
+      return solo * (1.0f - mute) * panVal * gain * gainR / channelCount;
     }
 
     static float factorRR(
@@ -145,7 +145,7 @@ struct AudioData {
       ) {
 
       const float panVal = pan >= 0.0f ? 1.0f : 1.0f + pan;
-      return solo * (1.0f - mute) * panVal * gain / channelCount;
+      return solo * (1.0f - mute) * panVal * gain * gainR / channelCount;
     }
 };
 

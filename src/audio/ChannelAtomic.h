@@ -13,8 +13,8 @@ struct ChannelAtomic {
   std::atomic<float> solo = { 0.0f };
   std::atomic<float> pan = { 0.0f };
 
-  std::atomic<float> gainL = { 0.0f };
-  std::atomic<float> gainR = { 0.0f };
+  std::atomic<float> gainL = { 1.0f };
+  std::atomic<float> gainR = { 1.0f };
   std::atomic<float> muteL = { 0.0f };
   std::atomic<float> muteR = { 0.0f };
   std::atomic<float> soloL = { 0.0f };
