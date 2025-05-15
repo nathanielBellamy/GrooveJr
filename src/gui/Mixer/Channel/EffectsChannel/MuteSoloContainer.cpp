@@ -31,6 +31,8 @@ MuteSoloContainer::MuteSoloContainer(
 
   if (channelIndex == 0) {
     solo.hide();
+    soloL.hide();
+    soloR.hide();
   }
 
   setupGrid();
@@ -61,9 +63,7 @@ void MuteSoloContainer::setupGrid() {
     grid.addWidget(&soloR, 1, 3, 1, 1);
     grid.addWidget(&effects, 0, 4, 2, 1);
   } else {
-    grid.addWidget(&effects, 0, 2, 1, 2);
-    grid.addWidget(&soloL, 1, 2, 1, 1);
-    grid.addWidget(&soloR, 1, 3, 1, 1);
+    grid.addWidget(&effects, 0, 2, 2, 2);
   }
 }
 

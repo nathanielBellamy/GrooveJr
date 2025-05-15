@@ -86,7 +86,6 @@ EffectsChannel::~EffectsChannel() {
   );
 }
 
-
 void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
   Logging::write(
     Info,
@@ -94,13 +93,16 @@ void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newC
     "Hydrating effects channel state to channel: " + std::to_string(newChannelIndex)
   );
 
-  channelIndex = newChannelIndex;
-
-  removeEffectsChannelButton.hydrateState(appState, channelIndex);
-  effectsSlots.hydrateState(appState, channelIndex);
-
-  setupTitle();
-  setupGrid();
+  // TODO: debug segfault on hydrate
+  // channelIndex = newChannelIndex;
+  //
+  // if (channelIndex > 0) {
+  //   removeEffectsChannelButton.hydrateState(appState, channelIndex);
+  // }
+  // effectsSlots.hydrateState(appState, channelIndex);
+  //
+  // setupTitle();
+  // setupGrid();
 }
 
 void EffectsChannel::updateShowRemoveEffectsChannelButton(bool val) {

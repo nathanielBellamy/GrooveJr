@@ -713,32 +713,42 @@ bool Cassette::deleteBuffers() const {
 int Cassette::updateAudioDataFromMixer(jack_ringbuffer_t* effectsChannelsSettingsRB, const int channelCount) {
   const float channelCountF = static_cast<float>(channelCount);
 
+  Effects::EffectsChannel* effectsChannels[MAX_EFFECTS_CHANNELS] {nullptr};
   float soloVals[MAX_EFFECTS_CHANNELS] {0.0f};
   float soloLVals[MAX_EFFECTS_CHANNELS] {0.0f};
   float soloRVals[MAX_EFFECTS_CHANNELS] {0.0f};
   bool soloEngaged = false;
+
+  // no solos on main
+  effectsChannels[0] = mixer->getEffectsChannel(0);
   for (int i = 1; i < channelCount; i++) {
-    soloVals[i] = mixer->getEffectsChannel(i)->getSolo();
-    soloLVals[i] = mixer->getEffectsChannel(i)->getSoloL();
-    soloRVals[i] = mixer->getEffectsChannel(i)->getSoloR();
-    if (soloVals[i] == 1.0f || soloLVals[i] == 1.0f || soloRVals[i] == 1.0f)
+    effectsChannels[i] = mixer->getEffectsChannel(i);
+    soloVals[i]  = effectsChannels[i]->getSolo();
+    soloLVals[i] = effectsChannels[i]->getSoloL();
+    soloRVals[i] = effectsChannels[i]->getSoloR();
+    if (!soloEngaged && (soloVals[i] == 1.0f || soloLVals[i] == 1.0f || soloRVals[i] == 1.0f))
       soloEngaged = true;
   }
 
   // update buffer
   for (int i = 0; i < channelCount; i++) {
-    const auto effectsChannel = mixer->getEffectsChannel(i);
+    const auto effectsChannel = effectsChannels[i];
+    const bool isMain = i == 0;
     const float gain = effectsChannel->getGain();
     const float gainL = effectsChannel->getGainL();
     const float gainR = effectsChannel->getGainR();
     const float mute = effectsChannel->getMute();
     const float muteL = effectsChannel->getMuteL();
     const float muteR = effectsChannel->getMuteR();
-    const float solo = i == 0 // no solo on main
+    const float solo = isMain // no solo on main
                         ? 1.0f
                         : soloEngaged ? soloVals[i] : 1.0f;
-    const float soloL = soloEngaged ? soloLVals[i] : 1.0f;
-    const float soloR = soloEngaged ? soloRVals[i] : 1.0f;
+    const float soloL = isMain
+                          ? 1.0f
+                          : soloEngaged ? soloLVals[i] : 1.0f;
+    const float soloR = isMain
+                          ? 1.0f
+                          : soloEngaged ? soloRVals[i] : 1.0f;
     const float pan  = effectsChannel->getPan();
     const float panL = effectsChannel->getPanL();
     const float panR = effectsChannel->getPanR();
