@@ -61,6 +61,10 @@ EffectsChannel::EffectsChannel(
     removeEffectsChannelButton.hide();
   }
 
+  // TODO:
+  // - toggle pan controls, pan vs panL/R
+  panSlider.hide();
+
   connectActions();
 
   setupTitle();
@@ -126,8 +130,8 @@ void EffectsChannel::setupGrid() {
   grid.addWidget(&gainRSlider, 1, 2, 3, 1);
   grid.addWidget(&gainRLabel, 4, 2, 1, 1);
   grid.addWidget(&effectsSlots, 1, 3, 1, 1);
-  grid.addWidget(&panSlider, 2, 3, 1, 1);
-  grid.addWidget(&panLabel, 2, 4, 1, 1);
+  // grid.addWidget(&panSlider, 2, 3, 1, 1);
+  // grid.addWidget(&panLabel, 2, 4, 1, 1);
   grid.addWidget(&panLSlider, 3, 3, 1, 1);
   grid.addWidget(&panLLabel, 3, 4, 1, 1);
   grid.addWidget(&panRSlider, 4, 3, 1, 1);
