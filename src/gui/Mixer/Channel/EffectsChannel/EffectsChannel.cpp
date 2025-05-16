@@ -64,6 +64,7 @@ EffectsChannel::EffectsChannel(
   // TODO:
   // - toggle pan controls, pan vs panL/R
   panSlider.hide();
+  panLabel.hide();
 
   connectActions();
 
@@ -93,7 +94,6 @@ void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newC
     "Hydrating effects channel state to channel: " + std::to_string(newChannelIndex)
   );
 
-  // TODO: debug segfault on hydrate
   channelIndex = newChannelIndex;
 
   if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {

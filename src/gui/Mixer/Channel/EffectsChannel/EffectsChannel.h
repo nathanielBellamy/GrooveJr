@@ -103,4 +103,4 @@ class EffectsChannel final : public QWidget {
 } // Gui
 } // Gj
 
-#endif //EFFECTSCHANNEL_H
+#endif //GUIEFFECTSCHANNEL_H
