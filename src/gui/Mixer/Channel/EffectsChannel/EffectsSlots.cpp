@@ -36,6 +36,13 @@ EffectsSlots::~EffectsSlots() {
 
 void EffectsSlots::hydrateState(const AppStatePacket& appState, int newChannelIndex) {
   channelIndex = newChannelIndex;
+
+  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
+    addEffectSlotButton.setEnabled(false);
+  } else {
+    addEffectSlotButton.setEnabled(true);
+  }
+
   for (const auto& effectSlot : effectsSlots) {
     effectSlot->hydrateState(appState, channelIndex);
   }

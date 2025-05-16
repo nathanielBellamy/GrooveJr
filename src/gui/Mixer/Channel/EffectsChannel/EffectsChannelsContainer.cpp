@@ -58,6 +58,12 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
     "Hydrating effects channels state"
   );
 
+  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
+    addEffectsChannelButton.setEnabled(false);
+  } else {
+    addEffectsChannelButton.setEnabled(true);
+  }
+
   for (int i = 0; i < channels.size(); i++) {
     channels.at(i)->hydrateState(appState, i+1);
   }

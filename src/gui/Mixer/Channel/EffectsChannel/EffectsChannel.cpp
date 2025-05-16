@@ -94,14 +94,14 @@ void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newC
   );
 
   // TODO: debug segfault on hydrate
-  // channelIndex = newChannelIndex;
-  //
-  // if (channelIndex > 0) {
-  //   removeEffectsChannelButton.hydrateState(appState, channelIndex);
-  // }
-  // effectsSlots.hydrateState(appState, channelIndex);
-  //
-  // setupTitle();
+  channelIndex = newChannelIndex;
+
+  if (channelIndex > 0)
+    removeEffectsChannelButton.hydrateState(appState, channelIndex);
+
+  effectsSlots.hydrateState(appState, channelIndex);
+
+  setupTitle();
   // setupGrid();
 }
 
