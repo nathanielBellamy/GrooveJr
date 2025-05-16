@@ -96,6 +96,12 @@ void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newC
   // TODO: debug segfault on hydrate
   channelIndex = newChannelIndex;
 
+  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
+    removeEffectsChannelButton.setEnabled(false);
+  } else {
+    removeEffectsChannelButton.setEnabled(true);
+  }
+
   if (channelIndex > 0)
     removeEffectsChannelButton.hydrateState(appState, channelIndex);
 

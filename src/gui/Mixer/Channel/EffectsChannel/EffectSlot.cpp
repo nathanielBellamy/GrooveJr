@@ -39,6 +39,15 @@ void EffectSlot::hydrateState(const AppStatePacket& appState, const int newChann
   channelIndex = newChannelIndex;
   const auto name = mixer->getEffectsChannels().at(channelIndex)->getPluginAtIdx(slotIndex)->name;
   pluginName.setText(name.data());
+
+  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
+    replaceEffectButton.setEnabled(false);
+    removeEffectButton.setEnabled(false);
+  } else {
+    replaceEffectButton.setEnabled(true);
+    removeEffectButton.setEnabled(true);
+  }
+
   update();
 }
 
