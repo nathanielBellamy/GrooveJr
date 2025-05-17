@@ -8,6 +8,8 @@
 #include <QAction>
 #include <QPushButton>
 
+#include "../../Color.h"
+
 namespace Gj {
 namespace Gui {
 
@@ -20,6 +22,7 @@ class SoloButton final : public QPushButton {
   private:
     int channelIndex;
     QAction* soloChannelAction;
+    std::string styleString(float soloVal) const;
     void setStyle();
     void mousePressEvent(QMouseEvent* event) override;
 

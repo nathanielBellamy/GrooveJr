@@ -16,6 +16,7 @@
 
 #include "../Logging.h"
 
+#include "./Color.h"
 #include "./MenuBar/MenuBar.h"
 #include "./Mixer/MixerWindow.h"
 #include "./MusicLibrary/MusicLibraryWindow.h"

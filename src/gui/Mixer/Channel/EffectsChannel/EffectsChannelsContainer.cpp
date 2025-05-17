@@ -140,7 +140,7 @@ void EffectsChannelsContainer::connectActions() {
 void EffectsChannelsContainer::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet(
-    ("border-radius: 5px; background-color: " + Color::toHex(GjC::DARK_200)).data()
+    ("border-radius: 5px; background-color: " + Color::toHex(GjC::LIGHT_200)).data()
   );
   channelsWidget.setStyleSheet(
     ("background-color: " + Color::toHex(GjC::DARK_300)).data()

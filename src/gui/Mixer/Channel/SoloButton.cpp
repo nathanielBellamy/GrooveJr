@@ -18,7 +18,7 @@ SoloButton::SoloButton(QWidget* parent, QAction* soloChannelAction, const int ch
 
 void SoloButton::setStyle() {
   setCursor(Qt::PointingHandCursor);
-  setStyleSheet("background-color: grey; border: 2px solid white; border-radius: 5px; color: black;");
+  setStyleSheet(styleString(0.0f).data());
 }
 
 void SoloButton::mousePressEvent(QMouseEvent* event){
@@ -26,12 +26,18 @@ void SoloButton::mousePressEvent(QMouseEvent* event){
   soloChannelAction->activate(QAction::Trigger);
 }
 
-void SoloButton::setSolo(const float val) {
-  if (val == 1.0f) {
-    setStyleSheet("background-color: yellow; border: 2px solid white; border-radius: 5px; color: black;");
+std::string SoloButton::styleString(const float soloVal) const {
+  std::string styleString = "border-radius: 5px; border: 2px solid " + Color::toHex(GjC::LIGHT_100) + "; ";
+  if (soloVal == 1.0f) {
+    styleString += "background-color: " + Color::toHex(GjC::SOLO_YELLOW) + "; color: " + Color::toHex(GjC::DARK_400) +"; ";
   } else {
-    setStyleSheet("background-color: grey; border: 2px solid white; border-radius: 5px; color: black;");
+    styleString += "background-color: " + Color::toHex(GjC::LIGHT_200) + "; color: " + Color::toHex(GjC::LIGHT_100) +"; ";
   }
+  return styleString;
+};
+
+void SoloButton::setSolo(const float val) {
+  setStyleSheet(styleString(val).data());
 }
 
 } // Gui

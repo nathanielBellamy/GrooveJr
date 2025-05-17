@@ -41,7 +41,7 @@ void MixerWindow::hydrateState(const AppStatePacket &appStatePacket) {
 }
 
 void MixerWindow::setStyle() {
-  const std::string styleString = "background-color: " + Color::toHex(GjC::LIGHT_100) + ";";
+  const std::string styleString = "background-color: " + Color::toHex(GjC::DARK_400) + ";";
   setStyleSheet(styleString.data());
 }
 

@@ -53,7 +53,9 @@ void MainWindow::initGrid() {
   }
 
   container.setLayout(&grid);
-  container.setStyleSheet("background-color: red;");
+  std::string styleString = "background-color: " + Color::toHex(GjC::DARK_400) + "; ";
+  styleString += "color: " + Color::toHex(GjC::LIGHT_100) + "; ";
+  container.setStyleSheet(styleString.data());
 }
 
 void MainWindow::closeEvent (QCloseEvent* e) {
