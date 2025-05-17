@@ -17,9 +17,8 @@ EffectsButton::EffectsButton(QWidget* parent, QAction* openEffectsContainer)
 void EffectsButton::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setCursor(Qt::PointingHandCursor);
-  std::string styleString = "border-radius: 5px; border: 2px solid " + Color::toHex(GjC::LIGHT_100) + "; ";
+  std::string styleString = "border-radius: 5px; border: 2px solid white; ";
   styleString += "background-color: " + Color::toHex(GjC::LIGHT_200) + "; ";
-  styleString += "color: " + Color::toHex(GjC::DARK_200) + "; ";
   setStyleSheet(styleString.data());
 }
 

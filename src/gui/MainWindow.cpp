@@ -23,7 +23,9 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
 
   setCentralWidget(&container);
   initGrid();
-  setStyleSheet("background-color: blue;");
+  setStyleSheet(
+    "font-weight: 900;"
+  );
   addToolBar(Qt::TopToolBarArea, &transportControl);
   setUnifiedTitleAndToolBarOnMac(true);
   setWindowTitle("GrooveJr");
@@ -54,7 +56,6 @@ void MainWindow::initGrid() {
 
   container.setLayout(&grid);
   std::string styleString = "background-color: " + Color::toHex(GjC::DARK_400) + "; ";
-  styleString += "color: " + Color::toHex(GjC::LIGHT_100) + "; ";
   container.setStyleSheet(styleString.data());
 }
 

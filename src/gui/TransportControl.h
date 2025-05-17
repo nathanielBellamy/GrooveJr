@@ -14,6 +14,7 @@
 #include "../messaging/atoms.h"
 #include "../messaging/EnvelopeQtPtr.h"
 #include "../enums/PlayState.h"
+#include "Color.h"
 
 #include <QToolbar>
 #include <QAction>

@@ -22,7 +22,9 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
 }
 
 void MusicLibraryWindow::setStyle() {
-  setStyleSheet("background-color: cyan;");
+  setStyleSheet((
+    "background-color: " + Color::toHex(GjC::DARK_400) + "; ").data()
+  );
 }
 
 void MusicLibraryWindow::setupGrid() {

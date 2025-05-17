@@ -25,8 +25,8 @@ enum class GjC {
 class Color {
   public:
     static inline std::map<GjC, std::string> hexs = {
-      {GjC::DARK_400, "#594F4F"},
-      {GjC::DARK_300, "#2A363B"},
+      {GjC::DARK_400, "#2A363B"},
+      {GjC::DARK_300, "#594F4F"},
       {GjC::DARK_200, "#E5FCC2"},
       {GjC::DARK_100, "#9DE0AD"},
       {GjC::LIGHT_300, "#45ADA8"},

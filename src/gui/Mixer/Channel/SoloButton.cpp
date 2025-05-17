@@ -27,11 +27,11 @@ void SoloButton::mousePressEvent(QMouseEvent* event){
 }
 
 std::string SoloButton::styleString(const float soloVal) const {
-  std::string styleString = "border-radius: 5px; border: 2px solid " + Color::toHex(GjC::LIGHT_100) + "; ";
+  std::string styleString = "border-radius: 5px; border: 2px solid white; ";
   if (soloVal == 1.0f) {
     styleString += "background-color: " + Color::toHex(GjC::SOLO_YELLOW) + "; color: " + Color::toHex(GjC::DARK_400) +"; ";
   } else {
-    styleString += "background-color: " + Color::toHex(GjC::LIGHT_200) + "; color: " + Color::toHex(GjC::LIGHT_100) +"; ";
+    styleString += "background-color: " + Color::toHex(GjC::LIGHT_200) + "; ";
   }
   return styleString;
 };

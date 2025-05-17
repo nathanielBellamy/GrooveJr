@@ -11,6 +11,8 @@
 #include <QLabel>
 #include <QWidget>
 
+#include "../Color.h"
+
 using namespace caf;
 
 namespace Gj {

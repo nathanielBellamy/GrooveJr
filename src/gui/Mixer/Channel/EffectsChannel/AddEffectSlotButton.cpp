@@ -22,7 +22,7 @@ void AddEffectSlotButton::setStyle(){
   setCursor(Qt::PointingHandCursor);
   setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
   setStyleSheet(
-  ("min-width: 20px; min-height: 20px; max-height: 20px; background-color: " + Color::toHex(GjC::DARK_300)).data()
+  ("min-width: 20px; min-height: 20px; max-height: 20px; background-color: " + Color::toHex(GjC::DARK_400)).data()
   );
 }
 

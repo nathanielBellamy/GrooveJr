@@ -143,11 +143,11 @@ void EffectsChannelsContainer::setStyle() {
     ("border-radius: 5px; background-color: " + Color::toHex(GjC::LIGHT_200)).data()
   );
   channelsWidget.setStyleSheet(
-    ("background-color: " + Color::toHex(GjC::DARK_300)).data()
+    ("background-color: " + Color::toHex(GjC::DARK_400)).data()
     );
   channelsWidget.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
   channelsWidgetInner.setStyleSheet(
-    ("background-color: " + Color::toHex(GjC::DARK_300)).data()
+    ("background-color: " + Color::toHex(GjC::DARK_400)).data()
   );
   channelsWidgetInner.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 }
