@@ -26,10 +26,8 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   , grid(this)
   , spacer(this)
   , channelsWidget(this)
-  , channelsWidgetInner(&channelsWidget)
   , channelsScrollArea(this)
   , channelsGrid(&channelsWidget)
-  , channelsGridInner(&channelsWidgetInner)
   , addEffectsChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListAdd), tr("&AddEffectsChannel"), this)
   , removeEffectsChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListRemove), tr("&RemoveEffectsChannel"), this)
   , addEffectsChannelButton(this, &addEffectsChannelAction)
@@ -142,37 +140,31 @@ void EffectsChannelsContainer::setStyle() {
   setStyleSheet(
     ("border-radius: 5px; background-color: " + Color::toHex(GjC::LIGHT_200)).data()
   );
-  channelsWidget.setStyleSheet(
-    ("background-color: " + Color::toHex(GjC::DARK_400)).data()
-    );
-  channelsWidget.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-  channelsWidgetInner.setStyleSheet(
-    ("background-color: " + Color::toHex(GjC::DARK_400)).data()
-  );
-  channelsWidgetInner.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+  channelsWidget.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
 }
 
 void EffectsChannelsContainer::setupGrid() {
   setupChannelsScrollArea();
-  grid.addWidget(&channelsWidget, 0, 0, 1, 1);
-  grid.addWidget(&addEffectsChannelButton, 0, 1, 1, 1);
-  channelsGrid.addWidget(&channelsWidgetInner, 0, 0, -1, -1);
+  grid.addWidget(&addEffectsChannelButton, 0, 1, -1, 1);
   int col = 0;
   for (const auto &effectsChannel : channels) {
-    channelsGridInner.addWidget(effectsChannel, 0, col, -1, 1);
+    channelsGrid.addWidget(effectsChannel, 0, col, -1, 1);
     col++;
   }
 }
 
 void EffectsChannelsContainer::setupChannelsScrollArea() {
-  channelsWidget.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-  channelsWidget.setMaximumWidth(1000);
-  channelsScrollArea.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  channelsScrollArea.setMinimumWidth(500);
+  channelsScrollArea.setMaximumWidth(1000);
+  grid.addWidget(&channelsScrollArea, 0, 0, -1, 1);
+  channelsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  channelsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   channelsScrollArea.setWidgetResizable(true);
   channelsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  channelsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  channelsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   channelsScrollArea.setLayoutDirection(Qt::LeftToRight);
-  channelsScrollArea.setWidget(&channelsWidgetInner);
+  channelsScrollArea.setWidget(&channelsWidget);
+  channelsWidget.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 }
 
 void EffectsChannelsContainer::setMute(const int channelIdx, const float val) const {

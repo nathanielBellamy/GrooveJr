@@ -58,10 +58,8 @@ class EffectsChannelsContainer final : public QWidget {
     QGridLayout grid;
     QWidget spacer;
     QWidget channelsWidget;
-    QWidget channelsWidgetInner;
     QScrollArea channelsScrollArea;
     QGridLayout channelsGrid;
-    QGridLayout channelsGridInner;
     std::vector<EffectsChannel*> channels;
     QAction addEffectsChannelAction;
     QAction removeEffectsChannelAction;
