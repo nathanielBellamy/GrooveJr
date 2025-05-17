@@ -21,7 +21,9 @@ void AddEffectsChannelButton::mousePressEvent(QMouseEvent* event){
 void AddEffectsChannelButton::setStyle(){
   setCursor(Qt::PointingHandCursor);
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-  setStyleSheet("min-width: 40px; max-width: 40px; background-color: pink;");
+  setStyleSheet(
+    ("min-width: 40px; max-width: 40px; background-color: " + Color::toHex(GjC::DARK_300)).data()
+  );
 }
 
 } // Gui

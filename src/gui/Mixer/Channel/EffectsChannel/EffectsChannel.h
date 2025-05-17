@@ -24,6 +24,7 @@
 #include "RemoveEffectsChannelButton.h"
 #include "./Effects/EffectsContainer.h"
 #include "../../../Shared/VstSelect.h"
+#include "../../../Color.h"
 
 #include "../../../../Logging.h"
 

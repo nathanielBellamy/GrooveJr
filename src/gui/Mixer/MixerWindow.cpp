@@ -41,7 +41,8 @@ void MixerWindow::hydrateState(const AppStatePacket &appStatePacket) {
 }
 
 void MixerWindow::setStyle() {
-  setStyleSheet("background-color: green;");
+  const std::string styleString = "background-color: " + Color::toHex(GjC::LIGHT_100) + ";";
+  setStyleSheet(styleString.data());
 }
 
 void MixerWindow::setupGrid() {

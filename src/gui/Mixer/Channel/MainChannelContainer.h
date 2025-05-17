@@ -13,6 +13,7 @@
 #include "../../../AppState.h"
 #include "EffectsChannel/EffectsChannel.h"
 #include "../../../audio/Mixer.h"
+#include "../../Color.h"
 
 using namespace caf;
 

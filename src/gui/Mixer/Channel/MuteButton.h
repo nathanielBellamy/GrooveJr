@@ -8,6 +8,8 @@
 #include <QAction>
 #include <QPushButton>
 
+#include "../../Color.h"
+
 namespace Gj {
 namespace Gui {
 
@@ -20,6 +22,7 @@ class MuteButton final : public QPushButton {
   private:
     int channelIndex;
     QAction* muteChannelAction;
+    std::string styleString(float muteVal) const;
     void setStyle();
     void mousePressEvent(QMouseEvent* event) override;
 };

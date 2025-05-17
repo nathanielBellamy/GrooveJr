@@ -16,18 +16,24 @@ MuteButton::MuteButton(QWidget* parent, QAction* muteChannelAction, const int ch
   setStyle();
 }
 
-void MuteButton::setMute(const float val) {
-  if (val == 1.0f) {
-    setStyleSheet("background-color: lightblue; border: 2px solid white; border-radius: 5px;");
+std::string MuteButton::styleString(const float muteVal) const {
+  std::string styleString = "border-radius: 5px; border: 2px solid white;";
+  if (muteVal == 1.0f) {
+    styleString += " background-color: lightblue; ";
   } else {
-    setStyleSheet("background-color: grey; border: 2px solid white; border-radius: 5px;");
+    styleString += " background-color: "  + Color::toHex(GjC::LIGHT_200) + "; ";
   }
+  return styleString;
+};
+
+void MuteButton::setMute(const float val) {
+  setStyleSheet(styleString(val).data());
 }
 
 
 void MuteButton::setStyle() {
   setCursor(Qt::PointingHandCursor);
-  setStyleSheet("background-color: grey; border: 2px solid white; border-radius: 5px;");
+  setStyleSheet(styleString(false).data());
 }
 
 void MuteButton::mousePressEvent(QMouseEvent* event){

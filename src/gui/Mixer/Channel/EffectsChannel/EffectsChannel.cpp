@@ -121,7 +121,9 @@ void EffectsChannel::updateShowRemoveEffectsChannelButton(bool val) {
 
 void EffectsChannel::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-  setStyleSheet("background-color: orange;");
+  setStyleSheet(
+    ("background-color: " + Color::toHex(GjC::LIGHT_300)).data()
+  );
 }
 
 void EffectsChannel::setupGrid() {

@@ -19,6 +19,8 @@
 
 #include "../../../../Logging.h"
 #include "../../../../AppState.h"
+
+#include "../../../Color.h"
 #include "../../../../audio/Mixer.h"
 #include "EffectsChannel.h"
 #include "AddEffectsChannelButton.h"

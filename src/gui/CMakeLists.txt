@@ -22,6 +22,7 @@ find_package (CAF
         REQUIRED)
 
 qt_add_library(GjGui STATIC
+        Color.h
         MainWindow.h
         MainWindow.cpp
         MenuBar/MenuBar.h

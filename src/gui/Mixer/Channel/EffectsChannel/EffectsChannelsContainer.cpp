@@ -139,10 +139,16 @@ void EffectsChannelsContainer::connectActions() {
 
 void EffectsChannelsContainer::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-  setStyleSheet("background-color: yellow; border-radius: 5px;");
-  channelsWidget.setStyleSheet("background-color: purple;");
+  setStyleSheet(
+    ("border-radius: 5px; background-color: " + Color::toHex(GjC::DARK_200)).data()
+  );
+  channelsWidget.setStyleSheet(
+    ("background-color: " + Color::toHex(GjC::DARK_300)).data()
+    );
   channelsWidget.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-  channelsWidgetInner.setStyleSheet("background-color: lightblue;");
+  channelsWidgetInner.setStyleSheet(
+    ("background-color: " + Color::toHex(GjC::DARK_300)).data()
+  );
   channelsWidgetInner.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 }
 

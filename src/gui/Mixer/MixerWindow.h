@@ -16,6 +16,7 @@
 
 #include "../../AppState.h"
 #include "../../audio/Mixer.h"
+#include "../Color.h"
 
 using namespace caf;
 

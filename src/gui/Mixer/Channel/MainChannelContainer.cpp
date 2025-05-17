@@ -37,7 +37,9 @@ void MainChannelContainer::hydrateState(const AppStatePacket &appState) {
 
 void MainChannelContainer::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-  setStyleSheet("background-color: red; border-radius: 5px;");
+  std::string styleString = "border-radius: 5px; ";
+  styleString += "background-color: " + Color::toHex(GjC::LIGHT_200) + "; ";
+  setStyleSheet(styleString.data());
 }
 
 void MainChannelContainer::setupGrid() {
