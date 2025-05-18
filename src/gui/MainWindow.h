@@ -20,7 +20,7 @@
 #include "./MenuBar/MenuBar.h"
 #include "./Mixer/MixerWindow.h"
 #include "./MusicLibrary/MusicLibraryWindow.h"
-#include "./TransportControl.h"
+#include "./TransportControl/TransportControl.h"
 
 #include "../audio/Mixer.h"
 

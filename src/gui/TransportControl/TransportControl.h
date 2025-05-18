@@ -9,18 +9,20 @@
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
 
-#include "../Logging.h"
-#include "../actors/ActorIds.h"
-#include "../messaging/atoms.h"
-#include "../messaging/EnvelopeQtPtr.h"
-#include "../enums/PlayState.h"
-#include "Color.h"
-
 #include <QToolbar>
 #include <QAction>
 #include <QLabel>
 #include <QStyle>
 #include <QWidget>
+
+#include "../../Logging.h"
+#include "../../actors/ActorIds.h"
+#include "../../messaging/atoms.h"
+#include "../../messaging/EnvelopeQtPtr.h"
+#include "../../enums/PlayState.h"
+#include "../Color.h"
+
+#include "CurrentlyPlaying.h"
 
 namespace Gj {
 namespace Gui {
@@ -37,6 +39,7 @@ class TransportControl final : public QToolBar {
     actor_system& sys;
     PlayState playState;
     QLabel title;
+    QWidget currentlyPlaying;
     QAction playTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay), "", this};
     QAction pauseTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause), "", this};
     QAction stopTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop), "", this};

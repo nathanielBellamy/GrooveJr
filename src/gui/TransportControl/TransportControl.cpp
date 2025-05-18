@@ -12,12 +12,15 @@ namespace Gui {
 TransportControl::TransportControl(QWidget* parent, actor_system& sys)
     : QToolBar(parent)
     , sys(sys)
+    , currentlyPlaying(this)
     {
 
   title.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   title.setText("GrooveJr");
   title.setFont({title.font().family(), 36});
   addWidget(&title);
+
+  addWidget(&currentlyPlaying);
 
   addSeparator();
   addSeparator();
@@ -109,7 +112,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys)
 
 
 int TransportControl::hydrateState(const AppStatePacket& appStatePacket) {
-  AppState appState = AppState::fromPacket(appStatePacket);
+  const AppState appState = AppState::fromPacket(appStatePacket);
   Logging::write(
     Info,
     "Gui::TransportControl::hydrateState",
