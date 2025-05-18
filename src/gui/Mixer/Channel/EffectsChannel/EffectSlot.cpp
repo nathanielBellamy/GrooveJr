@@ -54,7 +54,9 @@ void EffectSlot::hydrateState(const AppStatePacket& appState, const int newChann
 void EffectSlot::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setMinimumSize(QSize(100, 50));
-  setStyleSheet("background-color: blue; border: 2px solid white;");
+  setStyleSheet(
+    ("border: 2px solid white; background-color: " + Color::toHex(GjC::LIGHT_200) + "; ").data()
+  );
 }
 
 void EffectSlot::setupGrid() {
