@@ -10,20 +10,10 @@ namespace Gj {
 namespace Gui {
 
 TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
-    : QToolBar(parent)
+    : QWidget(parent)
     , sys(sys)
-    , currentlyPlaying(this, sys, mixer)
+    , grid(this)
     {
-
-  title.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-  title.setText("GrooveJr");
-  title.setFont({title.font().family(), 36});
-  addWidget(&title);
-
-  addWidget(&currentlyPlaying);
-
-  addSeparator();
-  addSeparator();
 
   addAction(&playTrigAction);
   addAction(&pauseTrigAction);
@@ -31,8 +21,28 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mi
   addAction(&rwTrigAction);
   addAction(&ffTrigAction);
 
-  setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  connectActions();
+  setupGrid();
+}
 
+
+int TransportControl::hydrateState(const AppStatePacket& appStatePacket) {
+  const AppState appState = AppState::fromPacket(appStatePacket);
+  Logging::write(
+    Info,
+    "Gui::TransportControl::hydrateState",
+    "Received app state with playState - " + std::to_string(appState.playState)
+  );
+
+  setPlayState(appState.playState);
+  return 0;
+}
+
+void TransportControl::setPlayState(PlayState newState) {
+  playState = newState;
+}
+
+void TransportControl::connectActions() {
   connect(&playTrigAction, &QAction::triggered, [&] {
     Logging::write(
       Info,
@@ -107,24 +117,12 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mi
         tc_trig_ff_a_v
     );
   });
-
-} // constructor
-
-
-int TransportControl::hydrateState(const AppStatePacket& appStatePacket) {
-  const AppState appState = AppState::fromPacket(appStatePacket);
-  Logging::write(
-    Info,
-    "Gui::TransportControl::hydrateState",
-    "Received app state with playState - " + std::to_string(appState.playState)
-  );
-
-  setPlayState(appState.playState);
-  return 0;
 }
 
-void TransportControl::setPlayState(PlayState newState) {
-  playState = newState;
+void TransportControl::setupGrid() {
+
+
+  setLayout(&grid);
 }
 
 } // Gui

@@ -9,8 +9,8 @@
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
 
-#include <QToolbar>
 #include <QAction>
+#include <QGridLayout>
 #include <QLabel>
 #include <QStyle>
 #include <QWidget>
@@ -30,7 +30,7 @@ namespace Gui {
 
 using namespace caf;
 
-class TransportControl final : public QToolBar {
+class TransportControl final : public QWidget {
   public:
     TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer* mixer);
     int hydrateState(const AppStatePacket& appStatePacket);
@@ -39,13 +39,15 @@ class TransportControl final : public QToolBar {
   private:
     actor_system& sys;
     PlayState playState;
-    QLabel title;
-    CurrentlyPlaying currentlyPlaying;
+    QGridLayout grid;
     QAction playTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay), "", this};
     QAction pauseTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause), "", this};
     QAction stopTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop), "", this};
     QAction rwTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipBackward), "", this};
     QAction ffTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipForward), "", this};
+
+    void connectActions();
+    void setupGrid();
 };
 
 

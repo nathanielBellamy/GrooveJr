@@ -73,10 +73,12 @@ qt_add_library(GjGui STATIC
         Mixer/Channel/EffectsChannel/Effects/VstWindow.cpp
         MusicLibrary/MusicLibraryWindow.h
         MusicLibrary/MusicLibraryWindow.cpp
-        TransportControl/TransportControl.h
-        TransportControl/TransportControl.cpp
-        TransportControl/CurrentlyPlaying.h
-        TransportControl/CurrentlyPlaying.cpp
+        MainToolBar/CurrentlyPlaying.h
+        MainToolBar/CurrentlyPlaying.cpp
+        MainToolBar/MainToolBar.h
+        MainToolBar/MainToolBar.cpp
+        MainToolBar/TransportControl.h
+        MainToolBar/TransportControl.cpp
 )
 
 message(GUI_VST3_SDK="${VST3SDK_HOME}")

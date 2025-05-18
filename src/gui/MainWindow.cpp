@@ -4,6 +4,8 @@
 
 #include "./MainWindow.h"
 
+#include "../main.h"
+
 using namespace caf;
 
 namespace Gj {
@@ -15,7 +17,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
     , shutdown_handler(shutdown_handler)
     , container(this)
     , menuBar(new MenuBar(actorSystem, this))
-    , transportControl(this, actorSystem, mixer)
+    , mainToolBar(this, actorSystem, mixer)
     , grid(&container)
     , musicLibraryWindow(&container, actorSystem)
     , mixerWindow(&container, actorSystem, mixer)
@@ -26,7 +28,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
   setStyleSheet(
     "font-weight: 900;"
   );
-  addToolBar(Qt::TopToolBarArea, &transportControl);
+  addToolBar(Qt::TopToolBarArea, &mainToolBar);
   setUnifiedTitleAndToolBarOnMac(true);
   setWindowTitle("GrooveJr");
   resize(640, 480);
@@ -38,7 +40,7 @@ int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
       "Gui::MainWindow::hydrateState",
       "Hydrating app state to Gui."
     );
-    transportControl.hydrateState(appStatePacket);
+    mainToolBar.hydrateState(appStatePacket);
     mixerWindow.hydrateState(appStatePacket);
     return 0;
 }

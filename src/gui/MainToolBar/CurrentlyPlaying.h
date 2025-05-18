@@ -27,7 +27,9 @@ class CurrentlyPlaying final : public QWidget {
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;
-    QLabel title;
+    QLabel track;
+    QLabel album;
+    QLabel artist;
     QGridLayout grid;
     void setStyle();
 };

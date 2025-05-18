@@ -11,13 +11,20 @@ CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, A
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
-  , title(this)
+  , track(this)
+  , album(this)
+  , artist(this)
   , grid(this)
   {
 
-  title.setText("CurrPlay");
-  title.setFont({title.font().family(), 36});
-  grid.addWidget(&title, 0, 0, -1, -1);
+  track.setText("Love is a Losing Game");
+  album.setText("Back to Black");
+  artist.setText("Amy Winehouse");
+
+  grid.addWidget(&track, 0, 0, 1, -1);
+  grid.addWidget(&album, 1, 0, 1, 1);
+  grid.addWidget(&artist, 1, 1, 1, 1);
+
   setLayout(&grid);
 
   setStyle();
@@ -25,6 +32,10 @@ CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, A
 
 void CurrentlyPlaying::setStyle() {
   setStyleSheet("background-color: blue;");
+}
+
+void CurrentlyPlaying::hydrateState(const AppStatePacket& appStatePacket) {
+  // TODO
 }
 
 } // Gui
