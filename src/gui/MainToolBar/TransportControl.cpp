@@ -10,16 +10,15 @@ namespace Gj {
 namespace Gui {
 
 TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
-    : QWidget(parent)
-    , sys(sys)
-    , grid(this)
-    {
-
-  addAction(&playTrigAction);
-  addAction(&pauseTrigAction);
-  addAction(&stopTrigAction);
-  addAction(&rwTrigAction);
-  addAction(&ffTrigAction);
+  : QWidget(parent)
+  , sys(sys)
+  , grid(this)
+  , playButton(this, &playTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay))
+  , pauseButton(this, &pauseTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause))
+  , stopButton(this, &stopTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop))
+  , rwButton(this, &rwTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipBackward))
+  , ffButton(this, &ffTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipForward))
+  {
 
   connectActions();
   setupGrid();
@@ -121,6 +120,11 @@ void TransportControl::connectActions() {
 
 void TransportControl::setupGrid() {
 
+  grid.addWidget(&playButton, 0, 0, 1, 1);
+  grid.addWidget(&pauseButton, 0, 1, 1, 1);
+  grid.addWidget(&stopButton, 0, 2, 1, 1);
+  grid.addWidget(&rwButton, 0, 3, 1, 1);
+  grid.addWidget(&ffButton, 0, 4, 1, 1);
 
   setLayout(&grid);
 }

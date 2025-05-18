@@ -23,7 +23,7 @@
 #include "../../audio/Mixer.h"
 #include "../Color.h"
 
-#include "CurrentlyPlaying.h"
+#include "TransportControlButton.h"
 
 namespace Gj {
 namespace Gui {
@@ -40,6 +40,12 @@ class TransportControl final : public QWidget {
     actor_system& sys;
     PlayState playState;
     QGridLayout grid;
+
+    TransportControlButton playButton;
+    TransportControlButton pauseButton;
+    TransportControlButton stopButton;
+    TransportControlButton rwButton;
+    TransportControlButton ffButton;
     QAction playTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay), "", this};
     QAction pauseTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause), "", this};
     QAction stopTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop), "", this};

@@ -79,6 +79,8 @@ qt_add_library(GjGui STATIC
         MainToolBar/MainToolBar.cpp
         MainToolBar/TransportControl.h
         MainToolBar/TransportControl.cpp
+        MainToolBar/TransportControlButton.h
+        MainToolBar/TransportControlButton.cpp
 )
 
 message(GUI_VST3_SDK="${VST3SDK_HOME}")
