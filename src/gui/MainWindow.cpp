@@ -15,7 +15,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
     , shutdown_handler(shutdown_handler)
     , container(this)
     , menuBar(new MenuBar(actorSystem, this))
-    , transportControl(this, actorSystem)
+    , transportControl(this, actorSystem, mixer)
     , grid(&container)
     , musicLibraryWindow(&container, actorSystem)
     , mixerWindow(&container, actorSystem, mixer)

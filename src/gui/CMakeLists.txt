@@ -75,6 +75,8 @@ qt_add_library(GjGui STATIC
         MusicLibrary/MusicLibraryWindow.cpp
         TransportControl/TransportControl.h
         TransportControl/TransportControl.cpp
+        TransportControl/CurrentlyPlaying.h
+        TransportControl/CurrentlyPlaying.cpp
 )
 
 message(GUI_VST3_SDK="${VST3SDK_HOME}")

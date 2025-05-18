@@ -20,6 +20,7 @@
 #include "../../messaging/atoms.h"
 #include "../../messaging/EnvelopeQtPtr.h"
 #include "../../enums/PlayState.h"
+#include "../../audio/Mixer.h"
 #include "../Color.h"
 
 #include "CurrentlyPlaying.h"
@@ -31,7 +32,7 @@ using namespace caf;
 
 class TransportControl final : public QToolBar {
   public:
-    TransportControl(QWidget* parent, actor_system& sys);
+    TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer* mixer);
     int hydrateState(const AppStatePacket& appStatePacket);
     void setPlayState(PlayState state);
 
@@ -39,7 +40,7 @@ class TransportControl final : public QToolBar {
     actor_system& sys;
     PlayState playState;
     QLabel title;
-    QWidget currentlyPlaying;
+    CurrentlyPlaying currentlyPlaying;
     QAction playTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay), "", this};
     QAction pauseTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause), "", this};
     QAction stopTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop), "", this};

@@ -19,7 +19,7 @@ namespace Gui {
 
 using namespace caf;
 
-class CurrentlyPlaying : public QWidget {
+class CurrentlyPlaying final : public QWidget {
   public:
     explicit CurrentlyPlaying(QWidget *parent, actor_system& actorSystem, Audio::Mixer* mixer);
     void hydrateState(const AppStatePacket& appStatePacket);
@@ -34,7 +34,5 @@ class CurrentlyPlaying : public QWidget {
 
 } // Gui
 } // Gj
-
-
 
 #endif //CURRENTLYPLAYING_H

@@ -9,10 +9,10 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 
-TransportControl::TransportControl(QWidget* parent, actor_system& sys)
+TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
     : QToolBar(parent)
     , sys(sys)
-    , currentlyPlaying(this)
+    , currentlyPlaying(this, sys, mixer)
     {
 
   title.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);

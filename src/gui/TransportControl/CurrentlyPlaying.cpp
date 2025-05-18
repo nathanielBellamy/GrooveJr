@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-CurrentlyPlaying::CurrentlyPlaying(QWidget *parent, actor_system& actorSystem, Audio::Mixer* mixer)
+CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer)
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
