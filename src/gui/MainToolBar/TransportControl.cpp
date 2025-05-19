@@ -13,7 +13,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mi
   : QWidget(parent)
   , sys(sys)
   , grid(this)
-  , progressBar(this, 0)
+  , progressBar(this, mixer, 0)
   , playButton(this, &playTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay))
   , pauseButton(this, &pauseTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause))
   , stopButton(this, &stopTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop))

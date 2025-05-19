@@ -285,8 +285,8 @@ int Cassette::setupAudioData() {
   }
 
   // Read the audio data into buffer
-  long readcount = sf_read_float(file, buffer, sfInfo.frames * sfInfo.channels);
-  if (readcount == 0) {
+  audioData.readCount = sf_read_float(file, buffer, sfInfo.frames * sfInfo.channels);
+  if (audioData.readCount == 0) {
     Logging::write(
       Error,
       "Audio::Cassette::setupAudioData",
@@ -711,6 +711,10 @@ bool Cassette::deleteBuffers() const {
 }
 
 int Cassette::updateAudioDataFromMixer(jack_ringbuffer_t* effectsChannelsSettingsRB, const int channelCount) {
+  // TODO:
+  // - pass frame through a ring buffer
+  mixer->getUpdateProgressBarFunc()(audioData.readCount, audioData.index);
+
   const float channelCountF = static_cast<float>(channelCount);
 
   Effects::EffectsChannel* effectsChannels[MAX_EFFECTS_CHANNELS] {nullptr};

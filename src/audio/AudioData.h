@@ -14,6 +14,7 @@ namespace Gj {
 namespace Audio {
 
 struct AudioData {
+    sf_count_t                       readCount;
     sf_count_t                       index;
     PlayState                        playState;
     float                            playbackSpeed;

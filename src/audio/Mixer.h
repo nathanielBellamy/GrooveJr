@@ -26,53 +26,55 @@ class Mixer {
     std::shared_ptr<JackClient> jackClient;
     float channelCount;
     std::vector<Effects::EffectsChannel*> effectsChannels;
+    std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
 
     void incorporateLatencySamples(int latencySamples) const;
 
 public:
-
-    explicit Mixer(AppState*);
-    ~Mixer();
-
-    [[nodiscard]]
-    jack_client_t* getJackClient() const {
-      return jackClient.get()->getJackClient();
-    };
-
-    [[nodiscard]]
-    std::vector<Effects::EffectsChannel*> getEffectsChannels() const {
-      return effectsChannels;
-    }
-
-    [[nodiscard]]
-    Effects::EffectsChannel* getEffectsChannel(int index) const {
-      return effectsChannels.at(index);
-    }
+  explicit Mixer(AppState*);
+  ~Mixer();
 
   [[nodiscard]]
-    int getEffectsChannelsCount() const {
-      return static_cast<int>(effectsChannels.size() - 1);
-    }
+  jack_client_t* getJackClient() const {
+    return jackClient.get()->getJackClient();
+  };
 
-    bool addEffectsChannel();
-    bool removeEffectsChannel(int idx);
-    [[nodiscard]]
-    int effectsOnChannelCount(int idx) const;
+  [[nodiscard]]
+  std::vector<Effects::EffectsChannel*> getEffectsChannels() const {
+    return effectsChannels;
+  }
 
-    bool addEffectToChannel(int idx, const std::string& effectPath) const;
-    void initEditorHostsOnChannel(int idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
-    void terminateEditorHostsOnChannel(int idx) const;
+  [[nodiscard]]
+  Effects::EffectsChannel* getEffectsChannel(int index) const {
+    return effectsChannels.at(index);
+  }
 
-    bool setSampleRate(int sampleRate) const;
+  [[nodiscard]]
+  int getEffectsChannelsCount() const {
+    return static_cast<int>(effectsChannels.size() - 1);
+  }
 
-    bool replaceEffectOnChannel(int channelIdx, int effectIdx, std::string effectPath) const;
-    bool removeEffectFromChannel(int channelIdx, int effectIdx) const;
+  bool addEffectsChannel();
+  bool removeEffectsChannel(int idx);
+  [[nodiscard]]
+  int effectsOnChannelCount(int idx) const;
 
-    int getAudioFramesPerBuffer() const { return gAppState->audioFramesPerBuffer; };
-    void setAudioFramesPerBuffer(int framesPerBuffer) const { gAppState->audioFramesPerBuffer = framesPerBuffer; };
+  bool addEffectToChannel(int idx, const std::string& effectPath) const;
+  void initEditorHostsOnChannel(int idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
+  void terminateEditorHostsOnChannel(int idx) const;
 
-    bool setGainOnChannel(int channelIdx, float gain) const;
+  bool setSampleRate(int sampleRate) const;
 
+  bool replaceEffectOnChannel(int channelIdx, int effectIdx, std::string effectPath) const;
+  bool removeEffectFromChannel(int channelIdx, int effectIdx) const;
+
+  int getAudioFramesPerBuffer() const { return gAppState->audioFramesPerBuffer; };
+  void setAudioFramesPerBuffer(int framesPerBuffer) const { gAppState->audioFramesPerBuffer = framesPerBuffer; };
+
+  bool setGainOnChannel(int channelIdx, float gain) const;
+
+  void setUpdateProgressBarFunc(std::function<void(sf_count_t, sf_count_t)> func) { updateProgressBarFunc = func; };
+  std::function<void(sf_count_t, sf_count_t)> getUpdateProgressBarFunc() { return updateProgressBarFunc; };
 };
 
 } // Audio

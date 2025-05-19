@@ -12,7 +12,7 @@
 #include <QPen>
 #include <QWidget>
 
-#include <iostream>
+#include "../../audio/Mixer.h"
 
 namespace Gj {
 namespace Gui {
@@ -20,10 +20,13 @@ namespace Gui {
 class ProgressBar final : public QWidget {
 
   public:
-    ProgressBar(QWidget* parent, sf_count_t frame);
+    ProgressBar(QWidget* parent, Audio::Mixer* mixer, sf_count_t frame);
+    void updateProgressBar(sf_count_t readCount, sf_count_t newFrame);
 
   private:
+    sf_count_t totalFrames;
     sf_count_t frame;
+    Audio::Mixer* mixer;
     QPainter painter;
     QPen pen;
 
