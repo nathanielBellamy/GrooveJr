@@ -11,6 +11,7 @@ namespace Gj {
 namespace Gui {
 
 enum class GjC {
+  DARK_500,
   DARK_400,
   DARK_300,
   DARK_200,
@@ -26,6 +27,7 @@ enum class GjC {
 class Color {
   public:
     static inline std::map<GjC, std::string> hexs = {
+      {GjC::DARK_500, "#2D2D2D"},
       {GjC::DARK_400, "#2A363B"},
       {GjC::DARK_300, "#594F4F"},
       {GjC::DARK_200, "#645757"},
