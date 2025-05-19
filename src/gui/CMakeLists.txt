@@ -77,6 +77,8 @@ qt_add_library(GjGui STATIC
         MainToolBar/CurrentlyPlaying.cpp
         MainToolBar/MainToolBar.h
         MainToolBar/MainToolBar.cpp
+        MainToolBar/ProgressBar.h
+        MainToolBar/ProgressBar.cpp
         MainToolBar/TransportControl.h
         MainToolBar/TransportControl.cpp
         MainToolBar/TransportControlButton.h
