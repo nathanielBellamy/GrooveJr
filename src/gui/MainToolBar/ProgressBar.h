@@ -26,10 +26,9 @@ class ProgressBar final : public QWidget {
     sf_count_t frame;
     QPainter painter;
     QPen pen;
-    QRect elapsed;
 
     void setStyle();
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event) override;
 
 };
 

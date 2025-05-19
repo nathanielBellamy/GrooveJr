@@ -13,18 +13,15 @@ ProgressBar::ProgressBar(QWidget* parent, sf_count_t frame)
   , frame(frame)
   , painter(this)
   , pen(Qt::NoPen)
-  , elapsed(0, 0, width() / 2, height())
   {
-
 
   setStyle();
 }
 
 void ProgressBar::setStyle() {
   setMinimumWidth(100);
-  setMinimumHeight(20);
-  setMaximumHeight(20);
-  setStyleSheet("border-radius: 10px; border: 2px solid white");
+  setFixedHeight(15);
+  setStyleSheet("border: 2px solid white");
 }
 
 void ProgressBar::paintEvent(QPaintEvent* event) {
