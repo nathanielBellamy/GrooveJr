@@ -11,7 +11,6 @@ EffectsSlots::EffectsSlots(QWidget* parent,
                            actor_system& actorSystem,
                            Audio::Mixer* mixer,
                            int channelIndex,
-                           QAction* addEffectAction,
                            QAction* replaceEffectAction,
                            QAction* removeEffectAction)
   : QWidget(parent)
@@ -19,7 +18,6 @@ EffectsSlots::EffectsSlots(QWidget* parent,
   , mixer(mixer)
   , channelIndex(channelIndex)
   , grid(this)
-  , addEffectSlotButton(this, addEffectAction)
   , replaceEffectAction(replaceEffectAction)
   , removeEffectAction(removeEffectAction)
   {
@@ -36,12 +34,6 @@ EffectsSlots::~EffectsSlots() {
 
 void EffectsSlots::hydrateState(const AppStatePacket& appState, int newChannelIndex) {
   channelIndex = newChannelIndex;
-
-  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
-    addEffectSlotButton.setEnabled(false);
-  } else {
-    addEffectSlotButton.setEnabled(true);
-  }
 
   for (const auto& effectSlot : effectsSlots) {
     effectSlot->hydrateState(appState, channelIndex);
@@ -71,14 +63,13 @@ void EffectsSlots::removeEffectSlot() {
 }
 
 void EffectsSlots::setupGrid() {
-  grid.setVerticalSpacing(0);
+  grid.setVerticalSpacing(4);
 
   int row = 0;
   for (auto &effectSlot : effectsSlots) {
     grid.addWidget(effectSlot.get(), row, 0, 1, 1);
     row++;
   }
-  grid.addWidget(&addEffectSlotButton, row, 0, 1, 1);
 }
 
 } // Gui

@@ -65,6 +65,9 @@ void MuteSoloContainer::setupGrid() {
   } else {
     grid.addWidget(&effects, 0, 2, 2, 2);
   }
+
+  grid.setHorizontalSpacing(4);
+  grid.setVerticalSpacing(4);
 }
 
 void MuteSoloContainer::setMute(const float val) {

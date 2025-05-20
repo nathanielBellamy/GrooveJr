@@ -52,8 +52,7 @@ void EffectSlot::hydrateState(const AppStatePacket& appState, const int newChann
 }
 
 void EffectSlot::setStyle() {
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
-  setMinimumSize(QSize(100, 50));
+  setFixedSize(QSize(150, 70));
   setStyleSheet(
     ("border: 2px solid white; background-color: " + Color::toHex(GjC::LIGHT_200) + "; ").data()
   );
@@ -68,8 +67,8 @@ void EffectSlot::setupGrid() {
   grid.setColumnMinimumWidth(1, 30);
   grid.setColumnStretch(1, 10);
 
-  grid.setVerticalSpacing(0);
-  grid.setHorizontalSpacing(1);
+  grid.setVerticalSpacing(4);
+  grid.setHorizontalSpacing(4);
 }
 
 } // Gui

@@ -31,6 +31,7 @@ EffectsChannel::EffectsChannel(
   , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Effects"), this)
   , vstSelect(this)
   , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
+  , addEffectSlotButton(this, &addEffectAction)
   , replaceEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentRevert), tr("&Replace Effect"), this)
   , removeEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Effect"), this)
   , grid(this)
@@ -47,7 +48,8 @@ EffectsChannel::EffectsChannel(
   , panLLabel("PanL", this)
   , panRSlider(Qt::Horizontal, this)
   , panRLabel("PanR", this)
-  , effectsSlots(this, actorSystem, mixer, channelIndex, &addEffectAction, &replaceEffectAction, &removeEffectAction)
+  , effectsSlots(this, actorSystem, mixer, channelIndex, &replaceEffectAction, &removeEffectAction)
+  , effectsSlotsScrollArea(this)
   , muteSoloContainer(
       this, &openEffectsContainer,
       muteChannelAction, muteLChannelAction, muteRChannelAction,
@@ -98,8 +100,10 @@ void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newC
 
   if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
     removeEffectsChannelButton.setEnabled(false);
+    addEffectSlotButton.setEnabled(false);
   } else {
     removeEffectsChannelButton.setEnabled(true);
+    addEffectSlotButton.setEnabled(true);
   }
 
   if (channelIndex > 0)
@@ -127,7 +131,8 @@ void EffectsChannel::setStyle() {
 }
 
 void EffectsChannel::setupGrid() {
-  grid.setVerticalSpacing(1);
+  grid.setVerticalSpacing(4);
+  grid.setHorizontalSpacing(4);
 
   grid.addWidget(&title, 0, 0, 1, 1);
 
@@ -139,7 +144,8 @@ void EffectsChannel::setupGrid() {
   grid.addWidget(&gainLLabel, 4, 1, 1, 1);
   grid.addWidget(&gainRSlider, 1, 2, 3, 1);
   grid.addWidget(&gainRLabel, 4, 2, 1, 1);
-  grid.addWidget(&effectsSlots, 1, 3, 1, 1);
+  grid.addWidget(&effectsSlotsScrollArea, 1, 3, 1, 1);
+  grid.addWidget(&addEffectSlotButton, 2, 3, 1, 1);
   // grid.addWidget(&panSlider, 2, 3, 1, 1);
   // grid.addWidget(&panLabel, 2, 4, 1, 1);
   grid.addWidget(&panLSlider, 3, 3, 1, 1);
@@ -157,6 +163,20 @@ void EffectsChannel::setupGrid() {
   grid.setRowStretch(1, 10);
 
   setLayout(&grid);
+  setupEffectsSlotsScrollArea();
+}
+
+void EffectsChannel::setupEffectsSlotsScrollArea() {
+  effectsSlotsScrollArea.setFixedSize(QSize(200, 175));
+  effectsSlotsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  effectsSlotsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  effectsSlotsScrollArea.setWidgetResizable(true);
+  effectsSlotsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  effectsSlotsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  effectsSlotsScrollArea.setLayoutDirection(Qt::LeftToRight);
+  effectsSlotsScrollArea.setWidget(&effectsSlots);
+  effectsSlots.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+
 }
 
 void EffectsChannel::setupTitle() {
@@ -349,7 +369,6 @@ void EffectsChannel::setSoloL(const float val) {
 void EffectsChannel::setSoloR(const float val) {
   muteSoloContainer.setSoloR(val);
 }
-
 
 } // Gui
 } // Gj

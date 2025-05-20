@@ -32,11 +32,10 @@ class EffectsSlots final : public QWidget {
       actor_system& actorSystem,
       Audio::Mixer* mixer,
       int channelIndex,
-      QAction* addEffectAction,
       QAction* replaceEffectAction,
       QAction* removeEffectAction
     );
-    ~EffectsSlots();
+    ~EffectsSlots() override;
     void addEffectSlot();
     void removeEffectSlot();
     void hydrateState(const AppStatePacket& appState, int newChannelIndex);
@@ -47,7 +46,6 @@ class EffectsSlots final : public QWidget {
     int channelIndex;
     QGridLayout grid;
     std::vector<std::unique_ptr<EffectSlot>> effectsSlots;
-    AddEffectSlotButton addEffectSlotButton;
     QAction* replaceEffectAction;
     QAction* removeEffectAction;
     void setupGrid();

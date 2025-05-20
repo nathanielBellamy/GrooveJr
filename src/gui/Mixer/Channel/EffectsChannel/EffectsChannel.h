@@ -12,6 +12,7 @@
 #include <QAction>
 #include <QGridLayout>
 #include <QLabel>
+#include <QScrollArea>
 #include <QSlider>
 #include <QWidget>
 #include <QUrl>
@@ -88,6 +89,8 @@ class EffectsChannel final : public QWidget {
     QSlider panRSlider;
     QLabel  panRLabel;
     EffectsSlots effectsSlots;
+    AddEffectSlotButton addEffectSlotButton;
+    QScrollArea effectsSlotsScrollArea;
     MuteSoloContainer muteSoloContainer;
     void setStyle();
     void setupGrid();
@@ -99,6 +102,7 @@ class EffectsChannel final : public QWidget {
     void setupPanLSlider();
     void setupPanRSlider();
     void connectActions();
+    void setupEffectsSlotsScrollArea();
 };
 
 } // Gui
