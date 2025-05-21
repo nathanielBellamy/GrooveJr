@@ -9,6 +9,7 @@
 #include<memory>
 #include<vector>
 
+#include<QAction>
 #include <QLabel>
 #include <QWidget>
 #include <QGridLayout>
@@ -16,6 +17,7 @@
 #include <QShowEvent>
 
 #include "VstWindow.h"
+#include "VstWindowSelectButton.h"
 #include "../../../../../audio/Mixer.h"
 #include "../../../../../Logging.h"
 
@@ -26,7 +28,7 @@ class EffectsContainer final : public QWidget {
 
   public:
      EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex);
-     ~EffectsContainer();
+     ~EffectsContainer() override;
 
   private:
     Audio::Mixer* mixer;
@@ -34,7 +36,10 @@ class EffectsContainer final : public QWidget {
     QGridLayout grid;
     QLabel title;
     std::vector<std::shared_ptr<VstWindow>> vstWindows;
+    QAction selectVstWindowAction;
+    std::vector<VstWindowSelectButton*> vstWindowSelectButtons;
 
+    void connectActions();
     void initVstWindows();
     void terminateVstWindows();
     void setupGrid();

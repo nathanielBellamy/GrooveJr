@@ -36,7 +36,25 @@ EffectsContainer::~EffectsContainer() {
     "Gui::EffectsContainer::~EffectsContainer",
     "Destroying Effects Container for Channel : " + std::to_string(channelIndex)
   );
+  for (const auto button : vstWindowSelectButtons) {
+    delete button;
+  }
+
+  Logging::write(
+    Info,
+    "Gui::EffectsContainer::~EffectsContainer",
+    "Destroyed Effects Container for Channel : " + std::to_string(channelIndex)
+  );
 }
+
+void EffectsContainer::connectActions() {
+  auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
+    const int effectIndex = selectVstWindowAction.data().toInt();
+    vstWindows.at(effectIndex)->activateWindow();
+    vstWindows.at(effectIndex)->raise();
+  });
+}
+
 
 void EffectsContainer::setStyle() {
   setMinimumSize(QSize(600, 600));
@@ -56,6 +74,11 @@ void EffectsContainer::setupGrid() {
   //   i++;
   // }
 
+  int i = 0;
+  for (const auto button : vstWindowSelectButtons) {
+    grid.addWidget(button, 2, i++, 1, 1);
+  }
+
   grid.setColumnStretch(0, 1);
   grid.setColumnStretch(1, 10);
   grid.setRowMinimumHeight(0, 20);
@@ -72,18 +95,19 @@ void EffectsContainer::initVstWindows() {
   for (int i = 0; i < mixer->effectsOnChannelCount(channelIndex); i++) {
     auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, i, mixer->getPluginName(channelIndex, i));
     vstWindows.push_back(std::move(vstWindow));
+    vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, i, &selectVstWindowAction));
   }
   Logging::write(
     Info,
     "EffectsContainer::initVstWindows()",
     "Created VstWindows for channel: " + std::to_string(channelIndex)
   );
-  // setupGrid();
+  setupGrid();
   mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
   for (auto&& vstWindow : vstWindows) {
-    vstWindow->show();
     vstWindow->activateWindow();
     vstWindow->raise();
+    vstWindow->show();
   }
   Logging::write(
     Info,

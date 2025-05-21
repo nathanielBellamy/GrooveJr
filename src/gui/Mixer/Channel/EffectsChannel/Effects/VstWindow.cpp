@@ -15,7 +15,7 @@ VstWindow::VstWindow(QWidget* parent, int channelIndex, int effectIndex, std::st
   , grid(this)
   {
 
-  setWindowTitle("Channel # " + QString::number(channelIndex) + " - Effect # " + QString::number(effectIndex + 1) + " - " + name.data());
+  setWindowTitle("Channel " + QString::number(channelIndex) + " - Effect " + QString::number(effectIndex + 1) + " - " + name.data());
 
   setStyle();
   setupGrid();
@@ -38,6 +38,7 @@ void VstWindow::setupGrid() {
 
 void VstWindow::show() {
   QWidget::show();
+  activateWindow();
   raise();
   // Logging::write(
   //   Info,
