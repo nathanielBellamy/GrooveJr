@@ -70,7 +70,7 @@ void EffectsContainer::showEvent(QShowEvent *event) {
 
 void EffectsContainer::initVstWindows() {
   for (int i = 0; i < mixer->effectsOnChannelCount(channelIndex); i++) {
-    auto vstWindow = std::make_shared<VstWindow>(nullptr);
+    auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, i, mixer->getPluginName(channelIndex, i));
     vstWindows.push_back(std::move(vstWindow));
   }
   Logging::write(
@@ -82,6 +82,8 @@ void EffectsContainer::initVstWindows() {
   mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
   for (auto&& vstWindow : vstWindows) {
     vstWindow->show();
+    vstWindow->activateWindow();
+    vstWindow->raise();
   }
   Logging::write(
     Info,

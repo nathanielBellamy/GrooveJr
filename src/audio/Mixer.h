@@ -75,6 +75,11 @@ public:
 
   void setUpdateProgressBarFunc(std::function<void(sf_count_t, sf_count_t)> func) { updateProgressBarFunc = func; };
   std::function<void(sf_count_t, sf_count_t)> getUpdateProgressBarFunc() { return updateProgressBarFunc; };
+
+  std::string getPluginName(const int channelIdx, const int pluginIndex) const {
+    return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);
+  };
+
 };
 
 } // Audio

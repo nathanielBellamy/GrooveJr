@@ -7,12 +7,15 @@
 namespace Gj {
 namespace Gui {
 
-VstWindow::VstWindow(QWidget* parent)
+VstWindow::VstWindow(QWidget* parent, int channelIndex, int effectIndex, std::string name)
   : QWidget(parent)
+  , channelIndex(channelIndex)
+  , effectIndex(effectIndex)
+  , name(name)
   , grid(this)
   {
 
-  setWindowTitle("Vst Window");
+  setWindowTitle("Channel # " + QString::number(channelIndex) + " - Effect # " + QString::number(effectIndex + 1) + " - " + name.data());
 
   setStyle();
   setupGrid();

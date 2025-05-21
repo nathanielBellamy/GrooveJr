@@ -208,6 +208,8 @@ class EffectsChannel {
 
     bool removeEffect(int effectIdx);
 
+    std::string getPluginName(int pluginIndex) const { return vst3Plugins.at(pluginIndex)->getName(); };
+
 };
 
 } // Effects

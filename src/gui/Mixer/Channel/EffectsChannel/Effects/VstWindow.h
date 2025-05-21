@@ -22,12 +22,15 @@ using namespace Steinberg::Vst::EditorHost;
 class VstWindow final : public QWidget, public IWindow {
 
 private:
+	int channelIndex;
+	int effectIndex;
+	std::string name;
 	QGridLayout grid;
 	void setStyle();
 	void setupGrid();
 
 public:
-  explicit VstWindow(QWidget* parent);
+  explicit VstWindow(QWidget* parent, int channelIndex, int effectIndex, std::string name);
 	~VstWindow () noexcept override = default;
 
 	void show () override;

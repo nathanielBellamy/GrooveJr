@@ -41,6 +41,8 @@ struct Plugin {
 
     void initEditorHost(EditorHost::WindowPtr window);
     void terminateEditorHost() const;
+
+    std::string getName() const { return name; };
 };
 
 } // Vst3
