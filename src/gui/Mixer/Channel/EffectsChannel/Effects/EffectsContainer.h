@@ -5,7 +5,6 @@
 #ifndef EFFECTSCONTAINER_H
 #define EFFECTSCONTAINER_H
 
-#include <iostream>
 #include<memory>
 #include<vector>
 

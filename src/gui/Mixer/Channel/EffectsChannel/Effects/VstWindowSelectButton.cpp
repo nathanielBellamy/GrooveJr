@@ -17,7 +17,6 @@ VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const int effectIn
 }
 
 void VstWindowSelectButton::mousePressEvent(QMouseEvent* event) {
-  std::cout << "VstWindowSelectButton::mousePressEvent" << std::endl;
   selectAction->setData(effectIndex);
   selectAction->activate(QAction::Trigger);
 }

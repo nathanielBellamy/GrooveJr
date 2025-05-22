@@ -22,6 +22,7 @@ EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int cha
 
   setStyle();
   setupGrid();
+  connectActions();
 
   hide();
 }
@@ -50,9 +51,10 @@ EffectsContainer::~EffectsContainer() {
 void EffectsContainer::connectActions() {
   auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
     const int effectIndex = selectVstWindowAction.data().toInt();
-    std::cout << "selected VstWindow " << effectIndex << std::endl;
     vstWindows.at(effectIndex)->activateWindow();
     vstWindows.at(effectIndex)->raise();
+    activateWindow();
+    raise();
   });
 }
 

@@ -5,8 +5,6 @@
 #ifndef VSTWINDOWSELECTBUTTON_H
 #define VSTWINDOWSELECTBUTTON_H
 
-#include <iostream>
-
 #include <QAction>
 #include <QMouseEvent>
 #include <QPushButton>
