@@ -40,6 +40,8 @@ class EffectsContainer final : public QWidget {
     std::vector<QLabel*> vstWindowSelectLabels;
 
     void connectActions();
+    void reset();
+    void clearButtonsAndLabels();
     void initVstWindows();
     void terminateVstWindows();
     void setupGrid();

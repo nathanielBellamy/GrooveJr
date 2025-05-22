@@ -33,13 +33,8 @@ EffectsContainer::~EffectsContainer() {
     "Gui::EffectsContainer::~EffectsContainer",
     "Destroying Effects Container for Channel : " + std::to_string(channelIndex)
   );
-  for (const auto button : vstWindowSelectButtons) {
-    delete button;
-  }
 
-  for (const auto label : vstWindowSelectLabels) {
-    delete label;
-  }
+  clearButtonsAndLabels();
 
   Logging::write(
     Info,
@@ -60,7 +55,7 @@ void EffectsContainer::connectActions() {
 
 
 void EffectsContainer::setStyle() {
-  setMinimumSize(QSize(200, 200));
+  setMinimumSize(QSize(300, 200));
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet(
     ("background-color: " + Color::toHex(GjC::DARK_400) + ";").data()
@@ -81,7 +76,9 @@ void EffectsContainer::showEvent(QShowEvent *event) {
   initVstWindows();
 }
 
-void EffectsContainer::initVstWindows() {
+void EffectsContainer::reset() {
+  clearButtonsAndLabels();
+
   for (int i = 0; i < mixer->effectsOnChannelCount(channelIndex); i++) {
     std::string pluginName = mixer->getPluginName(channelIndex, i);
     auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, i, pluginName);
@@ -91,11 +88,29 @@ void EffectsContainer::initVstWindows() {
     label->setText((std::to_string(i + 1) + ".").data());
     vstWindowSelectLabels.push_back(label);
   }
+}
+
+void EffectsContainer::clearButtonsAndLabels() {
+  for (const auto button : vstWindowSelectButtons) {
+    delete button;
+  }
+  vstWindowSelectButtons.clear();
+
+  for (const auto label : vstWindowSelectLabels) {
+    delete label;
+  }
+  vstWindowSelectLabels.clear();
+}
+
+
+void EffectsContainer::initVstWindows() {
   Logging::write(
     Info,
     "EffectsContainer::initVstWindows()",
     "Created VstWindows for channel: " + std::to_string(channelIndex)
   );
+
+  reset();
   setupGrid();
   mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
   for (auto&& vstWindow : vstWindows) {

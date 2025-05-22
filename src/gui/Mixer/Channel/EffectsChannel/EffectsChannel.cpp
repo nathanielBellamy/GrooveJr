@@ -299,6 +299,7 @@ void EffectsChannel::connectActions() {
           mix_add_effect_to_channel_a_v
       );
       effectsSlots.addEffectSlot();
+      // todo: addVstWindow to EffectsContainer and re-init editor hosts
     }
   });
 
