@@ -12,7 +12,6 @@ EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int cha
   , mixer(mixer)
   , channelIndex(channelIndex)
   , grid(this)
-  , title(this)
   {
 
   if (channelIndex == 0) {
@@ -20,9 +19,6 @@ EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int cha
   } else {
     setWindowTitle("Channel " + QString::number(channelIndex) + " Effects");
   }
-
-  title.setText("EffectsContainer");
-  title.setFont({title.font().family(), 18});
 
   setStyle();
   setupGrid();
@@ -40,6 +36,10 @@ EffectsContainer::~EffectsContainer() {
     delete button;
   }
 
+  for (const auto label : vstWindowSelectLabels) {
+    delete label;
+  }
+
   Logging::write(
     Info,
     "Gui::EffectsContainer::~EffectsContainer",
@@ -50,6 +50,7 @@ EffectsContainer::~EffectsContainer() {
 void EffectsContainer::connectActions() {
   auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
     const int effectIndex = selectVstWindowAction.data().toInt();
+    std::cout << "selected VstWindow " << effectIndex << std::endl;
     vstWindows.at(effectIndex)->activateWindow();
     vstWindows.at(effectIndex)->raise();
   });
@@ -57,33 +58,20 @@ void EffectsContainer::connectActions() {
 
 
 void EffectsContainer::setStyle() {
-  setMinimumSize(QSize(600, 600));
-  setStyleSheet("background-color: aqua;");
+  setMinimumSize(QSize(200, 200));
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  setStyleSheet(
+    ("background-color: " + Color::toHex(GjC::DARK_400) + ";").data()
+  );
 }
 
 void EffectsContainer::setupGrid() {
-  grid.setVerticalSpacing(10);
-
-  grid.addWidget(&title, 0, 0, 1, -1);
-  grid.setRowMinimumHeight(0, 40);
-
-  // int i = 0;
-  // for (auto&& vstWindow : vstWindows) {
-  //   grid.addWidget(vstWindow.get(), i, 0, 1, -1);
-  //   grid.setRowMinimumHeight(i, 300);
-  //   i++;
-  // }
-
-  int i = 0;
-  for (const auto button : vstWindowSelectButtons) {
-    grid.addWidget(button, 2, i++, 1, 1);
+  for (int i = 0; i < vstWindowSelectButtons.size(); i++) {
+    grid.addWidget(vstWindowSelectLabels.at(i), i, 0, 1, 1);
+    grid.addWidget(vstWindowSelectButtons.at(i), i, 1, 1, 1);
   }
 
-  grid.setColumnStretch(0, 1);
-  grid.setColumnStretch(1, 10);
-  grid.setRowMinimumHeight(0, 20);
-  grid.setRowStretch(1, 10);
-
+  grid.setVerticalSpacing(4);
   setLayout(&grid);
 }
 
@@ -93,9 +81,13 @@ void EffectsContainer::showEvent(QShowEvent *event) {
 
 void EffectsContainer::initVstWindows() {
   for (int i = 0; i < mixer->effectsOnChannelCount(channelIndex); i++) {
-    auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, i, mixer->getPluginName(channelIndex, i));
+    std::string pluginName = mixer->getPluginName(channelIndex, i);
+    auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, i, pluginName);
     vstWindows.push_back(std::move(vstWindow));
-    vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, i, &selectVstWindowAction));
+    vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, i, pluginName, &selectVstWindowAction));
+    const auto label = new QLabel(this);
+    label->setText((std::to_string(i + 1) + ".").data());
+    vstWindowSelectLabels.push_back(label);
   }
   Logging::write(
     Info,

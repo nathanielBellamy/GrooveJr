@@ -5,6 +5,8 @@
 #ifndef VSTWINDOWSELECTBUTTON_H
 #define VSTWINDOWSELECTBUTTON_H
 
+#include <iostream>
+
 #include <QAction>
 #include <QMouseEvent>
 #include <QPushButton>
@@ -18,7 +20,7 @@ class VstWindowSelectButton final : public QPushButton {
   void mousePressEvent(QMouseEvent* event) override;
 
   public:
-    VstWindowSelectButton(QWidget* parent, int effectIndex, QAction* selectAction);
+    VstWindowSelectButton(QWidget* parent, int effectIndex, std::string pluginName, QAction* selectAction);
 };
 
 } // Gui

@@ -31,7 +31,6 @@ EffectsChannel::EffectsChannel(
   , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Effects"), this)
   , vstSelect(this)
   , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
-  , addEffectSlotButton(this, &addEffectAction)
   , replaceEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentRevert), tr("&Replace Effect"), this)
   , removeEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Effect"), this)
   , grid(this)
@@ -49,12 +48,13 @@ EffectsChannel::EffectsChannel(
   , panRSlider(Qt::Horizontal, this)
   , panRLabel("PanR", this)
   , effectsSlots(this, actorSystem, mixer, channelIndex, &replaceEffectAction, &removeEffectAction)
+  , addEffectSlotButton(this, &addEffectAction)
   , effectsSlotsScrollArea(this)
   , muteSoloContainer(
-      this, &openEffectsContainer,
-      muteChannelAction, muteLChannelAction, muteRChannelAction,
-      soloChannelAction, soloLChannelAction, soloRChannelAction,
-      channelIndex
+    this, &openEffectsContainer,
+    muteChannelAction, muteLChannelAction, muteRChannelAction,
+    soloChannelAction, soloLChannelAction, soloRChannelAction,
+    channelIndex
   ) {
   if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
     // can't remove main, must have at least one non-main effects channel

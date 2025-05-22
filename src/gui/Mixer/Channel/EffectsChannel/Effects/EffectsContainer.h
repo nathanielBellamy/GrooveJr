@@ -9,13 +9,14 @@
 #include<memory>
 #include<vector>
 
-#include<QAction>
+#include <QAction>
 #include <QLabel>
 #include <QWidget>
 #include <QGridLayout>
 #include <QHideEvent>
 #include <QShowEvent>
 
+#include "../../../../Color.h"
 #include "VstWindow.h"
 #include "VstWindowSelectButton.h"
 #include "../../../../../audio/Mixer.h"
@@ -34,10 +35,10 @@ class EffectsContainer final : public QWidget {
     Audio::Mixer* mixer;
     int channelIndex;
     QGridLayout grid;
-    QLabel title;
     std::vector<std::shared_ptr<VstWindow>> vstWindows;
     QAction selectVstWindowAction;
     std::vector<VstWindowSelectButton*> vstWindowSelectButtons;
+    std::vector<QLabel*> vstWindowSelectLabels;
 
     void connectActions();
     void initVstWindows();
