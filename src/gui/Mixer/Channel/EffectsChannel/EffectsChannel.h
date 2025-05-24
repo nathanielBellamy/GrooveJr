@@ -50,7 +50,7 @@ class EffectsChannel final : public QWidget {
       QAction* soloLChannelAction,
       QAction* soloRChannelAction
     );
-    ~EffectsChannel();
+    ~EffectsChannel() override;
     void hydrateState(const AppStatePacket& appStatePacket, int newChannelIndex);
     void updateShowRemoveEffectsChannelButton(bool val);
     void setMute(float val);

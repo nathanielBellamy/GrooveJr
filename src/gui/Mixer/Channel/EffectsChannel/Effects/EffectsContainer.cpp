@@ -83,15 +83,9 @@ void EffectsContainer::addEffect(const int newEffectIndex, const std::string plu
   const auto label = new QLabel(this);
   label->setText((std::to_string(newEffectIndex + 1) + ".").data());
   vstWindowSelectLabels.push_back(label);
-}
 
-void EffectsContainer::reset() {
-  clearButtonsAndLabels();
-
-  for (int i = 0; i < mixer->effectsOnChannelCount(channelIndex); i++) {
-    std::string pluginName = mixer->getPluginName(channelIndex, i);
-    addEffect(i, pluginName);
-  }
+  if (isVisible())
+    mixer->initEditorHostOnChannel(channelIndex, newEffectIndex, vstWindow);
 }
 
 void EffectsContainer::clearButtonsAndLabels() {
@@ -114,8 +108,8 @@ void EffectsContainer::initVstWindows() {
     "Created VstWindows for channel: " + std::to_string(channelIndex)
   );
 
-  reset();
-  setupGrid();
+  // setupGrid();
+  // todo: debug oor vec
   mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
   for (auto&& vstWindow : vstWindows) {
     vstWindow->activateWindow();

@@ -140,6 +140,10 @@ void Mixer::initEditorHostsOnChannel(int idx, std::vector<std::shared_ptr<Gui::V
   return effectsChannels.at(idx)->initEditorHosts(vstWindows);
 }
 
+void Mixer::initEditorHostOnChannel(int idx, int newEffectChannel, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+  return effectsChannels.at(idx)->initEditorHost(newEffectChannel, vstWindow);
+}
+
 void Mixer::terminateEditorHostsOnChannel(int idx) const {
   return effectsChannels.at(idx)->terminateEditorHosts();
 }

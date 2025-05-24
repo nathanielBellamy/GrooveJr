@@ -204,6 +204,7 @@ class EffectsChannel {
 
     int effectCount() const;
     void initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
+    void initEditorHost(int effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
     void terminateEditorHosts() const;
 
     bool removeEffect(int effectIdx);

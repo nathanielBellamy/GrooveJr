@@ -137,6 +137,10 @@ void EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstW
 	}
 }
 
+void EffectsChannel::initEditorHost(const int effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+		vst3Plugins.at(effectIndex)->initEditorHost(vstWindow);
+}
+
 void EffectsChannel::terminateEditorHosts() const {
 	for (auto&& plugin : vst3Plugins) {
 		plugin->terminateEditorHost();

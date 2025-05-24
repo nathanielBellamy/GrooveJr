@@ -176,7 +176,6 @@ void EffectsChannel::setupEffectsSlotsScrollArea() {
   effectsSlotsScrollArea.setLayoutDirection(Qt::LeftToRight);
   effectsSlotsScrollArea.setWidget(&effectsSlots);
   effectsSlots.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-
 }
 
 void EffectsChannel::setupTitle() {
@@ -292,10 +291,8 @@ void EffectsChannel::connectActions() {
       mixer->addEffectToChannel(channelIndex, effectPath);
       effectsSlots.addEffectSlot();
       const int newEffectIndex = mixer->effectsOnChannelCount(channelIndex) - 1;
-      std::string name = mixer->getPluginName(channelIndex, newEffectIndex);
+      const std::string name = mixer->getPluginName(channelIndex, newEffectIndex);
       effectsContainer.addEffect(newEffectIndex, name);
-      if (effectsContainer.isVisible())
-        effectsContainer.initVstWindows();
 
       appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
       const scoped_actor self{ actorSystem };
