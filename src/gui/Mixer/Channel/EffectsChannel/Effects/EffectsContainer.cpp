@@ -77,7 +77,24 @@ void EffectsContainer::setupGrid() {
 }
 
 void EffectsContainer::showEvent(QShowEvent *event) {
-  initVstWindows();
+  Logging::write(
+    Info,
+    "EffectsContainer::initVstWindows()",
+    "Created VstWindows for channel: " + std::to_string(channelIndex)
+  );
+
+  setupGrid();
+  mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
+  for (auto&& vstWindow : vstWindows) {
+    vstWindow->activateWindow();
+    vstWindow->raise();
+    vstWindow->show();
+  }
+  Logging::write(
+    Info,
+    "EffectsContainer::initVstWindows()",
+    "Editorhosts initialized for channel: " + std::to_string(channelIndex)
+  );
 }
 
 void EffectsContainer::addEffect(const int newEffectIndex, const std::string pluginName) {
@@ -104,33 +121,7 @@ void EffectsContainer::clearButtonsAndLabels() {
   vstWindowSelectLabels.clear();
 }
 
-
-void EffectsContainer::initVstWindows() {
-  Logging::write(
-    Info,
-    "EffectsContainer::initVstWindows()",
-    "Created VstWindows for channel: " + std::to_string(channelIndex)
-  );
-
-  setupGrid();
-  mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
-  for (auto&& vstWindow : vstWindows) {
-    vstWindow->activateWindow();
-    vstWindow->raise();
-    vstWindow->show();
-  }
-  Logging::write(
-    Info,
-    "EffectsContainer::initVstWindows()",
-    "Editorhosts initialized for channel: " + std::to_string(channelIndex)
-  );
-}
-
 void EffectsContainer::hideEvent(QHideEvent *event) {
-  terminateVstWindows();
-}
-
-void EffectsContainer::terminateVstWindows() {
   mixer->terminateEditorHostsOnChannel(channelIndex);
   for (auto vstWindow : vstWindows) {
     vstWindow->close();

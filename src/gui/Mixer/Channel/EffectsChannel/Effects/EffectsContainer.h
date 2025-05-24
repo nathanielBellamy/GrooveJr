@@ -30,7 +30,6 @@ class EffectsContainer final : public QWidget {
     EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex);
     ~EffectsContainer() override;
     void addEffect(int newEffectIndex, std::string pluginName);
-    void initVstWindows();
 
   private:
     Audio::Mixer* mixer;
@@ -43,7 +42,6 @@ class EffectsContainer final : public QWidget {
 
     void connectActions();
     void clearButtonsAndLabels();
-    void terminateVstWindows();
     void setupGrid();
     void setStyle();
     void showEvent(QShowEvent *event) override;
