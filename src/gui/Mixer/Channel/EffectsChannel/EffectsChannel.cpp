@@ -289,8 +289,15 @@ void EffectsChannel::connectActions() {
         "Adding effect: " + effectPath + " to channel " + std::to_string(channelIndex)
       );
 
-      appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+      mixer->addEffectToChannel(channelIndex, effectPath);
+      effectsSlots.addEffectSlot();
+      const int newEffectIndex = mixer->effectsOnChannelCount(channelIndex) - 1;
+      std::string name = mixer->getPluginName(channelIndex, newEffectIndex);
+      effectsContainer.addEffect(newEffectIndex, name);
+      if (effectsContainer.isVisible())
+        effectsContainer.initVstWindows();
 
+      appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
       const scoped_actor self{ actorSystem };
       self->anon_send(
           actor_cast<actor>(appStateManagerPtr),
@@ -298,8 +305,6 @@ void EffectsChannel::connectActions() {
           effectPath,
           mix_add_effect_to_channel_a_v
       );
-      effectsSlots.addEffectSlot();
-      // todo: addVstWindow to EffectsContainer and re-init editor hosts
     }
   });
 

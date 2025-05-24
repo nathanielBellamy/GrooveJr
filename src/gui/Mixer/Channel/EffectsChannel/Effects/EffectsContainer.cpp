@@ -76,17 +76,21 @@ void EffectsContainer::showEvent(QShowEvent *event) {
   initVstWindows();
 }
 
+void EffectsContainer::addEffect(const int newEffectIndex, const std::string pluginName) {
+  auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, newEffectIndex, pluginName);
+  vstWindows.push_back(std::move(vstWindow));
+  vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, newEffectIndex, pluginName, &selectVstWindowAction));
+  const auto label = new QLabel(this);
+  label->setText((std::to_string(newEffectIndex + 1) + ".").data());
+  vstWindowSelectLabels.push_back(label);
+}
+
 void EffectsContainer::reset() {
   clearButtonsAndLabels();
 
   for (int i = 0; i < mixer->effectsOnChannelCount(channelIndex); i++) {
     std::string pluginName = mixer->getPluginName(channelIndex, i);
-    auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, i, pluginName);
-    vstWindows.push_back(std::move(vstWindow));
-    vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, i, pluginName, &selectVstWindowAction));
-    const auto label = new QLabel(this);
-    label->setText((std::to_string(i + 1) + ".").data());
-    vstWindowSelectLabels.push_back(label);
+    addEffect(i, pluginName);
   }
 }
 

@@ -122,13 +122,13 @@ struct AppStateManagerState {
                "Act::AppStateManager::mix_add_effects_channel_a",
                "Adding Effect " + effectPath + " on channel " + std::to_string(channelIdx)
              );
-             if (!mixer->addEffectToChannel(channelIdx, effectPath)) {
-               Logging::write(
-                 Error,
-                 "Act::AppStateManager::mix_add_effects_channel_a",
-                 "Unable to add effect: " + effectPath + " to channel " + std::to_string(channelIdx)
-               );
-             }
+             // if (!mixer->addEffectToChannel(channelIdx, effectPath)) {
+             //   Logging::write(
+             //     Error,
+             //     "Act::AppStateManager::mix_add_effects_channel_a",
+             //     "Unable to add effect: " + effectPath + " to channel " + std::to_string(channelIdx)
+             //   );
+             // }
              hydrateStateToDisplay();
            },
            [this](const int channelIdx, const int pluginIdx, std::string effectPath, mix_replace_effect_on_channel_a) {
