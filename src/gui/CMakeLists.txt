@@ -49,8 +49,8 @@ qt_add_library(GjGui STATIC
         Mixer/Channel/EffectsChannel/AddEffectsChannelButton.cpp
         Mixer/Channel/EffectsChannel/RemoveEffectsChannelButton.h
         Mixer/Channel/EffectsChannel/RemoveEffectsChannelButton.cpp
-        Mixer/Channel/EffectsChannel/AddEffectSlotButton.h
-        Mixer/Channel/EffectsChannel/AddEffectSlotButton.cpp
+        Mixer/Channel/EffectsChannel/AddEffectButton.h
+        Mixer/Channel/EffectsChannel/AddEffectButton.cpp
         Mixer/Channel/EffectsChannel/RemoveEffectButton.h
         Mixer/Channel/EffectsChannel/RemoveEffectButton.cpp
         Mixer/Channel/EffectsChannel/ReplaceEffectButton.h

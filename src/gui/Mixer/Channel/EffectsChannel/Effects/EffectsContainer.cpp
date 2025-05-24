@@ -7,10 +7,12 @@
 namespace Gj {
 namespace Gui {
 
-EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex)
+EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex, QAction* addEffectAction)
   : QWidget(nullptr)
   , mixer(mixer)
   , channelIndex(channelIndex)
+  , addEffectAction(addEffectAction)
+  , addEffectButton(this, addEffectAction)
   , grid(this)
   {
 
@@ -57,20 +59,22 @@ void EffectsContainer::connectActions() {
   });
 }
 
-
 void EffectsContainer::setStyle() {
   setMinimumSize(QSize(300, 200));
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
   setStyleSheet(
     ("background-color: " + Color::toHex(GjC::DARK_400) + ";").data()
   );
 }
 
 void EffectsContainer::setupGrid() {
+  int j = 0;
   for (int i = 0; i < vstWindowSelectButtons.size(); i++) {
     grid.addWidget(vstWindowSelectLabels.at(i), i, 0, 1, 1);
     grid.addWidget(vstWindowSelectButtons.at(i), i, 1, 1, 1);
+    j++;
   }
+  grid.addWidget(&addEffectButton, j, 0, 1, -1);
 
   grid.setVerticalSpacing(4);
   setLayout(&grid);
@@ -105,8 +109,10 @@ void EffectsContainer::addEffect(const int newEffectIndex, const std::string plu
   label->setText((std::to_string(newEffectIndex + 1) + ".").data());
   vstWindowSelectLabels.push_back(label);
 
-  if (isVisible())
+  if (isVisible()) {
     mixer->initEditorHostOnChannel(channelIndex, newEffectIndex, vstWindows.back());
+    setupGrid();
+  }
 }
 
 void EffectsContainer::clearButtonsAndLabels() {

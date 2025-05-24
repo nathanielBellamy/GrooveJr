@@ -67,11 +67,12 @@ class EffectsChannel final : public QWidget {
     int channelIndex;
     QAction* removeEffectsChannelAction;
     RemoveEffectsChannelButton removeEffectsChannelButton;
+    QAction addEffectAction;
+    AddEffectButton addEffectButton;
     EffectsContainer effectsContainer;
     QAction openEffectsContainer;
     VstSelect vstSelect;
     QUrl vstUrl;
-    QAction addEffectAction;
     QAction replaceEffectAction;
     QAction removeEffectAction;
     QGridLayout grid;
@@ -89,7 +90,6 @@ class EffectsChannel final : public QWidget {
     QSlider panRSlider;
     QLabel  panRLabel;
     EffectsSlots effectsSlots;
-    AddEffectSlotButton addEffectSlotButton;
     QScrollArea effectsSlotsScrollArea;
     MuteSoloContainer muteSoloContainer;
     void setStyle();

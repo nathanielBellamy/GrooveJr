@@ -2,23 +2,23 @@
 // Created by ns on 4/29/25.
 //
 
-#include "AddEffectSlotButton.h"
+#include "AddEffectButton.h"
 
 namespace Gj {
 namespace Gui {
 
-AddEffectSlotButton::AddEffectSlotButton(QWidget* parent, QAction* addEffectAction)
+AddEffectButton::AddEffectButton(QWidget* parent, QAction* addEffectAction)
   : QPushButton("&+", parent)
   , addEffectAction(addEffectAction)
   {
   setStyle();
 }
 
-void AddEffectSlotButton::mousePressEvent(QMouseEvent* event){
+void AddEffectButton::mousePressEvent(QMouseEvent* event){
   addEffectAction->activate(QAction::Trigger);
 }
 
-void AddEffectSlotButton::setStyle(){
+void AddEffectButton::setStyle(){
   setCursor(Qt::PointingHandCursor);
   setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
   setStyleSheet(

@@ -18,6 +18,7 @@
 #include "../../../../Color.h"
 #include "VstWindow.h"
 #include "VstWindowSelectButton.h"
+#include "../AddEffectButton.h"
 #include "../../../../../audio/Mixer.h"
 #include "../../../../../Logging.h"
 
@@ -27,13 +28,15 @@ namespace Gui {
 class EffectsContainer final : public QWidget {
 
   public:
-    EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex);
+    EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex, QAction* addEffectAction);
     ~EffectsContainer() override;
     void addEffect(int newEffectIndex, std::string pluginName);
 
   private:
     Audio::Mixer* mixer;
     int channelIndex;
+    QAction* addEffectAction;
+    AddEffectButton addEffectButton;
     QGridLayout grid;
     std::vector<std::shared_ptr<VstWindow>> vstWindows;
     QAction selectVstWindowAction;

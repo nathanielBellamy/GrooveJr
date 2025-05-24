@@ -27,10 +27,11 @@ EffectsChannel::EffectsChannel(
   , channelIndex(channelIndex)
   , removeEffectsChannelAction(removeEffectsChannelAction)
   , removeEffectsChannelButton(this, channelIndex, removeEffectsChannelAction)
-  , effectsContainer(nullptr, mixer, channelIndex)
+  , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
+  , addEffectButton(this, &addEffectAction)
+  , effectsContainer(nullptr, mixer, channelIndex, &addEffectAction)
   , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Effects"), this)
   , vstSelect(this)
-  , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
   , replaceEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentRevert), tr("&Replace Effect"), this)
   , removeEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Effect"), this)
   , grid(this)
@@ -48,7 +49,6 @@ EffectsChannel::EffectsChannel(
   , panRSlider(Qt::Horizontal, this)
   , panRLabel("PanR", this)
   , effectsSlots(this, actorSystem, mixer, channelIndex, &replaceEffectAction, &removeEffectAction)
-  , addEffectSlotButton(this, &addEffectAction)
   , effectsSlotsScrollArea(this)
   , muteSoloContainer(
     this, &openEffectsContainer,
@@ -100,10 +100,10 @@ void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newC
 
   if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
     removeEffectsChannelButton.setEnabled(false);
-    addEffectSlotButton.setEnabled(false);
+    addEffectButton.setEnabled(false);
   } else {
     removeEffectsChannelButton.setEnabled(true);
-    addEffectSlotButton.setEnabled(true);
+    addEffectButton.setEnabled(true);
   }
 
   if (channelIndex > 0)
@@ -145,7 +145,7 @@ void EffectsChannel::setupGrid() {
   grid.addWidget(&gainRSlider, 1, 2, 3, 1);
   grid.addWidget(&gainRLabel, 4, 2, 1, 1);
   grid.addWidget(&effectsSlotsScrollArea, 1, 3, 1, 1);
-  grid.addWidget(&addEffectSlotButton, 2, 3, 1, 1);
+  grid.addWidget(&addEffectButton, 2, 3, 1, 1);
   // grid.addWidget(&panSlider, 2, 3, 1, 1);
   // grid.addWidget(&panLabel, 2, 4, 1, 1);
   grid.addWidget(&panLSlider, 3, 3, 1, 1);

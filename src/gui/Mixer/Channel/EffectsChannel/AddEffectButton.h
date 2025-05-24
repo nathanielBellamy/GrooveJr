@@ -14,9 +14,9 @@
 namespace Gj {
 namespace Gui {
 
-class AddEffectSlotButton final : public QPushButton {
+class AddEffectButton final : public QPushButton {
   public:
-    AddEffectSlotButton(QWidget* parent, QAction* addEffectAction);
+    AddEffectButton(QWidget* parent, QAction* addEffectAction);
 
   private:
     QAction* addEffectAction;
