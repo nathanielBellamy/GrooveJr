@@ -132,23 +132,23 @@ bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) con
   return effectsChannels.at(idx)->addReplaceEffect(-1, effectPath);
 }
 
-int Mixer::effectsOnChannelCount(int idx) const {
+int Mixer::effectsOnChannelCount(const int idx) const {
   return effectsChannels.at(idx)->effectCount();
 }
 
-void Mixer::initEditorHostsOnChannel(int idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
+void Mixer::initEditorHostsOnChannel(const int idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
   return effectsChannels.at(idx)->initEditorHosts(vstWindows);
 }
 
-void Mixer::initEditorHostOnChannel(int idx, int newEffectChannel, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+void Mixer::initEditorHostOnChannel(const int idx, const int newEffectChannel, std::shared_ptr<Gui::VstWindow> vstWindow) const {
   return effectsChannels.at(idx)->initEditorHost(newEffectChannel, vstWindow);
 }
 
-void Mixer::terminateEditorHostsOnChannel(int idx) const {
+void Mixer::terminateEditorHostsOnChannel(const int idx) const {
   return effectsChannels.at(idx)->terminateEditorHosts();
 }
 
-bool Mixer::replaceEffectOnChannel(int channelIdx, int effectIdx, std::string effectPath) const {
+bool Mixer::replaceEffectOnChannel(const int channelIdx, const int effectIdx, std::string effectPath) const {
   return effectsChannels.at(channelIdx)->addReplaceEffect(effectIdx, effectPath);
 }
 

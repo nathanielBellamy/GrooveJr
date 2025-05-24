@@ -35,6 +35,10 @@ EffectsContainer::~EffectsContainer() {
   );
 
   clearButtonsAndLabels();
+  mixer->terminateEditorHostsOnChannel(channelIndex);
+  for (auto vstWindow : vstWindows) {
+    vstWindow->close();
+  }
 
   Logging::write(
     Info,
@@ -108,8 +112,7 @@ void EffectsContainer::initVstWindows() {
     "Created VstWindows for channel: " + std::to_string(channelIndex)
   );
 
-  // setupGrid();
-  // todo: debug oor vec
+  setupGrid();
   mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
   for (auto&& vstWindow : vstWindows) {
     vstWindow->activateWindow();
@@ -131,9 +134,7 @@ void EffectsContainer::terminateVstWindows() {
   mixer->terminateEditorHostsOnChannel(channelIndex);
   for (auto vstWindow : vstWindows) {
     vstWindow->close();
-    vstWindow.reset();
   }
-  vstWindows.clear();
 }
 
 } // Gui
