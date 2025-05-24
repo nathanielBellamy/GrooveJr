@@ -288,7 +288,13 @@ void EffectsChannel::connectActions() {
         "Adding effect: " + effectPath + " to channel " + std::to_string(channelIndex)
       );
 
-      mixer->addEffectToChannel(channelIndex, effectPath);
+      if (!mixer->addEffectToChannel(channelIndex, effectPath)) {
+        Logging::write(
+          Error,
+          "Gui::EffectsChannel::addEffectAction",
+          "Unable to add effect " + effectPath + " to channel " + std::to_string(channelIndex)
+        );
+      }
       effectsSlots.addEffectSlot();
       const int newEffectIndex = mixer->effectsOnChannelCount(channelIndex) - 1;
       const std::string name = mixer->getPluginName(channelIndex, newEffectIndex);

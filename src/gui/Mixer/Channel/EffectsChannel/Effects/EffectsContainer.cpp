@@ -106,7 +106,7 @@ void EffectsContainer::addEffect(const int newEffectIndex, const std::string plu
   vstWindowSelectLabels.push_back(label);
 
   if (isVisible())
-    mixer->initEditorHostOnChannel(channelIndex, newEffectIndex, vstWindow);
+    mixer->initEditorHostOnChannel(channelIndex, newEffectIndex, vstWindows.back());
 }
 
 void EffectsContainer::clearButtonsAndLabels() {
