@@ -86,6 +86,25 @@ void initVst3PluginContext() {
     PluginContextFactory::instance().setPluginContext (PluginContext);
 }
 
+void initSql() {
+  const std::filesystem::path cwd = std::filesystem::current_path();
+  const std::string db_name = cwd.string() + "/groovejr.db";
+  sqlite3* db;
+
+  if (sqlite3_open(db_name.c_str(), &db)) {
+    Logging::write(
+      Critical,
+      "main::initSql",
+      "Unable to init groovejr.db"
+    );
+  } else {
+    Logging::write(
+      Info,
+      "main::initSql",
+      "Initialized groovejr.db"
+    );
+  }
+}
 
 extern "C" {
     int main(int argc, char *argv[]) {
@@ -103,6 +122,9 @@ extern "C" {
           "main",
           "== GrooveJr =="
         );
+
+        // setup Sql
+        initSql();
 
         // setup Audio
         initVst3PluginContext();

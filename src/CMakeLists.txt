@@ -49,6 +49,9 @@ set (CAF_ROOT
 find_package (CAF
         REQUIRED)
 
+# setup SQLite
+find_package(SQLite3 REQUIRED)
+
 # setup local libraries
 add_subdirectory(
     /Users/ns/code/GrooveJr/src/audio
@@ -88,6 +91,7 @@ target_link_libraries(GrooveJr
         Qt6::Gui
         Boost::log
         ${Boost_LIBRARIES}
+        SQLite::SQLite3
 )
 target_compile_options(GrooveJr PRIVATE ${INCLUDE_FLAGS})
 set_target_properties(GrooveJr PROPERTIES LINKER_LANGUAGE CXX)

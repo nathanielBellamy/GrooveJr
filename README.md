@@ -11,7 +11,7 @@
 ### MacOs Build (Dev Build)
 
 - ```bash
-  brew install boost cmake jack blackhole-2ch libsndfile
+  brew install boost cmake jack blackhole-2ch libsndfile sqlite
   git clone git@github.com:nathanielBellamy/GrooveJr.git 
   cd GrooveJr/src
   vim CMakeLists.txt

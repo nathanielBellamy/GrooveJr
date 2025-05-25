@@ -8,12 +8,15 @@
 #include <thread>
 #include <signal.h>
 #include <unordered_map>
+#include <filesystem>
 
 #include "caf/actor_from_state.hpp"
 #include "caf/actor_ostream.hpp"
 #include "caf/actor_system.hpp"
 #include "caf/caf_main.hpp"
 #include "caf/event_based_actor.hpp"
+
+#include <sqlite3.h>
 
 #include "./messaging/atoms.h"
 #include "./actors/Supervisor.h"
