@@ -61,22 +61,25 @@ void EffectsContainer::connectActions() {
 
 void EffectsContainer::setStyle() {
   setMinimumSize(QSize(300, 200));
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+  setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
   setStyleSheet(
     ("background-color: " + Color::toHex(GjC::DARK_400) + ";").data()
   );
 }
 
 void EffectsContainer::setupGrid() {
+  grid.setVerticalSpacing(10);
+
   int j = 0;
   for (int i = 0; i < vstWindowSelectButtons.size(); i++) {
+    grid.setRowMinimumHeight(i, 50);
     grid.addWidget(vstWindowSelectLabels.at(i), i, 0, 1, 1);
     grid.addWidget(vstWindowSelectButtons.at(i), i, 1, 1, 1);
     j++;
   }
+  grid.setRowMinimumHeight(j, 50);
   grid.addWidget(&addEffectButton, j, 0, 1, -1);
 
-  grid.setVerticalSpacing(4);
   setLayout(&grid);
 }
 
@@ -112,6 +115,9 @@ void EffectsContainer::addEffect(const int newEffectIndex, const std::string plu
   if (isVisible()) {
     mixer->initEditorHostOnChannel(channelIndex, newEffectIndex, vstWindows.back());
     setupGrid();
+    resize(width(), height() + 40);
+    activateWindow();
+    raise();
   }
 }
 

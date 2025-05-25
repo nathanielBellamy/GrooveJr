@@ -13,7 +13,8 @@ VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const int effectIn
   , selectAction(selectAction)
   {
   setCursor(Qt::PointingHandCursor);
-  setFixedHeight(40);
+  setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  setMinimumHeight(40);
   setMinimumWidth(200);
   setStyleSheet("padding: 5px;");
 }

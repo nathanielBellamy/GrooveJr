@@ -31,7 +31,6 @@ CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, A
 }
 
 void CurrentlyPlaying::setStyle() {
-  setStyleSheet("background-color: blue;");
 }
 
 void CurrentlyPlaying::hydrateState(const AppStatePacket& appStatePacket) {

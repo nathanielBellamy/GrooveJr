@@ -124,7 +124,8 @@ void EffectsChannel::updateShowRemoveEffectsChannelButton(bool val) {
 }
 
 void EffectsChannel::setStyle() {
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  setFixedHeight(340);
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   setStyleSheet(
     ("background-color: " + Color::toHex(GjC::LIGHT_300)).data()
   );
@@ -145,14 +146,14 @@ void EffectsChannel::setupGrid() {
   grid.addWidget(&gainRSlider, 1, 2, 3, 1);
   grid.addWidget(&gainRLabel, 4, 2, 1, 1);
   grid.addWidget(&effectsSlotsScrollArea, 1, 3, 1, 1);
-  grid.addWidget(&addEffectButton, 2, 3, 1, 1);
+  grid.addWidget(&addEffectButton, 1, 4, 1, 1);
   // grid.addWidget(&panSlider, 2, 3, 1, 1);
   // grid.addWidget(&panLabel, 2, 4, 1, 1);
-  grid.addWidget(&panLSlider, 3, 3, 1, 1);
-  grid.addWidget(&panLLabel, 3, 4, 1, 1);
-  grid.addWidget(&panRSlider, 4, 3, 1, 1);
-  grid.addWidget(&panRLabel, 4, 4, 1, 1);
-  grid.addWidget(&muteSoloContainer, 5, 0, 1, -1);
+  grid.addWidget(&panLSlider, 2, 3, 1, 1);
+  grid.addWidget(&panLLabel, 2, 4, 1, 1);
+  grid.addWidget(&panRSlider, 3, 3, 1, 1);
+  grid.addWidget(&panRLabel, 3, 4, 1, 1);
+  grid.addWidget(&muteSoloContainer, 4, 0, 1, -1);
 
   grid.setVerticalSpacing(2);
   grid.setHorizontalSpacing(2);
