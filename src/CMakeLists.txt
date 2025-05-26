@@ -80,6 +80,8 @@ add_executable(GrooveJr
         gui/MainToolbar/TransportControl.cpp
         gui/MainToolbar/TransportControl.h
         actors/Display.h
+        db/Database.h
+        db/Database.cpp
 )
 target_link_libraries(GrooveJr
         PUBLIC

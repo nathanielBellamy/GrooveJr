@@ -14,7 +14,7 @@ namespace Gj {
 Audio::Effects::Vst3::Host::App* PluginContext;
 AppState* gAppState;
 Audio::Mixer* Mixer;
-sqlite3* DB;
+Db::Database* Database;
 
 void shutdown_handler(const int sig) {
   Logging::write(
@@ -88,22 +88,6 @@ void initVst3PluginContext() {
 }
 
 void initSql() {
-  const std::filesystem::path cwd = std::filesystem::current_path();
-  const std::string db_name = cwd.string() + "/groovejr.db";
-
-  if (sqlite3_open(db_name.c_str(), &DB)) {
-    Logging::write(
-      Critical,
-      "main::initSql",
-      "Unable to init groovejr.db"
-    );
-  } else {
-    Logging::write(
-      Info,
-      "main::initSql",
-      "Initialized groovejr.db"
-    );
-  }
 }
 
 extern "C" {
@@ -124,7 +108,7 @@ extern "C" {
         );
 
         // setup Sql
-        initSql();
+        Database = new Db::Database();
 
         // setup Audio
         initVst3PluginContext();
