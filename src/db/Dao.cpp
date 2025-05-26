@@ -10,8 +10,8 @@ namespace Db {
 Dao::Dao()
   : trackRepository(&db)
   {
-  if (init() == 0) {
-    if (provision() == 0) {
+  if (initDb() == 0) {
+    if (initSchema() == 0) {
       insertTestData();
       const auto res = trackRepository.getAll();
     }
@@ -23,7 +23,7 @@ Dao::~Dao() {
 //  delete db;
 }
 
-int Dao::init() {
+int Dao::initDb() {
   const std::filesystem::path cwd = std::filesystem::current_path();
   const std::string db_name = cwd.string() + "/groovejr.db";
 
@@ -44,8 +44,17 @@ int Dao::init() {
   return 0;
 }
 
-int Dao::provision() const {
-  std::string query = R"sql(
+int Dao::initSchema() const {
+  const std::string query = R"sql(
+    create table if not exists effects (
+      id integer primary key autoincrement,
+      file_path text not null,
+      name text not null,
+      state numeric,
+      channel_index integer not null,
+      effect_index integer not null
+    );
+
     create table if not exists tracks (
       id integer primary key autoincrement,
       file_path text not null,
@@ -55,7 +64,6 @@ int Dao::provision() const {
       sf_channels integer not null,
       created_at datetime default current_timestamp
     );
-
   )sql";
 
   if (sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr) != SQLITE_OK) {
@@ -76,7 +84,7 @@ int Dao::provision() const {
 }
 
 void Dao::insertTestData() const {
-  std::string query = R"sql(
+  const std::string query = R"sql(
     insert into tracks (file_path, title, sf_frames, sf_samplerate, sf_channels)
     values (
       '/foo.flac',

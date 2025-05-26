@@ -26,8 +26,8 @@ class Dao {
 
     Dao();
     ~Dao();
-    int init();
-    int provision() const;
+    int initDb();
+    int initSchema() const;
     void insertTestData() const;
 };
 
