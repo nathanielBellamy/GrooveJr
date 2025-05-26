@@ -21,8 +21,9 @@ class Database {
   public:
     Database();
     ~Database();
-    void init();
-    void provision();
+    int init();
+    int provision();
+    void insertTestData();
 };
 
 } // Db

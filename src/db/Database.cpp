@@ -8,15 +8,19 @@ namespace Gj {
 namespace Db {
 
 Database::Database() {
-  init();
-  provision();
+  if (init() == 0) {
+    if (provision() == 0) {
+      insertTestData();
+    }
+  }
 }
 
 Database::~Database() {
-  delete db;
+// TODO: debug warning about deleting forward decl
+//  delete db;
 }
 
-void Database::init() {
+int Database::init() {
   const std::filesystem::path cwd = std::filesystem::current_path();
   const std::string db_name = cwd.string() + "/groovejr.db";
 
@@ -26,16 +30,18 @@ void Database::init() {
       "main::initSql",
       "Unable to init groovejr.db"
     );
-  } else {
-    Logging::write(
-      Info,
-      "main::initSql",
-      "Initialized groovejr.db"
-    );
+    return 1;
   }
+
+  Logging::write(
+    Info,
+    "main::initSql",
+    "Initialized groovejr.db"
+  );
+  return 0;
 }
 
-void Database::provision() {
+int Database::provision() {
   std::string query = R"sql(
     create table if not exists tracks (
       id integer primary key autoincrement,
@@ -45,31 +51,53 @@ void Database::provision() {
       sf_samplerate integer not null,
       sf_channels integer not null,
       created_at datetime default current_timestamp
-    )
+    );
 
-    insert into tracks (file_path, title, sf_frames, sf_samplerate, sf_channels)
-    values (
-      '/Users/ns/Music/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac',
-      'Love is a Losing Game',
-      1234,
-      44100,
-      2
-    )
   )sql";
 
   if (sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr) != SQLITE_OK) {
     Logging::write(
         Critical,
         "Db::Database::provision",
-        "Unable to provision the database: " + std::string(sqlite3_errmsg(db))
+        "Unable to provision the database. Message: " + std::string(sqlite3_errmsg(db))
     );
-  } else {
+    return 1;
+  }
+
+  Logging::write(
+      Critical,
+      "Db::Database::provision",
+      "Provisioned the database."
+  );
+  return 0;
+}
+
+void Database::insertTestData() {
+  std::string query = R"sql(
+    insert into tracks (file_path, title, sf_frames, sf_samplerate, sf_channels)
+    values (
+      '/foo.flac',
+      'Foo Bar',
+      310310,
+      44100,
+      2
+    );
+  )sql";
+
+
+  if (sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr) != SQLITE_OK) {
     Logging::write(
         Critical,
-        "Db::Database::provision",
-        "Provisioned the database."
+        "Db::Database::insertTestData",
+        "Unable to insert test data into the database. Message: " + std::string(sqlite3_errmsg(db))
     );
   }
+
+  Logging::write(
+      Critical,
+      "Db::Database::insertTestData",
+      "Inserted test data in the database."
+  );
 }
 
 } // Db
