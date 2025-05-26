@@ -80,8 +80,8 @@ add_executable(GrooveJr
         gui/MainToolbar/TransportControl.cpp
         gui/MainToolbar/TransportControl.h
         actors/Display.h
-        db/Database.h
-        db/Database.cpp
+        db/Dao.h
+        db/Dao.cpp
         db/entity/Track.h
         db/entity/Track.cpp
         db/repository/TrackRepository.h

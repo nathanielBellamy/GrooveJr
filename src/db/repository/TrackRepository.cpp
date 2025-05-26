@@ -29,11 +29,9 @@ std::vector<Track> TrackRepository::getAll() const {
   }
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
-    int id = sqlite3_column_int(stmt, 0);
-    const unsigned char* filePath = sqlite3_column_text(stmt, 1);
-    const unsigned char* title = sqlite3_column_text(stmt, 2);
-
-    std::cout << "Row: ID = " << id << ", filePath = " << (filePath ? reinterpret_cast<const char*>(filePath) : "NULL") << '\n';
+    const Track track = Track::deser(stmt);
+    std::cout << "Row: ID = " << track.id << ", filePath = " << track.filePath << ", title = " << track.title << std::endl;
+    tracks.push_back(track);
   }
 
   return tracks;

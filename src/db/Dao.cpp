@@ -2,12 +2,12 @@
 // Created by ns on 5/25/25.
 //
 
-#include "Database.h"
+#include "Dao.h"
 
 namespace Gj {
 namespace Db {
 
-Database::Database()
+Dao::Dao()
   : trackRepository(&db)
   {
   if (init() == 0) {
@@ -18,12 +18,12 @@ Database::Database()
   }
 }
 
-Database::~Database() {
+Dao::~Dao() {
 // TODO: debug warning about deleting forward decl
 //  delete db;
 }
 
-int Database::init() {
+int Dao::init() {
   const std::filesystem::path cwd = std::filesystem::current_path();
   const std::string db_name = cwd.string() + "/groovejr.db";
 
@@ -44,7 +44,7 @@ int Database::init() {
   return 0;
 }
 
-int Database::provision() {
+int Dao::provision() const {
   std::string query = R"sql(
     create table if not exists tracks (
       id integer primary key autoincrement,
@@ -75,7 +75,7 @@ int Database::provision() {
   return 0;
 }
 
-void Database::insertTestData() {
+void Dao::insertTestData() const {
   std::string query = R"sql(
     insert into tracks (file_path, title, sf_frames, sf_samplerate, sf_channels)
     values (

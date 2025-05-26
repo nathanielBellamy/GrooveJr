@@ -7,10 +7,12 @@
 
 #include <string>
 
+#include <sqlite3.h>
+
 namespace Gj {
 namespace Db {
 
-class Track {
+struct Track {
   int id;
   std::string filePath;
   std::string title;
@@ -18,8 +20,8 @@ class Track {
   int sf_samplerate;
   int sf_channels;
 
-  public:
-    Track();
+  Track(int id, std::string filePath, std::string title);
+  static Track deser(sqlite3_stmt* stmt);
 };
 
 } // Db

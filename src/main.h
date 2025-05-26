@@ -32,7 +32,7 @@
 #include "./AppState.h"
 #include "./enums/PlayState.h"
 
-#include "./db/Database.h"
+#include "./db/Dao.h"
 
 namespace Gj {
 

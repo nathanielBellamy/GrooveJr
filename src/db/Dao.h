@@ -17,18 +17,18 @@
 namespace Gj {
 namespace Db {
 
-class Database {
+class Dao {
 
   sqlite3* db;
 
   public:
     TrackRepository trackRepository;
 
-    Database();
-    ~Database();
+    Dao();
+    ~Dao();
     int init();
-    int provision();
-    void insertTestData();
+    int provision() const;
+    void insertTestData() const;
 };
 
 } // Db

@@ -14,7 +14,7 @@ namespace Gj {
 Audio::Effects::Vst3::Host::App* PluginContext;
 AppState* gAppState;
 Audio::Mixer* Mixer;
-Db::Database* Database;
+Db::Dao* Dao;
 
 void shutdown_handler(const int sig) {
   Logging::write(
@@ -108,7 +108,7 @@ extern "C" {
         );
 
         // setup Sql
-        Database = new Db::Database();
+        Dao = new Db::Dao();
 
         // setup Audio
         initVst3PluginContext();
