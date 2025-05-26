@@ -13,7 +13,7 @@ TrackRepository::TrackRepository(sqlite3** db)
 
 std::vector<Track> TrackRepository::getAll() const {
   std::vector<Track> tracks;
-  std::string query = R"sql(
+  const std::string query = R"sql(
     select * from tracks;
   )sql";
 
@@ -29,7 +29,7 @@ std::vector<Track> TrackRepository::getAll() const {
   }
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
-    const Track track = Track::deser(stmt);
+    const auto track = Track::deser(stmt);
     std::cout << "Row: ID = " << track.id << ", filePath = " << track.filePath << ", title = " << track.title << std::endl;
     tracks.push_back(track);
   }

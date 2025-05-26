@@ -46,6 +46,13 @@ void shutdown_handler(const int sig) {
     "Deleted PluginContext"
   );
 
+  delete Dao;
+  Logging::write(
+    Info,
+    "shutdown_handler",
+    "Deleted Dao"
+  );
+
   Logging::write(
     Info,
     "shutdown_handler",

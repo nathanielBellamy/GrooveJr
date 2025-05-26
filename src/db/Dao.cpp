@@ -8,12 +8,14 @@ namespace Gj {
 namespace Db {
 
 Dao::Dao()
-  : trackRepository(&db)
+  : effectRepository(&db)
+  , trackRepository(&db)
   {
   if (initDb() == 0) {
     if (initSchema() == 0) {
       insertTestData();
-      const auto res = trackRepository.getAll();
+      const auto resTrack = trackRepository.getAll();
+      const auto resEffect = effectRepository.getAll();
     }
   }
 }
@@ -49,10 +51,12 @@ int Dao::initSchema() const {
     create table if not exists effects (
       id integer primary key autoincrement,
       file_path text not null,
+      format text not null,
       name text not null,
       state numeric,
       channel_index integer not null,
-      effect_index integer not null
+      effect_index integer not null,
+      version integer not null
     );
 
     create table if not exists tracks (
@@ -85,6 +89,16 @@ int Dao::initSchema() const {
 
 void Dao::insertTestData() const {
   const std::string query = R"sql(
+    insert into effects (file_path, format, name, channel_index, effect_index, version)
+    values (
+      '/Library/Audio/Plug-Ins/VST3/FooEffect.vst3',
+      'vst3',
+      'Foo Bar',
+      1,
+      0,
+      3
+    );
+
     insert into tracks (file_path, title, sf_frames, sf_samplerate, sf_channels)
     values (
       '/foo.flac',

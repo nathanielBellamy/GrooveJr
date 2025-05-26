@@ -12,6 +12,7 @@
 
 #include "../Logging.h"
 
+#include "./repository/EffectRepository.h"
 #include "./repository/TrackRepository.h"
 
 namespace Gj {
@@ -22,6 +23,7 @@ class Dao {
   sqlite3* db;
 
   public:
+    EffectRepository effectRepository;
     TrackRepository trackRepository;
 
     Dao();

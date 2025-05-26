@@ -16,12 +16,14 @@ struct Effect {
 
   int id;
   std::string filePath;
+  std::string format;
   std::string name;
   int state; // TODO
   int channelIndex;
   int effectIndex;
+  int version;
 
-  Effect(int id, std::string filePath, std::string name, int state, int channelIndex, int effectIndex);
+  Effect(int id, const std::string& filePath, const std::string& format, const std::string& name, int state, int channelIndex, int effectIndex, int version);
   static Effect deser(sqlite3_stmt* stmt);
 };
 
