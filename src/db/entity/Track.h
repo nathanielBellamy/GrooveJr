@@ -20,7 +20,7 @@ struct Track {
   int sf_samplerate;
   int sf_channels;
 
-  Track(int id, std::string filePath, std::string title);
+  Track(int id, const std::string& filePath, const std::string& title);
   static Track deser(sqlite3_stmt* stmt);
 };
 
