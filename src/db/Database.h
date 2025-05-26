@@ -5,11 +5,14 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
+#include <iostream>
 #include <filesystem>
 
 #include <sqlite3.h>
 
 #include "../Logging.h"
+
+#include "./repository/TrackRepository.h"
 
 namespace Gj {
 namespace Db {
@@ -19,6 +22,8 @@ class Database {
   sqlite3* db;
 
   public:
+    TrackRepository trackRepository;
+
     Database();
     ~Database();
     int init();

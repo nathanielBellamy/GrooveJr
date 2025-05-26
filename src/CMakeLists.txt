@@ -82,6 +82,10 @@ add_executable(GrooveJr
         actors/Display.h
         db/Database.h
         db/Database.cpp
+        db/entity/Track.h
+        db/entity/Track.cpp
+        db/repository/TrackRepository.h
+        db/repository/TrackRepository.cpp
 )
 target_link_libraries(GrooveJr
         PUBLIC

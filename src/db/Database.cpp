@@ -7,10 +7,13 @@
 namespace Gj {
 namespace Db {
 
-Database::Database() {
+Database::Database()
+  : trackRepository(&db)
+  {
   if (init() == 0) {
     if (provision() == 0) {
       insertTestData();
+      const auto res = trackRepository.getAll();
     }
   }
 }
@@ -83,7 +86,6 @@ void Database::insertTestData() {
       2
     );
   )sql";
-
 
   if (sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr) != SQLITE_OK) {
     Logging::write(
