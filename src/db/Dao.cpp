@@ -53,10 +53,6 @@ int Dao::initSchema() const {
       name text not null
     );
 
-    create table if not exists scene_to_effects (
-      -- join table
-    );
-
     create table if not exists effects (
       id integer primary key autoincrement,
       file_path text not null,
@@ -65,8 +61,15 @@ int Dao::initSchema() const {
       state numeric,
       channel_index integer not null,
       effect_index integer not null,
-      scene_id integer not null,
       version integer not null
+    );
+
+    create table if not exists scene_to_effects (
+      scene_id integer not null,
+      effect_id integer not null,
+      primary key (scene_id, effect_id),
+      foreign key (scene_id) references scenes(id) on delete cascade,
+      foreign key (effect_id) references effects(id) on delete cascade
     );
 
     create table if not exists tracks (

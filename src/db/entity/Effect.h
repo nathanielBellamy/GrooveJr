@@ -21,7 +21,6 @@ struct Effect {
   int state; // TODO
   int channelIndex;
   int effectIndex;
-  int sceneId;
   int version;
 
   Effect(
@@ -32,9 +31,9 @@ struct Effect {
     int state,
     int channelIndex,
     int effectIndex,
-    int sceneId,
     int version
   );
+
   Effect(
     const std::string& filePath,
     const std::string& format,
@@ -42,7 +41,6 @@ struct Effect {
     int state,
     int channelIndex,
     int effectIndex,
-    int sceneId,
     int version
   );
   static Effect deser(sqlite3_stmt* stmt);

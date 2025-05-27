@@ -19,7 +19,7 @@ class EffectRepository {
   sqlite3** db;
 
   public:
-    EffectRepository(sqlite3** db);
+    explicit EffectRepository(sqlite3** db);
     std::vector<Effect> getAll() const;
     int save(Effect effect) const;
 };
