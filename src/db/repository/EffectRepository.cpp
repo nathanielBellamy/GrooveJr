@@ -38,5 +38,13 @@ std::vector<Effect> EffectRepository::getAll() const {
   return effects;
 }
 
+int EffectRepository::save(Effect effect) const {
+  const std::string query = R"sql(
+    insert into effects (
+  )sql";
+
+
+}
+
 } // Db
 } // Gj

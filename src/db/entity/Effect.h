@@ -14,16 +14,37 @@ namespace Db {
 
 struct Effect {
 
-  int id;
+  int id = 0;
   std::string filePath;
   std::string format;
   std::string name;
   int state; // TODO
   int channelIndex;
   int effectIndex;
+  int sceneId;
   int version;
 
-  Effect(int id, const std::string& filePath, const std::string& format, const std::string& name, int state, int channelIndex, int effectIndex, int version);
+  Effect(
+    int id,
+    const std::string& filePath,
+    const std::string& format,
+    const std::string& name,
+    int state,
+    int channelIndex,
+    int effectIndex,
+    int sceneId,
+    int version
+  );
+  Effect(
+    const std::string& filePath,
+    const std::string& format,
+    const std::string& name,
+    int state,
+    int channelIndex,
+    int effectIndex,
+    int sceneId,
+    int version
+  );
   static Effect deser(sqlite3_stmt* stmt);
 };
 

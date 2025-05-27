@@ -48,6 +48,15 @@ int Dao::initDb() {
 
 int Dao::initSchema() const {
   const std::string query = R"sql(
+    create table if not exists scenes (
+      id integer primary key autoincrement,
+      name text not null
+    );
+
+    create table if not exists scene_to_effects (
+      -- join table
+    );
+
     create table if not exists effects (
       id integer primary key autoincrement,
       file_path text not null,
@@ -56,6 +65,7 @@ int Dao::initSchema() const {
       state numeric,
       channel_index integer not null,
       effect_index integer not null,
+      scene_id integer not null,
       version integer not null
     );
 

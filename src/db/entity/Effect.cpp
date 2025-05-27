@@ -15,6 +15,7 @@ Effect::Effect(
     const int state,
     const int channelIndex,
     const int effectIndex,
+    const int sceneId,
     const int version
   )
   : id(id)
@@ -24,6 +25,27 @@ Effect::Effect(
   , state(state)
   , channelIndex(channelIndex)
   , effectIndex(effectIndex)
+  , sceneId(sceneId)
+  , version(version)
+  {}
+
+Effect::Effect(
+    const std::string& filePath,
+    const std::string& format,
+    const std::string& name,
+    const int state,
+    const int channelIndex,
+    const int effectIndex,
+    const int sceneId,
+    const int version
+  )
+  : filePath(filePath)
+  , format(format)
+  , name(name)
+  , state(state)
+  , channelIndex(channelIndex)
+  , effectIndex(effectIndex)
+  , sceneId(sceneId)
   , version(version)
   {}
 
@@ -35,7 +57,8 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
   const int state = sqlite3_column_int(stmt, 4);
   const int channelIndex = sqlite3_column_int(stmt, 5);
   const int effectIndex = sqlite3_column_int(stmt, 6);
-  const int version = sqlite3_column_int(stmt, 7);
+  const int sceneId = sqlite3_column_int(stmt, 7);
+  const int version = sqlite3_column_int(stmt, 8);
 
   return Effect(
     id,
@@ -45,6 +68,7 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
     state,
     channelIndex,
     effectIndex,
+    sceneId,
     version
   );
 }
