@@ -87,7 +87,7 @@ struct AppStateManagerState {
         : self(self)
         , gAppState(gAppState)
         , mixer(mixer)
-        , appState(AppState { gAppState->audioFramesPerBuffer, gAppState->playState } )
+        , appState(AppState { gAppState->audioFramesPerBuffer, gAppState->playState, gAppState->sceneId } )
         {
            self->link_to(supervisor);
            self->system().registry().put(APP_STATE_MANAGER, actor_cast<strong_actor_ptr>(self));

@@ -12,6 +12,7 @@ namespace Gj {
 struct AppStatePacket {
     int audioFramesPerBuffer;
     int playState;
+    int sceneId;
 };
 
 template <class Inspector>
@@ -19,21 +20,19 @@ bool inspect(Inspector& f, AppStatePacket& x) {
     return f.object(x).fields(f.field("", x.playState));
 }
 
-class AppState {
+struct AppState {
+  AppState(int audioFramesPerBuffer, PlayState playState, int sceneId);
+  int audioFramesPerBuffer;
+  PlayState playState;
+  int sceneId;
 
-  public:
-    AppState(int audioFramesPerBuffer, PlayState playState);
-    int audioFramesPerBuffer;
-    PlayState playState;
+  AppStatePacket toPacket() const;
+  // TODO?
+  static AppState fromPacket(const AppStatePacket& packet);
 
-
-    AppStatePacket toPacket() const;
-     // TODO?
-    static AppState fromPacket(const AppStatePacket& packet);
-
-    // mutations
-    static AppState setAudioFramesPerBuffer(AppState appState, int audioFramesPerBuffer);
-    static AppState setPlayState(AppState appState, PlayState playState);
+  // mutations
+  static AppState setAudioFramesPerBuffer(AppState appState, int audioFramesPerBuffer);
+  static AppState setPlayState(AppState appState, PlayState playState);
 };
 
 } // Gj

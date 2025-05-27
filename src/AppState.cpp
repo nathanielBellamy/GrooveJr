@@ -6,28 +6,31 @@
 
 namespace Gj {
 
-AppState::AppState(int audioFramesPerBuffer, PlayState playState)
+AppState::AppState(const int audioFramesPerBuffer, const PlayState playState, const int sceneId)
   : audioFramesPerBuffer(audioFramesPerBuffer)
   , playState(playState)
+  , sceneId(sceneId)
   {}
 
-AppState AppState::setAudioFramesPerBuffer(const AppState appState, int audioFramesPerBuffer) {
+AppState AppState::setAudioFramesPerBuffer(const AppState appState, const int audioFramesPerBuffer) {
   const AppState newState = {
     audioFramesPerBuffer,
-    appState.playState
+    appState.playState,
+    appState.sceneId
   };
   return newState;
 }
 
-AppState AppState::setPlayState(const AppState appState, Gj::PlayState playState) {
-  const AppState newState { appState.audioFramesPerBuffer, playState };
+AppState AppState::setPlayState(const AppState appState, const PlayState playState) {
+  const AppState newState { appState.audioFramesPerBuffer, playState, appState.sceneId };
   return newState;
 };
 
 AppStatePacket AppState::toPacket() const {
-    AppStatePacket packet {
+    const AppStatePacket packet {
       audioFramesPerBuffer,
-      psToInt(playState)
+      psToInt(playState),
+      sceneId
     };
     return packet;
 }
@@ -35,7 +38,8 @@ AppStatePacket AppState::toPacket() const {
 AppState AppState::fromPacket(const AppStatePacket& packet) {
   const AppState appState {
       packet.audioFramesPerBuffer,
-      intToPs(packet.playState)
+      intToPs(packet.playState),
+      packet.sceneId
     };
     return appState;
 };
