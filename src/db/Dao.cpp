@@ -130,8 +130,12 @@ void Dao::insertTestData() const {
     );
   }
 
+  effectRepository.save(
+    Effect("/Library/Audio/Plug-Ins/VST3/BarEffect.vst3", "vst3", "Bar Bar", 1234, 2, 0, 3)
+  );
+
   Logging::write(
-      Critical,
+      Info,
       "Db::Database::insertTestData",
       "Inserted test data in the database."
   );

@@ -34,7 +34,7 @@ struct Effect {
     int version
   );
 
-  Effect(
+  explicit Effect(
     const std::string& filePath,
     const std::string& format,
     const std::string& name,
