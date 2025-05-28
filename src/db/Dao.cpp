@@ -56,31 +56,32 @@ int Dao::initSchema() const {
 
     create table if not exists effects (
       id integer primary key autoincrement,
-      file_path text not null,
+      filePath text not null,
       format text not null,
       name text not null,
       state numeric,
-      channel_index integer not null,
-      effect_index integer not null,
-      version integer not null
+      channelIndex integer not null,
+      effectIndex integer not null,
+      version integer not null,
+      createdAt datetime default current_timestamp
     );
 
     create table if not exists scene_to_effects (
-      scene_id integer not null,
-      effect_id integer not null,
-      primary key (scene_id, effect_id),
-      foreign key (scene_id) references scenes(id) on delete cascade,
-      foreign key (effect_id) references effects(id) on delete cascade
+      sceneId integer not null,
+      effectId integer not null,
+      primary key (sceneId, effectId),
+      foreign key (sceneId) references scenes(id) on delete cascade,
+      foreign key (effectId) references effects(id) on delete cascade
     );
 
     create table if not exists tracks (
       id integer primary key autoincrement,
-      file_path text not null,
+      filePath text not null,
       title text,
-      sf_frames integer not null,
-      sf_samplerate integer not null,
-      sf_channels integer not null,
-      created_at datetime default current_timestamp
+      frames integer not null,
+      sampleRate integer not null,
+      channels integer not null,
+      createdAt datetime default current_timestamp
     );
   )sql";
 
@@ -103,7 +104,7 @@ int Dao::initSchema() const {
 
 void Dao::insertTestData() const {
   const std::string query = R"sql(
-    insert into effects (file_path, format, name, channel_index, effect_index, version)
+    insert into effects (filePath, format, name, channelIndex, effectIndex, version)
     values (
       '/Library/Audio/Plug-Ins/VST3/FooEffect.vst3',
       'vst3',
@@ -113,7 +114,7 @@ void Dao::insertTestData() const {
       3
     );
 
-    insert into tracks (file_path, title, sf_frames, sf_samplerate, sf_channels)
+    insert into tracks (filePath, title, frames, sampleRate, channels)
     values (
       '/foo.flac',
       'Foo Bar',
