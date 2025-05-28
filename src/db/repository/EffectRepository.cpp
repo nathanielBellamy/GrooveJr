@@ -76,7 +76,41 @@ int EffectRepository::save(Effect effect) const {
     );
   }
 
-  return sqlite3_last_insert_rowid(*db);
+  const int effectId = sqlite3_last_insert_rowid(*db);
+
+  const std::string joinQuery = R"sql(
+    insert into effects (sceneId, effectId)
+    values (?, ?)
+  )sql";
+
+  sqlite3_stmt* joinStmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &joinStmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "EffectRepository::save",
+      "Failed to prepare join statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return 0;
+  }
+
+  sqlite3_bind_int(stmt, 1, gAppState->sceneId);
+  sqlite3_bind_int(stmt, 2, effectId);
+
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    Logging::write(
+      Error,
+      "EffectRepository::save",
+      "Failed to join Effect " + effect.name + " id: " + std::to_string(effectId) + " to sceneId: " + std::to_string(gAppState->sceneId)
+    );
+  } else {
+    Logging::write(
+      Info,
+      "EffectRepository::save",
+      "Saved " + effect.name + " id: " + std::to_string(effectId) + " to sceneId " + std::to_string(gAppState->sceneId)
+    );
+  }
+
+  return effectId;
 }
 
 } // Db
