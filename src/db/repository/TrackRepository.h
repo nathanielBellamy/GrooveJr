@@ -8,6 +8,7 @@
 #include <sqlite3.h>
 
 #include "../../Logging.h"
+#include "../../AppState.h"
 
 #include "../entity/Track.h"
 
@@ -16,9 +17,10 @@ namespace Db {
 
 class TrackRepository {
   sqlite3** db;
+  AppState* gAppState;
 
   public:
-    TrackRepository(sqlite3** db);
+    TrackRepository(sqlite3** db, AppState* gAppState);
     std::vector<Track> getAll() const;
 
 };

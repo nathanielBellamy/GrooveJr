@@ -114,13 +114,13 @@ extern "C" {
           "== GrooveJr =="
         );
 
-        // setup Sql
-        Dao = new Db::Dao();
-
         // setup Audio
         initVst3PluginContext();
         gAppState = new AppState(512, STOP, 1);
         Mixer = new Audio::Mixer(gAppState);
+
+        // setup Sql
+        Dao = new Db::Dao(gAppState);
 
         Logging::write(
           Info,

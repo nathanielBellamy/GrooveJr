@@ -7,8 +7,9 @@
 namespace Gj {
 namespace Db {
 
-TrackRepository::TrackRepository(sqlite3** db)
+TrackRepository::TrackRepository(sqlite3** db, AppState* gAppState)
   : db(db)
+  , gAppState(gAppState)
   {}
 
 std::vector<Track> TrackRepository::getAll() const {

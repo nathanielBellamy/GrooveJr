@@ -7,9 +7,10 @@
 namespace Gj {
 namespace Db {
 
-Dao::Dao()
-  : effectRepository(&db)
-  , trackRepository(&db)
+Dao::Dao(AppState* gAppState)
+  : gAppState(gAppState)
+  , effectRepository(&db, gAppState)
+  , trackRepository(&db, gAppState)
   {
   if (initDb() == 0) {
     if (initSchema() == 0) {

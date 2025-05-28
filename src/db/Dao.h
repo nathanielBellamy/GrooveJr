@@ -11,6 +11,7 @@
 #include <sqlite3.h>
 
 #include "../Logging.h"
+#include "../AppState.h"
 
 #include "./repository/EffectRepository.h"
 #include "./repository/TrackRepository.h"
@@ -19,14 +20,14 @@ namespace Gj {
 namespace Db {
 
 class Dao {
-
   sqlite3* db;
+  AppState* gAppState;
 
   public:
     EffectRepository effectRepository;
     TrackRepository trackRepository;
 
-    Dao();
+    Dao(AppState* gAppState);
     ~Dao();
     int initDb();
     int initSchema() const;

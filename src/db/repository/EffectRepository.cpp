@@ -8,8 +8,9 @@
 namespace Gj {
 namespace Db {
 
-EffectRepository::EffectRepository(sqlite3** db)
+EffectRepository::EffectRepository(sqlite3** db, AppState* gAppState)
   : db(db)
+  , gAppState(gAppState)
   {}
 
 std::vector<Effect> EffectRepository::getAll() const {
@@ -38,7 +39,6 @@ std::vector<Effect> EffectRepository::getAll() const {
 }
 
 int EffectRepository::save(Effect effect) const {
-  const int version = effect.version + 1;
   const std::string query = R"sql(
     insert into effects (file_path, format, name, state, channel_index, effect_index, version)
     values (?, ?, ?, ?, ?, ?, ?)
