@@ -23,7 +23,7 @@ std::vector<Track> TrackRepository::getAll() const {
   if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     Logging::write(
       Error,
-      "TrackRepository::getAll",
+      "Db::TrackRepository::getAll",
       "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
     );
     return tracks;

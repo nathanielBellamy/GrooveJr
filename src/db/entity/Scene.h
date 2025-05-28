@@ -12,12 +12,12 @@ namespace Db {
 
 struct Scene {
   int id;
-  int index;
+  int sceneIndex;
   std::string name;
   int version = 0;
 
-  Scene(int id, int index, const std::string& name, int version);
-  Scene(int index, const std::string& name);
+  Scene(int id, int sceneIndex, const std::string& name, int version);
+  Scene(int sceneIndex, const std::string& name);
 };
 
 } // Db

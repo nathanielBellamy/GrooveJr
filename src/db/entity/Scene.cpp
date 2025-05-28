@@ -8,15 +8,15 @@
 namespace Gj {
 namespace Db {
 
-Scene::Scene(const int id, const int index, const std::string& name, const int version)
+Scene::Scene(const int id, const int sceneIndex, const std::string& name, const int version)
   : id(id)
-  , index(index)
+  , sceneIndex(sceneIndex)
   , name(name)
   , version(version)
   {}
 
-Scene::Scene(const int index, const std::string& name)
-  : index(index)
+Scene::Scene(const int sceneIndex, const std::string& name)
+  : sceneIndex(sceneIndex)
   , name(name)
   {}
 

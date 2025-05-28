@@ -18,6 +18,7 @@ Dao::Dao(AppState* gAppState)
       insertTestData();
       const auto resTrack = trackRepository.getAll();
       const auto resEffect = effectRepository.getAll();
+      const auto resSceneEffects = sceneRepository.getEffects(1);
     }
   }
 }
@@ -34,7 +35,7 @@ int Dao::initDb() {
   if (sqlite3_open(db_name.c_str(), &db)) {
     Logging::write(
       Critical,
-      "main::initSql",
+      "Db::Dao::initDb",
       "Unable to init groovejr.db"
     );
     return 1;
@@ -42,7 +43,7 @@ int Dao::initDb() {
 
   Logging::write(
     Info,
-    "main::initSql",
+    "Db::Dao::initDb",
     "Initialized groovejr.db"
   );
   return 0;
@@ -52,7 +53,9 @@ int Dao::initSchema() const {
   const std::string query = R"sql(
     create table if not exists scenes (
       id integer primary key autoincrement,
-      name text not null
+      sceneIndex integer not null,
+      name text not null,
+      version integer not null
     );
 
     create table if not exists effects (
@@ -89,7 +92,7 @@ int Dao::initSchema() const {
   if (sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr) != SQLITE_OK) {
     Logging::write(
         Critical,
-        "Db::Database::provision",
+        "Db::Dao::initSchema",
         "Unable to provision the database. Message: " + std::string(sqlite3_errmsg(db))
     );
     return 1;
@@ -97,7 +100,7 @@ int Dao::initSchema() const {
 
   Logging::write(
       Critical,
-      "Db::Database::provision",
+      "Db::Dao::initSchema",
       "Provisioned the database."
   );
   return 0;

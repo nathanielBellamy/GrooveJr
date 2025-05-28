@@ -5,6 +5,8 @@
 #ifndef SCENEREPOSITORY_H
 #define SCENEREPOSITORY_H
 
+#include <vector>
+
 #include <sqlite3.h>
 
 #include "../../Logging.h"
@@ -23,6 +25,7 @@ class SceneRepository {
   public:
     SceneRepository(sqlite3** db, AppState* appState);
     int save(Scene scene) const;
+    std::vector<Effect> getEffects(int sceneIndex) const;
 };
 
 } // Db
