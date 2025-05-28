@@ -24,7 +24,7 @@ struct AppState {
   AppState(int audioFramesPerBuffer, PlayState playState, int sceneId);
   int audioFramesPerBuffer;
   PlayState playState;
-  int sceneId;
+  int sceneId; // TODO: rename sceneIndex
 
   AppStatePacket toPacket() const;
   // TODO?

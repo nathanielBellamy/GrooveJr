@@ -86,6 +86,10 @@ add_executable(GrooveJr
         db/entity/Effect.cpp
         db/repository/EffectRepository.h
         db/repository/EffectRepository.cpp
+        db/entity/Scene.h
+        db/entity/Scene.cpp
+        db/repository/SceneRepository.h
+        db/repository/SceneRepository.cpp
         db/entity/Track.h
         db/entity/Track.cpp
         db/repository/TrackRepository.h

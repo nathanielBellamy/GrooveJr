@@ -10,6 +10,7 @@ namespace Db {
 Dao::Dao(AppState* gAppState)
   : gAppState(gAppState)
   , effectRepository(&db, gAppState)
+  , sceneRepository(&db, gAppState)
   , trackRepository(&db, gAppState)
   {
   if (initDb() == 0) {
@@ -131,6 +132,10 @@ void Dao::insertTestData() const {
         "Unable to insert test data into the database. Message: " + std::string(sqlite3_errmsg(db))
     );
   }
+
+  sceneRepository.save(
+    Scene(0, "Base Scene")
+  );
 
   effectRepository.save(
     Effect("/Library/Audio/Plug-Ins/VST3/BarEffect.vst3", "vst3", "Bar Bar", 1234, 2, 0, 3)

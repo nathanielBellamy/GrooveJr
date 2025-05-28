@@ -14,6 +14,7 @@
 #include "../AppState.h"
 
 #include "./repository/EffectRepository.h"
+#include "./repository/SceneRepository.h"
 #include "./repository/TrackRepository.h"
 
 namespace Gj {
@@ -25,6 +26,7 @@ class Dao {
 
   public:
     EffectRepository effectRepository;
+    SceneRepository sceneRepository;
     TrackRepository trackRepository;
 
     Dao(AppState* gAppState);
