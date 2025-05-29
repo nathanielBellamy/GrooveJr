@@ -41,7 +41,7 @@ int SceneRepository::save(Scene scene) const {
   } else {
     Logging::write(
       Info,
-      "Db::EffectRepository::save",
+      "Db::SceneRepository::save",
       "Saved " + scene.name + " at index " + std::to_string(scene.sceneIndex)
     );
   }
@@ -55,7 +55,7 @@ std::vector<Effect> SceneRepository::getEffects(const int sceneIndex) const {
   const std::string query = R"sql(
     select * from effects e
     right join scene_to_effects ste
-    on ste.effectId = e.effectId
+    on ste.effectId = e.id
     where ste.sceneId = (
       select id
       from scenes

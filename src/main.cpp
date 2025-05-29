@@ -116,7 +116,7 @@ extern "C" {
 
         // setup Audio
         initVst3PluginContext();
-        gAppState = new AppState(512, STOP, 0);
+        gAppState = new AppState(512, STOP, 1, 0);
         Mixer = new Audio::Mixer(gAppState);
 
         // setup Sql

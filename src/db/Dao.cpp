@@ -18,7 +18,7 @@ Dao::Dao(AppState* gAppState)
       insertTestData();
       const auto resTrack = trackRepository.getAll();
       const auto resEffect = effectRepository.getAll();
-      const auto resSceneEffects = sceneRepository.getEffects(1);
+      const auto resSceneEffects = sceneRepository.getEffects(0);
     }
   }
 }
@@ -99,7 +99,7 @@ int Dao::initSchema() const {
   }
 
   Logging::write(
-      Critical,
+      Info,
       "Db::Dao::initSchema",
       "Provisioned the database."
   );

@@ -13,6 +13,7 @@ struct AppStatePacket {
     int audioFramesPerBuffer;
     int playState;
     int sceneId;
+    int sceneIndex;
 };
 
 template <class Inspector>
@@ -21,10 +22,11 @@ bool inspect(Inspector& f, AppStatePacket& x) {
 }
 
 struct AppState {
-  AppState(int audioFramesPerBuffer, PlayState playState, int sceneId);
+  AppState(int audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
   int audioFramesPerBuffer;
   PlayState playState;
-  int sceneId; // TODO: rename sceneIndex
+  int sceneId;
+  int sceneIndex;
 
   AppStatePacket toPacket() const;
   // TODO?
