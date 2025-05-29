@@ -80,11 +80,11 @@ int EffectRepository::save(Effect effect) const {
 
   const std::string joinQuery = R"sql(
     insert into scene_to_effects (sceneId, effectId)
-    values (?, ?)
+    values (?, ?);
   )sql";
 
   sqlite3_stmt* joinStmt;
-  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &joinStmt, nullptr) != SQLITE_OK) {
+  if (sqlite3_prepare_v2(*db, joinQuery.c_str(), -1, &joinStmt, nullptr) != SQLITE_OK) {
     Logging::write(
       Error,
       "Db::EffectRepository::save",
@@ -93,10 +93,10 @@ int EffectRepository::save(Effect effect) const {
     return 0;
   }
 
-  sqlite3_bind_int(stmt, 1, gAppState->sceneId);
-  sqlite3_bind_int(stmt, 2, effectId);
+  sqlite3_bind_int(joinStmt, 1, gAppState->sceneId);
+  sqlite3_bind_int(joinStmt, 2, effectId);
 
-  if (sqlite3_step(stmt) != SQLITE_DONE) {
+  if (sqlite3_step(joinStmt) != SQLITE_DONE) {
     Logging::write(
       Error,
       "Db::EffectRepository::save",
@@ -106,7 +106,7 @@ int EffectRepository::save(Effect effect) const {
     Logging::write(
       Info,
       "Db::EffectRepository::save",
-      "Saved " + effect.name + " id: " + std::to_string(effectId) + " to sceneId " + std::to_string(gAppState->sceneId)
+      "Joined Effect " + effect.name + " id: " + std::to_string(effectId) + " to sceneId " + std::to_string(gAppState->sceneId)
     );
   }
 

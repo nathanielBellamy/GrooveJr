@@ -18,6 +18,7 @@ Dao::Dao(AppState* gAppState)
       insertTestData();
       const auto resTrack = trackRepository.getAll();
       const auto resEffect = effectRepository.getAll();
+      const auto resScene = sceneRepository.getAll();
       const auto resSceneEffects = sceneRepository.getEffects(0);
     }
   }

@@ -53,7 +53,7 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
   const int state = sqlite3_column_int(stmt, 4);
   const int channelIndex = sqlite3_column_int(stmt, 5);
   const int effectIndex = sqlite3_column_int(stmt, 6);
-  const int version = sqlite3_column_int(stmt, 8);
+  const int version = sqlite3_column_int(stmt, 7);
 
   return Effect(
     id,

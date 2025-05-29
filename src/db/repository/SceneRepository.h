@@ -24,6 +24,7 @@ class SceneRepository {
 
   public:
     SceneRepository(sqlite3** db, AppState* appState);
+    std::vector<Scene> getAll() const;
     int save(Scene scene) const;
     std::vector<Effect> getEffects(int sceneIndex) const;
 };

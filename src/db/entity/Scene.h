@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include <sqlite3.h>
+
 namespace Gj {
 namespace Db {
 
@@ -18,6 +20,7 @@ struct Scene {
 
   Scene(int id, int sceneIndex, const std::string& name, int version);
   Scene(int sceneIndex, const std::string& name);
+  static Scene deser(sqlite3_stmt* stmt);
 };
 
 } // Db
