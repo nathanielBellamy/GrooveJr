@@ -22,12 +22,12 @@ bool inspect(Inspector& f, AppStatePacket& x) {
 }
 
 struct AppState {
-  AppState(int audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
   int audioFramesPerBuffer;
   PlayState playState;
   int sceneId;
   int sceneIndex;
 
+  AppState(int audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
   AppStatePacket toPacket() const;
   // TODO?
   static AppState fromPacket(const AppStatePacket& packet);
