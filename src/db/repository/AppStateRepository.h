@@ -9,6 +9,7 @@
 
 #include "../../Logging.h"
 #include "../../AppState.h"
+#include "../entity/AppState.h"
 
 namespace Gj {
 namespace Db {
@@ -19,7 +20,8 @@ class AppStateRepository {
 
   public:
     explicit AppStateRepository(sqlite3** db, AppState* gAppState);
-    AppState get() const;
+    Db::AppState get() const;
+    int save() const;
 };
 
 } // Db

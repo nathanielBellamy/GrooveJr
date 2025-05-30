@@ -9,6 +9,7 @@ namespace Db {
 
 Dao::Dao(AppState* gAppState)
   : gAppState(gAppState)
+  , appStateRepository(&db, gAppState)
   , effectRepository(&db, gAppState)
   , sceneRepository(&db, gAppState)
   , trackRepository(&db, gAppState)
@@ -52,11 +53,20 @@ int Dao::initDb() {
 
 int Dao::initSchema() const {
   const std::string query = R"sql(
+    create table if not exists appState (
+      id integer primary key autoincrement,
+      audioFramesPerBuffer integer,
+      sceneId integer,
+      sceneIndex integer,
+      createdAt datetime default current_timestamp
+    );
+
     create table if not exists scenes (
       id integer primary key autoincrement,
       sceneIndex integer not null,
       name text not null,
-      version integer not null
+      version integer not null,
+      createdAt datetime default current_timestamp
     );
 
     create table if not exists effects (

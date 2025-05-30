@@ -10,6 +10,7 @@
 namespace Gj {
 namespace Db {
 
+// todo: rename to avoid collision or forgo this struct
 struct AppState {
   int audioFramesPerBuffer;
   int sceneId;
