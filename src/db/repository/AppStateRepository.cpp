@@ -12,10 +12,10 @@ AppStateRepository::AppStateRepository(sqlite3** db, AppState* gAppState)
   , gAppState(gAppState)
   {}
 
-Db::AppState AppStateRepository::get() {
+AppStateEntity AppStateRepository::get() const {
   const std::string query = R"sql(
     select * from appState
-    order by createdAt desc
+    order by id desc
     limit 1;
   )sql";
 
@@ -26,20 +26,52 @@ Db::AppState AppStateRepository::get() {
       "Db::AppStateRepository::get",
       "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
     );
-    return Db::AppState(256, 0, 0);
+    return AppStateEntity::base();
   }
 
-  while (sqlite3_step(stmt) == SQLITE_ROW) {
-    const auto appState = Db::AppState::deser(stmt);
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    const auto appState = AppStateEntity::deser(stmt);
     return appState;
   }
 
-  return Db::AppState(256, 0, 0);
+  return AppStateEntity::base();
 }
 
-int AppStateRepository::save() {
+int AppStateRepository::save() const {
+  const std::string query = R"sql(
+    insert into appState (audioFramesPerBuffer, sceneId, sceneIndex)
+    values (?, ?, ?)
+  )sql";
 
-  return 0;
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::AppStateRepositoryRepository::save",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return 0;
+  }
+
+  sqlite3_bind_int(stmt, 1, gAppState->audioFramesPerBuffer);
+  sqlite3_bind_int(stmt, 2, gAppState->sceneId);
+  sqlite3_bind_int(stmt, 3, gAppState->sceneIndex);
+
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    Logging::write(
+      Error,
+      "Db::AppStateRepository::save",
+      "Failed to save AppState"
+    );
+  } else {
+    Logging::write(
+      Info,
+      "Db::AppStateRepository::save",
+      "Saved AppState"
+    );
+  }
+
+  return sqlite3_last_insert_rowid(*db);
 }
 
 } // Db

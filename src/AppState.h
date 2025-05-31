@@ -7,6 +7,8 @@
 
 #include "./enums/PlayState.h"
 
+#include "./db/entity/AppStateEntity.h"
+
 namespace Gj {
 
 struct AppStatePacket {
@@ -27,12 +29,15 @@ struct AppState {
   int sceneId;
   int sceneIndex;
 
+  AppState();
   AppState(int audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
   AppStatePacket toPacket() const;
   // TODO?
   static AppState fromPacket(const AppStatePacket& packet);
+  static AppState fromAppStateEntity(Db::AppStateEntity appStateEntity);
 
   // mutations
+  void setFromEntity(Db::AppStateEntity appStateEntity);
   static AppState setAudioFramesPerBuffer(AppState appState, int audioFramesPerBuffer);
   static AppState setPlayState(AppState appState, PlayState playState);
 };

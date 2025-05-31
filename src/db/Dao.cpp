@@ -14,9 +14,11 @@ Dao::Dao(AppState* gAppState)
   , sceneRepository(&db, gAppState)
   , trackRepository(&db, gAppState)
   {
+
   if (initDb() == 0) {
     if (initSchema() == 0) {
       insertTestData();
+      const auto resAppState = appStateRepository.get();
       const auto resTrack = trackRepository.getAll();
       const auto resEffect = effectRepository.getAll();
       const auto resScene = sceneRepository.getAll();

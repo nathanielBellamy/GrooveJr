@@ -13,6 +13,21 @@ AppState::AppState(const int audioFramesPerBuffer, const PlayState playState, co
   , sceneIndex(sceneIndex)
   {}
 
+AppState::AppState() {
+  const auto appState = fromAppStateEntity(Db::AppStateEntity::base());
+  audioFramesPerBuffer = appState.audioFramesPerBuffer;
+  playState = appState.playState;
+  sceneId = appState.sceneId;
+  sceneIndex = appState.sceneIndex;
+}
+
+void AppState::setFromEntity(const Db::AppStateEntity appStateEntity) {
+  audioFramesPerBuffer = appStateEntity.audioFramesPerBuffer;
+  playState = STOP;
+  sceneId = appStateEntity.sceneId;
+  sceneIndex = appStateEntity.sceneIndex;
+}
+
 AppState AppState::setAudioFramesPerBuffer(const AppState appState, const int audioFramesPerBuffer) {
   const AppState newState = {
     audioFramesPerBuffer,
@@ -51,5 +66,17 @@ AppState AppState::fromPacket(const AppStatePacket& packet) {
     };
     return appState;
 };
+
+AppState AppState::fromAppStateEntity(const Db::AppStateEntity appStateEntity) {
+  const AppState appState {
+    appStateEntity.audioFramesPerBuffer,
+    STOP,
+    appStateEntity.sceneId,
+    appStateEntity.sceneIndex
+  };
+
+  return appState;
+}
+
 
 } // Gj

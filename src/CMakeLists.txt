@@ -82,8 +82,8 @@ add_executable(GrooveJr
         actors/Display.h
         db/Dao.h
         db/Dao.cpp
-        db/entity/AppState.h
-        db/entity/AppState.cpp
+        db/entity/AppStateEntity.h
+        db/entity/AppStateEntity.cpp
         db/repository/AppStateRepository.h
         db/repository/AppStateRepository.cpp
         db/entity/Effect.h
