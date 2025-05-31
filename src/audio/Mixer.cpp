@@ -9,8 +9,9 @@ namespace Audio {
 
 using namespace Steinberg;
 
-Mixer::Mixer(AppState* gAppState)
+Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
   : gAppState(gAppState)
+  , dao(dao)
   , jackClient(new JackClient())
   , channelCount(1.0f)
   {
@@ -20,6 +21,14 @@ Mixer::Mixer(AppState* gAppState)
     "Audio::Mixer::Mixer()",
     "Instantiating Mixer..."
   );
+
+  Logging::write(
+    Info,
+    "Audio::Mixer::Mixer()",
+    "Retrieving effects..."
+  );
+
+  // std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(gAppState->sceneId);
 
   jackClient->initialize("GrooveJr");
 

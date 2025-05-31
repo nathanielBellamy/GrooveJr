@@ -13,6 +13,9 @@
 
 #include "../AppState.h"
 #include "../Logging.h"
+#include "../db/Dao.h"
+#include "../db/entity/Effect.h"
+// #include "../db/repository/EffectRepository.h"
 #include "./Channel.h"
 #include "JackClient.h"
 #include "./effects/EffectsChannel.h"
@@ -23,6 +26,7 @@ namespace Audio {
 
 class Mixer {
     AppState* gAppState;
+    Db::Dao* dao;
     std::shared_ptr<JackClient> jackClient;
     float channelCount;
     std::vector<Effects::EffectsChannel*> effectsChannels;
@@ -31,7 +35,7 @@ class Mixer {
     void incorporateLatencySamples(int latencySamples) const;
 
 public:
-  explicit Mixer(AppState*);
+  explicit Mixer(AppState*, Db::Dao*);
   ~Mixer();
 
   [[nodiscard]]

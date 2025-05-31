@@ -24,6 +24,7 @@ class EffectRepository {
     explicit EffectRepository(sqlite3** db, AppState* gAppState);
     std::vector<Effect> getAll() const;
     int save(Effect effect) const;
+    std::vector<Effect> getBySceneId(int sceneId) const;
 };
 
 } // Db

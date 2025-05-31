@@ -77,7 +77,6 @@ int SceneRepository::save(Scene scene) const {
 
 std::vector<Effect> SceneRepository::getEffects(const int sceneIndex) const {
   std::vector<Effect> effects;
-  // TODO: versioning
   const std::string query = R"sql(
     select * from effects e
     right join scene_to_effects ste
@@ -86,6 +85,7 @@ std::vector<Effect> SceneRepository::getEffects(const int sceneIndex) const {
       select id
       from scenes
       where sceneIndex = ?
+      order by version desc
       limit 1
     );
   )sql";

@@ -113,5 +113,35 @@ int EffectRepository::save(Effect effect) const {
   return effectId;
 }
 
+std::vector<Effect> EffectRepository::getBySceneId(const int sceneId) const {
+  std::vector<Effect> effects;
+  const std::string query = R"sql(
+    select * from effects e
+    right join scene_to_effects ste
+    on e.id = ste.effectId
+    where ste.sceneId = ?;
+  )sql";
+
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::EffectRepository::getBySceneId",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return effects;
+  }
+
+  sqlite3_bind_int(stmt, 1, sceneId);
+
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    const auto effect = Effect::deser(stmt);
+    std::cout << "Effect Row: ID = " << effect.id << ", filePath = " << effect.filePath << ", format = " << effect.format << ", name = " << effect.name << ", version = " << effect.version << std::endl;
+    effects.push_back(effect);
+  }
+
+  return effects;
+}
+
 } // Db
 } // Gj

@@ -121,7 +121,7 @@ extern "C" {
 
         // setup Audio
         initVst3PluginContext();
-        Mixer = new Audio::Mixer(gAppState);
+        Mixer = new Audio::Mixer(gAppState, Dao);
 
         Logging::write(
           Info,
