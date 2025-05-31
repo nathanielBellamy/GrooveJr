@@ -57,7 +57,10 @@ add_subdirectory(
     /Users/ns/code/GrooveJr/src/audio
 )
 add_subdirectory(
-        /Users/ns/code/GrooveJr/src/gui
+    /Users/ns/code/GrooveJr/src/gui
+)
+add_subdirectory(
+    /Users/ns/code/GrooveJr/src/db
 )
 add_definitions(-DQT_NO_VERSION_TAGGING)
 
@@ -80,29 +83,12 @@ add_executable(GrooveJr
         gui/MainToolbar/TransportControl.cpp
         gui/MainToolbar/TransportControl.h
         actors/Display.h
-        db/Dao.h
-        db/Dao.cpp
-        db/entity/AppStateEntity.h
-        db/entity/AppStateEntity.cpp
-        db/repository/AppStateRepository.h
-        db/repository/AppStateRepository.cpp
-        db/entity/Effect.h
-        db/entity/Effect.cpp
-        db/repository/EffectRepository.h
-        db/repository/EffectRepository.cpp
-        db/entity/Scene.h
-        db/entity/Scene.cpp
-        db/repository/SceneRepository.h
-        db/repository/SceneRepository.cpp
-        db/entity/Track.h
-        db/entity/Track.cpp
-        db/repository/TrackRepository.h
-        db/repository/TrackRepository.cpp
 )
 target_link_libraries(GrooveJr
         PUBLIC
         CAF::core
         GjAudio
+        GjDb
         GjGui
         Qt6::Core
         Qt6::Widgets
