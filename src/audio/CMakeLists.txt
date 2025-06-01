@@ -108,6 +108,7 @@ target_link_libraries(GjAudio PUBLIC
     Qt6::Core
     Qt6::Widgets
     ${LIBJACK_LIBRARY}
+    GjDb
 )
 target_include_directories(GjAudio
         PRIVATE

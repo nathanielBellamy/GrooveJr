@@ -28,7 +28,8 @@ Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
     "Retrieving effects..."
   );
 
-  // std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(gAppState->sceneId);
+  std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(gAppState->sceneId);
+  // TODO: set effects
 
   jackClient->initialize("GrooveJr");
 
