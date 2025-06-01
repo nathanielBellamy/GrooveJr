@@ -12,6 +12,8 @@ find_package(Boost REQUIRED COMPONENTS log_setup log)
 find_package(SQLite3 REQUIRED)
 
 add_library(GjDb SHARED
+    Logging.h
+    Logging.cpp
     Dao.h
     Dao.cpp
     entity/AppStateEntity.h

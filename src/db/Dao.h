@@ -10,12 +10,12 @@
 
 #include <sqlite3.h>
 
-#include "../Logging.h"
+#include "Logging.h"
 #include "../AppState.h"
 
-#include "./repository/EffectRepository.h"
-#include "./repository/SceneRepository.h"
-#include "./repository/TrackRepository.h"
+#include "repository/EffectRepository.h"
+#include "repository/SceneRepository.h"
+#include "repository/TrackRepository.h"
 #include "repository/AppStateRepository.h"
 
 namespace Gj {

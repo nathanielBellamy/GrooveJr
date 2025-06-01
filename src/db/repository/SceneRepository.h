@@ -9,7 +9,7 @@
 
 #include <sqlite3.h>
 
-#include "../../Logging.h"
+#include "../Logging.h"
 #include "../../AppState.h"
 
 #include "../entity/Scene.h"
