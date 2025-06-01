@@ -63,7 +63,6 @@ struct AppStateManagerState {
      AppStateManager::pointer self;
      AppState* gAppState;
      Audio::Mixer* mixer;
-     AppState appState;
      strong_actor_ptr playback;
      strong_actor_ptr display;
 
@@ -78,7 +77,7 @@ struct AppStateManagerState {
          self->anon_send(
            actor_cast<actor>(displayPtr),
            actor_cast<strong_actor_ptr>(self),
-           appState.toPacket(),
+           gAppState->toPacket(),
            current_state_a_v
          );
      };
@@ -87,12 +86,6 @@ struct AppStateManagerState {
         : self(self)
         , gAppState(gAppState)
         , mixer(mixer)
-        , appState(AppState {
-            gAppState->audioFramesPerBuffer,
-            gAppState->playState,
-            gAppState->sceneId,
-            gAppState->sceneIndex
-          })
         {
            self->link_to(supervisor);
            self->system().registry().put(APP_STATE_MANAGER, actor_cast<strong_actor_ptr>(self));
@@ -185,7 +178,7 @@ struct AppStateManagerState {
              self->anon_send(
                  actor_cast<actor>(replyTo),
                  actor_cast<strong_actor_ptr>(self),
-                 appState.toPacket(),
+                 gAppState->toPacket(),
                  current_state_a_v
              );
            },
@@ -210,9 +203,9 @@ struct AppStateManagerState {
              );
 
              if (success) {
-               appState = AppState::setPlayState(appState, PLAY);
+               gAppState->setPlayState(PLAY);
              } else {
-               appState = AppState::setPlayState(appState, STOP);
+               gAppState->setPlayState(STOP);
              }
 
              Logging::write(
@@ -230,7 +223,7 @@ struct AppStateManagerState {
                "Received TC Pause Trig"
              );
 
-             appState = AppState::setPlayState(appState, PAUSE);
+             gAppState->setPlayState(PAUSE);
 
              self->anon_send(
                  actor_cast<actor>(playback),
@@ -246,9 +239,9 @@ struct AppStateManagerState {
              );
 
              if (success) {
-               appState = AppState::setPlayState(appState, PAUSE);
+               gAppState->setPlayState(PAUSE);
              } else {
-               appState = AppState::setPlayState(appState, STOP);
+               gAppState->setPlayState(STOP);
              }
 
              Logging::write(
@@ -279,7 +272,7 @@ struct AppStateManagerState {
                "Received TC Stop Trig Response - status: " + std::to_string(success)
              );
 
-             appState = AppState::setPlayState(appState, STOP);
+             gAppState->setPlayState(STOP);
 
              Logging::write(
                Info,
@@ -310,9 +303,9 @@ struct AppStateManagerState {
              );
 
              if (success) {
-               appState = AppState::setPlayState(appState, RW);
+               gAppState->setPlayState(RW);
              } else {
-               appState = AppState::setPlayState(appState, STOP);
+               gAppState->setPlayState(STOP);
              }
 
              Logging::write(
@@ -344,9 +337,9 @@ struct AppStateManagerState {
              );
 
              if (success) {
-               appState = AppState::setPlayState(appState, FF);
+               gAppState->setPlayState(FF);
              } else {
-               appState = AppState::setPlayState(appState, STOP);
+               gAppState->setPlayState(STOP);
              }
 
              Logging::write(

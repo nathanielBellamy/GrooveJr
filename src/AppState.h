@@ -5,6 +5,8 @@
 #ifndef APPSTATE_H
 #define APPSTATE_H
 
+#include <atomic>
+
 #include "./enums/PlayState.h"
 
 #include "./db/entity/AppStateEntity.h"
@@ -24,22 +26,34 @@ bool inspect(Inspector& f, AppStatePacket& x) {
 }
 
 struct AppState {
-  int audioFramesPerBuffer;
-  PlayState playState;
-  int sceneId;
-  int sceneIndex;
+  std::atomic<int> audioFramesPerBuffer;
+  std::atomic<PlayState> playState;
+  std::atomic<int> sceneId;
+  std::atomic<int> sceneIndex;
 
   AppState();
   AppState(int audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
   AppStatePacket toPacket() const;
-  // TODO?
-  static AppState fromPacket(const AppStatePacket& packet);
   static AppState fromAppStateEntity(Db::AppStateEntity appStateEntity);
 
   // mutations
   void setFromEntity(Db::AppStateEntity appStateEntity);
-  static AppState setAudioFramesPerBuffer(AppState appState, int audioFramesPerBuffer);
-  static AppState setPlayState(AppState appState, PlayState playState);
+  int getAudioFramesPerBuffer() const {
+    return audioFramesPerBuffer.load();
+  };
+  void setAudioFramesPerBuffer(int val);
+  PlayState getPlayState() const {
+    return playState.load();
+  };
+  void setPlayState(PlayState val);
+  int getSceneId() const {
+    return sceneId.load();
+  };
+  void setSceneId(int val);
+  int getSceneIndex() const {
+    return sceneIndex.load();
+  };
+  void setSceneIndex(int val);
 };
 
 } // Gj

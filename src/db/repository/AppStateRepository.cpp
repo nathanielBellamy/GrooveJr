@@ -53,9 +53,9 @@ int AppStateRepository::save() const {
     return 0;
   }
 
-  sqlite3_bind_int(stmt, 1, gAppState->audioFramesPerBuffer);
-  sqlite3_bind_int(stmt, 2, gAppState->sceneId);
-  sqlite3_bind_int(stmt, 3, gAppState->sceneIndex);
+  sqlite3_bind_int(stmt, 1, gAppState->getAudioFramesPerBuffer());
+  sqlite3_bind_int(stmt, 2, gAppState->getSceneId());
+  sqlite3_bind_int(stmt, 3, gAppState->getSceneIndex());
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     Logging::write(

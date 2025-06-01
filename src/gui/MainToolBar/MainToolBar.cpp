@@ -35,11 +35,10 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer
 
 
 int MainToolBar::hydrateState(const AppStatePacket& appStatePacket) {
-  const AppState appState = AppState::fromPacket(appStatePacket);
   Logging::write(
     Info,
     "Gui::MainToolbar::hydrateState",
-    "Received app state with playState - " + std::to_string(appState.playState)
+    "Received app state with playState - " + std::to_string(appStatePacket.playState)
   );
 
   currentlyPlaying.hydrateState(appStatePacket);

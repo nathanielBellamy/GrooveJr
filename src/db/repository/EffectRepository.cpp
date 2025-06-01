@@ -93,20 +93,20 @@ int EffectRepository::save(Effect effect) const {
     return 0;
   }
 
-  sqlite3_bind_int(joinStmt, 1, gAppState->sceneId);
+  sqlite3_bind_int(joinStmt, 1, gAppState->getSceneId());
   sqlite3_bind_int(joinStmt, 2, effectId);
 
   if (sqlite3_step(joinStmt) != SQLITE_DONE) {
     Logging::write(
       Error,
       "Db::EffectRepository::save",
-      "Failed to join Effect " + effect.name + " id: " + std::to_string(effectId) + " to sceneId: " + std::to_string(gAppState->sceneId) + ". Message: " + std::string(sqlite3_errmsg(*db))
+      "Failed to join Effect " + effect.name + " id: " + std::to_string(effectId) + " to sceneId: " + std::to_string(gAppState->getSceneId()) + ". Message: " + std::string(sqlite3_errmsg(*db))
     );
   } else {
     Logging::write(
       Info,
       "Db::EffectRepository::save",
-      "Joined Effect " + effect.name + " id: " + std::to_string(effectId) + " to sceneId " + std::to_string(gAppState->sceneId)
+      "Joined Effect " + effect.name + " id: " + std::to_string(effectId) + " to sceneId " + std::to_string(gAppState->getSceneId())
     );
   }
 

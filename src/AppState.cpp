@@ -15,67 +15,54 @@ AppState::AppState(const int audioFramesPerBuffer, const PlayState playState, co
 
 AppState::AppState() {
   const auto appState = fromAppStateEntity(Db::AppStateEntity::base());
-  audioFramesPerBuffer = appState.audioFramesPerBuffer;
-  playState = appState.playState;
-  sceneId = appState.sceneId;
-  sceneIndex = appState.sceneIndex;
+  audioFramesPerBuffer.store( appState.audioFramesPerBuffer);
+  playState.store( appState.playState);
+  sceneId.store( appState.sceneId);
+  sceneIndex.store(appState.sceneIndex);
 }
 
 void AppState::setFromEntity(const Db::AppStateEntity appStateEntity) {
-  audioFramesPerBuffer = appStateEntity.audioFramesPerBuffer;
-  playState = STOP;
-  sceneId = appStateEntity.sceneId;
-  sceneIndex = appStateEntity.sceneIndex;
+  audioFramesPerBuffer.store(appStateEntity.audioFramesPerBuffer);
+  playState.store( STOP);
+  sceneId.store(appStateEntity.sceneId);
+  sceneIndex.store(appStateEntity.sceneIndex);
 }
 
-AppState AppState::setAudioFramesPerBuffer(const AppState appState, const int audioFramesPerBuffer) {
-  const AppState newState = {
-    audioFramesPerBuffer,
-    appState.playState,
-    appState.sceneId,
-    appState.sceneIndex
-  };
-  return newState;
+void AppState::setAudioFramesPerBuffer(const int val) {
+  if (val < 0)
+    return;
+  audioFramesPerBuffer.store(val);
 }
 
-AppState AppState::setPlayState(const AppState appState, const PlayState playState) {
-  const AppState newState {
-    appState.audioFramesPerBuffer,
-    playState,
-    appState.sceneId,
-    appState.sceneIndex
-  };
-  return newState;
+void AppState::setPlayState(const PlayState val) {
+  playState.store(val);
 };
+
+void AppState::setSceneId(const int val) {
+  sceneId.store(val);
+}
+
+void AppState::setSceneIndex(const int val) {
+  sceneIndex.store(val);
+}
+
 
 AppStatePacket AppState::toPacket() const {
     const AppStatePacket packet {
-      audioFramesPerBuffer,
-      psToInt(playState),
-      sceneId
+      audioFramesPerBuffer.load(),
+      psToInt(playState.load()),
+      sceneId.load(),
     };
     return packet;
 }
 
-AppState AppState::fromPacket(const AppStatePacket& packet) {
-  const AppState appState {
-      packet.audioFramesPerBuffer,
-      intToPs(packet.playState),
-      packet.sceneId,
-      packet.sceneIndex
-    };
-    return appState;
-};
-
 AppState AppState::fromAppStateEntity(const Db::AppStateEntity appStateEntity) {
-  const AppState appState {
+  return AppState(
     appStateEntity.audioFramesPerBuffer,
     STOP,
     appStateEntity.sceneId,
     appStateEntity.sceneIndex
-  };
-
-  return appState;
+  );
 }
 
 
