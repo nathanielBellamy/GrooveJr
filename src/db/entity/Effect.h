@@ -22,6 +22,12 @@ struct Effect {
   int channelIndex;
   int effectIndex;
   int version;
+  bool operator=(const Effect& rhs) const {
+    return id == rhs.id;
+  }
+  bool operator<(const Effect& rhs) const {
+    return effectIndex < rhs.effectIndex;
+  }
 
   Effect(
     int id,

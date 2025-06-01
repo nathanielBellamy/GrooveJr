@@ -177,9 +177,26 @@ int Mixer::loadScene(const int sceneId) {
   );
 
   const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(gAppState->sceneId);
-  // TODO: set effects
+
+  std::vector<std::vector<Db::Effect>> effectsByChannel;
   for (const auto effect : effects) {
     std::cout << "Mixer load Effects, id = " << effect.id << ", filePath = " << effect.filePath << ", format = " << effect.format << ", name = " << effect.name << ", version = " << effect.version << std::endl;
+    while (effectsByChannel.size() <= effect.channelIndex) {
+      effectsByChannel.push_back(std::vector<Db::Effect>());
+    }
+
+    effectsByChannel.at(effect.channelIndex).push_back(effect);
+  }
+
+  while (effectsChannels.size() < effectsByChannel.size()) {
+    addEffectsChannel();
+  }
+
+  for (const auto effectsChannelEffects : effectsByChannel) {
+    std::sort(effectsChannelEffects.begin(), effectsChannelEffects.end());
+    for (const auto effect : effectsChannelEffects) {
+      addEffectToChannel(effect.channelIndex, effect.filePath);
+    }
   }
 
   return 0;
@@ -192,9 +209,9 @@ int Mixer::saveScene() const {
     "Saving scene, sceneIndex: " + std::to_string(gAppState->sceneIndex)
   );
 
-  Db::Scene scene = Db::Scene(gAppState->sceneIndex, "Mixer Scene");
+  const auto scene = Db::Scene(gAppState->sceneIndex, "Mixer Scene");
   const int sceneId = dao->sceneRepository.save(scene);
-  gAppState->sceneId = sceneId;
+  gAppState->setSceneId(sceneId);
 
   for (const auto effectsChannel : effectsChannels) {
     const int effectCount = effectsChannel->effectCount();

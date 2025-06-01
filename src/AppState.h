@@ -38,22 +38,36 @@ struct AppState {
 
   // mutations
   void setFromEntity(Db::AppStateEntity appStateEntity);
+
   int getAudioFramesPerBuffer() const {
     return audioFramesPerBuffer.load();
   };
-  void setAudioFramesPerBuffer(int val);
+  void setAudioFramesPerBuffer(const int val) {
+    if (val < 0)
+      return;
+    audioFramesPerBuffer.store(val);
+  }
+
   PlayState getPlayState() const {
     return playState.load();
   };
-  void setPlayState(PlayState val);
+  void setPlayState(const PlayState val) {
+    playState.store(val);
+  };
+
   int getSceneId() const {
     return sceneId.load();
   };
-  void setSceneId(int val);
+  void setSceneId(const int val) {
+    sceneId.store(val);
+  };
+
   int getSceneIndex() const {
     return sceneIndex.load();
   };
-  void setSceneIndex(int val);
+  void setSceneIndex(const int val) {
+    sceneIndex.store(val);
+  }
 };
 
 } // Gj

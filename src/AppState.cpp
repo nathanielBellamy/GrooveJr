@@ -28,24 +28,6 @@ void AppState::setFromEntity(const Db::AppStateEntity appStateEntity) {
   sceneIndex.store(appStateEntity.sceneIndex);
 }
 
-void AppState::setAudioFramesPerBuffer(const int val) {
-  if (val < 0)
-    return;
-  audioFramesPerBuffer.store(val);
-}
-
-void AppState::setPlayState(const PlayState val) {
-  playState.store(val);
-};
-
-void AppState::setSceneId(const int val) {
-  sceneId.store(val);
-}
-
-void AppState::setSceneIndex(const int val) {
-  sceneIndex.store(val);
-}
-
 
 AppStatePacket AppState::toPacket() const {
     const AppStatePacket packet {
