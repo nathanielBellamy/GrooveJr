@@ -15,7 +15,7 @@
 #include "../Logging.h"
 #include "../db/Dao.h"
 #include "../db/entity/Effect.h"
-// #include "../db/repository/EffectRepository.h"
+#include "../db/entity/Scene.h"
 #include "./Channel.h"
 #include "JackClient.h"
 #include "./effects/EffectsChannel.h"
@@ -84,6 +84,9 @@ public:
   std::string getPluginName(const int channelIdx, const int pluginIndex) const {
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);
   };
+
+  int loadScene(int sceneId);
+  int saveScene() const;
 
 };
 

@@ -28,8 +28,7 @@ Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
     "Retrieving effects..."
   );
 
-  std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(gAppState->sceneId);
-  // TODO: set effects
+  loadScene(gAppState->sceneId);
 
   jackClient->initialize("GrooveJr");
 
@@ -168,6 +167,53 @@ bool Mixer::removeEffectFromChannel(const int channelIdx, const int effectIdx) c
 
 bool Mixer::setGainOnChannel(const int channelIdx, const float gain) const {
   return effectsChannels.at(channelIdx)->setGain(gain);
+}
+
+int Mixer::loadScene(const int sceneId) {
+  Logging::write(
+    Info,
+    "Audio::Mixer::loadScene",
+    "Loading scene " + std::to_string(sceneId)
+  );
+
+  const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(gAppState->sceneId);
+  // TODO: set effects
+  for (const auto effect : effects) {
+    std::cout << "Mixer load Effects, id = " << effect.id << ", filePath = " << effect.filePath << ", format = " << effect.format << ", name = " << effect.name << ", version = " << effect.version << std::endl;
+  }
+
+  return 0;
+}
+
+int Mixer::saveScene() const {
+  Logging::write(
+    Info,
+    "Audio::Mixer::saveScene",
+    "Saving scene, sceneIndex: " + std::to_string(gAppState->sceneIndex)
+  );
+
+  Db::Scene scene = Db::Scene(gAppState->sceneIndex, "Mixer Scene");
+  const int sceneId = dao->sceneRepository.save(scene);
+  gAppState->sceneId = sceneId;
+
+  for (const auto effectsChannel : effectsChannels) {
+    const int effectCount = effectsChannel->effectCount();
+    for (int i = 0; i < effectCount; i++) {
+      const auto plugin = effectsChannel->getPluginAtIdx(i);
+      const auto dbEffect = Db::Effect(
+        plugin->path,
+        "vst3",
+        plugin->name,
+        0,
+        effectsChannel->getIndex(),
+        i,
+        0
+      );
+      dao->effectRepository.save(dbEffect);
+    }
+  }
+
+  return 0;
 }
 
 
