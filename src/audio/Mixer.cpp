@@ -28,7 +28,7 @@ Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
     "Retrieving effects..."
   );
 
-  loadScene(gAppState->sceneId);
+  loadSceneById(gAppState->sceneId);
 
   jackClient->initialize("GrooveJr");
 
@@ -169,7 +169,7 @@ bool Mixer::setGainOnChannel(const int channelIdx, const float gain) const {
   return effectsChannels.at(channelIdx)->setGain(gain);
 }
 
-int Mixer::loadScene(const int sceneId) {
+int Mixer::loadSceneById(const int sceneId) {
   Logging::write(
     Info,
     "Audio::Mixer::loadScene",

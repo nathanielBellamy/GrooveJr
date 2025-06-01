@@ -85,7 +85,8 @@ public:
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);
   };
 
-  int loadScene(int sceneId);
+  int loadSceneById(int sceneId);
+  int loadSceneByIndex(int sceneId); // TODO
   int saveScene() const;
 
 };
