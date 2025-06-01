@@ -20,6 +20,7 @@
 #include <boost/log/sources/global_logger_storage.hpp>
 
 #include "audio/Logging.h"
+#include "db/Logging.h"
 
 namespace Gj {
 
