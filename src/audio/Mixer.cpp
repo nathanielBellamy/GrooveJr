@@ -172,12 +172,30 @@ bool Mixer::setGainOnChannel(const int channelIdx, const float gain) const {
 int Mixer::loadSceneById(const int sceneId) {
   Logging::write(
     Info,
-    "Audio::Mixer::loadScene",
-    "Loading scene " + std::to_string(sceneId)
+    "Audio::Mixer::loadSceneById",
+    "Loading scene id: " + std::to_string(sceneId)
   );
 
-  const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(gAppState->sceneId);
+  const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(gAppState->getSceneId());
+  setEffects(effects);
 
+  return 0;
+}
+
+int Mixer::loadSceneByIndex(const int sceneIndex) {
+  Logging::write(
+    Info,
+    "Audio::Mixer::loadScene",
+    "Loading scene index: " + std::to_string(sceneIndex)
+  );
+
+  const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneIndex(gAppState->getSceneIndex());
+  setEffects(effects);
+
+  return 0;
+}
+
+int Mixer::setEffects(const std::vector<Db::Effect> &effects) {
   std::vector<std::vector<Db::Effect>> effectsByChannel;
   for (const auto effect : effects) {
     std::cout << "Mixer load Effects, id = " << effect.id << ", filePath = " << effect.filePath << ", format = " << effect.format << ", name = " << effect.name << ", version = " << effect.version << std::endl;
@@ -201,6 +219,7 @@ int Mixer::loadSceneById(const int sceneId) {
 
   return 0;
 }
+
 
 int Mixer::saveScene() const {
   Logging::write(

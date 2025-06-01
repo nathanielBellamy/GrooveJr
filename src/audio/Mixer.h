@@ -86,7 +86,8 @@ public:
   };
 
   int loadSceneById(int sceneId);
-  int loadSceneByIndex(int sceneId); // TODO
+  int loadSceneByIndex(int sceneId);
+  int setEffects(const std::vector<Db::Effect>& effects);
   int saveScene() const;
 
 };
