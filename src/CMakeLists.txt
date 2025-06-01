@@ -54,13 +54,13 @@ find_package(SQLite3 REQUIRED)
 
 # setup local libraries
 add_subdirectory(
-    /Users/ns/code/GrooveJr/src/audio
+    ${GJ_BASE_DIR}/GrooveJr/src/audio
 )
 add_subdirectory(
-    /Users/ns/code/GrooveJr/src/gui
+    ${GJ_BASE_DIR}/GrooveJr/src/gui
 )
 add_subdirectory(
-    /Users/ns/code/GrooveJr/src/db
+     ${GJ_BASE_DIR}/GrooveJr/src/db
 )
 add_definitions(-DQT_NO_VERSION_TAGGING)
 
