@@ -30,10 +30,20 @@ AppStateEntity AppStateRepository::get() const {
   }
 
   if (sqlite3_step(stmt) == SQLITE_ROW) {
+    Logging::write(
+      Info,
+      "Db::AppStateRepository::get",
+      "Loaded app state."
+    );
     const auto appState = AppStateEntity::deser(stmt);
     return appState;
   }
 
+  Logging::write(
+    Error,
+    "Db::AppStateRepository::get",
+    "Failed to load app state."
+  );
   return AppStateEntity::base();
 }
 

@@ -38,7 +38,7 @@ std::vector<Scene> SceneRepository::getAll() const {
   return scenes;
 }
 
-int SceneRepository::save(Scene scene) const {
+int SceneRepository::save(const Scene& scene) const {
   const std::string query = R"sql(
     insert into scenes (sceneIndex, name, version)
     values (?, ?, ?)
@@ -72,7 +72,7 @@ int SceneRepository::save(Scene scene) const {
     );
   }
 
-  return sqlite3_last_insert_rowid(*db);
+  return static_cast<int>(sqlite3_last_insert_rowid(*db));
 }
 
 std::vector<Effect> SceneRepository::getEffects(const int sceneIndex) const {
@@ -102,8 +102,6 @@ std::vector<Effect> SceneRepository::getEffects(const int sceneIndex) const {
 
   sqlite3_bind_int(stmt, 1, sceneIndex);
 
-
-  std::cout << "============== scene get effects ============" << std::endl;
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     const auto effect = Effect::deser(stmt);
     std::cout << "Row: ID = " << effect.id << ", filePath = " << effect.filePath << ", name = " << effect.name << std::endl;

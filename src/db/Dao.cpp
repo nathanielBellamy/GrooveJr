@@ -8,7 +8,8 @@ namespace Gj {
 namespace Db {
 
 Dao::Dao(AppState* gAppState)
-  : gAppState(gAppState)
+  : db(nullptr)
+  , gAppState(gAppState)
   , appStateRepository(&db, gAppState)
   , effectRepository(&db, gAppState)
   , sceneRepository(&db, gAppState)
@@ -17,12 +18,17 @@ Dao::Dao(AppState* gAppState)
 
   if (initDb() == 0) {
     if (initSchema() == 0) {
-      insertTestData();
-      const auto resAppState = appStateRepository.get();
-      const auto resTrack = trackRepository.getAll();
-      const auto resEffect = effectRepository.getAll();
-      const auto resScene = sceneRepository.getAll();
-      const auto resSceneEffects = sceneRepository.getEffects(0);
+      Logging::write(
+        Info,
+        "Db::Dao::constructor",
+        "Initialized Db and constructed Dao"
+      );
+      // insertTestData();
+      // const auto resAppState = appStateRepository.get();
+      // const auto resTrack = trackRepository.getAll();
+      // const auto resEffect = effectRepository.getAll();
+      // const auto resScene = sceneRepository.getAll();
+      // const auto resSceneEffects = sceneRepository.getEffects(0);
     }
   }
 }

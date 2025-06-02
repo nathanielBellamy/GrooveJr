@@ -118,6 +118,11 @@ extern "C" {
         gAppState = new AppState;
         Dao = new Db::Dao(gAppState);
         gAppState->setFromEntity(Dao->appStateRepository.get());
+        Logging::write(
+          Info,
+          "main",
+          "Loaded gAppState: audioFramesPerBuffer = " + std::to_string(gAppState->getAudioFramesPerBuffer()) + ", sceneId: " + std::to_string(gAppState->getSceneId()) + ", sceneIndex: " + std::to_string(gAppState->getSceneIndex()) + "."
+        );
 
         // setup Audio
         initVst3PluginContext();
