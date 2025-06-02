@@ -12,13 +12,13 @@ SceneSelectButton::SceneSelectButton(QWidget* parent, QAction* action, const int
   , action(action)
   , sceneIndex(sceneIndex)
   {
+  setCursor(Qt::PointingHandCursor);
   setText(std::to_string(sceneIndex + 1).data());
   setStyle();
 }
 
 void SceneSelectButton::setStyle() {
-  setMinimumSize(QSize(40, 40));
-  setMaximumSize(QSize(40, 40));
+  setFixedSize(QSize(40, 40));
 }
 
 void SceneSelectButton::mousePressEvent(QMouseEvent* event) {

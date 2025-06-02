@@ -18,6 +18,7 @@
 #include "../../../actors/ActorIds.h"
 #include "../../../messaging/atoms.h"
 
+#include "SceneSaveButton.h"
 #include "SceneSelectButton.h"
 
 namespace Gj {
@@ -30,6 +31,8 @@ class Scenes final : public QWidget {
   Audio::Mixer* mixer;
   QGridLayout grid;
   QLabel title;
+  QAction sceneSaveAction;
+  SceneSaveButton sceneSaveButton;
   QAction selectSceneAction;
   SceneSelectButton selectButtonZero;
   SceneSelectButton selectButtonOne;

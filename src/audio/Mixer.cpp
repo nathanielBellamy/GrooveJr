@@ -189,7 +189,7 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
     "Loading scene index: " + std::to_string(sceneIndex)
   );
 
-  const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneIndex(gAppState->getSceneIndex());
+  const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneIndex(sceneIndex);
   setEffects(effects);
 
   return 0;

@@ -42,7 +42,7 @@ void TransportControl::setPlayState(PlayState newState) {
 }
 
 void TransportControl::connectActions() {
-  connect(&playTrigAction, &QAction::triggered, [&] {
+  const auto playConnection = connect(&playTrigAction, &QAction::triggered, [&] {
     Logging::write(
       Info,
       "Gui::TransportControl",
@@ -57,7 +57,7 @@ void TransportControl::connectActions() {
     );
   });
 
-  connect(&pauseTrigAction, &QAction::triggered, [&] {
+  const auto pauseConnection = connect(&pauseTrigAction, &QAction::triggered, [&] {
     Logging::write(
       Info,
       "Gui::TransportControl",
@@ -72,7 +72,7 @@ void TransportControl::connectActions() {
     );
   });
 
-  connect(&stopTrigAction, &QAction::triggered, [&] {
+  const auto stopConnection = connect(&stopTrigAction, &QAction::triggered, [&] {
     Logging::write(
       Info,
       "Gui::TransportControl",
@@ -87,7 +87,7 @@ void TransportControl::connectActions() {
     );
   });
 
-  connect(&rwTrigAction, &QAction::triggered, [&] {
+  const auto rwConnection = connect(&rwTrigAction, &QAction::triggered, [&] {
     Logging::write(
       Info,
       "Gui::TransportControl",
@@ -102,7 +102,7 @@ void TransportControl::connectActions() {
     );
   });
 
-  connect(&ffTrigAction, &QAction::triggered, [&] {
+  const auto ffConnection = connect(&ffTrigAction, &QAction::triggered, [&] {
     Logging::write(
       Info,
       "Gui::TransportControl",

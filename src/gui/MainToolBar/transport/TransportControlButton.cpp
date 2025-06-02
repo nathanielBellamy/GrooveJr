@@ -11,13 +11,13 @@ TransportControlButton::TransportControlButton(QWidget* parent, QAction* action,
   : QPushButton(parent)
   , action(action)
   {
+  setCursor(Qt::PointingHandCursor);
   setIcon(icon);
   setStyle();
 }
 
 void TransportControlButton::setStyle() {
-  setMinimumSize(QSize(40, 40));
-  setMaximumSize(QSize(40, 40));
+  setFixedSize(QSize(40, 40));
 }
 
 void TransportControlButton::mousePressEvent(QMouseEvent* event) {

@@ -87,6 +87,8 @@ qt_add_library(GjGui STATIC
         MainToolBar/transport/TransportControlButton.cpp
         MainToolBar/scenes/Scenes.h
         MainToolBar/scenes/Scenes.cpp
+        MainToolBar/scenes/SceneSaveButton.h
+        MainToolBar/scenes/SceneSaveButton.cpp
         MainToolBar/scenes/SceneSelectButton.h
         MainToolBar/scenes/SceneSelectButton.cpp
 )

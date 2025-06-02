@@ -14,6 +14,8 @@ Scenes::Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
   , mixer(mixer)
   , grid(this)
   , title(this)
+  , sceneSaveAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSave), tr("&Save Scene"), this)
+  , sceneSaveButton(this, &sceneSaveAction)
   , selectSceneAction(QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen), tr("&Select Scene"), this)
   , selectButtonZero(this, &selectSceneAction, 0)
   , selectButtonOne(this, &selectSceneAction, 1)
@@ -22,8 +24,8 @@ Scenes::Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
   , selectButtonFour(this, &selectSceneAction, 4)
   {
 
-  title.setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  title.setText("Scene:");
+  title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+  title.setText("Scenes");
   title.setFont({title.font().family(), 12});
 
   connectActions();
@@ -32,18 +34,23 @@ Scenes::Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
 
 
 void Scenes::setupGrid() {
-  grid.addWidget(&title, 0, 0, 1, 1);
-  grid.addWidget(&selectButtonZero, 0, 1, 1, 1);
-  grid.addWidget(&selectButtonOne, 0, 2, 1, 1);
-  grid.addWidget(&selectButtonTwo, 0, 3, 1, 1);
-  grid.addWidget(&selectButtonThree, 0, 4, 1, 1);
-  grid.addWidget(&selectButtonFour, 0, 5, 1, 1);
+  grid.addWidget(&title, 0, 0, 1, -1);
+  grid.addWidget(&sceneSaveButton, 0, 3, 1, 2);
+  grid.addWidget(&selectButtonZero, 1, 0, 1, 1);
+  grid.addWidget(&selectButtonOne, 1, 1, 1, 1);
+  grid.addWidget(&selectButtonTwo, 1, 2, 1, 1);
+  grid.addWidget(&selectButtonThree, 1, 3, 1, 1);
+  grid.addWidget(&selectButtonFour, 1, 4, 1, 1);
 
   setLayout(&grid);
 }
 
 void Scenes::connectActions() {
-  // todo
+  const auto selectSceneConnection = connect(&selectSceneAction, &QAction::triggered, [&] {
+    const int sceneIndex = selectSceneAction.data().toInt();
+
+    mixer->loadSceneByIndex(sceneIndex);
+  });
 }
 
 } // Gui
