@@ -189,6 +189,7 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
     "Loading scene index: " + std::to_string(sceneIndex)
   );
 
+  gAppState->setSceneIndex(sceneIndex);
   const int sceneId = dao->sceneRepository.findOrCreateBySceneIndex(sceneIndex);
 
   const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(sceneId);
@@ -198,6 +199,7 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
 }
 
 int Mixer::setEffects(const std::vector<Db::Effect> &effects) {
+  // TODO: clear all effects
   std::vector<std::vector<Db::Effect>> effectsByChannel;
   for (const auto& effect : effects) {
     std::cout << "Mixer load Effects, id = " << effect.id << ", filePath = " << effect.filePath << ", format = " << effect.format << ", name = " << effect.name << ", version = " << effect.version << std::endl;

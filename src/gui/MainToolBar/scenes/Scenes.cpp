@@ -46,6 +46,15 @@ void Scenes::setupGrid() {
 }
 
 void Scenes::connectActions() {
+  const auto saveSceneConnection = connect(&sceneSaveAction, &QAction::triggered, [&] {
+    if (mixer->saveScene() != 0)
+      Logging::write(
+        Error,
+        "Gui::Scenes::connectActions",
+        "Unable to save scene"
+      );
+  });
+
   const auto selectSceneConnection = connect(&selectSceneAction, &QAction::triggered, [&] {
     const int sceneIndex = selectSceneAction.data().toInt();
 
