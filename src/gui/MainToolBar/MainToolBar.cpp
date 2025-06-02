@@ -12,11 +12,12 @@ namespace Gui {
 MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
   : QToolBar(parent)
   , sys(sys)
+  , scenes(this, sys, mixer)
   , currentlyPlaying(this, sys, mixer)
   , transportControl(this, sys, mixer)
   {
 
-  title.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  title.setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
   title.setText("GrooveJr");
   title.setFont({title.font().family(), 36});
   addWidget(&title);
@@ -31,6 +32,10 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer
 
   addWidget(&transportControl);
 
+  addSeparator();
+  addSeparator();
+
+  addWidget(&scenes);
 }
 
 

@@ -25,6 +25,7 @@
 
 #include "CurrentlyPlaying.h"
 #include "TransportControl.h"
+#include "scenes/Scenes.h"
 
 namespace Gj {
 namespace Gui {
@@ -39,6 +40,7 @@ class MainToolBar final : public QToolBar {
   private:
     actor_system& sys;
     QLabel title;
+    Scenes scenes;
     CurrentlyPlaying currentlyPlaying;
     TransportControl transportControl;
 };

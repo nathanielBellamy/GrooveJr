@@ -14,15 +14,12 @@ namespace Gj {
 namespace Gui {
 
 class TransportControlButton final : public QPushButton {
-
   public:
     TransportControlButton(QWidget* parent, QAction* action, QIcon icon);
-    void setMute(float val);
 
   private:
     int channelIndex;
     QAction* action;
-    std::string styleString(float muteVal) const;
     void setStyle();
     void mousePressEvent(QMouseEvent* event) override;
 };
