@@ -27,6 +27,7 @@ class SceneRepository {
     std::vector<Scene> getAll() const;
     int save(Scene scene) const;
     std::vector<Effect> getEffects(int sceneIndex) const;
+    int findOrCreateBySceneIndex(int sceneIndex) const;
 };
 
 } // Db

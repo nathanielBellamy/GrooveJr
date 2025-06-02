@@ -189,7 +189,9 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
     "Loading scene index: " + std::to_string(sceneIndex)
   );
 
-  const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneIndex(sceneIndex);
+  const int sceneId = dao->sceneRepository.findOrCreateBySceneIndex(sceneIndex);
+
+  const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(sceneId);
   setEffects(effects);
 
   return 0;
@@ -197,10 +199,10 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
 
 int Mixer::setEffects(const std::vector<Db::Effect> &effects) {
   std::vector<std::vector<Db::Effect>> effectsByChannel;
-  for (const auto effect : effects) {
+  for (const auto& effect : effects) {
     std::cout << "Mixer load Effects, id = " << effect.id << ", filePath = " << effect.filePath << ", format = " << effect.format << ", name = " << effect.name << ", version = " << effect.version << std::endl;
     while (effectsByChannel.size() <= effect.channelIndex) {
-      effectsByChannel.push_back(std::vector<Db::Effect>());
+      effectsByChannel.emplace_back();
     }
 
     effectsByChannel.at(effect.channelIndex).push_back(effect);
@@ -210,10 +212,15 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) {
     addEffectsChannel();
   }
 
-  for (const auto effectsChannelEffects : effectsByChannel) {
+  for (const auto& effectsChannelEffects : effectsByChannel) {
     std::sort(effectsChannelEffects.begin(), effectsChannelEffects.end());
-    for (const auto effect : effectsChannelEffects) {
-      addEffectToChannel(effect.channelIndex, effect.filePath);
+    for (const auto& effect : effectsChannelEffects) {
+      if (!addEffectToChannel(effect.channelIndex, effect.filePath))
+        Logging::write(
+          Error,
+          "Audio::Mixer::setEffects",
+          "Could not add effect: " + effect.filePath + " to channel " + std::to_string(effect.channelIndex)
+        );
     }
   }
 
@@ -245,11 +252,16 @@ int Mixer::saveScene() const {
         i,
         0
       );
-      dao->effectRepository.save(dbEffect);
+      if (!dao->effectRepository.save(dbEffect))
+        Logging::write(
+          Error,
+          "Audio::Mixer::saveScene",
+          "Unable to save effect: " + dbEffect.filePath + " to sceneId: " + std::to_string(sceneId)
+        );
     }
   }
 
-  return 0;
+  return sceneId;
 }
 
 

@@ -113,5 +113,58 @@ std::vector<Effect> SceneRepository::getEffects(const int sceneIndex) const {
   return effects;
 }
 
+int SceneRepository::findOrCreateBySceneIndex(const int sceneIndex) const {
+  // find
+  const std::string query = R"sql(
+    select *
+    from scenes
+    where sceneIndex = ?
+    order by version desc
+    limit 1
+  )sql";
+
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::SceneRepository::getEffects",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return 0;
+  }
+
+  sqlite3_bind_int(stmt, 1, sceneIndex);
+
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    const auto scene = Effect::deser(stmt);
+    return scene.id;
+  }
+
+  // or create
+  const std::string insertQuery = R"sql(
+    insert into scenes (sceneIndex, name, version)
+    values (?, "Empty Scene", 1);
+  )sql";
+
+  sqlite3_stmt* insertStmt;
+  if (sqlite3_prepare_v2(*db, insertQuery.c_str(), -1, &insertStmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::SceneRepository::getEffects",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return 0;
+  }
+
+  sqlite3_bind_int(insertStmt, 1, sceneIndex);
+
+  if (sqlite3_step(insertStmt) == SQLITE_OK)
+    return static_cast<int>(sqlite3_last_insert_rowid(*db));
+
+  return 0;
+}
+
+
 } // Db
 } // Gj
