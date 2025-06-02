@@ -23,6 +23,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
     , mixerWindow(&container, actorSystem, mixer)
     {
 
+  container.setMinimumSize(QSize(1200, 700));
   setCentralWidget(&container);
   initGrid();
   setStyleSheet(
@@ -31,7 +32,6 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
   addToolBar(Qt::TopToolBarArea, &mainToolBar);
   setUnifiedTitleAndToolBarOnMac(true);
   setWindowTitle("GrooveJr");
-  resize(640, 480);
 }
 
 int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {

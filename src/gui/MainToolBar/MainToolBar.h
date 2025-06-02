@@ -24,7 +24,7 @@
 #include "../Color.h"
 
 #include "CurrentlyPlaying.h"
-#include "TransportControl.h"
+#include "transport/TransportControl.h"
 #include "scenes/Scenes.h"
 
 namespace Gj {

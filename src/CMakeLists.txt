@@ -80,8 +80,8 @@ add_executable(GrooveJr
         enums/PlayState.h
         messaging/atoms.h
         messaging/EnvelopeQtPtr.h
-        gui/MainToolbar/TransportControl.cpp
-        gui/MainToolbar/TransportControl.h
+        gui/MainToolBar/transport/TransportControl.cpp
+        gui/MainToolBar/transport/TransportControl.h
         actors/Display.h
 )
 target_link_libraries(GrooveJr

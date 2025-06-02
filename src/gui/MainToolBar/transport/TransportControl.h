@@ -15,13 +15,13 @@
 #include <QStyle>
 #include <QWidget>
 
-#include "../../Logging.h"
-#include "../../actors/ActorIds.h"
-#include "../../messaging/atoms.h"
-#include "../../messaging/EnvelopeQtPtr.h"
-#include "../../enums/PlayState.h"
-#include "../../audio/Mixer.h"
-#include "../Color.h"
+#include "../../../Logging.h"
+#include "../../../actors/ActorIds.h"
+#include "../../../messaging/atoms.h"
+#include "../../../messaging/EnvelopeQtPtr.h"
+#include "../../../enums/PlayState.h"
+#include "../../../audio/Mixer.h"
+#include "../../Color.h"
 
 #include "TransportControlButton.h"
 #include "ProgressBar.h"

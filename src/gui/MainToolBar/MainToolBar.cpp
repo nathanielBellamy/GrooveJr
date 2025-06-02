@@ -17,27 +17,18 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer
   , transportControl(this, sys, mixer)
   {
 
-  title.setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+  title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
   title.setText("GrooveJr");
   title.setFont({title.font().family(), 36});
+
   addWidget(&title);
-
   addSeparator();
-  addSeparator();
-
   addWidget(&currentlyPlaying);
-
   addSeparator();
-  addSeparator();
-
   addWidget(&transportControl);
-
   addSeparator();
-  addSeparator();
-
   addWidget(&scenes);
 }
-
 
 int MainToolBar::hydrateState(const AppStatePacket& appStatePacket) {
   Logging::write(

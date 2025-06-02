@@ -12,7 +12,7 @@
 #include <QPen>
 #include <QWidget>
 
-#include "../../audio/Mixer.h"
+#include "../../../audio/Mixer.h"
 
 namespace Gj {
 namespace Gui {
