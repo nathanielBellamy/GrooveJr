@@ -24,6 +24,7 @@
 
 #include "../audio/Mixer.h"
 
+#include <QAction>
 #include <QCloseEvent>
 #include <QMainWindow>
 #include <QGridLayout>
@@ -45,12 +46,14 @@ class MainWindow final : public QMainWindow {
     void (*shutdown_handler)(int);
     QWidget container;
     MenuBar* menuBar;
+    QAction sceneLoadAction;
     MainToolBar mainToolBar;
     QGridLayout grid;
     MusicLibraryWindow musicLibraryWindow;
     MixerWindow mixerWindow;
 
-    void initGrid();
+    void setupGrid();
+    void connectActions();
 };
 
 } // Gui

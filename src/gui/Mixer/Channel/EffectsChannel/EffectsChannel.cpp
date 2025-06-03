@@ -266,6 +266,16 @@ void EffectsChannel::setupPanRSlider() {
   });
 }
 
+int EffectsChannel::addEffect(const std::string &effectPath) {
+  effectsSlots.addEffectSlot();
+  const int newEffectIndex = mixer->effectsOnChannelCount(channelIndex) - 1;
+  const std::string name = mixer->getPluginName(channelIndex, newEffectIndex);
+  effectsContainer.addEffect(newEffectIndex, name);
+
+  return 0;
+}
+
+
 void EffectsChannel::connectActions() {
   auto openEffectsContainerConnection = connect(&openEffectsContainer, &QAction::triggered, [&]() {
     effectsContainer.show();
@@ -295,20 +305,18 @@ void EffectsChannel::connectActions() {
           "Gui::EffectsChannel::addEffectAction",
           "Unable to add effect " + effectPath + " to channel " + std::to_string(channelIndex)
         );
-      }
-      effectsSlots.addEffectSlot();
-      const int newEffectIndex = mixer->effectsOnChannelCount(channelIndex) - 1;
-      const std::string name = mixer->getPluginName(channelIndex, newEffectIndex);
-      effectsContainer.addEffect(newEffectIndex, name);
+      } else {
+        addEffect(effectPath);
 
-      appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-      const scoped_actor self{ actorSystem };
-      self->anon_send(
-          actor_cast<actor>(appStateManagerPtr),
-          channelIndex,
-          effectPath,
-          mix_add_effect_to_channel_a_v
-      );
+        appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+        const scoped_actor self{ actorSystem };
+        self->anon_send(
+            actor_cast<actor>(appStateManagerPtr),
+            channelIndex,
+            effectPath,
+            mix_add_effect_to_channel_a_v
+        );
+      }
     }
   });
 

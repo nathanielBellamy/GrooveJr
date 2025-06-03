@@ -17,7 +17,8 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
     , shutdown_handler(shutdown_handler)
     , container(this)
     , menuBar(new MenuBar(actorSystem, this))
-    , mainToolBar(this, actorSystem, mixer)
+    , sceneLoadAction(QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen), tr("&Select Scene"), this)
+    , mainToolBar(this, actorSystem, mixer, &sceneLoadAction)
     , grid(&container)
     , musicLibraryWindow(&container, actorSystem)
     , mixerWindow(&container, actorSystem, mixer)
@@ -25,7 +26,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
 
   container.setMinimumSize(QSize(1200, 700));
   setCentralWidget(&container);
-  initGrid();
+  setupGrid();
   setStyleSheet(
     "font-weight: 900;"
   );
@@ -45,7 +46,7 @@ int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
     return 0;
 }
 
-void MainWindow::initGrid() {
+void MainWindow::setupGrid() {
   grid.setVerticalSpacing(1);
   grid.setColumnStretch(0, 1);
 
@@ -68,6 +69,22 @@ void MainWindow::closeEvent (QCloseEvent* e) {
     "Closing GroveJr"
   );
   shutdown_handler(3);
+}
+
+void MainWindow::connectActions() {
+  const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
+    const int sceneIndex = sceneLoadAction.data().toInt();
+
+    mixer->loadSceneByIndex(sceneIndex);
+
+    for (const auto& effectsChannel : mixer->getEffectsChannels()) {
+      const int effectCount = effectsChannel->effectCount();
+      for (int i = 0; i < effectCount; i++) {
+        const auto* plugin = effectsChannel->getPluginAtIdx(i);
+        mixerWindow.addEffectToChannel(effectsChannel->getIndex(), plugin->path);
+      }
+    }
+  });
 }
 
 } // Gui

@@ -95,6 +95,10 @@ void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
   }
 }
 
+int EffectsChannelsContainer::addEffectToChannel(int channelIdx, const std::string &effectPath) const {
+  return channels.at(channelIdx)->addEffect(effectPath);
+}
+
 void EffectsChannelsContainer::connectActions() {
   auto addEffectsChannelConnection = connect(&addEffectsChannelAction, &QAction::triggered, [&]() {
     Logging::write(

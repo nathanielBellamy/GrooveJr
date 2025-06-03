@@ -33,7 +33,6 @@ class Scenes final : public QWidget {
   QLabel title;
   QAction sceneSaveAction;
   SceneSaveButton sceneSaveButton;
-  QAction selectSceneAction;
   SceneSelectButton selectButtonZero;
   SceneSelectButton selectButtonOne;
   SceneSelectButton selectButtonTwo;
@@ -44,7 +43,7 @@ class Scenes final : public QWidget {
   void setupGrid();
 
   public:
-    Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer);
+    Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction* sceneLoadAction);
 };
 
 

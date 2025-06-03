@@ -4,11 +4,10 @@
 
 #include "Scenes.h"
 
-
 namespace Gj {
 namespace Gui {
 
-Scenes::Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
+Scenes::Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction* sceneLoadAction)
   : QWidget(parent)
   , sys(sys)
   , mixer(mixer)
@@ -16,12 +15,11 @@ Scenes::Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
   , title(this)
   , sceneSaveAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSave), tr("&Save Scene"), this)
   , sceneSaveButton(this, &sceneSaveAction)
-  , selectSceneAction(QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen), tr("&Select Scene"), this)
-  , selectButtonZero(this, &selectSceneAction, 0)
-  , selectButtonOne(this, &selectSceneAction, 1)
-  , selectButtonTwo(this, &selectSceneAction, 2)
-  , selectButtonThree(this, &selectSceneAction, 3)
-  , selectButtonFour(this, &selectSceneAction, 4)
+  , selectButtonZero(this, sceneLoadAction, 0)
+  , selectButtonOne(this, sceneLoadAction, 1)
+  , selectButtonTwo(this, sceneLoadAction, 2)
+  , selectButtonThree(this, sceneLoadAction, 3)
+  , selectButtonFour(this, sceneLoadAction, 4)
   {
 
   title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
@@ -53,12 +51,6 @@ void Scenes::connectActions() {
         "Gui::Scenes::connectActions",
         "Unable to save scene"
       );
-  });
-
-  const auto selectSceneConnection = connect(&selectSceneAction, &QAction::triggered, [&] {
-    const int sceneIndex = selectSceneAction.data().toInt();
-
-    mixer->loadSceneByIndex(sceneIndex);
   });
 }
 

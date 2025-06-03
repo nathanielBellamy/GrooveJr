@@ -51,6 +51,9 @@ class EffectsChannelsContainer final : public QWidget {
     void setSolo(int channelIdx, float val) const;
     void setSoloL(int channelIdx, float val) const;
     void setSoloR(int channelIdx, float val) const;
+    void addEffectsChannel();
+    void removeEffectsChannel(int channelIdx);
+    int addEffectToChannel(int channelIdx, const std::string& effectPath) const;
 
   private:
     actor_system& actorSystem;
@@ -70,8 +73,6 @@ class EffectsChannelsContainer final : public QWidget {
     QAction* soloChannelAction;
     QAction* soloLChannelAction;
     QAction* soloRChannelAction;
-    void addEffectsChannel();
-    void removeEffectsChannel(int channelIdx);
     void connectActions();
     void setStyle();
     void setupGrid();

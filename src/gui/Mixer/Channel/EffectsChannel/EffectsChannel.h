@@ -59,6 +59,7 @@ class EffectsChannel final : public QWidget {
     void setSolo(float val);
     void setSoloL(float val);
     void setSoloR(float val);
+    int addEffect(const std::string& effectPath);
 
   private:
     actor_system& actorSystem;

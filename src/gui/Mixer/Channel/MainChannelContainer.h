@@ -58,6 +58,8 @@ class MainChannelContainer final : public QWidget {
     void setSoloR(float val) {
       mainChannel.setSoloR(val);
     };
+
+    int addEffect(const std::string& effectPath);
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;

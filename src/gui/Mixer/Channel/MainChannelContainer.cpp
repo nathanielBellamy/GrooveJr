@@ -46,5 +46,10 @@ void MainChannelContainer::setupGrid() {
   grid.addWidget(&mainChannel, 0, 0, -1, -1);
 }
 
+int MainChannelContainer::addEffect(const std::string &effectPath) {
+  return mainChannel.addEffect(effectPath);
+}
+
+
 } // Gui
 } // Gj

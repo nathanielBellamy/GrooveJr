@@ -60,6 +60,14 @@ void MixerWindow::setupGrid() {
   setLayout(&grid);
 }
 
+int MixerWindow::addEffectToChannel(int channelIndex, const std::string &effectPath) {
+  if (channelIndex == 0)
+    return mainChannelContainer.addEffect(effectPath);
+
+  return effectsChannelsContainer.addEffectToChannel(channelIndex, effectPath);
+}
+
+
 void MixerWindow::connectActions() {
   auto muteChannelConnection = connect(&muteChannelAction, &QAction::triggered, [&]() {
     const int channelIdx = muteChannelAction.data().toInt();

@@ -34,7 +34,7 @@ using namespace caf;
 
 class MainToolBar final : public QToolBar {
   public:
-    MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer);
+    MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction* sceneLoadAction);
     int hydrateState(const AppStatePacket& appStatePacket);
 
   private:

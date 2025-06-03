@@ -9,10 +9,10 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 
-MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
+MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction* sceneLoadAction)
   : QToolBar(parent)
   , sys(sys)
-  , scenes(this, sys, mixer)
+  , scenes(this, sys, mixer, sceneLoadAction)
   , currentlyPlaying(this, sys, mixer)
   , transportControl(this, sys, mixer)
   {
