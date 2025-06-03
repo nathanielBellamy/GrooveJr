@@ -12,11 +12,12 @@ namespace Db {
 
 
 struct AppStateEntity {
+  int id;
   int audioFramesPerBuffer;
   int sceneId;
   int sceneIndex;
 
-  AppStateEntity(int audioFramesPerBuffer, int sceneId, int sceneIndex);
+  AppStateEntity(int id, int audioFramesPerBuffer, int sceneId, int sceneIndex);
 
   static AppStateEntity deser(sqlite3_stmt* stmt);
 

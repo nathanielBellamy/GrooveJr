@@ -117,11 +117,24 @@ extern "C" {
         // setup Sql
         gAppState = new AppState;
         Dao = new Db::Dao(gAppState);
+        const auto appStateEntity = Dao->appStateRepository.get();
+        if (appStateEntity.id == 0) {
+          // no appState in Db, init one
+          if (Dao->appStateRepository.save() != 0)
+            Logging::write(
+              Error,
+              "main",
+              "Failed to save initial AppState"
+            );
+        }
+
+        std::cout << "main app state id = " << appStateEntity.id << std::endl;
+
         gAppState->setFromEntity(Dao->appStateRepository.get());
         Logging::write(
           Info,
           "main",
-          "Loaded gAppState: audioFramesPerBuffer = " + std::to_string(gAppState->getAudioFramesPerBuffer()) + ", sceneId: " + std::to_string(gAppState->getSceneId()) + ", sceneIndex: " + std::to_string(gAppState->getSceneIndex()) + "."
+          "Loaded gAppState: id = " + std::to_string(gAppState->id) + "audioFramesPerBuffer = " + std::to_string(gAppState->getAudioFramesPerBuffer()) + ", sceneId: " + std::to_string(gAppState->getSceneId()) + ", sceneIndex: " + std::to_string(gAppState->getSceneIndex()) + "."
         );
 
         // setup Audio

@@ -411,7 +411,7 @@ int Cassette::setupAudioData() {
 }
 
 IAudioClient::Buffers Cassette::getPluginBuffersMain(const int pluginIdx) const {
-  const int32_t audioFramesPerBuffer = gAppState->audioFramesPerBuffer;
+  const int32_t audioFramesPerBuffer = gAppState->getAudioFramesPerBuffer();
   if (pluginIdx % 2 == 0) {
     const IAudioClient::Buffers buffers = {
       buffersAPtr,
@@ -435,7 +435,7 @@ IAudioClient::Buffers Cassette::getPluginBuffersMain(const int pluginIdx) const 
 }
 
 IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, const AudioData& audioData) const {
-  const int32_t audioFramesPerBuffer = gAppState->audioFramesPerBuffer;
+  const int32_t audioFramesPerBuffer = gAppState->getAudioFramesPerBuffer();
   const int effectsCount = effectsChannel->effectCount(); // should always be >0
   if (pluginIdx % 2 == 0) {
     if (pluginIdx == effectsCount - 1) {

@@ -14,6 +14,7 @@
 namespace Gj {
 
 struct AppStatePacket {
+    int id;
     int audioFramesPerBuffer;
     int playState;
     int sceneId;
@@ -26,18 +27,25 @@ bool inspect(Inspector& f, AppStatePacket& x) {
 }
 
 struct AppState {
-  std::atomic<int> audioFramesPerBuffer;
-  std::atomic<PlayState> playState;
-  std::atomic<int> sceneId;
-  std::atomic<int> sceneIndex;
+  std::atomic<int> id{};
+  std::atomic<int> audioFramesPerBuffer{};
+  std::atomic<PlayState> playState{};
+  std::atomic<int> sceneId{};
+  std::atomic<int> sceneIndex{};
 
   AppState();
-  AppState(int audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
+  AppState(int id, int audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
   AppStatePacket toPacket() const;
   static AppState fromAppStateEntity(Db::AppStateEntity appStateEntity);
 
   // mutations
-  void setFromEntity(Db::AppStateEntity appStateEntity);
+  void setFromEntity(const Db::AppStateEntity appStateEntity) {
+    id.store(appStateEntity.id);
+    audioFramesPerBuffer.store(appStateEntity.audioFramesPerBuffer);
+    playState.store( STOP);
+    sceneId.store(appStateEntity.sceneId);
+    sceneIndex.store(appStateEntity.sceneIndex);
+  };
 
   int getAudioFramesPerBuffer() const {
     return audioFramesPerBuffer.load();

@@ -28,7 +28,11 @@ Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
     "Retrieving effects..."
   );
 
-  loadSceneById(gAppState->sceneId);
+  if (gAppState->sceneId == 0) {
+    loadSceneByIndex(0);
+  } else {
+    loadSceneById(gAppState->sceneId);
+  }
 
   jackClient->initialize("GrooveJr");
 
@@ -191,6 +195,9 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
 
   gAppState->setSceneIndex(sceneIndex);
   const int sceneId = dao->sceneRepository.findOrCreateBySceneIndex(sceneIndex);
+  gAppState->setSceneId(sceneId);
+  dao->appStateRepository.save();
+  gAppState->setFromEntity(dao->appStateRepository.get());
 
   const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(sceneId);
   setEffects(effects);

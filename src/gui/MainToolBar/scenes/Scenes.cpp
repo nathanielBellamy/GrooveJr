@@ -45,12 +45,12 @@ void Scenes::setupGrid() {
 
 void Scenes::connectActions() {
   const auto saveSceneConnection = connect(&sceneSaveAction, &QAction::triggered, [&] {
-    if (mixer->saveScene() != 0)
-      Logging::write(
-        Error,
-        "Gui::Scenes::connectActions",
-        "Unable to save scene"
-      );
+    const auto sceneId = mixer->saveScene();
+    Logging::write(
+      Info,
+      "Gui::Scenes::connectActions",
+      "Saved scene id: " + std::to_string(sceneId)
+    );
   });
 }
 

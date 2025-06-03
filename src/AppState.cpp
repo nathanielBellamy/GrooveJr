@@ -4,10 +4,13 @@
 
 #include "AppState.h"
 
+#include "actors/AudioThread.h"
+
 namespace Gj {
 
-AppState::AppState(const int audioFramesPerBuffer, const PlayState playState, const int sceneId, const int sceneIndex)
-  : audioFramesPerBuffer(audioFramesPerBuffer)
+AppState::AppState(const int id, const int audioFramesPerBuffer, const PlayState playState, const int sceneId, const int sceneIndex)
+  : id(id)
+  , audioFramesPerBuffer(audioFramesPerBuffer)
   , playState(playState)
   , sceneId(sceneId)
   , sceneIndex(sceneIndex)
@@ -15,22 +18,16 @@ AppState::AppState(const int audioFramesPerBuffer, const PlayState playState, co
 
 AppState::AppState() {
   const auto appState = fromAppStateEntity(Db::AppStateEntity::base());
+  id.store(appState.id);
   audioFramesPerBuffer.store( appState.audioFramesPerBuffer);
   playState.store( appState.playState);
   sceneId.store( appState.sceneId);
   sceneIndex.store(appState.sceneIndex);
 }
 
-void AppState::setFromEntity(const Db::AppStateEntity appStateEntity) {
-  audioFramesPerBuffer.store(appStateEntity.audioFramesPerBuffer);
-  playState.store( STOP);
-  sceneId.store(appStateEntity.sceneId);
-  sceneIndex.store(appStateEntity.sceneIndex);
-}
-
-
 AppStatePacket AppState::toPacket() const {
     const AppStatePacket packet {
+      id.load(),
       audioFramesPerBuffer.load(),
       psToInt(playState.load()),
       sceneId.load(),
@@ -39,13 +36,13 @@ AppStatePacket AppState::toPacket() const {
 }
 
 AppState AppState::fromAppStateEntity(const Db::AppStateEntity appStateEntity) {
-  return AppState(
+  return {
+    appStateEntity.id,
     appStateEntity.audioFramesPerBuffer,
     STOP,
     appStateEntity.sceneId,
     appStateEntity.sceneIndex
-  );
+  };
 }
-
 
 } // Gj
