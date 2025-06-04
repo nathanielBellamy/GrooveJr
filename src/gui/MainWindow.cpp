@@ -34,7 +34,6 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
   addToolBar(Qt::TopToolBarArea, &mainToolBar);
   setUnifiedTitleAndToolBarOnMac(true);
   setWindowTitle("GrooveJr");
-  setEffects();
 }
 
 int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
@@ -88,10 +87,17 @@ void MainWindow::setEffects() {
     }
   }
 
+  const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+  const scoped_actor self{ actorSystem };
+  self->anon_send(
+      actor_cast<actor>(appStateManagerPtr),
+      hydrate_display_a_v
+  );
+
   Logging::write(
     Info,
     "Gui::MainWindow::setEffects",
-    "Done settting effects."
+    "Done setting effects."
   );
 }
 
@@ -106,8 +112,13 @@ void MainWindow::connectActions() {
     );
 
     mixer->loadSceneByIndex(sceneIndex);
-
     setEffects();
+
+    Logging::write(
+      Info,
+      "Gui::MainWindow::sceneLoadAction",
+      "Done loading sceneIndex: " + std::to_string(sceneIndex)
+    );
   });
 }
 

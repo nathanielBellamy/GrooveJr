@@ -86,6 +86,7 @@ void caf_main(int argc, char *argv[], void (*shutdown_handler) (int), actor_syst
   Logging::write(Info, "caf_main", "Supervisor actor spawned");
 
   mainWindow.show();
+  mainWindow.setEffects();
   qtApp.exec();
 }
 

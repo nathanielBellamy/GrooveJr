@@ -52,7 +52,10 @@ struct AppStateManagerTrait {
                                  result<void>(strong_actor_ptr, bool, tc_trig_ff_ar),
 
                                  // Read state
-                                 result<void>(strong_actor_ptr, read_state_a)
+                                 result<void>(strong_actor_ptr, read_state_a),
+
+                                 // Hydrate state
+                                 result<void>(hydrate_display_a)
                                >;
 };
 
@@ -96,6 +99,14 @@ struct AppStateManagerState {
 
      AppStateManager::behavior_type make_behavior() {
        return {
+           [this](hydrate_display_a) {
+             Logging::write(
+               Info,
+               "Act::AppStateManager::hydrate_display_a",
+               "Hydrating state to display"
+             );
+             hydrateStateToDisplay();
+           },
            [this](mix_add_effects_channel_a) {
              Logging::write(
                Info,

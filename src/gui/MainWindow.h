@@ -39,6 +39,7 @@ class MainWindow final : public QMainWindow {
     explicit MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*shutdown_handler) (int));
     int hydrateState(const AppStatePacket& appStatePacket);
     void closeEvent(QCloseEvent* event) override;
+    void setEffects();
 
   private:
     actor_system& actorSystem;
@@ -54,7 +55,6 @@ class MainWindow final : public QMainWindow {
 
     void setupGrid();
     void connectActions();
-    void setEffects();
 };
 
 } // Gui
