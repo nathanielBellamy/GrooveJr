@@ -101,6 +101,10 @@ void MainWindow::setEffects() {
   );
 }
 
+void MainWindow::resetChannels(const int effectsChannelsCount) {
+  mixerWindow.resetChannels(effectsChannelsCount);
+}
+
 
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
@@ -112,6 +116,7 @@ void MainWindow::connectActions() {
     );
 
     mixer->loadSceneByIndex(sceneIndex);
+    resetChannels(mixer->getEffectsChannelsCount());
     setEffects();
 
     Logging::write(

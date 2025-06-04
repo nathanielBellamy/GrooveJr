@@ -60,6 +60,8 @@ class MainChannelContainer final : public QWidget {
     };
 
     int addEffect(const std::string& effectPath);
+    void resetChannel();
+
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;

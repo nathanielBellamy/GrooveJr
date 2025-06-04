@@ -136,6 +136,11 @@ void MixerWindow::connectActions() {
   });
 }
 
+void MixerWindow::resetChannels(const int effectsChannelsCount) {
+  mainChannelContainer.resetChannel();
+  effectsChannelsContainer.resetChannels(effectsChannelsCount);
+}
+
 
 } // Gui
 } // Gj

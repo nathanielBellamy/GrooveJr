@@ -195,5 +195,16 @@ void EffectsChannelsContainer::setSoloR(const int channelIdx, const float val) c
   channels.at(channelIdx - 1)->setSoloR(val);
 }
 
+void EffectsChannelsContainer::resetChannels(const int effectsChannelsCount) {
+  while (effectsChannelsCount < channels.size()) {
+    delete channels.back();
+    channels.pop_back();
+  }
+
+  for (const auto& channel : channels) {
+    channel->reset();
+  }
+}
+
 } // Gui
 } // Gj

@@ -53,6 +53,7 @@ class MainWindow final : public QMainWindow {
     MusicLibraryWindow musicLibraryWindow;
     MixerWindow mixerWindow;
 
+    void resetChannels(int effectsChannelsCount);
     void setupGrid();
     void connectActions();
 };

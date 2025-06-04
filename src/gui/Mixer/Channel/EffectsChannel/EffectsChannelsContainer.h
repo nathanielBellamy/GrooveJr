@@ -54,6 +54,7 @@ class EffectsChannelsContainer final : public QWidget {
     void addEffectsChannel();
     void removeEffectsChannel(int channelIdx);
     int addEffectToChannel(int channelIdx, const std::string& effectPath) const;
+    void resetChannels(int effectsChannelsCount);
 
   private:
     actor_system& actorSystem;

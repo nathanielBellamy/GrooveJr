@@ -50,6 +50,9 @@ int MainChannelContainer::addEffect(const std::string &effectPath) {
   return mainChannel.addEffect(effectPath);
 }
 
+void MainChannelContainer::resetChannel() {
+  mainChannel.reset();
+}
 
 } // Gui
 } // Gj

@@ -64,13 +64,12 @@ Mixer::~Mixer() {
     "Destroying Mixer."
   );
 
-  for (const auto channel : effectsChannels) {
-    delete channel;
-  }
+  deleteChannels();
+
   Logging::write(
     Info,
     "Audio::Mixer::~Mixer",
-    "Mixer done delete effectsChannels"
+    "Mixer done deleting effectsChannels"
   );
 
   if (jack_client_close(jackClient->getJackClient())) {
@@ -217,7 +216,37 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
   return 0;
 }
 
+int Mixer::deleteChannels() {
+  Logging::write(
+    Info,
+    "Audio::Mixer::deleteChannels",
+    "Deleting channels."
+  );
+
+  for (const auto effectsChannel : effectsChannels)
+    delete effectsChannel;
+
+  effectsChannels.clear();
+
+  Logging::write(
+    Info,
+    "Audio::Mixer::deleteChannels",
+    "Done deleting channels."
+  );
+
+  return 0;
+}
+
+
 int Mixer::setEffects(const std::vector<Db::Effect> &effects) {
+  deleteChannels();
+
+  Logging::write(
+    Info,
+    "Audio::Mixer::setEffects",
+    "Setting effects."
+  );
+
   // TODO: clear all effects
   std::vector<std::vector<Db::Effect>> effectsByChannel;
   for (const auto& effect : effects) {
@@ -244,6 +273,11 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) {
     }
   }
 
+  Logging::write(
+    Info,
+    "Audio::Mixer::setEffects",
+    "Done setting effects."
+  );
   return 0;
 }
 

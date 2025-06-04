@@ -388,5 +388,9 @@ void EffectsChannel::setSoloR(const float val) {
   muteSoloContainer.setSoloR(val);
 }
 
+void EffectsChannel::reset() {
+  // TODO
+}
+
 } // Gui
 } // Gj

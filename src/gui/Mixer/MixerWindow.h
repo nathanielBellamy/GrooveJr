@@ -28,6 +28,7 @@ class MixerWindow final : public QWidget {
     explicit MixerWindow(QWidget *parent, actor_system& actorSystem, Audio::Mixer* mixer);
     void hydrateState(const AppStatePacket& appStatePacket);
     int addEffectToChannel(int channelIndex, const std::string& effectPath);
+    void resetChannels(int effectsChannelsCount);
 
   private:
     actor_system& actorSystem;
