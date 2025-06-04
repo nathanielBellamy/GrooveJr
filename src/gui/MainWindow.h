@@ -54,6 +54,7 @@ class MainWindow final : public QMainWindow {
 
     void setupGrid();
     void connectActions();
+    void setEffects();
 };
 
 } // Gui

@@ -195,12 +195,24 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
 
   gAppState->setSceneIndex(sceneIndex);
   const int sceneId = dao->sceneRepository.findOrCreateBySceneIndex(sceneIndex);
+  Logging::write(
+    Info,
+    "Audio::Mixer::loadSceneByIndex",
+    "Found sceneIndex: " + std::to_string(sceneIndex) + " with sceneId: " + std::to_string(sceneId)
+  );
+
   gAppState->setSceneId(sceneId);
   dao->appStateRepository.save();
   gAppState->setFromEntity(dao->appStateRepository.get());
 
   const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(sceneId);
   setEffects(effects);
+
+  Logging::write(
+    Info,
+    "Audio::Mixer::loadSceneByIndex",
+    "Set Effects."
+  );
 
   return 0;
 }

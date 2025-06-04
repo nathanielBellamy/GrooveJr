@@ -30,9 +30,11 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*sh
   setStyleSheet(
     "font-weight: 900;"
   );
+  connectActions();
   addToolBar(Qt::TopToolBarArea, &mainToolBar);
   setUnifiedTitleAndToolBarOnMac(true);
   setWindowTitle("GrooveJr");
+  setEffects();
 }
 
 int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
@@ -71,19 +73,41 @@ void MainWindow::closeEvent (QCloseEvent* e) {
   shutdown_handler(3);
 }
 
+void MainWindow::setEffects() {
+  Logging::write(
+    Info,
+    "Gui::MainWindow::setEffects",
+    "Setting effects."
+  );
+
+  for (const auto& effectsChannel : mixer->getEffectsChannels()) {
+    const int effectCount = effectsChannel->effectCount();
+    for (int i = 0; i < effectCount; i++) {
+      const auto* plugin = effectsChannel->getPluginAtIdx(i);
+      mixerWindow.addEffectToChannel(effectsChannel->getIndex(), plugin->path);
+    }
+  }
+
+  Logging::write(
+    Info,
+    "Gui::MainWindow::setEffects",
+    "Done settting effects."
+  );
+}
+
+
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
     const int sceneIndex = sceneLoadAction.data().toInt();
+    Logging::write(
+      Info,
+      "Gui::MainWindow::sceneLoadAction",
+      "Loading scene: " + std::to_string(sceneIndex)
+    );
 
     mixer->loadSceneByIndex(sceneIndex);
 
-    for (const auto& effectsChannel : mixer->getEffectsChannels()) {
-      const int effectCount = effectsChannel->effectCount();
-      for (int i = 0; i < effectCount; i++) {
-        const auto* plugin = effectsChannel->getPluginAtIdx(i);
-        mixerWindow.addEffectToChannel(effectsChannel->getIndex(), plugin->path);
-      }
-    }
+    setEffects();
   });
 }
 

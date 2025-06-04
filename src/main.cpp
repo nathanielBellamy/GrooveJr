@@ -145,9 +145,8 @@ extern "C" {
           "Instantiated Mixer"
         );
 
-        Mixer->addEffectsChannel(); // main
-        Mixer->addEffectsChannel(); // channel 1
-        // Mixer->addEffectsChannel();
+        while (Mixer->getEffectsChannelsCount() < 1) // at least main and channel 1
+          Mixer->addEffectsChannel();
 
         // init actor system
         // Initialize the global type information before anything else.

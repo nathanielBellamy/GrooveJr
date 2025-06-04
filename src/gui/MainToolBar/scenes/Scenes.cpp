@@ -48,7 +48,7 @@ void Scenes::connectActions() {
     const auto sceneId = mixer->saveScene();
     Logging::write(
       Info,
-      "Gui::Scenes::connectActions",
+      "Gui::Scenes::sceneSaveAction",
       "Saved scene id: " + std::to_string(sceneId)
     );
   });
