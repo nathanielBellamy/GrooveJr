@@ -128,13 +128,11 @@ extern "C" {
             );
         }
 
-        std::cout << "main app state id = " << appStateEntity.id << std::endl;
-
         gAppState->setFromEntity(Dao->appStateRepository.get());
         Logging::write(
           Info,
           "main",
-          "Loaded gAppState: id = " + std::to_string(gAppState->id) + "audioFramesPerBuffer = " + std::to_string(gAppState->getAudioFramesPerBuffer()) + ", sceneId: " + std::to_string(gAppState->getSceneId()) + ", sceneIndex: " + std::to_string(gAppState->getSceneIndex()) + "."
+          "Loaded gAppState: id = " + std::to_string(gAppState->id) + " audioFramesPerBuffer = " + std::to_string(gAppState->getAudioFramesPerBuffer()) + ", sceneId: " + std::to_string(gAppState->getSceneId()) + ", sceneIndex: " + std::to_string(gAppState->getSceneIndex()) + "."
         );
 
         // setup Audio
