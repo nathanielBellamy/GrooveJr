@@ -4,8 +4,6 @@
 
 #include "AppState.h"
 
-#include "actors/AudioThread.h"
-
 namespace Gj {
 
 AppState::AppState(const int id, const int audioFramesPerBuffer, const PlayState playState, const int sceneId, const int sceneIndex)
