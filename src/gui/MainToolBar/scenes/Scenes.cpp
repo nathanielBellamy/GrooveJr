@@ -54,5 +54,22 @@ void Scenes::connectActions() {
   });
 }
 
+int Scenes::hydrateState(const AppStatePacket& appStatePacket) {
+  if (appStatePacket.sceneIndex == 0) {
+    selectButtonZero.setChecked(true);
+  } else {
+    selectButtonZero.setChecked(false);
+  }
+
+  if (appStatePacket.sceneIndex == 1) {
+    selectButtonZero.setChecked(true);
+  } else {
+    selectButtonOne.setChecked(false);
+  }
+
+  //TODO
+}
+
+
 } // Gui
 } // Gj

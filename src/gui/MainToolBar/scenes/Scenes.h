@@ -44,6 +44,7 @@ class Scenes final : public QWidget {
 
   public:
     Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction* sceneLoadAction);
+    int hydrateState(const AppStatePacket& appStatePacket);
 };
 
 

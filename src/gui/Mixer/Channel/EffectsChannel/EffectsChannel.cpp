@@ -389,7 +389,7 @@ void EffectsChannel::setSoloR(const float val) {
 }
 
 void EffectsChannel::reset() {
-  // TODO
+  effectsSlots.reset();
 }
 
 } // Gui

@@ -72,5 +72,9 @@ void EffectsSlots::setupGrid() {
   }
 }
 
+void EffectsSlots::reset() {
+  effectsSlots.clear();
+}
+
 } // Gui
 } // Gj

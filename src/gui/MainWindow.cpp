@@ -102,7 +102,19 @@ void MainWindow::setEffects() {
 }
 
 void MainWindow::resetChannels(const int effectsChannelsCount) {
+  Logging::write(
+    Info,
+    "Gui::MainWindow::resetChannels",
+    "Resetting effects."
+  );
+
   mixerWindow.resetChannels(effectsChannelsCount);
+
+  Logging::write(
+    Info,
+    "Gui::MainWindow::resetChannels",
+    "Done resetting effects."
+  );
 }
 
 
@@ -115,8 +127,8 @@ void MainWindow::connectActions() {
       "Loading scene: " + std::to_string(sceneIndex)
     );
 
-    mixer->loadSceneByIndex(sceneIndex);
     resetChannels(mixer->getEffectsChannelsCount());
+    mixer->loadSceneByIndex(sceneIndex);
     setEffects();
 
     Logging::write(

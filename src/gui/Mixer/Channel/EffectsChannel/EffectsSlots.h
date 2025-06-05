@@ -39,6 +39,7 @@ class EffectsSlots final : public QWidget {
     void addEffectSlot();
     void removeEffectSlot();
     void hydrateState(const AppStatePacket& appState, int newChannelIndex);
+    void reset();
 
   private:
     actor_system& actorSystem;
@@ -49,7 +50,6 @@ class EffectsSlots final : public QWidget {
     QAction* replaceEffectAction;
     QAction* removeEffectAction;
     void setupGrid();
-
 };
 
 } // Gui
