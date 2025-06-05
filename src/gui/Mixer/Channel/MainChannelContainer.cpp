@@ -47,6 +47,11 @@ void MainChannelContainer::setupGrid() {
 }
 
 int MainChannelContainer::addEffect(const std::string &effectPath) {
+  Logging::write(
+    Info,
+    "Gui::MainChannelContainer::addEffect",
+    "Adding effect: " + effectPath
+  );
   return mainChannel.addEffect(effectPath);
 }
 

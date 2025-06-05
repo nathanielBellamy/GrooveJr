@@ -216,7 +216,7 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
   Logging::write(
     Info,
     "Audio::Mixer::loadSceneByIndex",
-    "Set Effects."
+    "Done setting effects."
   );
 
   return 0;
