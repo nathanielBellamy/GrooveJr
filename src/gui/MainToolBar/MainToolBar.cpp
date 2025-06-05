@@ -39,6 +39,7 @@ int MainToolBar::hydrateState(const AppStatePacket& appStatePacket) {
 
   currentlyPlaying.hydrateState(appStatePacket);
   transportControl.hydrateState(appStatePacket);
+  scenes.hydrateState(appStatePacket);
 
   return 0;
 }

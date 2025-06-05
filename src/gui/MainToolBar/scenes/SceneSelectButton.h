@@ -7,16 +7,19 @@
 
 #include <QPushButton>
 
+#include "../../../AppState.h"
+#include "../../Color.h"
+
 namespace Gj {
 namespace Gui {
 
 class SceneSelectButton final : public QPushButton {
   public:
     SceneSelectButton(QWidget* parent, QAction* action, int sceneIndex);
+    void hydrateState(const AppStatePacket& appState);
 
   private:
     int sceneIndex;
-    bool selected;
     QAction* action;
     void setStyle();
     void mousePressEvent(QMouseEvent* event) override;

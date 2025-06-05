@@ -29,6 +29,7 @@ AppStatePacket AppState::toPacket() const {
       audioFramesPerBuffer.load(),
       psToInt(playState.load()),
       sceneId.load(),
+      sceneIndex.load()
     };
     return packet;
 }

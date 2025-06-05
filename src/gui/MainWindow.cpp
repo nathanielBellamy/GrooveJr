@@ -40,7 +40,7 @@ int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
     Logging::write(
       Info,
       "Gui::MainWindow::hydrateState",
-      "Hydrating app state to Gui."
+      "Hydrating app state to Gui: id: " + std::to_string(appStatePacket.id) +  " sceneId: " + std::to_string(appStatePacket.sceneId) + " sceneIndex: " + std::to_string(appStatePacket.sceneIndex)
     );
     mainToolBar.hydrateState(appStatePacket);
     mixerWindow.hydrateState(appStatePacket);
@@ -124,7 +124,7 @@ void MainWindow::connectActions() {
     Logging::write(
       Info,
       "Gui::MainWindow::sceneLoadAction",
-      "Loading scene: " + std::to_string(sceneIndex)
+      "Loading sceneIndex: " + std::to_string(sceneIndex)
     );
 
     resetChannels(mixer->getEffectsChannelsCount());

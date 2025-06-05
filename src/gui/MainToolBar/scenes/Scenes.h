@@ -14,6 +14,7 @@
 #include <QWidget>
 #include <QGridLayout>
 
+#include "../../../AppState.h"
 #include "../../../audio/Mixer.h"
 #include "../../../actors/ActorIds.h"
 #include "../../../messaging/atoms.h"
@@ -44,7 +45,7 @@ class Scenes final : public QWidget {
 
   public:
     Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction* sceneLoadAction);
-    int hydrateState(const AppStatePacket& appStatePacket);
+    void hydrateState(const AppStatePacket& appStatePacket);
 };
 
 
