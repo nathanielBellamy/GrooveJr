@@ -201,8 +201,14 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
   );
 
   gAppState->setSceneId(sceneId);
-  dao->appStateRepository.save();
-  gAppState->setFromEntity(dao->appStateRepository.get());
+  if (const int persistRes = dao->appStateRepository.persistAndSet(); persistRes != 0) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::loadSceneByIndex",
+      "Failed to persist state: " + std::to_string(persistRes)
+    );
+    return persistRes;
+  }
 
   const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(sceneId);
   setEffects(effects);
@@ -247,7 +253,6 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) {
     "Setting effects."
   );
 
-  // TODO: clear all effects
   std::vector<std::vector<Db::Effect>> effectsByChannel;
   for (const auto& effect : effects) {
     while (effectsByChannel.size() <= effect.channelIndex) {
@@ -291,8 +296,14 @@ int Mixer::saveScene() const {
   const auto scene = Db::Scene(gAppState->sceneIndex, "Mixer Scene");
   const int sceneId = dao->sceneRepository.save(scene);
   gAppState->setSceneId(sceneId);
-  dao->appStateRepository.save();
-  gAppState->setFromEntity(dao->appStateRepository.get());
+  if (const int persistRes = dao->appStateRepository.persistAndSet(); persistRes != 0) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::saveScene",
+      "Failed to persist state: " + std::to_string(persistRes)
+    );
+    return persistRes;
+  }
 
   for (const auto effectsChannel : effectsChannels) {
     const int effectCount = effectsChannel->effectCount();
@@ -318,7 +329,6 @@ int Mixer::saveScene() const {
 
   return sceneId;
 }
-
 
 } // Audio
 } // Gj

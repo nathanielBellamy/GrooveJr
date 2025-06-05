@@ -6,6 +6,7 @@
 #define APPSTATE_H
 
 #include <atomic>
+#include <string>
 
 #include "./enums/PlayState.h"
 
@@ -76,6 +77,10 @@ struct AppState {
   void setSceneIndex(const int val) {
     sceneIndex.store(val);
   }
+
+  std::string toString() const {
+    return " id: " + std::to_string(id) + " audioFramesPerBuffer: " + std::to_string(audioFramesPerBuffer) + " playState: " + std::to_string(playState) + " sceneId: " + std::to_string(sceneId) + " sceneIndex: " + std::to_string(sceneIndex);
+  };
 };
 
 } // Gj

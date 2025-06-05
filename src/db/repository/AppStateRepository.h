@@ -22,7 +22,7 @@ class AppStateRepository {
     explicit AppStateRepository(sqlite3** db, AppState* gAppState);
     AppStateEntity get() const;
     int save() const;
-    int persist() const;
+    int persistAndSet() const;
 };
 
 } // Db

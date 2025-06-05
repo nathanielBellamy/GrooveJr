@@ -84,5 +84,28 @@ int AppStateRepository::save() const {
   return sqlite3_last_insert_rowid(*db);
 }
 
+int AppStateRepository::persistAndSet() const {
+  try {
+    const auto id = save();
+    gAppState->setFromEntity(get());
+
+    Logging::write(
+      Info,
+      "Db::AppStateRepository::persistAndSet",
+      "Persisted AppState: " + gAppState->toString()
+    );
+
+    return 0;
+  } catch (const std::exception& e) {
+    Logging::write(
+      Error,
+      "Db::AppStateRepository::persistAndSet",
+      "Failed to persist AppState: " + std::string(e.what())
+    );
+    return 1;
+  }
+}
+
+
 } // Db
 } // Gj

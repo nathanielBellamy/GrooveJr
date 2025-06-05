@@ -71,7 +71,7 @@ void caf_main(int argc, char *argv[], void (*shutdown_handler) (int), actor_syst
 
   // init Qt App
   auto qtApp = QApplication {argc, argv};
-  auto mainWindow = Gui::MainWindow { sys, mixer, shutdown_handler };
+  auto mainWindow = Gui::MainWindow { sys, mixer, gAppState, shutdown_handler };
 
   Logging::write(Info, "caf_main", "Qt instantiated");
 

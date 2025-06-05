@@ -11,8 +11,9 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 
-MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, void (*shutdown_handler) (int))
-    : actorSystem(actorSystem)
+MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState* gAppState, void (*shutdown_handler) (int))
+    : gAppState(gAppState)
+    , actorSystem(actorSystem)
     , mixer(mixer)
     , shutdown_handler(shutdown_handler)
     , container(this)
@@ -42,8 +43,16 @@ int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
       "Gui::MainWindow::hydrateState",
       "Hydrating app state to Gui: id: " + std::to_string(appStatePacket.id) +  " sceneId: " + std::to_string(appStatePacket.sceneId) + " sceneIndex: " + std::to_string(appStatePacket.sceneIndex)
     );
+
     mainToolBar.hydrateState(appStatePacket);
     mixerWindow.hydrateState(appStatePacket);
+
+    Logging::write(
+      Info,
+      "Gui::MainWindow::hydrateState",
+      "Done hydrating state."
+    );
+
     return 0;
 }
 
@@ -121,21 +130,24 @@ void MainWindow::resetChannels(const int effectsChannelsCount) {
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
     const int sceneIndex = sceneLoadAction.data().toInt();
-    Logging::write(
-      Info,
-      "Gui::MainWindow::sceneLoadAction",
-      "Loading sceneIndex: " + std::to_string(sceneIndex)
-    );
 
-    resetChannels(mixer->getEffectsChannelsCount());
-    mixer->loadSceneByIndex(sceneIndex);
-    setEffects();
+    if (gAppState->getSceneIndex() != sceneIndex) {
+      Logging::write(
+        Info,
+        "Gui::MainWindow::sceneLoadAction",
+        "Loading sceneIndex: " + std::to_string(sceneIndex)
+      );
 
-    Logging::write(
-      Info,
-      "Gui::MainWindow::sceneLoadAction",
-      "Done loading sceneIndex: " + std::to_string(sceneIndex)
-    );
+      resetChannels(mixer->getEffectsChannelsCount());
+      mixer->loadSceneByIndex(sceneIndex);
+      setEffects();
+
+      Logging::write(
+        Info,
+        "Gui::MainWindow::sceneLoadAction",
+        "Done loading sceneIndex: " + std::to_string(sceneIndex)
+      );
+    }
   });
 }
 
