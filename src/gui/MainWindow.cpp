@@ -88,13 +88,7 @@ void MainWindow::setEffects() {
     "Setting effects."
   );
 
-  for (const auto& effectsChannel : mixer->getEffectsChannels()) {
-    const int effectCount = effectsChannel->effectCount();
-    for (int i = 0; i < effectCount; i++) {
-      const auto* plugin = effectsChannel->getPluginAtIdx(i);
-      mixerWindow.addEffectToChannel(effectsChannel->getIndex(), plugin->path);
-    }
-  }
+  mixerWindow.setEffects();
 
   const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
   const scoped_actor self{ actorSystem };

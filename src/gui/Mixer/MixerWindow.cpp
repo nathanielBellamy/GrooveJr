@@ -60,17 +60,15 @@ void MixerWindow::setupGrid() {
   setLayout(&grid);
 }
 
-int MixerWindow::addEffectToChannel(const int channelIndex, const std::string& effectPath) {
+void MixerWindow::setEffects() {
   Logging::write(
     Info,
-    "Gui::MixerWindow::addEffectToChannel",
-    "Adding effect " + effectPath + " to channel " + std::to_string(channelIndex)
+    "Gui::MixerWindow::setEffects",
+    "Setting effects."
   );
 
-  if (channelIndex == 0)
-    return mainChannelContainer.addEffect(effectPath);
-
-  return effectsChannelsContainer.addEffectToChannel(channelIndex, effectPath);
+  mainChannelContainer.setEffects();
+  effectsChannelsContainer.setEffects();
 }
 
 

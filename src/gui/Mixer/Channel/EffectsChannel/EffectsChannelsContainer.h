@@ -53,7 +53,7 @@ class EffectsChannelsContainer final : public QWidget {
     void setSoloR(int channelIdx, float val) const;
     void addEffectsChannel();
     void removeEffectsChannel(int channelIdx);
-    int addEffectToChannel(int channelIdx, const std::string& effectPath) const;
+    void setEffects();
     void resetChannels(int effectsChannelsCount);
 
   private:

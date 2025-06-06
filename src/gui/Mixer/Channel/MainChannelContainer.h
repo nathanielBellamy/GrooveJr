@@ -59,7 +59,7 @@ class MainChannelContainer final : public QWidget {
       mainChannel.setSoloR(val);
     };
 
-    int addEffect(const std::string& effectPath);
+    void setEffects();
     void resetChannel();
 
   private:

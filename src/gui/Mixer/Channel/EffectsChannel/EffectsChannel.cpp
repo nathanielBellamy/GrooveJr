@@ -266,15 +266,24 @@ void EffectsChannel::setupPanRSlider() {
   });
 }
 
-int EffectsChannel::addEffect(const std::string &effectPath) {
-  effectsSlots.addEffectSlot();
-  const int newEffectIndex = mixer->effectsOnChannelCount(channelIndex) - 1;
-  const std::string name = mixer->getPluginName(channelIndex, newEffectIndex);
-  effectsContainer.addEffect(newEffectIndex, name);
-
-  return 0;
+void EffectsChannel::setEffects() {
+  Logging::write(
+    Info,
+    "EffectsChannel::setEffects",
+    "Setting effects."
+  );
+  effectsSlots.reset();
+  for (int i = 0; i < mixer->getEffectsChannel(channelIndex)->effectCount(); i++) {
+    addEffect(i);
+  }
 }
 
+void EffectsChannel::addEffect(const int effectIndex) {
+  effectsSlots.addEffectSlot();
+  const int newEffectIndex = effectIndex < 0 ? mixer->effectsOnChannelCount(channelIndex) - 1 : effectIndex;
+  const std::string name = mixer->getPluginName(channelIndex, newEffectIndex);
+  effectsContainer.addEffect(newEffectIndex, name);
+}
 
 void EffectsChannel::connectActions() {
   auto openEffectsContainerConnection = connect(&openEffectsContainer, &QAction::triggered, [&]() {
@@ -306,7 +315,7 @@ void EffectsChannel::connectActions() {
           "Unable to add effect " + effectPath + " to channel " + std::to_string(channelIndex)
         );
       } else {
-        addEffect(effectPath);
+        addEffect(-1);
 
         appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
         const scoped_actor self{ actorSystem };

@@ -46,13 +46,13 @@ void MainChannelContainer::setupGrid() {
   grid.addWidget(&mainChannel, 0, 0, -1, -1);
 }
 
-int MainChannelContainer::addEffect(const std::string &effectPath) {
+void MainChannelContainer::setEffects() {
   Logging::write(
     Info,
-    "Gui::MainChannelContainer::addEffect",
-    "Adding effect: " + effectPath
+    "Gui::MainChannelContainer::setEffects",
+    "Setting effects."
   );
-  return mainChannel.addEffect(effectPath);
+  return mainChannel.setEffects();
 }
 
 void MainChannelContainer::resetChannel() {

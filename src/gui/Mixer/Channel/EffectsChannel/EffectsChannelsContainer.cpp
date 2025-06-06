@@ -95,13 +95,15 @@ void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
   }
 }
 
-int EffectsChannelsContainer::addEffectToChannel(int channelIdx, const std::string &effectPath) const {
+void EffectsChannelsContainer::setEffects() {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::addEffectToChannel",
-    "Adding effect " + effectPath + " to channel " + std::to_string(channelIdx)
+    "Setting effects"
   );
-  return channels.at(channelIdx)->addEffect(effectPath);
+  for (const auto& channel : channels) {
+    channel->setEffects();
+  }
 }
 
 void EffectsChannelsContainer::connectActions() {
