@@ -262,7 +262,7 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) {
     effectsByChannel.at(effect.channelIndex).push_back(effect);
   }
 
-  while (effectsChannels.size() < effectsByChannel.size()) {
+  while (effectsChannels.size() < effectsByChannel.size() || effectsChannels.size() < 2) {
     addEffectsChannel();
   }
 

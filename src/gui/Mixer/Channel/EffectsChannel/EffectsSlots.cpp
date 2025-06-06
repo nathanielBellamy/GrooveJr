@@ -10,7 +10,7 @@ namespace Gui {
 EffectsSlots::EffectsSlots(QWidget* parent,
                            actor_system& actorSystem,
                            Audio::Mixer* mixer,
-                           int channelIndex,
+                           const int channelIndex,
                            QAction* replaceEffectAction,
                            QAction* removeEffectAction)
   : QWidget(parent)
@@ -32,7 +32,7 @@ EffectsSlots::~EffectsSlots() {
   );
 }
 
-void EffectsSlots::hydrateState(const AppStatePacket& appState, int newChannelIndex) {
+void EffectsSlots::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
   channelIndex = newChannelIndex;
 
   for (const auto& effectSlot : effectsSlots) {

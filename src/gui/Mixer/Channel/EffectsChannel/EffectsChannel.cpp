@@ -89,7 +89,7 @@ EffectsChannel::~EffectsChannel() {
   );
 }
 
-void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
+void EffectsChannel::hydrateState(const AppStatePacket& appStatePacket, const int newChannelIndex) {
   Logging::write(
     Info,
     "Gui::EffectsChannel::hydrateState",
@@ -98,7 +98,7 @@ void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newC
 
   channelIndex = newChannelIndex;
 
-  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
+  if (appStatePacket.playState == PLAY || appStatePacket.playState == FF || appStatePacket.playState == RW) {
     removeEffectsChannelButton.setEnabled(false);
     addEffectButton.setEnabled(false);
   } else {
@@ -107,9 +107,9 @@ void EffectsChannel::hydrateState(const AppStatePacket& appState, const int newC
   }
 
   if (channelIndex > 0)
-    removeEffectsChannelButton.hydrateState(appState, channelIndex);
+    removeEffectsChannelButton.hydrateState(appStatePacket, channelIndex);
 
-  effectsSlots.hydrateState(appState, channelIndex);
+  effectsSlots.hydrateState(appStatePacket, channelIndex);
 
   setupTitle();
   // setupGrid();

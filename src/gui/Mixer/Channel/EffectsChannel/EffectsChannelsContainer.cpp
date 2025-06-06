@@ -95,7 +95,7 @@ void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
   }
 }
 
-void EffectsChannelsContainer::setEffects() {
+void EffectsChannelsContainer::setEffects() const {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::addEffectToChannel",
@@ -126,7 +126,7 @@ void EffectsChannelsContainer::connectActions() {
     update();
   });
 
-  auto removeEfffectsChannelConnection = connect(&removeEffectsChannelAction, &QAction::triggered, [&]() {
+  auto removeEffectsChannelConnection = connect(&removeEffectsChannelAction, &QAction::triggered, [&]() {
     const int channelIdx = removeEffectsChannelAction.data().toInt();
     Logging::write(
       Info,
@@ -137,7 +137,7 @@ void EffectsChannelsContainer::connectActions() {
 
     strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
-    scoped_actor self{ actorSystem };
+    const scoped_actor self{ actorSystem };
     self->anon_send(
         actor_cast<actor>(appStateManagerPtr),
         channelIdx,
@@ -209,14 +209,18 @@ void EffectsChannelsContainer::resetChannels() {
     "Resetting channels."
   );
 
-  for (const auto& channel : channels) {
+  for (auto& channel : channels) {
     delete channel;
+    channel = nullptr;
   }
   channels.clear();
 
   for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
     addEffectsChannel();
   }
+
+  if (channels.empty())
+    addEffectsChannel();
 
   Logging::write(
     Info,
