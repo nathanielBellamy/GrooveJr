@@ -73,7 +73,19 @@ void EffectsSlots::setupGrid() {
 }
 
 void EffectsSlots::reset() {
+  Logging::write(
+    Info,
+    "Gui::EffectsSlots::reset",
+    "Resetting EffectsSlots on Channel " + std::to_string(channelIndex)
+  );
+
   effectsSlots.clear();
+
+  Logging::write(
+    Info,
+    "Gui::EffectsSlots::reset",
+    "Done resetting EffectsSlots on channel " + std::to_string(channelIndex)
+  );
 }
 
 } // Gui

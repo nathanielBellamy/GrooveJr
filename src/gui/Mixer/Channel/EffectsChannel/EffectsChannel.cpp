@@ -269,20 +269,42 @@ void EffectsChannel::setupPanRSlider() {
 void EffectsChannel::setEffects() {
   Logging::write(
     Info,
-    "EffectsChannel::setEffects",
-    "Setting effects."
+    "Gui::EffectsChannel::setEffects",
+    "Setting effects on channelIndex: " + std::to_string(channelIndex)
   );
+
   effectsSlots.reset();
+  if (channelIndex > mixer->getEffectsChannelsCount())
+    return;
+
   for (int i = 0; i < mixer->getEffectsChannel(channelIndex)->effectCount(); i++) {
     addEffect(i);
   }
+
+  Logging::write(
+    Info,
+    "Gui::EffectsChannel::setEffects",
+    "Done setting effects on channelIndex: " + std::to_string(channelIndex)
+  );
 }
 
 void EffectsChannel::addEffect(const int effectIndex) {
+  Logging::write(
+    Info,
+    "Gui::EffectsChannel::addEffect",
+    "Adding effect at index: " + std::to_string(effectIndex)
+  );
+
   effectsSlots.addEffectSlot();
   const int newEffectIndex = effectIndex < 0 ? mixer->effectsOnChannelCount(channelIndex) - 1 : effectIndex;
   const std::string name = mixer->getPluginName(channelIndex, newEffectIndex);
   effectsContainer.addEffect(newEffectIndex, name);
+
+  Logging::write(
+    Info,
+    "Gui::EffectsChannel::addEffect",
+    "Added effect " + name + " at index: " + std::to_string(effectIndex)
+  );
 }
 
 void EffectsChannel::connectActions() {
