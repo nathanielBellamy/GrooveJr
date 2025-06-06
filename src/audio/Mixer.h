@@ -58,6 +58,11 @@ public:
     return static_cast<int>(effectsChannels.size() - 1);
   }
 
+  [[nodiscard]]
+  int getTotalChannelsCount() const {
+    return static_cast<int>(effectsChannels.size());
+  }
+
   bool addEffectsChannel();
   bool removeEffectsChannel(int idx);
   [[nodiscard]]

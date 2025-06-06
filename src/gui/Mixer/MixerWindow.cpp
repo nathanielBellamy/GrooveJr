@@ -140,9 +140,9 @@ void MixerWindow::connectActions() {
   });
 }
 
-void MixerWindow::resetChannels(const int effectsChannelsCount) {
+void MixerWindow::resetChannels() {
   mainChannelContainer.resetChannel();
-  effectsChannelsContainer.resetChannels(effectsChannelsCount);
+  effectsChannelsContainer.resetChannels();
 }
 
 

@@ -202,15 +202,27 @@ void EffectsChannelsContainer::setSoloR(const int channelIdx, const float val) c
   channels.at(channelIdx - 1)->setSoloR(val);
 }
 
-void EffectsChannelsContainer::resetChannels(const int effectsChannelsCount) {
-  while (effectsChannelsCount < channels.size()) {
-    delete channels.back();
-    channels.pop_back();
-  }
+void EffectsChannelsContainer::resetChannels() {
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::resetChannels",
+    "Resetting channels."
+  );
 
   for (const auto& channel : channels) {
-    channel->reset();
+    delete channel;
   }
+  channels.clear();
+
+  for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
+    addEffectsChannel();
+  }
+
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::resetChannels",
+    "Done resetting channels."
+  );
 }
 
 } // Gui

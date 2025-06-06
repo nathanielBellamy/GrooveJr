@@ -104,14 +104,14 @@ void MainWindow::setEffects() {
   );
 }
 
-void MainWindow::resetChannels(const int effectsChannelsCount) {
+void MainWindow::resetChannels() {
   Logging::write(
     Info,
     "Gui::MainWindow::resetChannels",
     "Resetting effects."
   );
 
-  mixerWindow.resetChannels(effectsChannelsCount);
+  mixerWindow.resetChannels();
 
   Logging::write(
     Info,
@@ -123,16 +123,14 @@ void MainWindow::resetChannels(const int effectsChannelsCount) {
 
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
-    const int sceneIndex = sceneLoadAction.data().toInt();
-
-    if (gAppState->getSceneIndex() != sceneIndex) {
+    if (const int sceneIndex = sceneLoadAction.data().toInt(); gAppState->getSceneIndex() != sceneIndex) {
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",
         "Loading sceneIndex: " + std::to_string(sceneIndex)
       );
 
-      resetChannels(mixer->getEffectsChannelsCount());
+      resetChannels();
       mixer->loadSceneByIndex(sceneIndex);
       setEffects();
 
