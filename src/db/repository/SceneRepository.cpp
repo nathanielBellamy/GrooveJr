@@ -133,9 +133,13 @@ int SceneRepository::findOrCreateBySceneIndex(const int sceneIndex) const {
 
   sqlite3_bind_int(stmt, 1, sceneIndex);
 
-
   if (sqlite3_step(stmt) == SQLITE_ROW) {
-    const auto scene = Effect::deser(stmt);
+    const auto scene = Scene::deser(stmt);
+    Logging::write(
+      Info,
+      "Db::SceneRepository::findOrCreateBySceneIndex",
+      "Found scene sceneId: " + std::to_string(scene.id) + " sceneIndex: " + std::to_string(scene.sceneIndex)
+    );
     return scene.id;
   }
 
@@ -149,7 +153,7 @@ int SceneRepository::findOrCreateBySceneIndex(const int sceneIndex) const {
   if (sqlite3_prepare_v2(*db, insertQuery.c_str(), -1, &insertStmt, nullptr) != SQLITE_OK) {
     Logging::write(
       Error,
-      "Db::SceneRepository::getEffects",
+      "Db::SceneRepository::findOrCreateBySceneIndex",
       "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
     );
     return 0;
@@ -160,6 +164,11 @@ int SceneRepository::findOrCreateBySceneIndex(const int sceneIndex) const {
   if (sqlite3_step(insertStmt) == SQLITE_OK)
     return static_cast<int>(sqlite3_last_insert_rowid(*db));
 
+  Logging::write(
+    Error,
+    "Db::SceneRepository::findOrCreateBySceneIndex",
+    "Failed to create sceneIndex: " + std::to_string(sceneIndex)
+  );
   return 0;
 }
 

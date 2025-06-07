@@ -31,7 +31,6 @@ std::vector<Effect> EffectRepository::getAll() const {
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     const auto effect = Effect::deser(stmt);
-    std::cout << "Effect Row: ID = " << effect.id << ", filePath = " << effect.filePath << ", format = " << effect.format << ", name = " << effect.name << ", version = " << effect.version << std::endl;
     effects.push_back(effect);
   }
 
