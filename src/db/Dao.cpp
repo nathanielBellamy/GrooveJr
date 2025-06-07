@@ -79,7 +79,29 @@ int Dao::initSchema() const {
 
     create table if not exists channels (
       id integer primary key autoincrement,
-      -- todo
+      channelIndex integer not null,
+      gain real not null default 1.0,
+      mute real not null default 0.0,
+      solo real not null default 0.0,
+      pan real not null default 0.0,
+      gainL real not null default 1.0,
+      gainR real not null default 1.0,
+      muteL real not null default 0.0,
+      muteR real not null default 0.0,
+      soloL real not null default 0.0,
+      soloR real not null default 0.0,
+      panL real not null default 0.0,
+      panR real not null default 0.0,
+      version integer not null,
+      createdAt datetime default current_timestamp
+    );
+
+    create table if not exists scene_to_channels (
+      sceneId integer not null,
+      channelId integer not null,
+      primary key (sceneId, channelId),
+      foreign key (sceneId) references scenes(id) on delete cascade,
+      foreign key (channelId) references channels(id) on delete cascade
     );
 
     create table if not exists effects (
@@ -92,6 +114,14 @@ int Dao::initSchema() const {
       effectIndex integer not null,
       version integer not null,
       createdAt datetime default current_timestamp
+    );
+
+    create table if not exists channel_to_effects (
+      channelId integer not null,
+      effectId integer not null,
+      primary key (channelId, effectId),
+      foreign key (channelId) references channels(id) on delete cascade,
+      foreign key (effectId) references effects(id) on delete cascade
     );
 
     create table if not exists scene_to_effects (
