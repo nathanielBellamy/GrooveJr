@@ -5,12 +5,15 @@
 #ifndef CHANNELENTITY_H
 #define CHANNELENTITY_H
 
+#include <string>
+
 namespace Gj {
 namespace Db {
 
 struct ChannelEntity {
   int id;
   int channelIndex;
+  std::string name;
   float gain;
   float mute;
   float solo;
@@ -28,6 +31,7 @@ struct ChannelEntity {
   ChannelEntity(
     int id,
     int channelIndex,
+    std::string name,
     float gain,
     float mute,
     float solo,

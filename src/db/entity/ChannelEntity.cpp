@@ -10,6 +10,7 @@ namespace Db {
 ChannelEntity::ChannelEntity(
     const int id,
     const int channelIndex,
+    const std::string name,
     const float gain,
     const float mute,
     const float solo,
@@ -24,6 +25,7 @@ ChannelEntity::ChannelEntity(
     const float panR)
     : id(id)
     , channelIndex(channelIndex)
+    , name(name)
     , gain(gain)
     , mute(mute)
     , solo(solo)

@@ -13,6 +13,7 @@
 #include "Logging.h"
 #include "../AppState.h"
 
+#include "repository/ChannelRepository.h"
 #include "repository/EffectRepository.h"
 #include "repository/SceneRepository.h"
 #include "repository/TrackRepository.h"
@@ -27,6 +28,7 @@ class Dao {
 
   public:
     AppStateRepository appStateRepository;
+    ChannelRepository channelRepository;
     EffectRepository effectRepository;
     SceneRepository sceneRepository;
     TrackRepository trackRepository;

@@ -11,6 +11,7 @@ Dao::Dao(AppState* gAppState)
   : db(nullptr)
   , gAppState(gAppState)
   , appStateRepository(&db, gAppState)
+  , channelRepository(&db, gAppState)
   , effectRepository(&db, gAppState)
   , sceneRepository(&db, gAppState)
   , trackRepository(&db, gAppState)
@@ -80,6 +81,7 @@ int Dao::initSchema() const {
     create table if not exists channels (
       id integer primary key autoincrement,
       channelIndex integer not null,
+      name text not null default 'Channel',
       gain real not null default 1.0,
       mute real not null default 0.0,
       solo real not null default 0.0,

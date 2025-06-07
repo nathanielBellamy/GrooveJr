@@ -37,7 +37,7 @@ std::vector<Effect> EffectRepository::getAll() const {
   return effects;
 }
 
-int EffectRepository::save(Effect effect) const {
+int EffectRepository::save(const Effect& effect) const {
   const std::string query = R"sql(
     insert into effects (filePath, format, name, state, channelIndex, effectIndex, version)
     values (?, ?, ?, ?, ?, ?, ?)
