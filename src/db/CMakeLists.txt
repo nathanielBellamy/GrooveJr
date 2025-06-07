@@ -20,6 +20,8 @@ add_library(GjDb SHARED
     entity/AppStateEntity.cpp
     repository/AppStateRepository.h
     repository/AppStateRepository.cpp
+    entity/ChannelEntity.h.h
+    entity/ChannelEntity.cpp
     entity/Effect.h
     entity/Effect.cpp
     repository/EffectRepository.h

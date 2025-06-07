@@ -77,6 +77,11 @@ int Dao::initSchema() const {
       createdAt datetime default current_timestamp
     );
 
+    create table if not exists channels (
+      id integer primary key autoincrement,
+      -- todo
+    );
+
     create table if not exists effects (
       id integer primary key autoincrement,
       filePath text not null,

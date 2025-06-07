@@ -209,6 +209,7 @@ void EffectsChannelsContainer::resetChannels() {
     "Resetting channels."
   );
 
+  // TODO: debug once channelEntity is in place and loading
   for (int i = static_cast<int>(channels.size()) - 1; i > 0; i--)
     removeEffectsChannel(i);
 
