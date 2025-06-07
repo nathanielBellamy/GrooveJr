@@ -211,6 +211,19 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
   }
 
   const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(sceneId);
+  Logging::write(
+    Info,
+    "Audio::Mixer::loadSceneByIndex",
+    "Loaded Effects for sceneIndex: " + std::to_string(sceneIndex) + " with sceneId: " + std::to_string(sceneId)
+  );
+
+  for (const auto& effect : effects) {
+    Logging::write(
+      Info,
+      "Audio::Mixer::loadSceneByIndex",
+      "Found effect - name: " + effect.name + " channelIndex: " + std::to_string(effect.channelIndex) + " effectIndex: " + std::to_string(effect.effectIndex) + " sceneIndex: " + std::to_string(sceneIndex)
+    );
+  }
   setEffects(effects);
 
   Logging::write(
