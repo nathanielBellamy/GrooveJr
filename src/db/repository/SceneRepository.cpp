@@ -161,7 +161,7 @@ int SceneRepository::findOrCreateBySceneIndex(const int sceneIndex) const {
 
   sqlite3_bind_int(insertStmt, 1, sceneIndex);
 
-  if (sqlite3_step(insertStmt) == SQLITE_OK)
+  if (sqlite3_step(insertStmt) == SQLITE_DONE)
     return static_cast<int>(sqlite3_last_insert_rowid(*db));
 
   Logging::write(
