@@ -117,7 +117,7 @@ int SceneRepository::findOrCreateBySceneIndex(const int sceneIndex) const {
     select *
     from scenes
     where sceneIndex = ?
-    order by version desc
+    order by id desc
     limit 1
   )sql";
 
