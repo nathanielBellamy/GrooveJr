@@ -64,6 +64,7 @@ public:
   }
 
   bool addEffectsChannel();
+  bool addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity);
   bool removeEffectsChannel(int idx);
   [[nodiscard]]
   int effectsOnChannelCount(int idx) const;
@@ -90,10 +91,11 @@ public:
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);
   };
 
-  int loadSceneById(int sceneId);
+  int loadScene();
   int loadSceneByIndex(int sceneIndex);
   int deleteChannels();
-  int setEffects(const std::vector<Db::Effect>& effects);
+  int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);
+  int setEffects(const std::vector<Db::Effect>& effects) const;
   int saveScene() const;
 
 };

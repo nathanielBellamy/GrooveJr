@@ -31,7 +31,7 @@ Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
   if (gAppState->sceneId == 0) {
     loadSceneByIndex(0);
   } else {
-    loadSceneById(gAppState->sceneId);
+    loadScene();
   }
 
   jackClient->initialize("GrooveJr");
@@ -105,6 +105,18 @@ bool Mixer::addEffectsChannel() {
     return true;
 }
 
+bool Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) {
+    effectsChannels.push_back(
+      new Effects::EffectsChannel(
+        gAppState,
+        jackClient,
+        channelEntity
+      )
+    );
+    channelCount++;
+    return true;
+}
+
 bool Mixer::removeEffectsChannel(const int idx) {
   delete effectsChannels.at(idx);
   effectsChannels.erase(effectsChannels.begin() + idx);
@@ -172,14 +184,17 @@ bool Mixer::setGainOnChannel(const int channelIdx, const float gain) const {
   return effectsChannels.at(channelIdx)->setGain(gain);
 }
 
-int Mixer::loadSceneById(const int sceneId) {
+int Mixer::loadScene() {
+  const int sceneId = gAppState->getSceneId();
   Logging::write(
     Info,
     "Audio::Mixer::loadSceneById",
     "Loading scene id: " + std::to_string(sceneId)
   );
 
-  const std::vector<Db::Effect> effects = dao->effectRepository.getBySceneId(gAppState->getSceneId());
+  const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(sceneId);
+  setChannels(channels);
+  const std::vector<Db::Effect> effects = dao->sceneRepository.getEffects(sceneId);
   setEffects(effects);
 
   return 0;
@@ -210,7 +225,7 @@ int Mixer::loadSceneByIndex(const int sceneIndex) {
     return persistRes;
   }
 
-  loadSceneById(sceneId);
+  loadScene();
   return 0;
 }
 
@@ -225,6 +240,7 @@ int Mixer::deleteChannels() {
     delete effectsChannel;
 
   effectsChannels.clear();
+  channelCount = 0;
 
   Logging::write(
     Info,
@@ -235,10 +251,26 @@ int Mixer::deleteChannels() {
   return 0;
 }
 
+int Mixer::setChannels(const std::vector<Db::ChannelEntity>& channelEntities) {
+  Logging::write(
+    Info,
+    "Audio::Mixer::setChannels",
+    "Setting channels: " + std::to_string(channelEntities.size())
+  );
 
-int Mixer::setEffects(const std::vector<Db::Effect> &effects) {
   deleteChannels();
 
+  for (const auto& channelEntity : channelEntities)
+    addEffectsChannelFromEntity(channelEntity);
+
+  Logging::write(
+    Info,
+    "Audio::Mixer::setChannels",
+    "Done setting channels: " + std::to_string(channelEntities.size())
+  );
+}
+
+int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
   Logging::write(
     Info,
     "Audio::Mixer::setEffects",
@@ -252,10 +284,6 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) {
     }
 
     effectsByChannel.at(effect.channelIndex).push_back(effect);
-  }
-
-  while (effectsChannels.size() < effectsByChannel.size() || effectsChannels.size() < 2) {
-    addEffectsChannel();
   }
 
   for (const auto& effectsChannelEffects : effectsByChannel) {
@@ -298,7 +326,12 @@ int Mixer::saveScene() const {
   }
 
   for (const auto effectsChannel : effectsChannels) {
-
+    if (!dao->channelRepository.save(effectsChannel->toEntity()))
+        Logging::write(
+          Error,
+          "Audio::Mixer::saveScene",
+          "Unable to save channel: " + std::to_string(effectsChannel->getIndex()) + " to sceneId: " + std::to_string(sceneId)
+        );
 
     const int effectCount = effectsChannel->effectCount();
     for (int i = 0; i < effectCount; i++) {

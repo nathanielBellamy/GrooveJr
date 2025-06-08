@@ -28,6 +28,37 @@ EffectsChannel::EffectsChannel(
   );
 }
 
+EffectsChannel::EffectsChannel(
+	AppState* gAppState,
+	std::shared_ptr<JackClient> jackClient,
+	const Db::ChannelEntity& channelEntity
+	)
+	: gAppState(gAppState)
+	, jackClient(jackClient)
+	, index(channelEntity.channelIndex)
+	, name(channelEntity.name)
+  {
+
+	channel.gain.store(channelEntity.gain);
+	channel.mute.store(channelEntity.mute);
+	channel.solo.store(channelEntity.solo);
+	channel.pan.store(channelEntity.pan);
+	channel.gainL.store(channelEntity.gainL);
+	channel.gainR.store(channelEntity.gainR);
+	channel.muteL.store(channelEntity.muteL);
+	channel.muteR.store(channelEntity.muteR);
+	channel.soloL.store(channelEntity.soloL);
+	channel.soloR.store(channelEntity.soloR);
+	channel.panL.store(channelEntity.panL);
+	channel.panR.store(channelEntity.panR);
+
+  Logging::write(
+  	Info,
+  	"Audio::EffectsChannel::ctor",
+  	"Instantiating EffectsChannel fromEntity: " + std::to_string(index)
+  );
+}
+
 EffectsChannel::~EffectsChannel() {
   Logging::write(
   	Info,
@@ -35,9 +66,8 @@ EffectsChannel::~EffectsChannel() {
   	"Destroying EffectsChannel: " + std::to_string(index)
   );
 
-	for (const auto plugin : vst3Plugins) {
+	for (const auto plugin : vst3Plugins)
 		delete plugin;
-	}
 
 	Logging::write(
   	Info,

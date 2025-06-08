@@ -36,6 +36,11 @@ class EffectsChannel {
       std::shared_ptr<JackClient> jackClient,
       int index
     );
+    EffectsChannel(
+      AppState* gAppState,
+      std::shared_ptr<JackClient> jackClient,
+      const Db::ChannelEntity& channelEntity
+    );
     ~EffectsChannel();
 
     [[nodiscard]]
@@ -232,10 +237,6 @@ class EffectsChannel {
         channel.panL.load(),
         channel.panR.load(),
       };
-    }
-
-    static EffectsChannel fromEntity(Db::ChannelEntity channelEntity) {
-      // todo
     }
 };
 
