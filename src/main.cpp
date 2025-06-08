@@ -122,7 +122,7 @@ extern "C" {
         const auto appStateEntity = Dao->appStateRepository.get();
         if (appStateEntity.id == 0) {
           // no appState in Db, init one
-          if (Dao->appStateRepository.save() != 0)
+          if (Dao->appStateRepository.save() == 0)
             Logging::write(
               Error,
               "main",

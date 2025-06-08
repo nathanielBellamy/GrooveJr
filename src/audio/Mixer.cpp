@@ -28,7 +28,7 @@ Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
     "Retrieving effects..."
   );
 
-  if (gAppState->sceneId == 0) {
+  if (gAppState->getSceneId() == 0) {
     loadSceneByIndex(0);
   } else {
     loadScene();
@@ -267,10 +267,14 @@ int Mixer::setChannels(const std::vector<Db::ChannelEntity>& channelEntities) {
 
   deleteChannels();
 
-  std::sort(channelEntities.begin(), channelEntities.end());
-  for (const auto& channelEntity : channelEntities) {
-    std::cout << "channelEntity: " << channelEntity.id << std::endl;
-    addEffectsChannelFromEntity(channelEntity);
+  if (channelEntities.empty()) {
+    addEffectsChannel(); // main
+    addEffectsChannel(); // channel 1
+  } else {
+    std::sort(channelEntities.begin(), channelEntities.end());
+    for (const auto& channelEntity : channelEntities) {
+      addEffectsChannelFromEntity(channelEntity);
+    }
   }
 
   Logging::write(
