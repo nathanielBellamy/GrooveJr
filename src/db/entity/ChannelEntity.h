@@ -49,6 +49,13 @@ struct ChannelEntity {
     float panR
   );
 
+  bool operator=(const ChannelEntity& rhs) const {
+    return id == rhs.id;
+  }
+  bool operator<(const ChannelEntity& rhs) const {
+    return channelIndex < rhs.channelIndex;
+  }
+
   static ChannelEntity deser(sqlite3_stmt* stmt);
 };
 

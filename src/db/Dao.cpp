@@ -94,7 +94,6 @@ int Dao::initSchema() const {
       soloR real not null default 0.0,
       panL real not null default 0.0,
       panR real not null default 0.0,
-      version integer not null,
       createdAt datetime default current_timestamp
     );
 

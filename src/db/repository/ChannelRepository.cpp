@@ -14,8 +14,8 @@ ChannelRepository::ChannelRepository(sqlite3** db, AppState* gAppState)
 
 int ChannelRepository::save(const ChannelEntity& channel) const {
   const std::string query = R"sql(
-    insert into channels (channelIndex, name, gain, mute, solo, pan, gainL, gainR, muteL, muteR, soloL, soloR, panL, panR))
-    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    insert into channels (channelIndex, name, gain, mute, solo, pan, gainL, gainR, muteL, muteR, soloL, soloR, panL, panR)
+    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
   )sql";
 
   sqlite3_stmt* stmt;
@@ -80,13 +80,13 @@ int ChannelRepository::save(const ChannelEntity& channel) const {
   if (sqlite3_step(joinStmt) != SQLITE_DONE) {
     Logging::write(
       Error,
-      "Db::EffectRepository::save",
+      "Db::ChannelRepository::save",
       "Failed to join Channel " + channel.name + " id: " + std::to_string(channelId) + " to sceneId: " + std::to_string(gAppState->getSceneId()) + ". Message: " + std::string(sqlite3_errmsg(*db))
     );
   } else {
     Logging::write(
       Info,
-      "Db::EffectRepository::save",
+      "Db::ChannelRepository::save",
       "Joined Channel " + channel.name + " id: " + std::to_string(channelId) + " to sceneId " + std::to_string(gAppState->getSceneId())
     );
   }

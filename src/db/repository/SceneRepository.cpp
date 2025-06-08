@@ -75,32 +75,26 @@ int SceneRepository::save(const Scene& scene) const {
   return static_cast<int>(sqlite3_last_insert_rowid(*db));
 }
 
-std::vector<ChannelEntity> SceneRepository::getChannels(const int sceneIndex) const {
+std::vector<ChannelEntity> SceneRepository::getChannels(const int sceneId) const {
   std::vector<ChannelEntity> channels;
   const std::string query = R"sql(
     select * from channels c
     right join scene_to_channels stc
     on stc.channelId = c.id
-    where stc.sceneId = (
-      select id
-      from scenes
-      where sceneIndex = ?
-      order by id desc
-      limit 1
-    );
+    where stc.sceneId = ?;
   )sql";
 
   sqlite3_stmt* stmt;
   if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     Logging::write(
       Error,
-      "Db::SceneRepository::getEffects",
+      "Db::SceneRepository::getChannels",
       "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
     );
     return channels;
   }
 
-  sqlite3_bind_int(stmt, 1, sceneIndex);
+  sqlite3_bind_int(stmt, 1, sceneId);
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     const auto channel = ChannelEntity::deser(stmt);
@@ -110,19 +104,13 @@ std::vector<ChannelEntity> SceneRepository::getChannels(const int sceneIndex) co
   return channels;
 }
 
-std::vector<Effect> SceneRepository::getEffects(const int sceneIndex) const {
+std::vector<Effect> SceneRepository::getEffects(const int sceneId) const {
   std::vector<Effect> effects;
   const std::string query = R"sql(
     select * from effects e
     right join scene_to_effects ste
     on ste.effectId = e.id
-    where ste.sceneId = (
-      select id
-      from scenes
-      where sceneIndex = ?
-      order by id desc
-      limit 1
-    );
+    where ste.sceneId = ?;
   )sql";
 
   sqlite3_stmt* stmt;
@@ -135,7 +123,7 @@ std::vector<Effect> SceneRepository::getEffects(const int sceneIndex) const {
     return effects;
   }
 
-  sqlite3_bind_int(stmt, 1, sceneIndex);
+  sqlite3_bind_int(stmt, 1, sceneId);
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     const auto effect = Effect::deser(stmt);

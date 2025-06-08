@@ -193,9 +193,16 @@ int Mixer::loadScene() {
   );
 
   const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(sceneId);
+  std::cout << "loaded channels: " << channels.size() << std::endl;
   setChannels(channels);
   const std::vector<Db::Effect> effects = dao->sceneRepository.getEffects(sceneId);
   setEffects(effects);
+
+  Logging::write(
+    Info,
+    "Audio::Mixer::loadSceneById",
+    "Loading scene id: " + std::to_string(sceneId)
+  );
 
   return 0;
 }
@@ -260,14 +267,19 @@ int Mixer::setChannels(const std::vector<Db::ChannelEntity>& channelEntities) {
 
   deleteChannels();
 
-  for (const auto& channelEntity : channelEntities)
+  std::sort(channelEntities.begin(), channelEntities.end());
+  for (const auto& channelEntity : channelEntities) {
+    std::cout << "channelEntity: " << channelEntity.id << std::endl;
     addEffectsChannelFromEntity(channelEntity);
+  }
 
   Logging::write(
     Info,
     "Audio::Mixer::setChannels",
     "Done setting channels: " + std::to_string(channelEntities.size())
   );
+
+  return 0;
 }
 
 int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
