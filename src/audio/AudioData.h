@@ -3,7 +3,6 @@
 #include <sndfile.hh>
 #include "../enums/PlayState.h"
 #include "./effects/EffectsChannelProcessData.h"
-#include "./Channel.h"
 #include "./Constants.h"
 
 #include <jack/ringbuffer.h>

@@ -6,6 +6,7 @@
 #define EFFECTSCHANNEL_H
 
 #include <memory>
+#include <string>
 
 #include "./vst3/Plugin.h"
 #include "../ChannelAtomic.h"
@@ -22,7 +23,9 @@ class EffectsChannel {
   // fx0:inputBuffers->buffersA, fx1:buffersA->buffersB, fx2:buffersB->buffersA, fx3:buffersA->buffersB, ...
   AppState* gAppState;
   std::shared_ptr<JackClient> jackClient;
+  int id { 0 };
   int index;
+  std::string name { "Channel" };
   std::vector<Vst3::Plugin*> vst3Plugins;
 
   public:
@@ -209,8 +212,31 @@ class EffectsChannel {
 
     bool removeEffect(int effectIdx);
 
-    std::string getPluginName(int pluginIndex) const { return vst3Plugins.at(pluginIndex)->getName(); };
+    std::string getPluginName(const int pluginIndex) const { return vst3Plugins.at(pluginIndex)->getName(); };
 
+    Db::ChannelEntity toEntity() {
+      return {
+        id,
+        index,
+        name,
+        channel.gain.load(),
+        channel.mute.load(),
+        channel.solo.load(),
+        channel.pan.load(),
+        channel.gainL.load(),
+        channel.gainR.load(),
+        channel.muteL.load(),
+        channel.muteR.load(),
+        channel.soloL.load(),
+        channel.soloR.load(),
+        channel.panL.load(),
+        channel.panR.load(),
+      };
+    }
+
+    static EffectsChannel fromEntity(Db::ChannelEntity channelEntity) {
+      // todo
+    }
 };
 
 } // Effects

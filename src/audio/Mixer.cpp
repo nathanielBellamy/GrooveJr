@@ -298,6 +298,8 @@ int Mixer::saveScene() const {
   }
 
   for (const auto effectsChannel : effectsChannels) {
+
+
     const int effectCount = effectsChannel->effectCount();
     for (int i = 0; i < effectCount; i++) {
       const auto plugin = effectsChannel->getPluginAtIdx(i);

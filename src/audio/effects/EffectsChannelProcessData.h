@@ -10,7 +10,6 @@
 #include <sndfile.hh>
 #include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 
-#include "../Channel.h"
 #include "../Constants.h"
 
 namespace Gj {
