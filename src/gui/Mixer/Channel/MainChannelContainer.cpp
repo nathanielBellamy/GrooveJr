@@ -55,8 +55,20 @@ void MainChannelContainer::setEffects() {
   return mainChannel.setEffects();
 }
 
-void MainChannelContainer::resetChannel() {
-  mainChannel.reset();
+void MainChannelContainer::setChannel() {
+  Logging::write(
+    Info,
+    "Gui::MainChannelContainer::setChannel",
+    "Setting channel."
+  );
+
+  mainChannel.set();
+
+  Logging::write(
+    Info,
+    "Gui::MainChannelContainer::setChannel",
+    "Done setting channel."
+  );
 }
 
 } // Gui

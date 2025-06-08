@@ -81,6 +81,22 @@ void MainWindow::closeEvent (QCloseEvent* e) {
   shutdown_handler(3);
 }
 
+void MainWindow::setChannels() {
+  Logging::write(
+    Info,
+    "Gui::MainWindow::setChannels",
+    "Setting channels."
+  );
+
+  mixerWindow.setChannels();
+
+  Logging::write(
+    Info,
+    "Gui::MainWindow::setChannels",
+    "Done setting channels."
+  );
+}
+
 void MainWindow::setEffects() {
   Logging::write(
     Info,
@@ -104,23 +120,6 @@ void MainWindow::setEffects() {
   );
 }
 
-void MainWindow::resetChannels() {
-  Logging::write(
-    Info,
-    "Gui::MainWindow::resetChannels",
-    "Resetting effects."
-  );
-
-  mixerWindow.resetChannels();
-
-  Logging::write(
-    Info,
-    "Gui::MainWindow::resetChannels",
-    "Done resetting effects."
-  );
-}
-
-
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
     if (const int sceneIndex = sceneLoadAction.data().toInt(); gAppState->getSceneIndex() != sceneIndex) {
@@ -130,8 +129,8 @@ void MainWindow::connectActions() {
         "Loading sceneIndex: " + std::to_string(sceneIndex)
       );
 
-      resetChannels();
       mixer->loadSceneByIndex(sceneIndex);
+      setChannels();
       setEffects();
 
       Logging::write(

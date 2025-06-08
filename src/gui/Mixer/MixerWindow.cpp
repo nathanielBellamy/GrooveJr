@@ -140,9 +140,9 @@ void MixerWindow::connectActions() {
   });
 }
 
-void MixerWindow::resetChannels() {
-  mainChannelContainer.resetChannel();
-  effectsChannelsContainer.resetChannels();
+void MixerWindow::setChannels() {
+  mainChannelContainer.setChannel();
+  effectsChannelsContainer.setChannels();
 }
 
 

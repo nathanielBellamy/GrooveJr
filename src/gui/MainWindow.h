@@ -40,6 +40,7 @@ class MainWindow final : public QMainWindow {
     explicit MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState* gAppState, void (*shutdown_handler) (int));
     int hydrateState(const AppStatePacket& appStatePacket);
     void closeEvent(QCloseEvent* event) override;
+    void setChannels();
     void setEffects();
 
   private:
@@ -55,7 +56,6 @@ class MainWindow final : public QMainWindow {
     MusicLibraryWindow musicLibraryWindow;
     MixerWindow mixerWindow;
 
-    void resetChannels();
     void setupGrid();
     void connectActions();
 };

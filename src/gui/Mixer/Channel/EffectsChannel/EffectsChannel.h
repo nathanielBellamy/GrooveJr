@@ -61,13 +61,13 @@ class EffectsChannel final : public QWidget {
     void setSoloR(float val);
     void setEffects();
     void addEffect(int effectIndex);
-    void reset();
+    void set();
+    int channelIndex;
 
   private:
     actor_system& actorSystem;
     strong_actor_ptr appStateManagerPtr;
     Audio::Mixer* mixer;
-    int channelIndex;
     QAction* removeEffectsChannelAction;
     RemoveEffectsChannelButton removeEffectsChannelButton;
     QAction addEffectAction;

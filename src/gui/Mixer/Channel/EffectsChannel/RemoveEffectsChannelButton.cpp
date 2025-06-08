@@ -16,6 +16,15 @@ RemoveEffectsChannelButton::RemoveEffectsChannelButton(QWidget *parent, int chan
   setStyle();
 }
 
+RemoveEffectsChannelButton::~RemoveEffectsChannelButton() {
+  Logging::write(
+    Info,
+    "Gui::RemoveEffectsChannelButton::~RemoveEffectsChannelButton",
+    "Destroying RemoveEffectsChannelButton"
+  );
+}
+
+
 void RemoveEffectsChannelButton::hydrateState(const AppStatePacket &appState, const int newChannelIdx) {
   channelIndex = newChannelIdx;
 }

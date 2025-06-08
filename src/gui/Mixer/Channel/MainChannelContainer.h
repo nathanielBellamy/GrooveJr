@@ -60,7 +60,7 @@ class MainChannelContainer final : public QWidget {
     };
 
     void setEffects();
-    void resetChannel();
+    void setChannel();
 
   private:
     actor_system& actorSystem;

@@ -86,6 +86,7 @@ void caf_main(int argc, char *argv[], void (*shutdown_handler) (int), actor_syst
   Logging::write(Info, "caf_main", "Supervisor actor spawned");
 
   mainWindow.show();
+  mainWindow.setChannels();
   mainWindow.setEffects();
   qtApp.exec();
 }
@@ -146,8 +147,8 @@ extern "C" {
           "Instantiated Mixer"
         );
 
-        while (Mixer->getEffectsChannelsCount() < 1) // at least main and channel 1
-          Mixer->addEffectsChannel();
+        // while (Mixer->getEffectsChannelsCount() < 1) // at least main and channel 1
+        //   Mixer->addEffectsChannel();
 
         // init actor system
         // Initialize the global type information before anything else.

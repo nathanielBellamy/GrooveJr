@@ -35,9 +35,8 @@ EffectsSlots::~EffectsSlots() {
 void EffectsSlots::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
   channelIndex = newChannelIndex;
 
-  for (const auto& effectSlot : effectsSlots) {
+  for (const auto& effectSlot : effectsSlots)
     effectSlot->hydrateState(appState, channelIndex);
-  }
 }
 
 void EffectsSlots::addEffectSlot() {

@@ -54,7 +54,7 @@ class EffectsChannelsContainer final : public QWidget {
     void addEffectsChannel();
     void removeEffectsChannel(int channelIdx);
     void setEffects() const;
-    void resetChannels();
+    void setChannels();
 
   private:
     actor_system& actorSystem;

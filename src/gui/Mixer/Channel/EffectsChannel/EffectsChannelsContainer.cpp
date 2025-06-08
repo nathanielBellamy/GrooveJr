@@ -87,12 +87,23 @@ void EffectsChannelsContainer::addEffectsChannel() {
 }
 
 void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::removeEffectsChannel",
+    "Removing effects channels channel " + std::to_string(channelIdx)
+  );
+
   delete channels.at(channelIdx - 1);
   channels.erase(channels.begin() + channelIdx - 1);
 
-  if (channels.size() == 1) {
+  if (channels.size() == 1)
     channels.front()->updateShowRemoveEffectsChannelButton(false);
-  }
+
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::removeEffectsChannel",
+    "Done removing effects channels channel " + std::to_string(channelIdx)
+  );
 }
 
 void EffectsChannelsContainer::setEffects() const {
@@ -202,27 +213,31 @@ void EffectsChannelsContainer::setSoloR(const int channelIdx, const float val) c
   channels.at(channelIdx - 1)->setSoloR(val);
 }
 
-void EffectsChannelsContainer::resetChannels() {
+void EffectsChannelsContainer::setChannels() {
   Logging::write(
     Info,
-    "Gui::EffectsChannelsContainer::resetChannels",
-    "Resetting channels."
+    "Gui::EffectsChannelsContainer::setChannels",
+    "Setting channels."
   );
 
-  // TODO: debug once channelEntity is in place and loading
-  for (int i = static_cast<int>(channels.size()) - 1; i > 0; i--)
-    removeEffectsChannel(i);
+  for (const auto channel : channels)
+    removeEffectsChannel(channel->channelIndex);
 
-  for (int i = 0; i < mixer->getEffectsChannelsCount() - 1; i++)
+  std::cout << "done removing channels" << std::endl;
+
+  for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
     addEffectsChannel();
+    // todo: set channel vals
+  }
 
   if (channels.empty())
     addEffectsChannel();
 
+  setupGrid();
   Logging::write(
     Info,
-    "Gui::EffectsChannelsContainer::resetChannels",
-    "Done resetting channels."
+    "Gui::EffectsChannelsContainer::setChannels",
+    "Done setting channels."
   );
 }
 

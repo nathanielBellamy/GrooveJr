@@ -419,8 +419,9 @@ void EffectsChannel::setSoloR(const float val) {
   muteSoloContainer.setSoloR(val);
 }
 
-void EffectsChannel::reset() {
+void EffectsChannel::set() {
   effectsSlots.reset();
+  //todo: set channel vals
 }
 
 } // Gui
