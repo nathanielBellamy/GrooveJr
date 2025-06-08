@@ -21,6 +21,15 @@ VstWindow::VstWindow(QWidget* parent, int channelIndex, int effectIndex, std::st
   setupGrid();
 }
 
+VstWindow::~VstWindow() noexcept {
+  Logging::write(
+    Info,
+    "Gui::VstWindow::~VstWindow",
+    "Destroying VstWindow"
+  );
+}
+
+
 void VstWindow::setStyle() {
   setMinimumSize(QSize(800, 400));
 }

@@ -31,7 +31,7 @@ private:
 
 public:
   explicit VstWindow(QWidget* parent, int channelIndex, int effectIndex, std::string name);
-	~VstWindow () noexcept override = default;
+	~VstWindow () noexcept override;
 
 	void show () override;
 	void close () override;

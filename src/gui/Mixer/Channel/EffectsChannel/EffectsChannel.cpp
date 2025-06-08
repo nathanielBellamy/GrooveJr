@@ -21,10 +21,10 @@ EffectsChannel::EffectsChannel(
   QAction* soloRChannelAction
   )
   : QWidget(parent)
+  , channelIndex(channelIndex)
   , actorSystem(actorSystem)
   , appStateManagerPtr(actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER))
   , mixer(mixer)
-  , channelIndex(channelIndex)
   , removeEffectsChannelAction(removeEffectsChannelAction)
   , removeEffectsChannelButton(this, channelIndex, removeEffectsChannelAction)
   , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
@@ -115,7 +115,7 @@ void EffectsChannel::hydrateState(const AppStatePacket& appStatePacket, const in
   // setupGrid();
 }
 
-void EffectsChannel::updateShowRemoveEffectsChannelButton(bool val) {
+void EffectsChannel::updateShowRemoveEffectsChannelButton(const bool val) {
   if (val) {
     removeEffectsChannelButton.show();
   } else {

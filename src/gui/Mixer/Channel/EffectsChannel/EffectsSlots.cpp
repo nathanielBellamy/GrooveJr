@@ -30,6 +30,14 @@ EffectsSlots::~EffectsSlots() {
     "Gui::EffectsSlots::~EffectsSlots",
     "Destroying EffectsSlots on Channel " + std::to_string(channelIndex)
   );
+
+  effectsSlots.clear();
+
+  Logging::write(
+    Info,
+    "Gui::EffectsSlots::~EffectsSlots",
+    "Done destroying EffectsSlots on Channel " + std::to_string(channelIndex)
+  );
 }
 
 void EffectsSlots::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {

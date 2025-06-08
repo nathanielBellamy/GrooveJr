@@ -35,6 +35,14 @@ EffectSlot::EffectSlot(QWidget* parent,
   setupGrid();
 }
 
+EffectSlot::~EffectSlot() {
+  Logging::write(
+    Info,
+    "Gui::EffectSlot::~EffectSlot",
+    "Destroying EffectSlot"
+  );
+}
+
 void EffectSlot::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
   channelIndex = newChannelIndex;
   const auto name = mixer->getEffectsChannels().at(channelIndex)->getPluginAtIdx(slotIndex)->name;

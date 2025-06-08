@@ -38,7 +38,7 @@ EffectsContainer::~EffectsContainer() {
 
   clearButtonsAndLabels();
   mixer->terminateEditorHostsOnChannel(channelIndex);
-  for (auto vstWindow : vstWindows) {
+  for (const auto& vstWindow : vstWindows) {
     vstWindow->close();
   }
 

@@ -42,7 +42,7 @@ MuteSoloContainer::~MuteSoloContainer() {
   Logging::write(
     Info,
     "Gui::MuteSoloContainer::~MuteSoloContainer",
-    "Destroying MuteSoloContainer"
+    "Destroying MuteSoloContainer on channelIndex: " + std::to_string(channelIndex)
   );
 }
 

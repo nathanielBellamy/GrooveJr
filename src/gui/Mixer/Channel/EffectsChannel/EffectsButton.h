@@ -16,7 +16,7 @@ namespace Gui {
 class EffectsButton final : public QPushButton {
 
   public:
-    EffectsButton(QWidget* parent, QAction* action);
+    EffectsButton(QWidget* parent, QAction* openEffectsContainer);
 
   private:
     QAction* openEffectsContainer;

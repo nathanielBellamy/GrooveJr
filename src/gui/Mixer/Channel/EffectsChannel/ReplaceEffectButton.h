@@ -13,6 +13,7 @@
 #include <QVariant>
 
 #include "../../../../AppState.h"
+#include "../../../../Logging.h"
 
 namespace Gj {
 namespace Gui {
@@ -21,6 +22,7 @@ class ReplaceEffectButton final : public QPushButton {
 
   public:
     ReplaceEffectButton(QWidget* parent, int channelIndex, int slotIndex, bool occupied, QAction* action);
+    ~ReplaceEffectButton() override;
     void hydrateState(const AppStatePacket& appState, int newChannelIdx);
 
   private:

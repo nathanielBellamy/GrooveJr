@@ -18,10 +18,18 @@ ReplaceEffectButton::ReplaceEffectButton(QWidget *parent, int channelIndex, int 
   setStyle();
 }
 
+ReplaceEffectButton::~ReplaceEffectButton() {
+  Logging::write(
+    Info,
+    "Gui::ReplaceEffectButton::~ReplaceEffectButton",
+    "Destroying ReplaceEffectButton."
+  );
+}
+
+
 void ReplaceEffectButton::hydrateState(const AppStatePacket &appState, int newChannelIdx) {
   channelIndex = newChannelIdx;
 }
-
 
 void ReplaceEffectButton::mousePressEvent(QMouseEvent* event) {
   replaceEffectAction->setData(QVariant(slotIndex));

@@ -41,6 +41,7 @@ class EffectSlot final : public QWidget {
                bool occupied,
                QAction* replaceEffectAction,
                QAction* removeEffectAction);
+    ~EffectSlot() override;
     void hydrateState(const AppStatePacket& appState, int newChannelIndex);
 
   private:
