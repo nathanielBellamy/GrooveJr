@@ -75,6 +75,41 @@ int SceneRepository::save(const Scene& scene) const {
   return static_cast<int>(sqlite3_last_insert_rowid(*db));
 }
 
+std::vector<ChannelEntity> SceneRepository::getChannels(const int sceneIndex) const {
+  std::vector<ChannelEntity> channels;
+  const std::string query = R"sql(
+    select * from channels c
+    right join scene_to_channels stc
+    on stc.channelId = c.id
+    where stc.sceneId = (
+      select id
+      from scenes
+      where sceneIndex = ?
+      order by id desc
+      limit 1
+    );
+  )sql";
+
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::SceneRepository::getEffects",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return channels;
+  }
+
+  sqlite3_bind_int(stmt, 1, sceneIndex);
+
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    const auto channel = ChannelEntity::deser(stmt);
+    channels.push_back(channel);
+  }
+
+  return channels;
+}
+
 std::vector<Effect> SceneRepository::getEffects(const int sceneIndex) const {
   std::vector<Effect> effects;
   const std::string query = R"sql(
@@ -85,7 +120,7 @@ std::vector<Effect> SceneRepository::getEffects(const int sceneIndex) const {
       select id
       from scenes
       where sceneIndex = ?
-      order by version desc
+      order by id desc
       limit 1
     );
   )sql";

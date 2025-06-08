@@ -14,6 +14,7 @@
 
 #include "../entity/Scene.h"
 #include "../entity/Effect.h"
+#include "../entity/ChannelEntity.h"
 
 namespace Gj {
 namespace Db {
@@ -26,6 +27,7 @@ class SceneRepository {
     SceneRepository(sqlite3** db, AppState* appState);
     std::vector<Scene> getAll() const;
     int save(const Scene& scene) const;
+    std::vector<ChannelEntity> getChannels(int sceneIndex) const;
     std::vector<Effect> getEffects(int sceneIndex) const;
     int findOrCreateBySceneIndex(int sceneIndex) const;
 };

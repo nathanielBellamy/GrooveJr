@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include <sqlite3.h>
+
 namespace Gj {
 namespace Db {
 
@@ -47,6 +49,7 @@ struct ChannelEntity {
     float panR
   );
 
+  static ChannelEntity deser(sqlite3_stmt* stmt);
 };
 
 } // Db
