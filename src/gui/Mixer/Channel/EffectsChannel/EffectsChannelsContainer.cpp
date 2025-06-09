@@ -39,10 +39,7 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   , soloRChannelAction(soloRChannelAction)
   {
 
-  for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
-    addEffectsChannel();
-  }
-
+  setChannels();
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   connectActions();
   setStyle();
@@ -62,9 +59,8 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
     addEffectsChannelButton.setEnabled(true);
   }
 
-  for (int i = 0; i < channels.size(); i++) {
+  for (int i = 0; i < channels.size(); i++)
     channels.at(i)->hydrateState(appState, i+1);
-  }
 
   setupGrid();
   update();
@@ -81,9 +77,8 @@ void EffectsChannelsContainer::addEffectsChannel() {
   );
   channels.push_back(effectsChannel);
 
-  if (channels.size() > 1) {
+  if (channels.size() > 1)
     channels.front()->updateShowRemoveEffectsChannelButton(true);
-  }
 }
 
 void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
@@ -131,9 +126,8 @@ void EffectsChannelsContainer::setEffects() const {
     "Gui::EffectsChannelsContainer::addEffectToChannel",
     "Setting effects"
   );
-  for (const auto& channel : channels) {
+  for (const auto& channel : channels)
     channel->setEffects();
-  }
 }
 
 void EffectsChannelsContainer::connectActions() {
@@ -245,13 +239,19 @@ void EffectsChannelsContainer::setChannels() {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::setChannels",
-    "Done removing channels."
+    "Done removing channels - channelsCount: " + std::to_string(channels.size())
   );
 
   for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
     addEffectsChannel();
     // todo: set channel vals
   }
+
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::setChannels",
+    "Done adding channels - channelsCount: " + std::to_string(channels.size()) + " mixer ecc: " + std::to_string(mixer->getEffectsChannelsCount())
+  );
 
   if (channels.empty())
     addEffectsChannel();
