@@ -34,6 +34,26 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 
+struct Destroyer {
+  explicit Destroyer() {
+    std::cout << " creating destroyer " << std::endl;
+    Logging::write(
+      Info,
+      "Destroyer::Destroyer",
+      "creating destroyer"
+    );
+  };
+
+  ~Destroyer() {
+    std::cout << "destroying destroyer" << std::endl;
+    Logging::write(
+      Info,
+      "Destroyer::Destroyer",
+      "Destroying the destoyer"
+    );
+  }
+};
+
 class EffectsChannel final : public QWidget {
 
   public:
@@ -93,6 +113,7 @@ class EffectsChannel final : public QWidget {
     QSlider panRSlider;
     QLabel  panRLabel;
     EffectsSlots effectsSlots;
+    Destroyer destroyer;
     QScrollArea effectsSlotsScrollArea;
     MuteSoloContainer muteSoloContainer;
     void setStyle();

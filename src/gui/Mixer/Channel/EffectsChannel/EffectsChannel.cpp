@@ -4,6 +4,7 @@
 
 #include "EffectsChannel.h"
 
+
 namespace Gj {
 namespace Gui {
 
@@ -55,7 +56,8 @@ EffectsChannel::EffectsChannel(
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction,
     channelIndex
-  ) {
+  )
+  {
   if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
     // can't remove main, must have at least one non-main effects channel
     removeEffectsChannelButton.show();
