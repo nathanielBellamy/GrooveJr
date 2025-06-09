@@ -9,8 +9,10 @@
 #include "caf/scoped_actor.hpp"
 #include "../../../../messaging/atoms.h"
 
+#include <algorithm>
 #include <memory>
 #include <vector>
+#include <iterator>
 
 #include <QAction>
 #include <QGridLayout>

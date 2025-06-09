@@ -93,8 +93,27 @@ void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
     "Removing effects channels channel " + std::to_string(channelIdx)
   );
 
-  delete channels.at(channelIdx - 1);
-  channels.erase(channels.begin() + channelIdx - 1);
+  const auto itrToRemove = std::find_if(channels.begin(), channels.end(), [&channelIdx](EffectsChannel* channel) {
+      return channel->channelIndex == channelIdx;
+  });
+
+  if (itrToRemove != channels.end()) {
+    Logging::write(
+      Info,
+      "Gui::EffectsChannelsContainer::removeEffectsChannel",
+      "Found channel to remove with channelIndex: " + std::to_string(channelIdx)
+    );
+
+    const int indexToRemove = std::distance(channels.begin(), itrToRemove);
+    delete channels.at(indexToRemove);
+    channels.erase(channels.begin() + indexToRemove);
+  } else {
+    Logging::write(
+      Error,
+      "Gui::EffectsChannelsContainer::removeEffectsChannel",
+      "Unable to find channel to remove with channelIndex: " + std::to_string(channelIdx)
+    );
+  }
 
   if (channels.size() == 1)
     channels.front()->updateShowRemoveEffectsChannelButton(false);
@@ -223,7 +242,11 @@ void EffectsChannelsContainer::setChannels() {
   for (const auto channel : channels)
     removeEffectsChannel(channel->channelIndex);
 
-  std::cout << "done removing channels" << std::endl;
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::setChannels",
+    "Done removing channels."
+  );
 
   for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
     addEffectsChannel();

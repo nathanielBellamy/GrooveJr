@@ -169,7 +169,8 @@ void Mixer::initEditorHostOnChannel(const int idx, const int newEffectChannel, s
 }
 
 void Mixer::terminateEditorHostsOnChannel(const int idx) const {
-  return effectsChannels.at(idx)->terminateEditorHosts();
+  if (idx < effectsChannels.size() && idx >= 0)
+    effectsChannels.at(idx)->terminateEditorHosts();
 }
 
 bool Mixer::replaceEffectOnChannel(const int channelIdx, const int effectIdx, std::string effectPath) const {
@@ -193,7 +194,6 @@ int Mixer::loadScene() {
   );
 
   const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(sceneId);
-  std::cout << "loaded channels: " << channels.size() << std::endl;
   setChannels(channels);
   const std::vector<Db::Effect> effects = dao->sceneRepository.getEffects(sceneId);
   setEffects(effects);
