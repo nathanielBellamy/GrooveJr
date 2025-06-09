@@ -49,8 +49,8 @@ EffectsChannel::EffectsChannel(
   , panLLabel("PanL", this)
   , panRSlider(Qt::Horizontal, this)
   , panRLabel("PanR", this)
-  , effectsSlots(this, actorSystem, mixer, channelIndex, &replaceEffectAction, &removeEffectAction)
   , effectsSlotsScrollArea(this)
+  , effectsSlots(this, actorSystem, mixer, channelIndex, &replaceEffectAction, &removeEffectAction)
   , muteSoloContainer(
     this, &openEffectsContainer,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
