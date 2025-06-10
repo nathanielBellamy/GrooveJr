@@ -127,7 +127,6 @@ std::vector<Effect> SceneRepository::getEffects(const int sceneId) const {
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     const auto effect = Effect::deser(stmt);
-    std::cout << "Row: ID = " << effect.id << ", filePath = " << effect.filePath << ", name = " << effect.name << std::endl;
     effects.push_back(effect);
   }
 

@@ -120,6 +120,63 @@ void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
   );
 }
 
+void EffectsChannelsContainer::clearEffectsChannels() {
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::clearEffectsChannels",
+    "Clear effects channels."
+  );
+
+  for (const auto& channel : channels) {
+    delete channel;
+  }
+
+  channels.clear();
+
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::clearEffectsChannels",
+    "Done clearing effects channels."
+  );
+}
+
+void EffectsChannelsContainer::setChannels() {
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::setChannels",
+    "Setting channels."
+  );
+
+  clearEffectsChannels();
+
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::setChannels",
+    "Done removing channels - channelsCount: " + std::to_string(channels.size())
+  );
+
+  for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
+    addEffectsChannel();
+    // todo: set channel vals
+  }
+
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::setChannels",
+    "Done adding channels - channelsCount: " + std::to_string(channels.size()) + " mixer ecc: " + std::to_string(mixer->getEffectsChannelsCount())
+  );
+
+  if (channels.empty())
+    addEffectsChannel();
+
+  setupGrid();
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::setChannels",
+    "Done setting channels."
+  );
+}
+
 void EffectsChannelsContainer::setEffects() const {
   Logging::write(
     Info,
@@ -224,44 +281,6 @@ void EffectsChannelsContainer::setSoloL(const int channelIdx, const float val) c
 
 void EffectsChannelsContainer::setSoloR(const int channelIdx, const float val) const {
   channels.at(channelIdx - 1)->setSoloR(val);
-}
-
-void EffectsChannelsContainer::setChannels() {
-  Logging::write(
-    Info,
-    "Gui::EffectsChannelsContainer::setChannels",
-    "Setting channels."
-  );
-
-  for (const auto channel : channels)
-    removeEffectsChannel(channel->channelIndex);
-
-  Logging::write(
-    Info,
-    "Gui::EffectsChannelsContainer::setChannels",
-    "Done removing channels - channelsCount: " + std::to_string(channels.size())
-  );
-
-  for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
-    addEffectsChannel();
-    // todo: set channel vals
-  }
-
-  Logging::write(
-    Info,
-    "Gui::EffectsChannelsContainer::setChannels",
-    "Done adding channels - channelsCount: " + std::to_string(channels.size()) + " mixer ecc: " + std::to_string(mixer->getEffectsChannelsCount())
-  );
-
-  if (channels.empty())
-    addEffectsChannel();
-
-  setupGrid();
-  Logging::write(
-    Info,
-    "Gui::EffectsChannelsContainer::setChannels",
-    "Done setting channels."
-  );
 }
 
 } // Gui
