@@ -68,6 +68,7 @@ add_library(GjAudio SHARED
         Cassette.cpp
         ThreadStatics.h
         ThreadStatics.cpp
+        Math.h
         Mixer.h
         Mixer.cpp
         JackClient.h

@@ -20,6 +20,7 @@
 #include "../../../../AppState.h"
 
 #include "../../../../audio/Mixer.h"
+#include "../../../../audio/Math.h"
 #include "EffectsSlots.h"
 #include "MuteSoloContainer.h"
 #include "RemoveEffectsChannelButton.h"
@@ -98,12 +99,12 @@ class EffectsChannel final : public QWidget {
     void setStyle();
     void setupGrid();
     void setupTitle();
-    void setupGainSlider();
-    void setupGainLSlider();
-    void setupGainRSlider();
-    void setupPanSlider();
-    void setupPanLSlider();
-    void setupPanRSlider();
+    void setupGainSlider(float gain);
+    void setupGainLSlider(float gainL);
+    void setupGainRSlider(float gainR);
+    void setupPanSlider(float pan);
+    void setupPanLSlider(float panL);
+    void setupPanRSlider(float panR);
     void connectActions();
     void setupEffectsSlotsScrollArea();
 };

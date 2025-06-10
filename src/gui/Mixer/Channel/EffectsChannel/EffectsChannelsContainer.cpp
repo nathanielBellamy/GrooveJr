@@ -155,10 +155,8 @@ void EffectsChannelsContainer::setChannels() {
     "Done removing channels - channelsCount: " + std::to_string(channels.size())
   );
 
-  for (int i = 0; i < mixer->getEffectsChannelsCount(); i++) {
+  for (int i = 0; i < mixer->getEffectsChannelsCount(); i++)
     addEffectsChannel();
-    // todo: set channel vals
-  }
 
   Logging::write(
     Info,

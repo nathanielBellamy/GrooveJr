@@ -71,14 +71,16 @@ EffectsChannel::EffectsChannel(
   panLabel.hide();
 
   connectActions();
-
   setupTitle();
-  setupGainSlider();
-  setupGainLSlider();
-  setupGainRSlider();
-  setupPanSlider();
-  setupPanLSlider();
-  setupPanRSlider();
+
+  const auto& channel = mixer->getEffectsChannel(channelIndex)->channel;
+
+  setupGainSlider(channel.gain.load());
+  setupGainLSlider(channel.gainL.load());
+  setupGainRSlider(channel.gainR.load());
+  setupPanSlider(channel.pan.load());
+  setupPanLSlider(channel.panL.load());
+  setupPanRSlider(channel.panR.load());
   setStyle();
   setupGrid();
 }
@@ -190,81 +192,93 @@ void EffectsChannel::setupTitle() {
   title.setFont({title.font().family(), 16});
 }
 
-void EffectsChannel::setupGainSlider() {
+void EffectsChannel::setupGainSlider(const float gain) {
   gainSlider.setMinimum(0);
   gainSlider.setMaximum(127);
   gainSlider.setTickInterval(1);
-  gainSlider.setValue(100);
+  gainSlider.setValue(
+    Audio::Math::floatToUInt127(gain)
+  );
   gainSlider.setTickPosition(QSlider::NoTicks);
-  auto gainSliderConnection = connect(&gainSlider, &QSlider::valueChanged, [this](int gain) {
-    const float gainF = static_cast<float>(gain) / 100.0f;
-
-    mixer->getEffectsChannel(channelIndex)->setGain(gainF);
+  auto gainSliderConnection = connect(&gainSlider, &QSlider::valueChanged, [this](const int newGain) {
+    mixer->getEffectsChannel(channelIndex)->setGain(
+      Audio::Math::uInt127ToFloat(newGain)
+    );
   });
 }
 
-void EffectsChannel::setupGainLSlider() {
+void EffectsChannel::setupGainLSlider(const float gainL) {
   gainLSlider.setMinimum(0);
   gainLSlider.setMaximum(127);
   gainLSlider.setTickInterval(1);
-  gainLSlider.setValue(100);
+  gainLSlider.setValue(
+    Audio::Math::floatToInt127(gainL)
+  );
   gainLSlider.setTickPosition(QSlider::NoTicks);
-  auto gainSliderConnection = connect(&gainLSlider, &QSlider::valueChanged, [this](int gain) {
-    const float gainF = static_cast<float>(gain) / 100.0f;
-
-    mixer->getEffectsChannel(channelIndex)->setGainL(gainF);
+  auto gainSliderConnection = connect(&gainLSlider, &QSlider::valueChanged, [this](const int newGainL) {
+    mixer->getEffectsChannel(channelIndex)->setGainL(
+      Audio::Math::uInt127ToFloat(newGainL)
+    );
   });
 }
 
-void EffectsChannel::setupGainRSlider() {
+void EffectsChannel::setupGainRSlider(const float gainR) {
   gainRSlider.setMinimum(0);
   gainRSlider.setMaximum(127);
   gainRSlider.setTickInterval(1);
-  gainRSlider.setValue(100);
+  gainRSlider.setValue(
+    Audio::Math::floatToUInt127(gainR)
+  );
   gainRSlider.setTickPosition(QSlider::NoTicks);
-  auto gainSliderConnection = connect(&gainRSlider, &QSlider::valueChanged, [this](int gain) {
-    const float gainF = static_cast<float>(gain) / 100.0f;
-
-    mixer->getEffectsChannel(channelIndex)->setGainR(gainF);
+  auto gainSliderConnection = connect(&gainRSlider, &QSlider::valueChanged, [this](const int newGainR) {
+    mixer->getEffectsChannel(channelIndex)->setGainR(
+      Audio::Math::uInt127ToFloat(newGainR)
+    );
   });
 }
 
-void EffectsChannel::setupPanSlider() {
+void EffectsChannel::setupPanSlider(const float pan) {
   panSlider.setMinimum(-127);
   panSlider.setMaximum(127);
   panSlider.setTickInterval(1);
-  panSlider.setValue(0);
+  panSlider.setValue(
+    Audio::Math::floatToInt127(pan)
+  );
   panSlider.setTickPosition(QSlider::NoTicks);
-  auto panSliderConnection = connect(&panSlider, &QSlider::valueChanged, [this](const int pan) {
-    const float panF = static_cast<float>(pan) / 127.0f;
-
-    mixer->getEffectsChannel(channelIndex)->setPan(panF);
+  auto panSliderConnection = connect(&panSlider, &QSlider::valueChanged, [this](const int newPan) {
+    mixer->getEffectsChannel(channelIndex)->setPan(
+      Audio::Math::int127ToFloat(newPan)
+    );
   });
 }
 
-void EffectsChannel::setupPanLSlider() {
+void EffectsChannel::setupPanLSlider(const float panL) {
   panLSlider.setMinimum(-127);
   panLSlider.setMaximum(127);
   panLSlider.setTickInterval(1);
-  panLSlider.setValue(-127);
+  panLSlider.setValue(
+    Audio::Math::floatToInt127(panL)
+  );
   panLSlider.setTickPosition(QSlider::NoTicks);
-  auto panSliderConnection = connect(&panLSlider, &QSlider::valueChanged, [this](const int pan) {
-    const float panF = static_cast<float>(pan) / 127.0f;
-
-    mixer->getEffectsChannel(channelIndex)->setPanL(panF);
+  auto panSliderConnection = connect(&panLSlider, &QSlider::valueChanged, [this](const int newPanL) {
+    mixer->getEffectsChannel(channelIndex)->setPanL(
+      Audio::Math::int127ToFloat(newPanL)
+    );
   });
 }
 
-void EffectsChannel::setupPanRSlider() {
+void EffectsChannel::setupPanRSlider(const float panR) {
   panRSlider.setMinimum(-127);
   panRSlider.setMaximum(127);
   panRSlider.setTickInterval(1);
-  panRSlider.setValue(127);
+  panRSlider.setValue(
+    Audio::Math::floatToInt127(panR)
+  );
   panRSlider.setTickPosition(QSlider::NoTicks);
-  auto panSliderConnection = connect(&panRSlider, &QSlider::valueChanged, [this](const int pan) {
-    const float panF = static_cast<float>(pan) / 127.0f;
-
-    mixer->getEffectsChannel(channelIndex)->setPanR(panF);
+  auto panSliderConnection = connect(&panRSlider, &QSlider::valueChanged, [this](const int newPanR) {
+    mixer->getEffectsChannel(channelIndex)->setPanR(
+      Audio::Math::int127ToFloat(newPanR)
+    );
   });
 }
 
