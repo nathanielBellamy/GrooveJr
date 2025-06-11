@@ -23,6 +23,7 @@ class SceneSelectButton final : public QPushButton {
     QAction* action;
     void setStyle();
     void mousePressEvent(QMouseEvent* event) override;
+    QSize sizeHint() const override;
 };
 
 } // Gui

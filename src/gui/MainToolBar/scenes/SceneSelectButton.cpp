@@ -18,7 +18,7 @@ SceneSelectButton::SceneSelectButton(QWidget* parent, QAction* action, const int
 }
 
 void SceneSelectButton::setStyle() {
-  setFixedSize(QSize(40, 30));
+  setFixedSize(sizeHint());
 }
 
 void SceneSelectButton::mousePressEvent(QMouseEvent* event) {
@@ -28,13 +28,23 @@ void SceneSelectButton::mousePressEvent(QMouseEvent* event) {
 
 void SceneSelectButton::hydrateState(const AppStatePacket& appState) {
   std::string styleString;
-  if (appState.sceneIndex == sceneIndex) {
-    styleString += " background-color: " + Color::toHex(GjC::LIGHT_300) +"; color: " + Color::toHex(GjC::DARK_400) + "; ";
-  } else {
-    styleString += " background-color: "  + Color::toHex(GjC::DARK_400) + "; color: white;";
-  }
+
+  // TODO: why does setting colors affect button size?
+  if (appState.sceneIndex == sceneIndex)
+    styleString += "background-color: " + Color::toHex(GjC::LIGHT_300) +"; color: " + Color::toHex(GjC::DARK_400) + "; padding: 0px;";
 
   setStyleSheet(styleString.c_str());
+  setStyle();
+
+  if (appState.sceneIndex == sceneIndex || appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
+    setEnabled(false);
+  } else {
+    setEnabled(true);
+  }
+}
+
+QSize SceneSelectButton::sizeHint() const {
+  return {40, 30};
 }
 
 
