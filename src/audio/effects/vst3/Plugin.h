@@ -7,6 +7,8 @@
 
 #include <sndfile.h>
 
+#include "public.sdk/source/vst/utility/memoryibstream.h"
+
 #include "../../../Logging.h"
 #include "../../../AppState.h"
 #include "../../JackClient.h"

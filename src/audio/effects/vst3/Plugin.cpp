@@ -14,6 +14,8 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 	, path(path)
 	{
 
+	Steinberg::ResizableMemoryIBStream state;
+
 	Logging::write(
 		Info,
 		"Audio::Plugin::Plugin",
