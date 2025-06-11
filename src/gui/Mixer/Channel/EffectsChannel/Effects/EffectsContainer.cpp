@@ -37,10 +37,10 @@ EffectsContainer::~EffectsContainer() {
   );
 
   clearButtonsAndLabels();
-  mixer->terminateEditorHostsOnChannel(channelIndex);
-  for (const auto& vstWindow : vstWindows) {
+  if (isVisible())
+    mixer->terminateEditorHostsOnChannel(channelIndex);
+  for (const auto& vstWindow : vstWindows)
     vstWindow->close();
-  }
 
   Logging::write(
     Info,
@@ -122,22 +122,20 @@ void EffectsContainer::addEffect(const int newEffectIndex, const std::string plu
 }
 
 void EffectsContainer::clearButtonsAndLabels() {
-  for (const auto button : vstWindowSelectButtons) {
+  for (const auto button : vstWindowSelectButtons)
     delete button;
-  }
+
   vstWindowSelectButtons.clear();
 
-  for (const auto label : vstWindowSelectLabels) {
+  for (const auto label : vstWindowSelectLabels)
     delete label;
-  }
   vstWindowSelectLabels.clear();
 }
 
 void EffectsContainer::hideEvent(QHideEvent *event) {
   mixer->terminateEditorHostsOnChannel(channelIndex);
-  for (auto vstWindow : vstWindows) {
+  for (auto vstWindow : vstWindows)
     vstWindow->close();
-  }
 }
 
 } // Gui

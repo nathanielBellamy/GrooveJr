@@ -124,7 +124,20 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 }
 
 void Plugin::terminateEditorHost() const {
-	editorHost->terminate();
+	Logging::write(
+		Info,
+		"Audio::Plugin::terminateEditorHost",
+		"Terminating editorHost for Plugin: " + this->name
+	);
+
+	if (editorHost != nullptr)
+		editorHost->terminate();
+
+	Logging::write(
+		Info,
+		"Audio::Plugin::terminateEditorHost",
+		"Done terminating editorHost for Plugin: " + this->name
+	);
 }
 
 } // Vst3

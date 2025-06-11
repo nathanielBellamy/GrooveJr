@@ -169,8 +169,27 @@ void Mixer::initEditorHostOnChannel(const int idx, const int newEffectChannel, s
 }
 
 void Mixer::terminateEditorHostsOnChannel(const int idx) const {
-  if (idx < effectsChannels.size() && idx >= 0)
+  Logging::write(
+    Info,
+    "Audio::Mixer::terminateEditorHostsOnChannel",
+    "Terminating editor hosts on channelIndex: " + std::to_string(idx)
+  );
+
+  if (idx < effectsChannels.size() && idx >= 0) {
     effectsChannels.at(idx)->terminateEditorHosts();
+  } else {
+    Logging::write(
+      Error,
+      "Audio::Mixer::terminateEditorHostsOnChannel",
+      "Attempting to terminate editor host on out of range channelIndex: " + std::to_string(idx) + " channelCount: " + std::to_string(effectsChannels.size())
+    );
+  }
+
+  Logging::write(
+    Info,
+    "Audio::Mixer::terminateEditorHostsOnChannel",
+    "Done terminating editor hosts on channelIndex: " + std::to_string(idx)
+  );
 }
 
 bool Mixer::replaceEffectOnChannel(const int channelIdx, const int effectIdx, std::string effectPath) const {
@@ -189,8 +208,8 @@ int Mixer::loadScene() {
   const int sceneId = gAppState->getSceneId();
   Logging::write(
     Info,
-    "Audio::Mixer::loadSceneById",
-    "Loading scene id: " + std::to_string(sceneId)
+    "Audio::Mixer::loadScene",
+    "Loading sceneIndex: " + std::to_string(gAppState->getSceneIndex()) + " sceneId: " + std::to_string(sceneId)
   );
 
   const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(sceneId);

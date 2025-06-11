@@ -172,9 +172,20 @@ void EffectsChannel::initEditorHost(const int effectIndex, std::shared_ptr<Gui::
 }
 
 void EffectsChannel::terminateEditorHosts() const {
-	for (auto&& plugin : vst3Plugins) {
+	Logging::write(
+		Info,
+		"Audio::EffectsChannel::terminateEditorHosts",
+		"Terminating Editor Hosts on channel " + std::to_string(index)
+	);
+
+	for (auto&& plugin : vst3Plugins)
 		plugin->terminateEditorHost();
-	}
+
+	Logging::write(
+		Info,
+		"Audio::EffectsChannel::terminateEditorHosts",
+		"Done terminating Editor Hosts on channel " + std::to_string(index)
+	);
 }
 
 bool EffectsChannel::removeEffect(const int effectIdx) {

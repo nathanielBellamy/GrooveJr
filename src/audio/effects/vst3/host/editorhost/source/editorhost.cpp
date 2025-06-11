@@ -298,7 +298,7 @@ options:
 
 	Gj::Audio::Logging::write(
 		Gj::Audio::LogSeverityLevel::Info,
-		"EditorHost::init",
+		"Audio::Steinberg::Vst::EditorHost::init",
 		"Handled cmdArgs - will call openEditor"
 	);
 	openEditor (cmdArgs.back (), std::move (uid), flags);
@@ -307,12 +307,24 @@ options:
 //------------------------------------------------------------------------
 void App::terminate ()
 {
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"Audio::Steinberg::Vst::EditorHost::terminate",
+		"Terminating editorhost."
+	);
+
 	PluginContextFactory::instance().setPluginContext (nullptr);
 	if (windowController)
 		windowController->closePlugView ();
 	windowController.reset ();
 	plugProvider.reset ();
 	module.reset ();
+
+	Gj::Audio::Logging::write(
+		Gj::Audio::LogSeverityLevel::Info,
+		"Audio::Steinberg::Vst::EditorHost::terminate",
+		"Done terminating editorhost."
+	);
 }
 
 //------------------------------------------------------------------------
@@ -395,7 +407,7 @@ void WindowController::closePlugView ()
 		}
 		plugView = nullptr;
 	}
-	// window = nullptr;
+	window = nullptr;
 }
 
 //------------------------------------------------------------------------
