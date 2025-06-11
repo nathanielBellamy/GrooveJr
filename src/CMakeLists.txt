@@ -14,7 +14,7 @@ set (OS_LIB_FLAG "-dynamicLib")
 # - for linux:
 # - for macO_sonoma: /opt/homebrew/Cellar
 # NOTE:
-#  - on MacOS it may be helpful to use `brew info portaudio` to view home directory
+#  - on MacOS it may be helpful to use `brew info jack` to view home directory
 set (C_LIBS_HOME "/opt/homebrew/Cellar")
 
 set (GJ_BASE_DIR "/Users/ns/code/")

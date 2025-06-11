@@ -98,9 +98,9 @@ message(GUI_VST3_SDK="${VST3SDK_HOME}")
 target_compile_options(GjGui
         PRIVATE
         -I${VST3SDK_HOME}
-        -I/Users/ns/code/qt6-build/qtbase/include
-        -I/Users/ns/code/actor-framework/libcaf_core
-        -I/Users/ns/code/actor-framework/libcaf_io
+        -I/${GJ_BASE_DIR}/qt6-build/qtbase/include
+        -I/${GJ_BASE_DIR}/actor-framework/libcaf_core
+        -I/${GJ_BASE_DIR}/actor-framework/libcaf_io
 )
 add_definitions(-DQT_NO_VERSION_TAGGING)
 
