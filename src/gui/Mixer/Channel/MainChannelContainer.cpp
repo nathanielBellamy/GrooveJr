@@ -22,17 +22,24 @@ MainChannelContainer::MainChannelContainer(
   , actorSystem(actorSystem)
   , mixer(mixer)
   , grid(this)
-  , mainChannel(
+  , muteChannelAction(muteChannelAction)
+  , muteLChannelAction(muteLChannelAction)
+  , muteRChannelAction(muteRChannelAction)
+  , soloChannelAction(soloChannelAction)
+  , soloLChannelAction(soloLChannelAction)
+  , soloRChannelAction(soloRChannelAction)
+  , mainChannel(std::make_unique<EffectsChannel>(
     this, actorSystem, mixer, 0, nullptr,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction
-  ) {
+  ))
+  {
   setupGrid();
   setStyle();
 }
 
-void MainChannelContainer::hydrateState(const AppStatePacket &appState) {
-  mainChannel.hydrateState(appState, 0);
+void MainChannelContainer::hydrateState(const AppStatePacket &appState) const {
+  mainChannel->hydrateState(appState, 0);
 }
 
 void MainChannelContainer::setStyle() {
@@ -43,16 +50,16 @@ void MainChannelContainer::setStyle() {
 }
 
 void MainChannelContainer::setupGrid() {
-  grid.addWidget(&mainChannel, 0, 0, -1, -1);
+  grid.addWidget(mainChannel.get(), 0, 0, -1, -1);
 }
 
-void MainChannelContainer::setEffects() {
+void MainChannelContainer::setEffects() const {
   Logging::write(
     Info,
     "Gui::MainChannelContainer::setEffects",
     "Setting effects."
   );
-  return mainChannel.setEffects();
+  return mainChannel->setEffects();
 }
 
 void MainChannelContainer::setChannel() {
@@ -62,8 +69,12 @@ void MainChannelContainer::setChannel() {
     "Setting channel."
   );
 
-  mainChannel.set();
+  mainChannel = std::make_unique<EffectsChannel>(this, actorSystem, mixer, 0, nullptr,
+    muteChannelAction, muteLChannelAction, muteRChannelAction,
+    soloChannelAction, soloLChannelAction, soloRChannelAction
+  );
 
+  setupGrid();
   Logging::write(
     Info,
     "Gui::MainChannelContainer::setChannel",

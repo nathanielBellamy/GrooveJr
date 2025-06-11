@@ -62,7 +62,6 @@ class EffectsChannel final : public QWidget {
     void setSoloR(float val);
     void setEffects();
     void addEffect(int effectIndex);
-    void set();
     int channelIndex;
 
   private:

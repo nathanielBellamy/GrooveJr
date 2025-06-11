@@ -5,6 +5,8 @@
 #ifndef MAINDRYCONTAINER_H
 #define MAINDRYCONTAINER_H
 
+#include <memory>
+
 #include "caf/actor_system.hpp"
 
 #include <QGridLayout>
@@ -34,39 +36,45 @@ class MainChannelContainer final : public QWidget {
       QAction* soloLChannelAction,
       QAction* soloRChannelAction
     );
-    void hydrateState(const AppStatePacket& appState);
-    void setMute(float val) {
-      mainChannel.setMute(val);
+    void hydrateState(const AppStatePacket& appState) const;
+    void setMute(const float val) const {
+      mainChannel->setMute(val);
     };
 
-    void setMuteL(float val) {
-      mainChannel.setMuteL(val);
+    void setMuteL(const float val) const {
+      mainChannel->setMuteL(val);
     };
 
-    void setMuteR(float val) {
-      mainChannel.setMuteR(val);
+    void setMuteR(const float val) const {
+      mainChannel->setMuteR(val);
     };
 
-    void setSolo(float val) {
-      mainChannel.setSolo(val);
+    void setSolo(const float val) const {
+      mainChannel->setSolo(val);
     };
 
-    void setSoloL(float val) {
-      mainChannel.setSoloL(val);
+    void setSoloL(const float val) const {
+      mainChannel->setSoloL(val);
     };
 
-    void setSoloR(float val) {
-      mainChannel.setSoloR(val);
+    void setSoloR(const float val) const {
+      mainChannel->setSoloR(val);
     };
 
-    void setEffects();
+    void setEffects() const;
     void setChannel();
 
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;
     QGridLayout grid;
-    EffectsChannel mainChannel;
+    QAction* muteChannelAction;
+    QAction* muteLChannelAction;
+    QAction* muteRChannelAction;
+    QAction* soloChannelAction;
+    QAction* soloLChannelAction;
+    QAction* soloRChannelAction;
+    std::unique_ptr<EffectsChannel> mainChannel;
     void setStyle();
     void setupGrid();
 };
