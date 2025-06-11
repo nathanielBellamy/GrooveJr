@@ -9,15 +9,18 @@ namespace Gui {
 
 MuteSoloContainer::MuteSoloContainer(
   QWidget* parent,
+  Audio::Mixer* mixer,
+  const int channelIndex,
   QAction* openEffectsContainer,
   QAction* muteChannelAction,
   QAction* muteLChannelAction,
   QAction* muteRChannelAction,
   QAction* soloChannelAction,
   QAction* soloLChannelAction,
-  QAction* soloRChannelAction,
-  const int channelIndex)
+  QAction* soloRChannelAction
+  )
   : QWidget(parent)
+  , mixer(mixer)
   , channelIndex(channelIndex)
   , grid(this)
   , mute(this, muteChannelAction, channelIndex)
@@ -29,7 +32,15 @@ MuteSoloContainer::MuteSoloContainer(
   , effects(this, openEffectsContainer)
   {
 
-  if (channelIndex == 0) {
+  const auto& channel = mixer->getEffectsChannel(channelIndex)->channel;
+  mute.setMute(channel.mute.load());
+  muteL.setMute(channel.muteL.load());
+  muteR.setMute(channel.muteR.load());
+  if (channelIndex > 0) {
+    solo.setSolo(channel.solo.load());
+    soloL.setSolo(channel.soloL.load());
+    soloR.setSolo(channel.soloR.load());
+  } else {
     solo.hide();
     soloL.hide();
     soloR.hide();

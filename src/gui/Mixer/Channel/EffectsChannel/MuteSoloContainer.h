@@ -11,6 +11,10 @@
 
 #include "../../../../AppState.h"
 #include "../../../../Logging.h"
+
+#include "../../../../audio/ChannelAtomic.h"
+#include "../../../../audio/Mixer.h"
+
 #include "../MuteButton.h"
 #include "../SoloButton.h"
 #include "EffectsButton.h"
@@ -22,14 +26,15 @@ class MuteSoloContainer final : public QWidget {
   public:
     MuteSoloContainer(
       QWidget* parent,
+      Audio::Mixer* mixer,
+      int channelIndex,
       QAction* openEffectsContainer,
       QAction* muteChannelAction,
       QAction* muteLChannelAction,
       QAction* muteRChannelAction,
       QAction* soloChannelAction,
       QAction* soloLChannelAction,
-      QAction* soloRChannelAction,
-      int channelIndex
+      QAction* soloRChannelAction
     );
     ~MuteSoloContainer();
     void hydrateState(const AppStatePacket& appState, int newChannelIdx);
@@ -41,6 +46,7 @@ class MuteSoloContainer final : public QWidget {
     void setSoloR(float val);
 
   private:
+    Audio::Mixer* mixer;
     int channelIndex;
     QGridLayout grid;
     MuteButton mute;

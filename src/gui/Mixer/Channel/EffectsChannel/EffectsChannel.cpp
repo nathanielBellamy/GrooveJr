@@ -52,10 +52,9 @@ EffectsChannel::EffectsChannel(
   , effectsSlotsScrollArea(this)
   , effectsSlots(this, actorSystem, mixer, channelIndex, &replaceEffectAction, &removeEffectAction)
   , muteSoloContainer(
-    this, &openEffectsContainer,
+    this, mixer, channelIndex, &openEffectsContainer,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
-    soloChannelAction, soloLChannelAction, soloRChannelAction,
-    channelIndex
+    soloChannelAction, soloLChannelAction, soloRChannelAction
   )
   {
   if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
