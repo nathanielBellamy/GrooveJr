@@ -47,19 +47,23 @@ struct Plugin {
     std::string getName() const { return name; };
 
     void setState(
-        Steinberg::ResizableMemoryIBStream* audioHostState,
-        Steinberg::ResizableMemoryIBStream* editorHostState
+        Steinberg::ResizableMemoryIBStream* audioHostComponentState,
+        Steinberg::ResizableMemoryIBStream* audioHostControllerState,
+        Steinberg::ResizableMemoryIBStream* editorHostComponentState,
+        Steinberg::ResizableMemoryIBStream* editorHostControllerState
     ) {
-        audioHost->setState(audioHostState);
-        editorHost->setState(editorHostState);
+        audioHost->setState(audioHostComponentState, audioHostControllerState);
+        editorHost->setState(editorHostComponentState, editorHostControllerState);
     }
 
     void getState(
-        Steinberg::ResizableMemoryIBStream* audioHostState,
-        Steinberg::ResizableMemoryIBStream* editorHostState
+        Steinberg::ResizableMemoryIBStream* audioHostComponentState,
+        Steinberg::ResizableMemoryIBStream* audioHostControllerState,
+        Steinberg::ResizableMemoryIBStream* editorHostComponentState,
+        Steinberg::ResizableMemoryIBStream* editorHostControllerState
     ) {
-        audioHost->getState(audioHostState);
-        editorHost->getState(editorHostState);
+        audioHost->getState(audioHostComponentState, audioHostControllerState);
+        editorHost->getState(editorHostComponentState, editorHostControllerState);
     }
 };
 

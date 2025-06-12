@@ -70,12 +70,15 @@ public:
 	OPtr<IComponent> processorComponent;
 	IPtr<PlugProvider> plugProvider {nullptr};
 
-	void getState(IBStream* state) const {
-		processorComponent->getState(state);
+	void getState(IBStream* componentState, IBStream* controllerState) const {
+		processorComponent->getState(componentState);
+		editController->getState(controllerState);
 	};
 
-	void setState(IBStream* state) const {
-		processorComponent->setState(state);
+	void setState(IBStream* componentState, IBStream* controllerState) const {
+		processorComponent->setState(componentState);
+		editController->setComponentState(componentState);
+		editController->setState(controllerState);
 	};
 
 private:

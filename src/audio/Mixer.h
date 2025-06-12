@@ -11,6 +11,8 @@
 #include <memory>
 #include <sndfile.hh>
 
+#include "public.sdk/source/vst/utility/memoryibstream.h"
+
 #include "../AppState.h"
 #include "../Logging.h"
 #include "../db/Dao.h"
@@ -97,6 +99,22 @@ public:
   int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);
   int setEffects(const std::vector<Db::Effect>& effects) const;
   int saveScene() const;
+
+  Steinberg::int64 getStreamSize(Steinberg::IBStream* stream) const {
+    Steinberg::int64 start = 0;
+    Steinberg::int64 size = 0;
+
+    if (stream->seek(0, Steinberg::IBStream::kIBSeekCur, &start) != Steinberg::kResultOk)
+      return -1;
+
+    if (stream->seek(0, Steinberg::IBStream::kIBSeekEnd, &size) != Steinberg::kResultOk)
+      return -1;
+
+    // Restore the original position
+    stream->seek(start, Steinberg::IBStream::kIBSeekSet, nullptr);
+
+    return size;
+  }
 
 };
 

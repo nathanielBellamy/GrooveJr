@@ -71,12 +71,15 @@ public:
 	AudioClientPtr audioClient;
 	int channelCount = {2}; // TODO: access info from libsndfile
 
-	void getState(IBStream* state) const {
-		component->getState(state);
+	void getState(IBStream* componentState, IBStream* controllerState) const {
+		component->getState(componentState);
+		editController->getState(controllerState);
 	};
 
-	void setState(IBStream* state) const {
-		component->setState(state);
+	void setState(IBStream* componentState, IBStream* controllerState) const {
+		component->setState(componentState);
+		editController->setComponentState(componentState);
+		editController->setState(controllerState);
 	};
 
 private:

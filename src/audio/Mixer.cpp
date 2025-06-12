@@ -369,14 +369,65 @@ int Mixer::saveScene() const {
         );
 
     const int effectCount = effectsChannel->effectCount();
+    const auto channelIndex = effectsChannel->getIndex();
     for (int i = 0; i < effectCount; i++) {
       const auto plugin = effectsChannel->getPluginAtIdx(i);
+      const auto audioHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>();
+      const auto audioHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>();
+      const auto editorHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>();
+      const auto editorHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>();
+      plugin->getState(
+        audioHostComponentStateStream.get(),
+        audioHostControllerStateStream.get(),
+        editorHostComponentStateStream.get(),
+        editorHostControllerStateStream.get()
+      );
+
+      const auto audioHostComponentStateSize = getStreamSize(audioHostComponentStateStream.get());
+      const auto audioHostControllerStateSize = getStreamSize(audioHostControllerStateStream.get());
+      const auto editorHostComponentStateSize = getStreamSize(editorHostComponentStateStream.get());
+      const auto editorHostControllerStateSize = getStreamSize(editorHostControllerStateStream.get());
+
+      std::vector<uint8_t> audioHostComponentBuffer (audioHostComponentStateSize);
+      std::vector<uint8_t> audioHostControllerBuffer (audioHostControllerStateSize);
+      std::vector<uint8_t> editorHostComponentBuffer (editorHostComponentStateSize);
+      std::vector<uint8_t> editorHostControllerBuffer (editorHostControllerStateSize);
+
+      int32 audioHostComponentNumBytesRead = 0;
+      int32 audioHostControllerNumBytesRead = 0;
+      int32 editorHostComponentNumBytesRead = 0;
+      int32 editorHostControllerNumBytesRead = 0;
+
+      audioHostComponentStateStream->read(
+        audioHostComponentBuffer.data(),
+        static_cast<int32>(audioHostComponentStateSize),
+        &audioHostComponentNumBytesRead
+      );
+
+      audioHostControllerStateStream->read(
+        audioHostControllerBuffer.data(),
+        static_cast<int32>(audioHostControllerStateSize),
+        &audioHostControllerNumBytesRead
+      );
+
+      editorHostComponentStateStream->read(
+        editorHostComponentBuffer.data(),
+        static_cast<int32>(editorHostComponentStateSize),
+        &editorHostComponentNumBytesRead
+      );
+
+      editorHostControllerStateStream->read(
+        editorHostControllerBuffer.data(),
+        static_cast<int32>(editorHostControllerStateSize),
+        &editorHostControllerNumBytesRead
+      );
+
       const auto dbEffect = Db::Effect(
         plugin->path,
         "vst3",
         plugin->name,
         0,
-        effectsChannel->getIndex(),
+        channelIndex,
         i,
         0
       );
