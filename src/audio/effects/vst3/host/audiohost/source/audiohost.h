@@ -71,6 +71,14 @@ public:
 	AudioClientPtr audioClient;
 	int channelCount = {2}; // TODO: access info from libsndfile
 
+	void getState(IBStream* state) const {
+		component->getState(state);
+	};
+
+	void setState(IBStream* state) const {
+		component->setState(state);
+	};
+
 private:
 	enum OpenFlags
 	{};

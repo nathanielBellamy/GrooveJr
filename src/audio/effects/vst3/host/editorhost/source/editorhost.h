@@ -70,6 +70,14 @@ public:
 	OPtr<IComponent> processorComponent;
 	IPtr<PlugProvider> plugProvider {nullptr};
 
+	void getState(IBStream* state) const {
+		processorComponent->getState(state);
+	};
+
+	void setState(IBStream* state) const {
+		processorComponent->setState(state);
+	};
+
 private:
 	enum OpenFlags
 	{

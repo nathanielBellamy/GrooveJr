@@ -45,6 +45,22 @@ struct Plugin {
     void terminateEditorHost() const;
 
     std::string getName() const { return name; };
+
+    void setState(
+        Steinberg::ResizableMemoryIBStream* audioHostState,
+        Steinberg::ResizableMemoryIBStream* editorHostState
+    ) {
+        audioHost->setState(audioHostState);
+        editorHost->setState(editorHostState);
+    }
+
+    void getState(
+        Steinberg::ResizableMemoryIBStream* audioHostState,
+        Steinberg::ResizableMemoryIBStream* editorHostState
+    ) {
+        audioHost->getState(audioHostState);
+        editorHost->getState(editorHostState);
+    }
 };
 
 } // Vst3
