@@ -12,37 +12,45 @@ Effect::Effect(
     const std::string& filePath,
     const std::string& format,
     const std::string& name,
-    const int state,
     const int channelIndex,
     const int effectIndex,
-    const int version
+    std::vector<uint8_t> audioHostComponentStateBlob,
+    std::vector<uint8_t> audioHostControllerStateBlob,
+    std::vector<uint8_t> editorHostComponentStateBlob,
+    std::vector<uint8_t> editorHostControllerStateBlob
   )
   : id(id)
   , filePath(filePath)
   , format(format)
   , name(name)
-  , state(state)
   , channelIndex(channelIndex)
   , effectIndex(effectIndex)
-  , version(version)
+  , audioHostComponentStateBlob(audioHostComponentStateBlob)
+  , audioHostControllerStateBlob(audioHostControllerStateBlob)
+  , editorHostComponentStateBlob(editorHostComponentStateBlob)
+  , editorHostControllerStateBlob(editorHostControllerStateBlob)
   {}
 
 Effect::Effect(
     const std::string& filePath,
     const std::string& format,
     const std::string& name,
-    const int state,
     const int channelIndex,
     const int effectIndex,
-    const int version
+    std::vector<uint8_t> audioHostComponentStateBlob,
+    std::vector<uint8_t> audioHostControllerStateBlob,
+    std::vector<uint8_t> editorHostComponentStateBlob,
+    std::vector<uint8_t> editorHostControllerStateBlob
   )
   : filePath(filePath)
   , format(format)
   , name(name)
-  , state(state)
   , channelIndex(channelIndex)
   , effectIndex(effectIndex)
-  , version(version)
+  , audioHostComponentStateBlob(audioHostComponentStateBlob)
+  , audioHostControllerStateBlob(audioHostControllerStateBlob)
+  , editorHostComponentStateBlob(editorHostComponentStateBlob)
+  , editorHostControllerStateBlob(editorHostControllerStateBlob)
   {}
 
 Effect Effect::deser(sqlite3_stmt *stmt) {
@@ -50,20 +58,56 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
   const unsigned char* filePath = sqlite3_column_text(stmt, 1);
   const unsigned char* format = sqlite3_column_text(stmt, 2);
   const unsigned char* name = sqlite3_column_text(stmt, 3);
-  const int state = sqlite3_column_int(stmt, 4);
-  const int channelIndex = sqlite3_column_int(stmt, 5);
-  const int effectIndex = sqlite3_column_int(stmt, 6);
-  const int version = sqlite3_column_int(stmt, 7);
+  const int channelIndex = sqlite3_column_int(stmt, 4);
+  const int effectIndex = sqlite3_column_int(stmt, 5);
+  const int audioHostComponentStateBlobSize = sqlite3_column_bytes(stmt, 6);
+  const void* audioHostComponentStateBlobRaw = sqlite3_column_blob(stmt, 6);
+  const int audioHostControllerStateBlobSize = sqlite3_column_bytes(stmt, 7);
+  const void* audioHostControllerStateBlobRaw = sqlite3_column_blob(stmt, 7);
+  const int editorHostComponentStateBlobSize = sqlite3_column_bytes(stmt, 8);
+  const void* editorHostComponentStateBlobRaw = sqlite3_column_blob(stmt, 8);
+  const int editorHostControllerStateBlobSize = sqlite3_column_bytes(stmt, 9);
+  const void* editorHostControllerStateBlobRaw = sqlite3_column_blob(stmt, 9);
+
+  // if (audioHostComponentStateBlobSize > 0 && audioHostComponentStateBlobRaw != nullptr) {
+    std::vector audioHostComponentStateBlobDeser(
+      static_cast<const uint8_t*>(audioHostComponentStateBlobRaw),
+      static_cast<const uint8_t*>(audioHostComponentStateBlobRaw) + audioHostComponentStateBlobSize
+    );
+  // }
+
+  // if (audioHostControllerStateBlobSize > 0 && audioHostControllerStateBlobRaw != nullptr) {
+    std::vector audioHostControllerStateBlobDeser(
+      static_cast<const uint8_t*>(audioHostControllerStateBlobRaw),
+      static_cast<const uint8_t*>(audioHostControllerStateBlobRaw) + audioHostControllerStateBlobSize
+    );
+  // }
+
+  // if (editorHostComponentStateBlobSize > 0 && editorHostComponentStateBlobRaw != nullptr) {
+    std::vector editorHostComponentStateBlobDeser(
+      static_cast<const uint8_t*>(editorHostComponentStateBlobRaw),
+      static_cast<const uint8_t*>(editorHostComponentStateBlobRaw) + editorHostComponentStateBlobSize
+    );
+  // }
+
+  // if (editorHostControllerStateBlobSize > 0 && editorHostControllerStateBlobRaw != nullptr) {
+    std::vector editorHostControllerStateBlobDeser(
+      static_cast<const uint8_t*>(editorHostControllerStateBlobRaw),
+      static_cast<const uint8_t*>(editorHostControllerStateBlobRaw) + editorHostControllerStateBlobSize
+    );
+  // }
 
   return Effect(
     id,
     std::string(reinterpret_cast<const char*>(filePath)),
     std::string(reinterpret_cast<const char*>(format)),
     std::string(reinterpret_cast<const char*>(name)),
-    state,
     channelIndex,
     effectIndex,
-    version
+    audioHostComponentStateBlobDeser,
+    audioHostControllerStateBlobDeser,
+    editorHostComponentStateBlobDeser,
+    editorHostControllerStateBlobDeser
   );
 }
 

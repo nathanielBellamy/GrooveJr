@@ -39,8 +39,18 @@ std::vector<Effect> EffectRepository::getAll() const {
 
 int EffectRepository::save(const Effect& effect) const {
   const std::string query = R"sql(
-    insert into effects (filePath, format, name, state, channelIndex, effectIndex, version)
-    values (?, ?, ?, ?, ?, ?, ?)
+    insert into effects (
+      filePath,
+      format,
+      name,
+      channelIndex,
+      effectIndex,
+      audioHostComponentState,
+      audioHostControllerState,
+      editorHostComponentState,
+      editorHostControllerState
+    )
+    values (?, ?, ?, ?, ?, ?, ?, ?, ?)
   )sql";
 
   sqlite3_stmt* stmt;
@@ -56,10 +66,36 @@ int EffectRepository::save(const Effect& effect) const {
   sqlite3_bind_text(stmt, 1, effect.filePath.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_text(stmt, 2, effect.format.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_text(stmt, 3, effect.name.c_str(), -1, SQLITE_STATIC);
-  sqlite3_bind_int(stmt, 4, effect.state);
-  sqlite3_bind_int(stmt, 5, effect.channelIndex);
-  sqlite3_bind_int(stmt, 6, effect.effectIndex);
-  sqlite3_bind_int(stmt, 7, effect.version + 1);
+  sqlite3_bind_int(stmt, 4, effect.channelIndex);
+  sqlite3_bind_int(stmt, 5, effect.effectIndex);
+  sqlite3_bind_blob(
+    stmt,
+    6,
+    effect.audioHostComponentStateBlob.data(),
+    static_cast<int>(effect.audioHostComponentStateBlob.size()),
+    SQLITE_TRANSIENT
+  );
+  sqlite3_bind_blob(
+    stmt,
+    7,
+    effect.audioHostControllerStateBlob.data(),
+    static_cast<int>(effect.audioHostControllerStateBlob.size()),
+    SQLITE_TRANSIENT
+  );
+  sqlite3_bind_blob(
+    stmt,
+    8,
+    effect.editorHostComponentStateBlob.data(),
+    static_cast<int>(effect.editorHostComponentStateBlob.size()),
+    SQLITE_TRANSIENT
+  );
+  sqlite3_bind_blob(
+    stmt,
+    9,
+    effect.editorHostControllerStateBlob.data(),
+    static_cast<int>(effect.editorHostControllerStateBlob.size()),
+    SQLITE_TRANSIENT
+  );
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     Logging::write(

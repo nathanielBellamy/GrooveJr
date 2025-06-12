@@ -37,7 +37,6 @@ class Dao {
     ~Dao();
     int initDb();
     int initSchema() const;
-    void insertTestData() const;
 };
 
 } // Db

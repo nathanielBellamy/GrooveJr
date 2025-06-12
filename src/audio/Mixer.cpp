@@ -314,9 +314,8 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
 
   std::vector<std::vector<Db::Effect>> effectsByChannel;
   for (const auto& effect : effects) {
-    while (effectsByChannel.size() <= effect.channelIndex) {
+    while (effectsByChannel.size() <= effect.channelIndex)
       effectsByChannel.emplace_back();
-    }
 
     effectsByChannel.at(effect.channelIndex).push_back(effect);
   }
@@ -332,6 +331,8 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
         );
     }
   }
+
+  // TODO: setState
 
   Logging::write(
     Info,
@@ -426,10 +427,12 @@ int Mixer::saveScene() const {
         plugin->path,
         "vst3",
         plugin->name,
-        0,
         channelIndex,
         i,
-        0
+        audioHostComponentBuffer,
+        audioHostControllerBuffer,
+        editorHostComponentBuffer,
+        editorHostControllerBuffer
       );
       if (!dao->effectRepository.save(dbEffect))
         Logging::write(

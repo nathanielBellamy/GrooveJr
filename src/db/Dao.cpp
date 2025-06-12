@@ -110,10 +110,12 @@ int Dao::initSchema() const {
       filePath text not null,
       format text not null,
       name text not null,
-      state numeric,
       channelIndex integer not null,
       effectIndex integer not null,
-      version integer not null,
+      audioHostComponentState blob not null,
+      audioHostControllerState blob not null,
+      editorHostComponentState blob not null,
+      editorHostControllerState blob not null,
       createdAt datetime default current_timestamp
     );
 
@@ -159,51 +161,6 @@ int Dao::initSchema() const {
       "Provisioned the database."
   );
   return 0;
-}
-
-void Dao::insertTestData() const {
-  const std::string query = R"sql(
-    insert into effects (filePath, format, name, channelIndex, effectIndex, version)
-    values (
-      '/Library/Audio/Plug-Ins/VST3/FooEffect.vst3',
-      'vst3',
-      'Foo Bar',
-      1,
-      0,
-      3
-    );
-
-    insert into tracks (filePath, title, frames, sampleRate, channels)
-    values (
-      '/foo.flac',
-      'Foo Bar',
-      310310,
-      44100,
-      2
-    );
-  )sql";
-
-  if (sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr) != SQLITE_OK) {
-    Logging::write(
-        Critical,
-        "Db::Database::insertTestData",
-        "Unable to insert test data into the database. Message: " + std::string(sqlite3_errmsg(db))
-    );
-  }
-
-  sceneRepository.save(
-    Scene(0, "Base Scene")
-  );
-
-  effectRepository.save(
-    Effect("/Library/Audio/Plug-Ins/VST3/BarEffect.vst3", "vst3", "Bar Bar", 1234, 2, 0, 3)
-  );
-
-  Logging::write(
-      Info,
-      "Db::Database::insertTestData",
-      "Inserted test data in the database."
-  );
 }
 
 } // Db
