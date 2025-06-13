@@ -84,7 +84,7 @@ bool EffectsChannel::addReplaceEffect(const int effectIdx, const std::string& ef
 		"Adding effect: " + effectPath + " to channel " + std::to_string(index)
 	);
 
-  auto effect = new Vst3::Plugin (
+	const auto effect = new Vst3::Plugin (
   		effectPath,
   		gAppState,
   		jackClient
@@ -137,6 +137,70 @@ bool EffectsChannel::addReplaceEffect(const int effectIdx, const std::string& ef
 
 	return true;
 }
+
+// an effectIdx of -1 indicates to push_back
+Result EffectsChannel::loadEffect(const int effectIdx, const Db::Effect& effectEntity) {
+	Logging::write(
+		Info,
+		"Audio::EffectsChannel::loadEffect",
+		"Adding effect: " + effectEntity.filePath + " to channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectIdx)
+	);
+
+	const auto effect = new Vst3::Plugin (
+  		effectEntity.filePath,
+  		gAppState,
+  		jackClient
+  	);
+
+	Logging::write(
+		Info,
+		"Audio::EffectsChannel::loadEffect",
+		"Instantiated plugin " + effect->name + " on channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectIdx)
+	);
+
+  const FUnknownPtr<IAudioProcessor> processor = effect->getProcesser();
+  // int latencySamples = processor->getLatencySamples();
+  // incorporateLatencySamples(latencySamples);
+
+  if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer)) {
+		Logging::write(
+			Warning,
+			"Audio::EffectsChannel::loadEffect",
+			"Processor for " + effectEntity.filePath + " on channel " + std::to_string(index) + " cannot process sample size " + std::to_string(gAppState->audioFramesPerBuffer)
+		);
+  	return ERROR;
+  }
+
+  // Vst::BusDirection busDirection;
+  // int32 index;
+  // Vst::SpeakerArrangement arrangement;
+  // processor->getBusArrangement(busDirection, index, arrangement);
+
+  const int32 maxSamplesPerBlock = gAppState->audioFramesPerBuffer;
+  ProcessSetup setup = {
+    kRealtime,
+    kSample64,
+    maxSamplesPerBlock,
+    44100.0
+  };
+  processor->setupProcessing(setup);
+
+	if (effectIdx < 0) {
+		vst3Plugins.push_back(effect);
+	} else {
+		delete vst3Plugins.at(effectIdx);
+		vst3Plugins.at(effectIdx) = effect;
+	}
+
+	Logging::write(
+		Info,
+		"Audio::EffectsChannel::loadEffect",
+		"Effect " + effect->path + " added on channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectIdx)
+	);
+
+	return OK;
+}
+
 
 void EffectsChannel::setSampleRate(const int sampleRate) const {
 	for (auto&& plugin : vst3Plugins) {

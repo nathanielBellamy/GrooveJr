@@ -5,12 +5,16 @@
 #ifndef VST3PLUGIN_H
 #define VST3PLUGIN_H
 
+#include <vector>
+#include <memory>
+
 #include <sndfile.h>
 
 #include "public.sdk/source/vst/utility/memoryibstream.h"
 
 #include "../../../Logging.h"
 #include "../../../AppState.h"
+#include "../../../db/entity/Effect.h"
 #include "../../JackClient.h"
 #include "./host/audiohost/source/audiohost.h"
 #include "./host/editorhost/source/editorhost.h"
@@ -29,12 +33,21 @@ struct Plugin {
     VST3::Hosting::Module::Ptr          module;
     AudioHost::App*                     audioHost;
     EditorHost::App*                    editorHost;
+    std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostComponentState;
+    std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostControlelrState;
 
     Plugin(
         std::string path,
         AppState* gAppState,
         std::shared_ptr<JackClient> jackClient
     );
+
+    Plugin(
+        const Db::Effect& effectEntity,
+        AppState* gAppState,
+        std::shared_ptr<JackClient> jackClient
+    );
+
     ~Plugin();
 
     Steinberg::FUnknownPtr<IAudioProcessor> getProcesser() {
@@ -55,6 +68,13 @@ struct Plugin {
         audioHost->setState(audioHostComponentState, audioHostControllerState);
         editorHost->setState(editorHostComponentState, editorHostControllerState);
     }
+
+    void loadState(
+        const std::vector<uint8_t>& audioHostComponentStateBlob,
+        const std::vector<uint8_t>& audioHostControllerStateBlob,
+        const std::vector<uint8_t>& editorHostComponentStateBlob,
+        const std::vector<uint8_t>& editorHostControllerStateBlob
+    );
 
     void getState(
         Steinberg::ResizableMemoryIBStream* audioHostComponentState,

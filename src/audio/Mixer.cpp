@@ -139,21 +139,38 @@ void Mixer::incorporateLatencySamples(const int latencySamples) const {
   gAppState->audioFramesPerBuffer = static_cast<int>(std::pow(2, std::ceil(exponent)));
 }
 
-bool Mixer::addEffectToChannel(const int idx, const std::string& effectPath) const {
+bool Mixer::addEffectToChannel(const int channelIndex, const std::string& effectPath) const {
   Logging::write(
     Info,
     "Audio::Mixer::addEffectToChannel",
-    "Adding effect " + effectPath + " to channel " + std::to_string(idx)
+    "Adding effect " + effectPath + " to channel " + std::to_string(channelIndex)
   );
-  if (effectsChannels.at(idx) == nullptr) {
+  if (effectsChannels.at(channelIndex) == nullptr) {
     Logging::write(
       Error,
       "Audio::Mixer::addEffectToChannel",
-      "No channel found at idx: " + std::to_string(idx)
+      "No channel found at idx: " + std::to_string(channelIndex)
     );
     return false;
   }
-  return effectsChannels.at(idx)->addReplaceEffect(-1, effectPath);
+  return effectsChannels.at(channelIndex)->addReplaceEffect(-1, effectPath);
+}
+
+Result Mixer::loadEffectOnChannel(const int channelIndex, const Db::Effect& effectEntity) const {
+  Logging::write(
+    Info,
+    "Audio::Mixer::loadEffectOnChannel",
+    "Adding effect " + effectEntity.filePath + " to channel " + std::to_string(channelIndex)
+  );
+  if (effectsChannels.at(channelIndex) == nullptr) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::addEffectToChannel",
+      "No channel found at idx: " + std::to_string(channelIndex)
+    );
+    return ERROR;
+  }
+  return effectsChannels.at(channelIndex)->loadEffect(-1, effectEntity);
 }
 
 int Mixer::effectsOnChannelCount(const int idx) const {
@@ -323,12 +340,15 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
   for (const auto& effectsChannelEffects : effectsByChannel) {
     std::sort(effectsChannelEffects.begin(), effectsChannelEffects.end());
     for (const auto& effect : effectsChannelEffects) {
-      if (!addEffectToChannel(effect.channelIndex, effect.filePath))
+      if (!addEffectToChannel(effect.channelIndex, effect.filePath)) {
+
+      } else {
         Logging::write(
           Error,
           "Audio::Mixer::setEffects",
           "Could not add effect: " + effect.filePath + " to channel " + std::to_string(effect.channelIndex)
         );
+      }
     }
   }
 

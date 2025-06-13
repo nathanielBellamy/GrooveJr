@@ -18,7 +18,7 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 
 	Logging::write(
 		Info,
-		"Audio::Plugin::Plugin",
+		"Audio::Plugin::Plugin::path",
 		"Instantiating plugin " + path
 	);
 
@@ -31,7 +31,7 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 		reason += error;
 		Logging::write(
 			Error,
-			"Audio::Plugin::Plugin",
+			"Audio::Plugin::Plugin::path",
 			reason
 		);
 	}
@@ -48,6 +48,92 @@ Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient
 		);
 		audioHost->setModule(module);
 		audioHost->init(cmdArgs);
+	} catch (...) {
+		Logging::write(
+			Error,
+			"Audio::Plugin::Plugin::path",
+			"An error occurred while initializing audioHost for " + path
+		);
+		return;
+	}
+
+	Logging::write(
+		Info,
+		"Audio::Plugin::Plugin::path",
+		"Initialized audioHost for " + path
+	);
+}
+
+Plugin::Plugin(const Db::Effect& effectEntity, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
+	: gAppState(gAppState)
+	, path(effectEntity.filePath)
+	{
+
+	Logging::write(
+		Info,
+		"Audio::Plugin::Plugin::entity",
+		"Instantiating plugin " + path
+	);
+
+	std::string error;
+	module = VST3::Hosting::Module::create(path, error);
+	if (!module) {
+		std::string reason = "Could not create Module for file:";
+		reason += path;
+		reason += "\nError: ";
+		reason += error;
+		Logging::write(
+			Error,
+			"Audio::Plugin::Plugin::entity",
+			reason
+		);
+	}
+
+	const auto moduleName = module->getName();
+	name = moduleName.substr(0, moduleName.find_last_of('.'));
+
+	const auto& cmdArgs = std::vector { path };
+
+	const auto audioHostComponentState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+	int audioHostComponentStateBytes = effectEntity.audioHostComponentStateBlob.size();
+	int audioHostComponentStateBytesWritten = 0;
+
+	audioHostComponentState->write(
+		const_cast<void*>(static_cast<const void*>(effectEntity.audioHostComponentStateBlob.data())),
+		audioHostComponentStateBytes,
+		&audioHostComponentStateBytesWritten
+	);
+
+	const auto audioHostControllerState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+	int audioHostControllerStateBytes = effectEntity.audioHostControllerStateBlob.size();
+	int audioHostControllerStateBytesWritten = 0;
+
+	audioHostControllerState->write(
+		const_cast<void*>(static_cast<const void*>(effectEntity.audioHostControllerStateBlob.data())),
+		audioHostControllerStateBytes,
+		&audioHostControllerStateBytesWritten
+	);
+
+	if (audioHostComponentStateBytesWritten == audioHostComponentStateBytes && audioHostControllerStateBytesWritten) {
+		audioHost->setState(audioHostComponentState.get(), audioHostControllerState.get());
+	} else {
+		Logging::write(
+			Error,
+			"Audio::Plugin::Plugin::entity",
+			"Unable to prepare audioHostComponentState"
+		);
+	}
+
+	try {
+		audioHost = new AudioHost::App(
+			gAppState,
+			jackClient
+		);
+		audioHost->setModule(module);
+		audioHost->init(cmdArgs);
+
+
+
 	} catch (...) {
 		Logging::write(
 			Error,

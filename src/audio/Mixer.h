@@ -14,6 +14,7 @@
 #include "public.sdk/source/vst/utility/memoryibstream.h"
 
 #include "../AppState.h"
+#include "../enums/Result.h"
 #include "../Logging.h"
 #include "../db/Dao.h"
 #include "../db/entity/ChannelEntity.h"
@@ -71,7 +72,8 @@ public:
   [[nodiscard]]
   int effectsOnChannelCount(int idx) const;
 
-  bool addEffectToChannel(int idx, const std::string& effectPath) const;
+  bool addEffectToChannel(int channelIndex, const std::string& effectPath) const;
+  Result loadEffectOnChannel(int channelIndex, const Db::Effect& effectEntity) const;
   void initEditorHostsOnChannel(int idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
   void initEditorHostOnChannel(int idx, int newEffectChannel, std::shared_ptr<Gui::VstWindow> vstWindow) const;
   void terminateEditorHostsOnChannel(int idx) const;

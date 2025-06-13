@@ -78,6 +78,7 @@ add_executable(GrooveJr
         actors/AudioThread.h
         actors/EffectsManager.h
         enums/PlayState.h
+        enums/Result.h
         messaging/atoms.h
         messaging/EnvelopeQtPtr.h
         gui/MainToolBar/transport/TransportControl.cpp

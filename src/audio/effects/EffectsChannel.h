@@ -11,6 +11,8 @@
 #include "./vst3/Plugin.h"
 #include "../ChannelAtomic.h"
 #include "../../AppState.h"
+#include "../../enums/Result.h"
+#include "../../db/entity/Effect.h"
 #include "../Logging.h"
 #include "../JackClient.h"
 
@@ -208,6 +210,7 @@ class EffectsChannel {
     };
 
     bool addReplaceEffect(int effectIdx, const std::string& effectPath);
+    Result loadEffect(int effectIdx, const Db::Effect& effectEntity);
     void setSampleRate(int sampleRate) const;
 
     int effectCount() const;
