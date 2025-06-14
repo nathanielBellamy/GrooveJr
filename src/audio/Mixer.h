@@ -73,7 +73,7 @@ public:
   int effectsOnChannelCount(int idx) const;
 
   bool addEffectToChannel(int channelIndex, const std::string& effectPath) const;
-  Result loadEffectOnChannel(int channelIndex, const Db::Effect& effectEntity) const;
+  Result loadEffectOnChannel(const Db::Effect& effectEntity) const;
   void initEditorHostsOnChannel(int idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
   void initEditorHostOnChannel(int idx, int newEffectChannel, std::shared_ptr<Gui::VstWindow> vstWindow) const;
   void terminateEditorHostsOnChannel(int idx) const;

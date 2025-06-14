@@ -210,7 +210,7 @@ class EffectsChannel {
     };
 
     bool addReplaceEffect(int effectIdx, const std::string& effectPath);
-    Result loadEffect(int effectIdx, const Db::Effect& effectEntity);
+    Result loadEffect(const Db::Effect& effectEntity);
     void setSampleRate(int sampleRate) const;
 
     int effectCount() const;

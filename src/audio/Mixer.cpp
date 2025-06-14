@@ -156,21 +156,21 @@ bool Mixer::addEffectToChannel(const int channelIndex, const std::string& effect
   return effectsChannels.at(channelIndex)->addReplaceEffect(-1, effectPath);
 }
 
-Result Mixer::loadEffectOnChannel(const int channelIndex, const Db::Effect& effectEntity) const {
+Result Mixer::loadEffectOnChannel(const Db::Effect& effectEntity) const {
   Logging::write(
     Info,
     "Audio::Mixer::loadEffectOnChannel",
-    "Adding effect " + effectEntity.filePath + " to channel " + std::to_string(channelIndex)
+    "Adding effect " + effectEntity.filePath + " to channel " + std::to_string(effectEntity.channelIndex)
   );
-  if (effectsChannels.at(channelIndex) == nullptr) {
+  if (effectsChannels.at(effectEntity.channelIndex) == nullptr) {
     Logging::write(
       Error,
       "Audio::Mixer::addEffectToChannel",
-      "No channel found at idx: " + std::to_string(channelIndex)
+      "No channel found at idx: " + std::to_string(effectEntity.channelIndex)
     );
     return ERROR;
   }
-  return effectsChannels.at(channelIndex)->loadEffect(-1, effectEntity);
+  return effectsChannels.at(effectEntity.channelIndex)->loadEffect(-1, effectEntity);
 }
 
 int Mixer::effectsOnChannelCount(const int idx) const {
@@ -340,7 +340,7 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
   for (const auto& effectsChannelEffects : effectsByChannel) {
     std::sort(effectsChannelEffects.begin(), effectsChannelEffects.end());
     for (const auto& effect : effectsChannelEffects) {
-      if (!addEffectToChannel(effect.channelIndex, effect.filePath)) {
+      if (loadEffectOnChannel(effect.channelIndex, effect)) {
 
       } else {
         Logging::write(

@@ -138,12 +138,11 @@ bool EffectsChannel::addReplaceEffect(const int effectIdx, const std::string& ef
 	return true;
 }
 
-// an effectIdx of -1 indicates to push_back
-Result EffectsChannel::loadEffect(const int effectIdx, const Db::Effect& effectEntity) {
+Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::loadEffect",
-		"Adding effect: " + effectEntity.filePath + " to channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectIdx)
+		"Adding effect: " + effectEntity.filePath + " to channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectEntity.effectIndex)
 	);
 
 	const auto effect = new Vst3::Plugin (
@@ -155,7 +154,7 @@ Result EffectsChannel::loadEffect(const int effectIdx, const Db::Effect& effectE
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::loadEffect",
-		"Instantiated plugin " + effect->name + " on channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectIdx)
+		"Instantiated plugin " + effect->name + " on channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectEntity.effectIndex)
 	);
 
   const FUnknownPtr<IAudioProcessor> processor = effect->getProcesser();
@@ -185,11 +184,11 @@ Result EffectsChannel::loadEffect(const int effectIdx, const Db::Effect& effectE
   };
   processor->setupProcessing(setup);
 
-	if (effectIdx < 0) {
+	if (effectEntity.effectIndex < 0 || effectEntity.effectIndex > vst3Plugins.size() - 1) {
 		vst3Plugins.push_back(effect);
 	} else {
-		delete vst3Plugins.at(effectIdx);
-		vst3Plugins.at(effectIdx) = effect;
+		delete vst3Plugins.at(effectEntity.effectIndex);
+		vst3Plugins.at(effectEntity.effectIndex) = effect;
 	}
 
 	Logging::write(
