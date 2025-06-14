@@ -170,7 +170,7 @@ Result Mixer::loadEffectOnChannel(const Db::Effect& effectEntity) const {
     );
     return ERROR;
   }
-  return effectsChannels.at(effectEntity.channelIndex)->loadEffect(-1, effectEntity);
+  return effectsChannels.at(effectEntity.channelIndex)->loadEffect(effectEntity);
 }
 
 int Mixer::effectsOnChannelCount(const int idx) const {
@@ -340,8 +340,12 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
   for (const auto& effectsChannelEffects : effectsByChannel) {
     std::sort(effectsChannelEffects.begin(), effectsChannelEffects.end());
     for (const auto& effect : effectsChannelEffects) {
-      if (loadEffectOnChannel(effect.channelIndex, effect)) {
-
+      if (loadEffectOnChannel(effect)) {
+        Logging::write(
+          Info,
+          "Audio::Mixer::setEffects",
+          "Loaded effect " + effect.name + " on channel " + std::to_string(effect.channelIndex)
+        );
       } else {
         Logging::write(
           Error,
@@ -351,8 +355,6 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
       }
     }
   }
-
-  // TODO: setState
 
   Logging::write(
     Info,

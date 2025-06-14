@@ -145,11 +145,8 @@ Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
 		"Adding effect: " + effectEntity.filePath + " to channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectEntity.effectIndex)
 	);
 
-	const auto effect = new Vst3::Plugin (
-  		effectEntity.filePath,
-  		gAppState,
-  		jackClient
-  	);
+	// TODO: Vst3::Plugin(effectEntity, gAppState, jackClient);
+	const auto effect = new Vst3::Plugin (effectEntity.filePath, gAppState, jackClient);
 
 	Logging::write(
 		Info,
@@ -194,7 +191,7 @@ Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::loadEffect",
-		"Effect " + effect->path + " added on channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectIdx)
+		"Effect " + effect->path + " added on channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectEntity.effectIndex)
 	);
 
 	return OK;
