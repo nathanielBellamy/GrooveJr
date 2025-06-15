@@ -107,20 +107,21 @@ public:
     Steinberg::int64 size = 0;
 
       // TODO: debug seek to beginning of stream
-    if (stream->seek(0, Steinberg::IBStream::kIBSeekCur, &start) != Steinberg::kResultOk) {
+
+    if (const auto seekRes = stream->seek(0, Steinberg::IBStream::kIBSeekSet, &start); seekRes != Steinberg::kResultOk) {
       Logging::write(
         Error,
         "Audio::Mixer::getStreamSize",
-        "Could not seek to beginning of stream"
+        "Could not seek to beginning of stream. Code: " + std::to_string(seekRes)
       );
       return -1;
     }
 
-    if (stream->seek(0, Steinberg::IBStream::kIBSeekEnd, &size) != Steinberg::kResultOk) {
+    if (const auto seekRes = stream->seek(0, Steinberg::IBStream::kIBSeekEnd, &size); seekRes != Steinberg::kResultOk) {
       Logging::write(
         Error,
         "Audio::Mixer::getStreamSize",
-        "Could not seek to end of stream"
+        "Could not seek to end of stream. Code: " + std::to_string(seekRes)
       );
       return -1;
     }

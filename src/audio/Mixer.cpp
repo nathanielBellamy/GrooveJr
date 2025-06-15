@@ -395,10 +395,10 @@ int Mixer::saveScene() const {
     const auto channelIndex = effectsChannel->getIndex();
     for (int i = 0; i < effectCount; i++) {
       const auto plugin = effectsChannel->getPluginAtIdx(i);
-      const auto audioHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>();
-      const auto audioHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>();
-      const auto editorHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>();
-      const auto editorHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>();
+      const auto audioHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(1024);
+      const auto audioHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(1024);
+      const auto editorHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(1024);
+      const auto editorHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(1024);
       plugin->getState(
         audioHostComponentStateStream.get(),
         audioHostControllerStateStream.get(),
