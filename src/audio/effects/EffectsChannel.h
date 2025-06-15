@@ -12,7 +12,7 @@
 #include "../ChannelAtomic.h"
 #include "../../AppState.h"
 #include "../../enums/Result.h"
-#include "../../db/entity/Effect.h"
+#include "../../db/entity/mixer/Effect.h"
 #include "../Logging.h"
 #include "../JackClient.h"
 

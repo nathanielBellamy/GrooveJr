@@ -7,10 +7,10 @@
 
 #include <sqlite3.h>
 
-#include "../Logging.h"
-#include "../../AppState.h"
+#include "../../Logging.h"
+#include "../../../AppState.h"
 
-#include "../entity/Track.h"
+#include "../../entity/musicLibrary/Track.h"
 
 namespace Gj {
 namespace Db {

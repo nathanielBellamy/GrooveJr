@@ -20,22 +20,22 @@ add_library(GjDb SHARED
     entity/AppStateEntity.cpp
     repository/AppStateRepository.h
     repository/AppStateRepository.cpp
-    entity/ChannelEntity.h
-    entity/ChannelEntity.cpp
-    repository/ChannelRepository.h
-    repository/ChannelRepository.cpp
-    entity/Effect.h
-    entity/Effect.cpp
-    repository/EffectRepository.h
-    repository/EffectRepository.cpp
-    entity/Scene.h
-    entity/Scene.cpp
-    repository/SceneRepository.h
-    repository/SceneRepository.cpp
-    entity/Track.h
-    entity/Track.cpp
-    repository/TrackRepository.h
-    repository/TrackRepository.cpp
+    entity/mixer/ChannelEntity.h
+    entity/mixer/ChannelEntity.cpp
+    repository/mixer/ChannelRepository.h
+    repository/mixer/ChannelRepository.cpp
+    entity/mixer/Effect.h
+    entity/mixer/Effect.cpp
+    repository/mixer/EffectRepository.h
+    repository/mixer/EffectRepository.cpp
+    entity/mixer/Scene.h
+    entity/mixer/Scene.cpp
+    repository/mixer/SceneRepository.h
+    repository/mixer/SceneRepository.cpp
+    entity/musicLibrary/Track.h
+    entity/musicLibrary/Track.cpp
+    repository/musicLibrary/TrackRepository.h
+    repository/musicLibrary/TrackRepository.cpp
 )
 
 target_link_libraries(GjDb

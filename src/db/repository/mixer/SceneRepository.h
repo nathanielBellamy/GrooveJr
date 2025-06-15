@@ -9,12 +9,12 @@
 
 #include <sqlite3.h>
 
-#include "../Logging.h"
-#include "../../AppState.h"
+#include "../../Logging.h"
+#include "../../../AppState.h"
 
-#include "../entity/Scene.h"
-#include "../entity/Effect.h"
-#include "../entity/ChannelEntity.h"
+#include "../../entity/mixer/Scene.h"
+#include "../../entity/mixer/Effect.h"
+#include "../../entity/mixer/ChannelEntity.h"
 
 namespace Gj {
 namespace Db {

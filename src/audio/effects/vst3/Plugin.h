@@ -14,7 +14,7 @@
 
 #include "../../../Logging.h"
 #include "../../../AppState.h"
-#include "../../../db/entity/Effect.h"
+#include "../../../db/entity/mixer/Effect.h"
 #include "../../JackClient.h"
 #include "./host/audiohost/source/audiohost.h"
 #include "./host/editorhost/source/editorhost.h"

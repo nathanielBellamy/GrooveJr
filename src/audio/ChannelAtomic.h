@@ -7,7 +7,7 @@
 
 #include <atomic>
 
-#include "../db/entity/ChannelEntity.h"
+#include "../db/entity/mixer/ChannelEntity.h"
 
 namespace Gj {
 namespace Audio {

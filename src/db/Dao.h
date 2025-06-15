@@ -13,10 +13,10 @@
 #include "Logging.h"
 #include "../AppState.h"
 
-#include "repository/ChannelRepository.h"
-#include "repository/EffectRepository.h"
-#include "repository/SceneRepository.h"
-#include "repository/TrackRepository.h"
+#include "repository/mixer/ChannelRepository.h"
+#include "repository/mixer/EffectRepository.h"
+#include "repository/mixer/SceneRepository.h"
+#include "repository/musicLibrary/TrackRepository.h"
 #include "repository/AppStateRepository.h"
 
 namespace Gj {

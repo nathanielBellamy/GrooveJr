@@ -7,9 +7,9 @@
 
 #include <sqlite3.h>
 
-#include "../../AppState.h"
+#include "../../../AppState.h"
 #include "../../Logging.h"
-#include "../entity/ChannelEntity.h"
+#include "../../entity/mixer/ChannelEntity.h"
 
 namespace Gj {
 namespace Db {

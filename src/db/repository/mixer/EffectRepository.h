@@ -9,9 +9,9 @@
 
 #include <sqlite3.h>
 
-#include "../Logging.h"
-#include "../../AppState.h"
-#include "../entity/Effect.h"
+#include "../../Logging.h"
+#include "../../../AppState.h"
+#include "../../entity/mixer/Effect.h"
 
 namespace Gj {
 namespace Db {
