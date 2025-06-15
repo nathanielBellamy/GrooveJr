@@ -66,7 +66,8 @@ struct Plugin {
         Steinberg::ResizableMemoryIBStream* editorHostControllerState
     ) {
         audioHost->setState(audioHostComponentState, audioHostControllerState);
-        editorHost->setState(editorHostComponentState, editorHostControllerState);
+        if (editorHost != nullptr)
+          editorHost->setState(editorHostComponentState, editorHostControllerState);
     }
 
     void loadState(
@@ -83,7 +84,8 @@ struct Plugin {
         Steinberg::ResizableMemoryIBStream* editorHostControllerState
     ) {
         audioHost->getState(audioHostComponentState, audioHostControllerState);
-        editorHost->getState(editorHostComponentState, editorHostControllerState);
+        if (editorHost != nullptr)
+          editorHost->getState(editorHostComponentState, editorHostControllerState);
     }
 };
 

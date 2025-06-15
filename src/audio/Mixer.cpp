@@ -405,12 +405,19 @@ int Mixer::saveScene() const {
         editorHostComponentStateStream.get(),
         editorHostControllerStateStream.get()
       );
+      std::cout << "will get stream sizes" << std::endl;
 
       const auto audioHostComponentStateSize = getStreamSize(audioHostComponentStateStream.get());
       const auto audioHostControllerStateSize = getStreamSize(audioHostControllerStateStream.get());
       const auto editorHostComponentStateSize = getStreamSize(editorHostComponentStateStream.get());
       const auto editorHostControllerStateSize = getStreamSize(editorHostControllerStateStream.get());
 
+      std::cout << "foooo bar stream sizes"
+        << " :: " << audioHostComponentStateSize
+        << " :: " << audioHostControllerStateSize
+        << " :: " << editorHostControllerStateSize
+        << " :: " << editorHostControllerStateSize
+        << std::endl;
       std::vector<uint8_t> audioHostComponentBuffer (audioHostComponentStateSize);
       std::vector<uint8_t> audioHostControllerBuffer (audioHostControllerStateSize);
       std::vector<uint8_t> editorHostComponentBuffer (editorHostComponentStateSize);
@@ -420,31 +427,37 @@ int Mixer::saveScene() const {
       int32 audioHostControllerNumBytesRead = 0;
       int32 editorHostComponentNumBytesRead = 0;
       int32 editorHostControllerNumBytesRead = 0;
+      std::cout << "foooo bar" << std::endl;
 
       audioHostComponentStateStream->read(
         audioHostComponentBuffer.data(),
         static_cast<int32>(audioHostComponentStateSize),
         &audioHostComponentNumBytesRead
       );
+      std::cout << "fooooo read audiohost component - num bytes: " << audioHostComponentNumBytesRead << std::endl;
 
       audioHostControllerStateStream->read(
         audioHostControllerBuffer.data(),
         static_cast<int32>(audioHostControllerStateSize),
         &audioHostControllerNumBytesRead
       );
+      std::cout << "fooooo read audiohost controller - num bytes: " << audioHostControllerNumBytesRead << std::endl;
 
       editorHostComponentStateStream->read(
         editorHostComponentBuffer.data(),
         static_cast<int32>(editorHostComponentStateSize),
         &editorHostComponentNumBytesRead
       );
+      std::cout << "fooooo read editorHost component - num bytes: " << editorHostComponentNumBytesRead << std::endl;
 
       editorHostControllerStateStream->read(
         editorHostControllerBuffer.data(),
         static_cast<int32>(editorHostControllerStateSize),
         &editorHostControllerNumBytesRead
       );
+      std::cout << "fooooo read editorHost controller - num bytes: " << editorHostControllerNumBytesRead << std::endl;
 
+      std::cout << "fooooo saving effect" << std::endl;
       const auto dbEffect = Db::Effect(
         plugin->path,
         "vst3",
