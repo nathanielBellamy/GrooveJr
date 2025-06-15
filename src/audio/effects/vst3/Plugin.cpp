@@ -94,36 +94,6 @@ Plugin::Plugin(const Db::Effect& effectEntity, AppState* gAppState, std::shared_
 
 	const auto& cmdArgs = std::vector { path };
 
-	const auto audioHostComponentState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
-	int audioHostComponentStateBytes = effectEntity.audioHostComponentStateBlob.size();
-	int audioHostComponentStateBytesWritten = 0;
-
-	audioHostComponentState->write(
-		const_cast<void*>(static_cast<const void*>(effectEntity.audioHostComponentStateBlob.data())),
-		audioHostComponentStateBytes,
-		&audioHostComponentStateBytesWritten
-	);
-
-	const auto audioHostControllerState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
-	int audioHostControllerStateBytes = effectEntity.audioHostControllerStateBlob.size();
-	int audioHostControllerStateBytesWritten = 0;
-
-	audioHostControllerState->write(
-		const_cast<void*>(static_cast<const void*>(effectEntity.audioHostControllerStateBlob.data())),
-		audioHostControllerStateBytes,
-		&audioHostControllerStateBytesWritten
-	);
-
-	if (audioHostComponentStateBytesWritten == audioHostComponentStateBytes && audioHostControllerStateBytesWritten) {
-		audioHost->setState(audioHostComponentState.get(), audioHostControllerState.get());
-	} else {
-		Logging::write(
-			Error,
-			"Audio::Plugin::Plugin::entity",
-			"Unable to prepare audioHostComponentState"
-		);
-	}
-
 	try {
 		audioHost = new AudioHost::App(
 			gAppState,
@@ -132,8 +102,56 @@ Plugin::Plugin(const Db::Effect& effectEntity, AppState* gAppState, std::shared_
 		audioHost->setModule(module);
 		audioHost->init(cmdArgs);
 
+		const auto audioHostComponentState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+		int audioHostComponentStateBytes = effectEntity.audioHostComponentStateBlob.size();
+		int audioHostComponentStateBytesWritten = 0;
 
+		audioHostComponentState->write(
+			const_cast<void*>(static_cast<const void*>(effectEntity.audioHostComponentStateBlob.data())),
+			audioHostComponentStateBytes,
+			&audioHostComponentStateBytesWritten
+		);
 
+		const auto audioHostControllerState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+		int audioHostControllerStateBytes = effectEntity.audioHostControllerStateBlob.size();
+		int audioHostControllerStateBytesWritten = 0;
+
+		audioHostControllerState->write(
+			const_cast<void*>(static_cast<const void*>(effectEntity.audioHostControllerStateBlob.data())),
+			audioHostControllerStateBytes,
+			&audioHostControllerStateBytesWritten
+		);
+
+		if (audioHostComponentStateBytesWritten == audioHostComponentStateBytes
+					&& audioHostControllerStateBytesWritten == audioHostControllerStateBytes) {
+			audioHost->setState(audioHostComponentState.get(), audioHostControllerState.get());
+		} else {
+			Logging::write(
+				Error,
+				"Audio::Plugin::Plugin::entity",
+				"Unable to prepare audioHostComponentState"
+			);
+		}
+
+		editorHostComponentState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+		int editorHostComponentStateBytes = effectEntity.audioHostComponentStateBlob.size();
+		int editorHostComponentStateBytesWritten = 0;
+
+		editorHostComponentState->write(
+			const_cast<void*>(static_cast<const void*>(effectEntity.editorHostComponentStateBlob.data())),
+			editorHostComponentStateBytes,
+			&editorHostComponentStateBytesWritten
+		);
+
+		editorHostControllerState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+		int editorHostControllerStateBytes = effectEntity.audioHostControllerStateBlob.size();
+		int editorHostControllerStateBytesWritten = 0;
+
+		editorHostControllerState->write(
+			const_cast<void*>(static_cast<const void*>(effectEntity.editorHostControllerStateBlob.data())),
+			editorHostControllerStateBytes,
+			&editorHostControllerStateBytesWritten
+		);
 	} catch (...) {
 		Logging::write(
 			Error,
@@ -195,6 +213,8 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 		editorHost->editController = audioHost->editController;
 		editorHost->processorComponent = audioHost->component;
 		editorHost->init (cmdArgs);
+
+		editorHost->setState(editorHostComponentState.get(), editorHostComponentState.get());
 	} catch (...) {
 		Logging::write(
 			Warning,

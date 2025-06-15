@@ -145,8 +145,7 @@ Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
 		"Adding effect: " + effectEntity.filePath + " to channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectEntity.effectIndex)
 	);
 
-	// TODO: Vst3::Plugin(effectEntity, gAppState, jackClient);
-	const auto effect = new Vst3::Plugin (effectEntity.filePath, gAppState, jackClient);
+	const auto effect = new Vst3::Plugin(effectEntity, gAppState, jackClient);
 
 	Logging::write(
 		Info,

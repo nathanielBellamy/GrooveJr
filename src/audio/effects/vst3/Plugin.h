@@ -34,7 +34,7 @@ struct Plugin {
     AudioHost::App*                     audioHost;
     EditorHost::App*                    editorHost;
     std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostComponentState;
-    std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostControlelrState;
+    std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostControllerState;
 
     Plugin(
         std::string path,
