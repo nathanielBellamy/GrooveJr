@@ -102,7 +102,7 @@ public:
   int setEffects(const std::vector<Db::Effect>& effects) const;
   int saveScene() const;
 
-  Steinberg::int64 getStreamSize(Steinberg::IBStream* stream) const {
+  Result getStreamSize(Steinberg::IBStream* stream, Steinberg::int64* size) const {
     Steinberg::int64 start = 0;
     if (const auto seekRes = stream->seek(0, Steinberg::IBStream::kIBSeekSet, &start); seekRes == Steinberg::kResultOk) {
       Logging::write(
@@ -116,7 +116,9 @@ public:
         "Audio::Mixer::getStreamSize",
         "Could not seek to beginning of stream. Code: " + std::to_string(seekRes)
       );
-      return -1;
+
+      size = 0;
+      return ERROR;
     }
 
     Steinberg::int64 end = 0;
@@ -132,20 +134,21 @@ public:
         "Audio::Mixer::getStreamSize",
         "Could not seek to end of stream. Code: " + std::to_string(seekRes)
       );
-      return -1;
+      size = 0;
+      return ERROR;
     }
 
     // Restore the original position
     stream->seek(start, Steinberg::IBStream::kIBSeekSet, nullptr);
 
-    const Steinberg::int64 size = end - start;
+    *size = end - start;
     Logging::write(
       Info,
       "Audio::Mixer::getStreamSize",
-      "Found stream size of " + std::to_string(size)
+      "Found stream size of " + std::to_string(*size)
     );
 
-    return size;
+    return OK;
   }
 
 };

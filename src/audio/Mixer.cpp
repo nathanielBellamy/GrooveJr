@@ -407,8 +407,23 @@ int Mixer::saveScene() const {
       );
       std::cout << "will get stream sizes" << std::endl;
 
-      const auto audioHostComponentStateSize = getStreamSize(audioHostComponentStateStream.get());
-      const auto audioHostControllerStateSize = getStreamSize(audioHostControllerStateStream.get());
+      int64 audioHostComponentStateSize = 0;
+      if (getStreamSize(audioHostComponentStateStream.get(), &audioHostComponentStateSize) != OK) {
+        Logging::write(
+          Error,
+          "Audio::Mixer::saveScene",
+          "Unable to determine stream size for audioHostComponentStateStream"
+        );
+      }
+
+      int64 audioHostControllerStateSize = 0;
+      if (getStreamSize(audioHostControllerStateStream.get(), &audioHostControllerStateSize) != OK) {
+        Logging::write(
+          Error,
+          "Audio::Mixer::saveScene",
+          "Unable to determine stream size for audioHostControllerStateStream"
+        );
+      }
       // const auto editorHostComponentStateSize = getStreamSize(editorHostComponentStateStream.get());
       // const auto editorHostControllerStateSize = getStreamSize(editorHostControllerStateStream.get());
 
