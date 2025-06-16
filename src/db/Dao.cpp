@@ -112,10 +112,10 @@ int Dao::initSchema() const {
       name text not null,
       channelIndex integer not null,
       effectIndex integer not null,
-      audioHostComponentState blob not null,
-      audioHostControllerState blob not null,
-      editorHostComponentState blob not null,
-      editorHostControllerState blob not null,
+      audioHostComponentState blob,
+      audioHostControllerState blob,
+      editorHostComponentState blob,
+      editorHostControllerState blob,
       createdAt datetime default current_timestamp
     );
 

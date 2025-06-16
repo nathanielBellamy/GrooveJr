@@ -427,12 +427,6 @@ int Mixer::saveScene() const {
       // const auto editorHostComponentStateSize = getStreamSize(editorHostComponentStateStream.get());
       // const auto editorHostControllerStateSize = getStreamSize(editorHostControllerStateStream.get());
 
-      std::cout << "foooo bar stream sizes"
-        << " :: " << audioHostComponentStateSize
-        << " :: " << audioHostControllerStateSize
-        // << " :: " << editorHostControllerStateSize
-        // << " :: " << editorHostControllerStateSize
-        << std::endl;
       std::vector<uint8_t> audioHostComponentBuffer (audioHostComponentStateSize);
       std::vector<uint8_t> audioHostControllerBuffer (audioHostControllerStateSize);
       std::vector<uint8_t> editorHostComponentBuffer (1028); //editorHostComponentStateSize);
@@ -442,21 +436,18 @@ int Mixer::saveScene() const {
       int32 audioHostControllerNumBytesRead = 0;
       // int32 editorHostComponentNumBytesRead = 0;
       // int32 editorHostControllerNumBytesRead = 0;
-      std::cout << "foooo bar" << std::endl;
 
       audioHostComponentStateStream->read(
         audioHostComponentBuffer.data(),
         static_cast<int32>(audioHostComponentStateSize),
         &audioHostComponentNumBytesRead
       );
-      std::cout << "fooooo read audiohost component - num bytes: " << audioHostComponentNumBytesRead << std::endl;
 
       audioHostControllerStateStream->read(
         audioHostControllerBuffer.data(),
         static_cast<int32>(audioHostControllerStateSize),
         &audioHostControllerNumBytesRead
       );
-      std::cout << "fooooo read audiohost controller - num bytes: " << audioHostControllerNumBytesRead << std::endl;
 
       // editorHostComponentStateStream->read(
       //   editorHostComponentBuffer.data(),
@@ -472,7 +463,6 @@ int Mixer::saveScene() const {
       // );
       // std::cout << "fooooo read editorHost controller - num bytes: " << editorHostControllerNumBytesRead << std::endl;
 
-      std::cout << "fooooo saving effect" << std::endl;
       const auto dbEffect = Db::Effect(
         plugin->path,
         "vst3",

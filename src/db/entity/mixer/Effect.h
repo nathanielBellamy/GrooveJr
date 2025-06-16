@@ -10,6 +10,8 @@
 
 #include <sqlite3.h>
 
+#include "../../Logging.h"
+
 namespace Gj {
 namespace Db {
 

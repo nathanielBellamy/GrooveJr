@@ -69,33 +69,45 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
   const int editorHostControllerStateBlobSize = sqlite3_column_bytes(stmt, 9);
   const void* editorHostControllerStateBlobRaw = sqlite3_column_blob(stmt, 9);
 
-  // if (audioHostComponentStateBlobSize > 0 && audioHostComponentStateBlobRaw != nullptr) {
-    std::vector audioHostComponentStateBlobDeser(
-      static_cast<const uint8_t*>(audioHostComponentStateBlobRaw),
-      static_cast<const uint8_t*>(audioHostComponentStateBlobRaw) + audioHostComponentStateBlobSize
-    );
-  // }
+  std::vector audioHostComponentStateBlobDeser(
+    static_cast<const uint8_t*>(audioHostComponentStateBlobRaw),
+    static_cast<const uint8_t*>(audioHostComponentStateBlobRaw) + audioHostComponentStateBlobSize
+  );
+  Logging::write(
+    Info,
+    "Effect::deser",
+    "Found audioHostComponentStateBlob of size " + std::to_string(audioHostComponentStateBlobDeser.size())
+  );
 
-  // if (audioHostControllerStateBlobSize > 0 && audioHostControllerStateBlobRaw != nullptr) {
-    std::vector audioHostControllerStateBlobDeser(
-      static_cast<const uint8_t*>(audioHostControllerStateBlobRaw),
-      static_cast<const uint8_t*>(audioHostControllerStateBlobRaw) + audioHostControllerStateBlobSize
-    );
-  // }
+  std::vector audioHostControllerStateBlobDeser(
+    static_cast<const uint8_t*>(audioHostControllerStateBlobRaw),
+    static_cast<const uint8_t*>(audioHostControllerStateBlobRaw) + audioHostControllerStateBlobSize
+  );
+  Logging::write(
+    Info,
+    "Effect::deser",
+    "Found audioHostControllerStateBlob of size " + std::to_string(audioHostControllerStateBlobSize)
+  );
 
-  // if (editorHostComponentStateBlobSize > 0 && editorHostComponentStateBlobRaw != nullptr) {
-    std::vector editorHostComponentStateBlobDeser(
-      static_cast<const uint8_t*>(editorHostComponentStateBlobRaw),
-      static_cast<const uint8_t*>(editorHostComponentStateBlobRaw) + editorHostComponentStateBlobSize
-    );
-  // }
+  std::vector editorHostComponentStateBlobDeser(
+    static_cast<const uint8_t*>(editorHostComponentStateBlobRaw),
+    static_cast<const uint8_t*>(editorHostComponentStateBlobRaw) + editorHostComponentStateBlobSize
+  );
+  Logging::write(
+    Info,
+    "Effect::deser",
+    "Found editorHostComponentStateBlob of size " + std::to_string(editorHostComponentStateBlobDeser.size())
+  );
 
-  // if (editorHostControllerStateBlobSize > 0 && editorHostControllerStateBlobRaw != nullptr) {
-    std::vector editorHostControllerStateBlobDeser(
-      static_cast<const uint8_t*>(editorHostControllerStateBlobRaw),
-      static_cast<const uint8_t*>(editorHostControllerStateBlobRaw) + editorHostControllerStateBlobSize
-    );
-  // }
+  std::vector editorHostControllerStateBlobDeser(
+    static_cast<const uint8_t*>(editorHostControllerStateBlobRaw),
+    static_cast<const uint8_t*>(editorHostControllerStateBlobRaw) + editorHostControllerStateBlobSize
+  );
+  Logging::write(
+    Info,
+    "Effect::deser",
+    "Found editorHostControllerStateBlob of size " + std::to_string(editorHostControllerStateBlobDeser.size())
+  );
 
   return Effect(
     id,
