@@ -104,11 +104,13 @@ public:
 
   Steinberg::int64 getStreamSize(Steinberg::IBStream* stream) const {
     Steinberg::int64 start = 0;
-    Steinberg::int64 size = 0;
-
-      // TODO: debug seek to beginning of stream
-
-    if (const auto seekRes = stream->seek(0, Steinberg::IBStream::kIBSeekSet, &start); seekRes != Steinberg::kResultOk) {
+    if (const auto seekRes = stream->seek(0, Steinberg::IBStream::kIBSeekSet, &start); seekRes == Steinberg::kResultOk) {
+      Logging::write(
+        Info,
+        "Audio::Mixer::getStreamSize",
+        "Found start of stream at: " + std::to_string(start)
+      );
+    } else {
       Logging::write(
         Error,
         "Audio::Mixer::getStreamSize",
@@ -117,7 +119,14 @@ public:
       return -1;
     }
 
-    if (const auto seekRes = stream->seek(0, Steinberg::IBStream::kIBSeekEnd, &size); seekRes != Steinberg::kResultOk) {
+    Steinberg::int64 end = 0;
+    if (const auto seekRes = stream->seek(0, Steinberg::IBStream::kIBSeekEnd, &end); seekRes != Steinberg::kResultOk) {
+      Logging::write(
+        Info,
+        "Audio::Mixer::getStreamSize",
+        "Found end of stream at: " + std::to_string(end)
+      );
+    } else {
       Logging::write(
         Error,
         "Audio::Mixer::getStreamSize",
@@ -125,10 +134,10 @@ public:
       );
       return -1;
     }
-
     // Restore the original position
     stream->seek(start, Steinberg::IBStream::kIBSeekSet, nullptr);
 
+    const Steinberg::int64 size = end - start;
     Logging::write(
       Info,
       "Audio::Mixer::getStreamSize",

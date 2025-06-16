@@ -395,10 +395,10 @@ int Mixer::saveScene() const {
     const auto channelIndex = effectsChannel->getIndex();
     for (int i = 0; i < effectCount; i++) {
       const auto plugin = effectsChannel->getPluginAtIdx(i);
-      const auto audioHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(1024);
-      const auto audioHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(1024);
-      const auto editorHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(1024);
-      const auto editorHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(1024);
+      const auto audioHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
+      const auto audioHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
+      const auto editorHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
+      const auto editorHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
       plugin->getState(
         audioHostComponentStateStream.get(),
         audioHostControllerStateStream.get(),
@@ -409,24 +409,24 @@ int Mixer::saveScene() const {
 
       const auto audioHostComponentStateSize = getStreamSize(audioHostComponentStateStream.get());
       const auto audioHostControllerStateSize = getStreamSize(audioHostControllerStateStream.get());
-      const auto editorHostComponentStateSize = getStreamSize(editorHostComponentStateStream.get());
-      const auto editorHostControllerStateSize = getStreamSize(editorHostControllerStateStream.get());
+      // const auto editorHostComponentStateSize = getStreamSize(editorHostComponentStateStream.get());
+      // const auto editorHostControllerStateSize = getStreamSize(editorHostControllerStateStream.get());
 
       std::cout << "foooo bar stream sizes"
         << " :: " << audioHostComponentStateSize
         << " :: " << audioHostControllerStateSize
-        << " :: " << editorHostControllerStateSize
-        << " :: " << editorHostControllerStateSize
+        // << " :: " << editorHostControllerStateSize
+        // << " :: " << editorHostControllerStateSize
         << std::endl;
       std::vector<uint8_t> audioHostComponentBuffer (audioHostComponentStateSize);
       std::vector<uint8_t> audioHostControllerBuffer (audioHostControllerStateSize);
-      std::vector<uint8_t> editorHostComponentBuffer (editorHostComponentStateSize);
-      std::vector<uint8_t> editorHostControllerBuffer (editorHostControllerStateSize);
+      std::vector<uint8_t> editorHostComponentBuffer (1028); //editorHostComponentStateSize);
+      std::vector<uint8_t> editorHostControllerBuffer (1028); //editorHostControllerStateSize);
 
       int32 audioHostComponentNumBytesRead = 0;
       int32 audioHostControllerNumBytesRead = 0;
-      int32 editorHostComponentNumBytesRead = 0;
-      int32 editorHostControllerNumBytesRead = 0;
+      // int32 editorHostComponentNumBytesRead = 0;
+      // int32 editorHostControllerNumBytesRead = 0;
       std::cout << "foooo bar" << std::endl;
 
       audioHostComponentStateStream->read(
@@ -443,19 +443,19 @@ int Mixer::saveScene() const {
       );
       std::cout << "fooooo read audiohost controller - num bytes: " << audioHostControllerNumBytesRead << std::endl;
 
-      editorHostComponentStateStream->read(
-        editorHostComponentBuffer.data(),
-        static_cast<int32>(editorHostComponentStateSize),
-        &editorHostComponentNumBytesRead
-      );
-      std::cout << "fooooo read editorHost component - num bytes: " << editorHostComponentNumBytesRead << std::endl;
-
-      editorHostControllerStateStream->read(
-        editorHostControllerBuffer.data(),
-        static_cast<int32>(editorHostControllerStateSize),
-        &editorHostControllerNumBytesRead
-      );
-      std::cout << "fooooo read editorHost controller - num bytes: " << editorHostControllerNumBytesRead << std::endl;
+      // editorHostComponentStateStream->read(
+      //   editorHostComponentBuffer.data(),
+      //   static_cast<int32>(editorHostComponentStateSize),
+      //   &editorHostComponentNumBytesRead
+      // );
+      // std::cout << "fooooo read editorHost component - num bytes: " << editorHostComponentNumBytesRead << std::endl;
+      //
+      // editorHostControllerStateStream->read(
+      //   editorHostControllerBuffer.data(),
+      //   static_cast<int32>(editorHostControllerStateSize),
+      //   &editorHostControllerNumBytesRead
+      // );
+      // std::cout << "fooooo read editorHost controller - num bytes: " << editorHostControllerNumBytesRead << std::endl;
 
       std::cout << "fooooo saving effect" << std::endl;
       const auto dbEffect = Db::Effect(
