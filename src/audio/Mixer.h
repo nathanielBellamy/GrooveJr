@@ -117,7 +117,7 @@ public:
         "Could not seek to beginning of stream. Code: " + std::to_string(seekRes)
       );
 
-      size = 0;
+      *size = 0;
       return ERROR;
     }
 
@@ -134,7 +134,7 @@ public:
         "Audio::Mixer::getStreamSize",
         "Could not seek to end of stream. Code: " + std::to_string(seekRes)
       );
-      size = 0;
+      *size = 0;
       return ERROR;
     }
 
