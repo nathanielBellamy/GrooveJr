@@ -405,7 +405,6 @@ int Mixer::saveScene() const {
         editorHostComponentStateStream.get(),
         editorHostControllerStateStream.get()
       );
-      std::cout << "will get stream sizes" << std::endl;
 
       int64 audioHostComponentStateSize = 0;
       if (getStreamSize(audioHostComponentStateStream.get(), &audioHostComponentStateSize) != OK) {
@@ -424,18 +423,12 @@ int Mixer::saveScene() const {
           "Unable to determine stream size for audioHostControllerStateStream"
         );
       }
-      // const auto editorHostComponentStateSize = getStreamSize(editorHostComponentStateStream.get());
-      // const auto editorHostControllerStateSize = getStreamSize(editorHostControllerStateStream.get());
 
       std::vector<uint8_t> audioHostComponentBuffer (audioHostComponentStateSize);
       std::vector<uint8_t> audioHostControllerBuffer (audioHostControllerStateSize);
-      std::vector<uint8_t> editorHostComponentBuffer (1028); //editorHostComponentStateSize);
-      std::vector<uint8_t> editorHostControllerBuffer (1028); //editorHostControllerStateSize);
 
       int32 audioHostComponentNumBytesRead = 0;
       int32 audioHostControllerNumBytesRead = 0;
-      // int32 editorHostComponentNumBytesRead = 0;
-      // int32 editorHostControllerNumBytesRead = 0;
 
       audioHostComponentStateStream->read(
         audioHostComponentBuffer.data(),
@@ -449,19 +442,46 @@ int Mixer::saveScene() const {
         &audioHostControllerNumBytesRead
       );
 
-      // editorHostComponentStateStream->read(
-      //   editorHostComponentBuffer.data(),
-      //   static_cast<int32>(editorHostComponentStateSize),
-      //   &editorHostComponentNumBytesRead
-      // );
-      // std::cout << "fooooo read editorHost component - num bytes: " << editorHostComponentNumBytesRead << std::endl;
-      //
-      // editorHostControllerStateStream->read(
-      //   editorHostControllerBuffer.data(),
-      //   static_cast<int32>(editorHostControllerStateSize),
-      //   &editorHostControllerNumBytesRead
-      // );
-      // std::cout << "fooooo read editorHost controller - num bytes: " << editorHostControllerNumBytesRead << std::endl;
+      std::vector<uint8_t> editorHostComponentBuffer;
+      std::vector<uint8_t> editorHostControllerBuffer;
+      if (plugin->editorHost != nullptr) {
+        // TODO: move this logic into plugin, call to persist state on Plugin during terminateEditorHost, read persisted state here if null
+        int64 editorHostComponentStateSize = 0;
+        if (getStreamSize(editorHostComponentStateStream.get(), &editorHostComponentStateSize) != OK) {
+          Logging::write(
+            Error,
+            "Audio::Mixer::saveScene",
+            "Unable to determine stream size for editorHostComponentStateStream"
+          );
+        }
+
+        int64 editorHostControllerStateSize = 0;
+        if (getStreamSize(editorHostControllerStateStream.get(), &editorHostControllerStateSize) != OK) {
+          Logging::write(
+            Error,
+            "Audio::Mixer::saveScene",
+            "Unable to determine stream size for editorHostControllerStateStream"
+          );
+        }
+
+        editorHostComponentBuffer = std::vector<uint8_t>(editorHostComponentStateSize);
+        editorHostControllerBuffer = std::vector<uint8_t>(editorHostControllerStateSize);
+
+        int32 editorHostComponentNumBytesRead = 0;
+        int32 editorHostControllerNumBytesRead = 0;
+
+        editorHostComponentStateStream->read(
+          editorHostComponentBuffer.data(),
+          static_cast<int32>(editorHostComponentStateSize),
+          &editorHostComponentNumBytesRead
+        );
+
+        editorHostControllerStateStream->read(
+          editorHostControllerBuffer.data(),
+          static_cast<int32>(editorHostControllerStateSize),
+          &editorHostControllerNumBytesRead
+        );
+      }
 
       const auto dbEffect = Db::Effect(
         plugin->path,
