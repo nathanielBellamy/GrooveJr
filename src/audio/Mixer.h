@@ -120,7 +120,7 @@ public:
     }
 
     Steinberg::int64 end = 0;
-    if (const auto seekRes = stream->seek(0, Steinberg::IBStream::kIBSeekEnd, &end); seekRes != Steinberg::kResultOk) {
+    if (const auto seekRes = stream->seek(-1, Steinberg::IBStream::kIBSeekEnd, &end); seekRes == Steinberg::kResultOk) {
       Logging::write(
         Info,
         "Audio::Mixer::getStreamSize",
@@ -134,6 +134,7 @@ public:
       );
       return -1;
     }
+
     // Restore the original position
     stream->seek(start, Steinberg::IBStream::kIBSeekSet, nullptr);
 
