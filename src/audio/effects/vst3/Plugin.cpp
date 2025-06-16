@@ -9,6 +9,8 @@ namespace Audio {
 namespace Effects {
 namespace Vst3 {
 
+using namespace Steinberg;
+
 Plugin::Plugin(std::string path, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
 	: gAppState(gAppState)
 	, path(path)
@@ -133,21 +135,21 @@ Plugin::Plugin(const Db::Effect& effectEntity, AppState* gAppState, std::shared_
 			);
 		}
 
-		editorHostComponentState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+		editorHostComponentStateStream = std::make_unique<Steinberg::ResizableMemoryIBStream>();
 		int editorHostComponentStateBytes = effectEntity.audioHostComponentStateBlob.size();
 		int editorHostComponentStateBytesWritten = 0;
 
-		editorHostComponentState->write(
+		editorHostComponentStateStream->write(
 			const_cast<void*>(static_cast<const void*>(effectEntity.editorHostComponentStateBlob.data())),
 			editorHostComponentStateBytes,
 			&editorHostComponentStateBytesWritten
 		);
 
-		editorHostControllerState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+		editorHostControllerStateStream = std::make_unique<Steinberg::ResizableMemoryIBStream>();
 		int editorHostControllerStateBytes = effectEntity.audioHostControllerStateBlob.size();
 		int editorHostControllerStateBytesWritten = 0;
 
-		editorHostControllerState->write(
+		editorHostControllerStateStream->write(
 			const_cast<void*>(static_cast<const void*>(effectEntity.editorHostControllerStateBlob.data())),
 			editorHostControllerStateBytes,
 			&editorHostControllerStateBytesWritten
@@ -214,7 +216,7 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 		editorHost->processorComponent = audioHost->component;
 		editorHost->init (cmdArgs);
 
-		editorHost->setState(editorHostComponentState.get(), editorHostComponentState.get());
+		editorHost->setState(editorHostComponentStateStream.get(), editorHostComponentStateStream.get());
 	} catch (...) {
 		Logging::write(
 			Warning,
@@ -230,6 +232,47 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 		"Initialized editorHost for " + path
 	);
 }
+
+Result Plugin::peristEditorHostState() {
+		int64 editorHostComponentStateSize = 0;
+		if (Util::getStreamSize(editorHostComponentStateStream.get(), &editorHostComponentStateSize) != OK) {
+			Logging::write(
+				Error,
+				"Audio::Mixer::saveScene",
+				"Unable to determine stream size for editorHostComponentStateStream"
+			);
+		}
+
+		int64 editorHostControllerStateSize = 0;
+		if (Util::getStreamSize(editorHostControllerStateStream.get(), &editorHostControllerStateSize) != OK) {
+			Logging::write(
+				Error,
+				"Audio::Mixer::saveScene",
+				"Unable to determine stream size for editorHostControllerStateStream"
+			);
+		}
+
+	  std::vector<uint8_t> editorHostComponentBuffer (editorHostComponentStateSize);
+		std::vector<uint8_t> editorHostControllerBuffer (editorHostControllerStateSize);
+
+		int32 editorHostComponentNumBytesRead = 0;
+		int32 editorHostControllerNumBytesRead = 0;
+
+		editorHostComponentStateStream->read(
+			editorHostComponentBuffer.data(),
+			static_cast<int32>(editorHostComponentStateSize),
+			&editorHostComponentNumBytesRead
+		);
+
+		editorHostControllerStateStream->read(
+			editorHostControllerBuffer.data(),
+			static_cast<int32>(editorHostControllerStateSize),
+			&editorHostControllerNumBytesRead
+		);
+
+	return OK;
+}
+
 
 void Plugin::terminateEditorHost() const {
 	Logging::write(

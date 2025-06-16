@@ -15,10 +15,12 @@
 #include "../../../Logging.h"
 #include "../../../AppState.h"
 #include "../../../db/entity/mixer/Effect.h"
+#include "../../../enums/Result.h"
 #include "../../JackClient.h"
 #include "./host/audiohost/source/audiohost.h"
 #include "./host/editorhost/source/editorhost.h"
 #include "../../../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
+#include "Util.h"
 
 
 namespace Gj {
@@ -33,8 +35,8 @@ struct Plugin {
     VST3::Hosting::Module::Ptr          module;
     AudioHost::App*                     audioHost;
     EditorHost::App*                    editorHost;
-    std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostComponentState;
-    std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostControllerState;
+    std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostComponentStateStream;
+    std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostControllerStateStream;
 
     Plugin(
         std::string path,
@@ -55,6 +57,7 @@ struct Plugin {
     }
 
     void initEditorHost(EditorHost::WindowPtr window);
+    Result peristEditorHostState();
     void terminateEditorHost() const;
 
     std::string getName() const { return name; };

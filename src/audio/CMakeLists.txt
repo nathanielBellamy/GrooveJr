@@ -79,6 +79,7 @@ add_library(GjAudio SHARED
         Constants.h
         effects/vst3/Plugin.h
         effects/vst3/Plugin.cpp
+        effects/vst3/Util.h
         effects/EffectsChannel.h
         effects/EffectsChannel.cpp
         effects/EffectsChannelProcessData.h

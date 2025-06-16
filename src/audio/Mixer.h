@@ -23,6 +23,7 @@
 #include "JackClient.h"
 #include "./effects/EffectsChannel.h"
 #include "../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
+#include "effects/vst3/Util.h"
 
 namespace Gj {
 namespace Audio {
@@ -101,55 +102,6 @@ public:
   int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);
   int setEffects(const std::vector<Db::Effect>& effects) const;
   int saveScene() const;
-
-  Result getStreamSize(Steinberg::IBStream* stream, Steinberg::int64* size) const {
-    Steinberg::int64 start = 0;
-    if (const auto seekRes = stream->seek(0, Steinberg::IBStream::kIBSeekSet, &start); seekRes == Steinberg::kResultOk) {
-      Logging::write(
-        Info,
-        "Audio::Mixer::getStreamSize",
-        "Found start of stream at: " + std::to_string(start)
-      );
-    } else {
-      Logging::write(
-        Error,
-        "Audio::Mixer::getStreamSize",
-        "Could not seek to beginning of stream. Code: " + std::to_string(seekRes)
-      );
-
-      *size = 0;
-      return ERROR;
-    }
-
-    Steinberg::int64 end = 0;
-    if (const auto seekRes = stream->seek(-1, Steinberg::IBStream::kIBSeekEnd, &end); seekRes == Steinberg::kResultOk) {
-      Logging::write(
-        Info,
-        "Audio::Mixer::getStreamSize",
-        "Found end of stream at: " + std::to_string(end)
-      );
-    } else {
-      Logging::write(
-        Error,
-        "Audio::Mixer::getStreamSize",
-        "Could not seek to end of stream. Code: " + std::to_string(seekRes)
-      );
-      *size = 0;
-      return ERROR;
-    }
-
-    // Restore the original position
-    stream->seek(start, Steinberg::IBStream::kIBSeekSet, nullptr);
-
-    *size = end - start;
-    Logging::write(
-      Info,
-      "Audio::Mixer::getStreamSize",
-      "Found stream size of " + std::to_string(*size)
-    );
-
-    return OK;
-  }
 
 };
 

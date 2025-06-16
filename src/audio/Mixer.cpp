@@ -407,7 +407,7 @@ int Mixer::saveScene() const {
       );
 
       int64 audioHostComponentStateSize = 0;
-      if (getStreamSize(audioHostComponentStateStream.get(), &audioHostComponentStateSize) != OK) {
+      if (Effects::Vst3::Util::getStreamSize(audioHostComponentStateStream.get(), &audioHostComponentStateSize) != OK) {
         Logging::write(
           Error,
           "Audio::Mixer::saveScene",
@@ -416,7 +416,7 @@ int Mixer::saveScene() const {
       }
 
       int64 audioHostControllerStateSize = 0;
-      if (getStreamSize(audioHostControllerStateStream.get(), &audioHostControllerStateSize) != OK) {
+      if (Effects::Vst3::Util::getStreamSize(audioHostControllerStateStream.get(), &audioHostControllerStateSize) != OK) {
         Logging::write(
           Error,
           "Audio::Mixer::saveScene",
@@ -447,7 +447,7 @@ int Mixer::saveScene() const {
       if (plugin->editorHost != nullptr) {
         // TODO: move this logic into plugin, call to persist state on Plugin during terminateEditorHost, read persisted state here if null
         int64 editorHostComponentStateSize = 0;
-        if (getStreamSize(editorHostComponentStateStream.get(), &editorHostComponentStateSize) != OK) {
+        if (Effects::Vst3::Util::getStreamSize(editorHostComponentStateStream.get(), &editorHostComponentStateSize) != OK) {
           Logging::write(
             Error,
             "Audio::Mixer::saveScene",
@@ -456,7 +456,7 @@ int Mixer::saveScene() const {
         }
 
         int64 editorHostControllerStateSize = 0;
-        if (getStreamSize(editorHostControllerStateStream.get(), &editorHostControllerStateSize) != OK) {
+        if (Effects::Vst3::Util::getStreamSize(editorHostControllerStateStream.get(), &editorHostControllerStateSize) != OK) {
           Logging::write(
             Error,
             "Audio::Mixer::saveScene",
