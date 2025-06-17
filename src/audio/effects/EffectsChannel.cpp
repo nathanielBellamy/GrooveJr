@@ -180,7 +180,7 @@ Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
   };
   processor->setupProcessing(setup);
 
-	if (effectEntity.effectIndex < 0 || effectEntity.effectIndex > vst3Plugins.size() - 1) {
+	if (vst3Plugins.empty() || effectEntity.effectIndex > vst3Plugins.size() - 1) {
 		vst3Plugins.push_back(effect);
 	} else {
 		delete vst3Plugins.at(effectEntity.effectIndex);
