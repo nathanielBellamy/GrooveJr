@@ -54,6 +54,12 @@ Effect::Effect(
   {}
 
 Effect Effect::deser(sqlite3_stmt *stmt) {
+  Logging::write(
+    Info,
+    "Db::Effect::deser",
+    "Deserializing effect"
+  );
+
   const int id = sqlite3_column_int(stmt, 0);
   const unsigned char* filePath = sqlite3_column_text(stmt, 1);
   const unsigned char* format = sqlite3_column_text(stmt, 2);
@@ -69,7 +75,7 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
   const int editorHostControllerStateBlobSize = sqlite3_column_bytes(stmt, 9);
   const void* editorHostControllerStateBlobRaw = sqlite3_column_blob(stmt, 9);
 
-  std::vector audioHostComponentStateBlobDeser(
+  const std::vector audioHostComponentStateBlobDeser(
     static_cast<const uint8_t*>(audioHostComponentStateBlobRaw),
     static_cast<const uint8_t*>(audioHostComponentStateBlobRaw) + audioHostComponentStateBlobSize
   );
@@ -79,7 +85,7 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
     "Found audioHostComponentStateBlob of size " + std::to_string(audioHostComponentStateBlobDeser.size())
   );
 
-  std::vector audioHostControllerStateBlobDeser(
+  const std::vector audioHostControllerStateBlobDeser(
     static_cast<const uint8_t*>(audioHostControllerStateBlobRaw),
     static_cast<const uint8_t*>(audioHostControllerStateBlobRaw) + audioHostControllerStateBlobSize
   );
@@ -89,7 +95,7 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
     "Found audioHostControllerStateBlob of size " + std::to_string(audioHostControllerStateBlobSize)
   );
 
-  std::vector editorHostComponentStateBlobDeser(
+  const std::vector editorHostComponentStateBlobDeser(
     static_cast<const uint8_t*>(editorHostComponentStateBlobRaw),
     static_cast<const uint8_t*>(editorHostComponentStateBlobRaw) + editorHostComponentStateBlobSize
   );
@@ -99,7 +105,7 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
     "Found editorHostComponentStateBlob of size " + std::to_string(editorHostComponentStateBlobDeser.size())
   );
 
-  std::vector editorHostControllerStateBlobDeser(
+  const std::vector editorHostControllerStateBlobDeser(
     static_cast<const uint8_t*>(editorHostControllerStateBlobRaw),
     static_cast<const uint8_t*>(editorHostControllerStateBlobRaw) + editorHostControllerStateBlobSize
   );
@@ -109,7 +115,12 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
     "Found editorHostControllerStateBlob of size " + std::to_string(editorHostControllerStateBlobDeser.size())
   );
 
-  return Effect(
+  Logging::write(
+    Info,
+    "Db::Effect::deser",
+    "Done deserializing effect"
+  );
+  return {
     id,
     std::string(reinterpret_cast<const char*>(filePath)),
     std::string(reinterpret_cast<const char*>(format)),
@@ -120,7 +131,7 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
     audioHostControllerStateBlobDeser,
     editorHostComponentStateBlobDeser,
     editorHostControllerStateBlobDeser
-  );
+  };
 }
 
 } // Db
