@@ -445,42 +445,14 @@ int Mixer::saveScene() const {
       std::vector<uint8_t> editorHostComponentBuffer;
       std::vector<uint8_t> editorHostControllerBuffer;
       if (plugin->editorHost != nullptr) {
-        // TODO: move this logic into plugin, call to persist state on Plugin during terminateEditorHost, read persisted state here if null
-        int64 editorHostComponentStateSize = 0;
-        if (Effects::Vst3::Util::getStreamSize(editorHostComponentStateStream.get(), &editorHostComponentStateSize) != OK) {
+        if (const auto populateRes = plugin->populateEditorHostStateBuffers(editorHostComponentBuffer, editorHostControllerBuffer);
+            populateRes != OK) {
           Logging::write(
             Error,
             "Audio::Mixer::saveScene",
-            "Unable to determine stream size for editorHostComponentStateStream"
+            "Unable to populate editorHost buffers and thus unable to persist Plugin: " + plugin->name + " Status: " + std::to_string(populateRes)
           );
         }
-
-        int64 editorHostControllerStateSize = 0;
-        if (Effects::Vst3::Util::getStreamSize(editorHostControllerStateStream.get(), &editorHostControllerStateSize) != OK) {
-          Logging::write(
-            Error,
-            "Audio::Mixer::saveScene",
-            "Unable to determine stream size for editorHostControllerStateStream"
-          );
-        }
-
-        editorHostComponentBuffer = std::vector<uint8_t>(editorHostComponentStateSize);
-        editorHostControllerBuffer = std::vector<uint8_t>(editorHostControllerStateSize);
-
-        int32 editorHostComponentNumBytesRead = 0;
-        int32 editorHostControllerNumBytesRead = 0;
-
-        editorHostComponentStateStream->read(
-          editorHostComponentBuffer.data(),
-          static_cast<int32>(editorHostComponentStateSize),
-          &editorHostComponentNumBytesRead
-        );
-
-        editorHostControllerStateStream->read(
-          editorHostControllerBuffer.data(),
-          static_cast<int32>(editorHostControllerStateSize),
-          &editorHostControllerNumBytesRead
-        );
       }
 
       const auto dbEffect = Db::Effect(

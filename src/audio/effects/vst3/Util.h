@@ -20,8 +20,8 @@ using namespace Steinberg;
 struct Util {
 
   static Result getStreamSize(IBStream* stream, int64* size) {
-    Steinberg::int64 start = 0;
-    if (const auto seekRes = stream->seek(0, Steinberg::IBStream::kIBSeekSet, &start); seekRes == Steinberg::kResultOk) {
+    int64 start = 0;
+    if (const auto seekRes = stream->seek(0, IBStream::kIBSeekSet, &start); seekRes == kResultOk) {
       Logging::write(
         Info,
         "Audio::Mixer::getStreamSize",
@@ -39,7 +39,7 @@ struct Util {
     }
 
     Steinberg::int64 end = 0;
-    if (const auto seekRes = stream->seek(-1, Steinberg::IBStream::kIBSeekEnd, &end); seekRes == Steinberg::kResultOk) {
+    if (const auto seekRes = stream->seek(-1, IBStream::kIBSeekEnd, &end); seekRes == kResultOk) {
       Logging::write(
         Info,
         "Audio::Mixer::getStreamSize",
@@ -56,7 +56,7 @@ struct Util {
     }
 
     // Restore the original position
-    stream->seek(start, Steinberg::IBStream::kIBSeekSet, nullptr);
+    stream->seek(start, IBStream::kIBSeekSet, nullptr);
 
     *size = end - start;
     Logging::write(

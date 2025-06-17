@@ -233,62 +233,123 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 	);
 }
 
-Result Plugin::peristEditorHostState() {
-		int64 editorHostComponentStateSize = 0;
-		if (Util::getStreamSize(editorHostComponentStateStream.get(), &editorHostComponentStateSize) != OK) {
-			Logging::write(
-				Error,
-				"Audio::Mixer::saveScene",
-				"Unable to determine stream size for editorHostComponentStateStream"
-			);
-		}
-
-		int64 editorHostControllerStateSize = 0;
-		if (Util::getStreamSize(editorHostControllerStateStream.get(), &editorHostControllerStateSize) != OK) {
-			Logging::write(
-				Error,
-				"Audio::Mixer::saveScene",
-				"Unable to determine stream size for editorHostControllerStateStream"
-			);
-		}
-
-	  std::vector<uint8_t> editorHostComponentBuffer (editorHostComponentStateSize);
-		std::vector<uint8_t> editorHostControllerBuffer (editorHostControllerStateSize);
-
-		int32 editorHostComponentNumBytesRead = 0;
-		int32 editorHostControllerNumBytesRead = 0;
-
-		editorHostComponentStateStream->read(
-			editorHostComponentBuffer.data(),
-			static_cast<int32>(editorHostComponentStateSize),
-			&editorHostComponentNumBytesRead
+Result Plugin::cacheEditorHostState() const {
+	if (editorHost == nullptr) {
+		Logging::write(
+			Error,
+			"Audio::Plugin::cacheEditorHostState",
+			"Attempting to retrieve the editorHost state from an empty editorHost"
 		);
+		return ERROR;
+	}
 
-		editorHostControllerStateStream->read(
-			editorHostControllerBuffer.data(),
-			static_cast<int32>(editorHostControllerStateSize),
-			&editorHostControllerNumBytesRead
-		);
+	editorHost->getState(editorHostComponentStateStream.get(), editorHostControllerStateStream.get());
 
 	return OK;
 }
 
 
-void Plugin::terminateEditorHost() const {
+Result Plugin::populateEditorHostStateBuffers(std::vector<uint8_t>& componentStateBuffer, std::vector<uint8_t>& controllerStateBuffer) const {
+	if (editorHost == nullptr) {
+		Logging::write(
+			Error,
+			"Audio::Plugin::getEditorHostState",
+			"Attempting to retrieve the editorHost state from an empty editorHost"
+		);
+		return ERROR;
+	}
+
+	editorHost->getState(editorHostComponentStateStream.get(), editorHostControllerStateStream.get());
+
+	int64 editorHostComponentStateSize = 0;
+	if (Util::getStreamSize(editorHostComponentStateStream.get(), &editorHostComponentStateSize) != OK) {
+		Logging::write(
+			Error,
+			"Audio::Effects::Vst3::Plugin::populateEditorHostState",
+			"Unable to determine stream size for editorHostComponentStateStream"
+		);
+		return ERROR;
+	}
+
+	int64 editorHostControllerStateSize = 0;
+	if (Util::getStreamSize(editorHostControllerStateStream.get(), &editorHostControllerStateSize) != OK) {
+		Logging::write(
+			Error,
+			"Audio::Effects::Vst3::Plugin::populateEditorHostState",
+			"Unable to determine stream size for editorHostControllerStateStream"
+		);
+		return ERROR;
+	}
+
+	componentStateBuffer.resize(editorHostComponentStateSize);
+	controllerStateBuffer.resize(editorHostControllerStateSize);
+
+	int32 editorHostComponentNumBytesRead = 0;
+	int32 editorHostControllerNumBytesRead = 0;
+
+	if (const auto componentRes = editorHostComponentStateStream->read(
+			componentStateBuffer.data(),
+			static_cast<int32>(editorHostComponentStateSize),
+			&editorHostComponentNumBytesRead
+		); componentRes != kResultOk) {
+		Logging::write(
+			Error,
+			"Audio::Effects::Vst3::Plugin::populateEditorHostState",
+			"Unable to read editorHostComponentStateStream. tresult: " + std::to_string(componentRes)
+		);
+		return ERROR;
+	}
+
+	if (const auto controllerRes = editorHostControllerStateStream->read(
+		  controllerStateBuffer.data(),
+		  static_cast<int32>(editorHostControllerStateSize),
+		  &editorHostControllerNumBytesRead
+		); controllerRes != kResultOk) {
+		Logging::write(
+			Error,
+			"Audio::Effects::Vst3::Plugin::populateEditorHostState",
+			"Unable to read editorHostControllerStateStream. tresult: " + std::to_string(controllerRes)
+		);
+		return ERROR;
+	};
+
+	return OK;
+}
+
+
+Result Plugin::terminateEditorHost() const {
 	Logging::write(
 		Info,
-		"Audio::Plugin::terminateEditorHost",
+		"Audio::Effects::Vst3::Plugin::terminateEditorHost",
 		"Terminating editorHost for Plugin: " + this->name
 	);
 
-	if (editorHost != nullptr)
-		editorHost->terminate();
+	if (editorHost == nullptr) {
+		Logging::write(
+			Warning,
+			"Audio::Effects::Vst3::Plugin::terminateEditorHost",
+			"Attempting to terminate null editorHost."
+		);
+		return WARNING;
+	}
+
+	if (const auto cacheRes = cacheEditorHostState(); cacheRes != OK) {
+		// TODO: update editorHost->getState to return a Result
+		Logging::write(
+			Error,
+			"Audio::Effects::Vst3::Plugin::terminateEditorHost",
+			"Unable to cache editorHost State. Result: " + std::to_string(cacheRes)
+		);
+	};
+
+	editorHost->terminate();
 
 	Logging::write(
 		Info,
-		"Audio::Plugin::terminateEditorHost",
+		"Audio::Effects::Vst3::Plugin::terminateEditorHost",
 		"Done terminating editorHost for Plugin: " + this->name
 	);
+	return OK;
 }
 
 } // Vst3

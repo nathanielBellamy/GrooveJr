@@ -9,8 +9,9 @@
 namespace Gj {
 
 enum Result {
-  OK,
-  ERROR
+  OK,         // copacetic
+  WARNING,    // not everything went as planned
+  ERROR       // something bad happened
 };
 
 } // Gj

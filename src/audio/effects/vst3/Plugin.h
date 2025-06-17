@@ -28,6 +28,8 @@ namespace Audio {
 namespace Effects {
 namespace Vst3 {
 
+using namespace Steinberg;
+
 struct Plugin {
     AppState*                           gAppState;
     std::string                         name;
@@ -35,8 +37,8 @@ struct Plugin {
     VST3::Hosting::Module::Ptr          module;
     AudioHost::App*                     audioHost;
     EditorHost::App*                    editorHost;
-    std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostComponentStateStream;
-    std::unique_ptr<Steinberg::ResizableMemoryIBStream> editorHostControllerStateStream;
+    std::unique_ptr<ResizableMemoryIBStream> editorHostComponentStateStream;
+    std::unique_ptr<ResizableMemoryIBStream> editorHostControllerStateStream;
 
     Plugin(
         std::string path,
@@ -52,22 +54,28 @@ struct Plugin {
 
     ~Plugin();
 
-    Steinberg::FUnknownPtr<IAudioProcessor> getProcesser() {
+    [[nodiscard]]
+    FUnknownPtr<IAudioProcessor> getProcesser() const {
         return audioHost->audioClient->getComponent();
     }
 
     void initEditorHost(EditorHost::WindowPtr window);
-    Result peristEditorHostState();
-    void terminateEditorHost() const;
+    [[nodiscard]]
+    Result cacheEditorHostState() const;
+    [[nodiscard]]
+    Result populateEditorHostStateBuffers(std::vector<uint8_t>& componentStateBuffer, std::vector<uint8_t>& controllerStateBuffer) const;
+    [[nodiscard]]
+    Result terminateEditorHost() const;
 
+    [[nodiscard]]
     std::string getName() const { return name; };
 
     void setState(
-        Steinberg::ResizableMemoryIBStream* audioHostComponentState,
-        Steinberg::ResizableMemoryIBStream* audioHostControllerState,
-        Steinberg::ResizableMemoryIBStream* editorHostComponentState,
-        Steinberg::ResizableMemoryIBStream* editorHostControllerState
-    ) {
+        ResizableMemoryIBStream* audioHostComponentState,
+        ResizableMemoryIBStream* audioHostControllerState,
+        ResizableMemoryIBStream* editorHostComponentState,
+        ResizableMemoryIBStream* editorHostControllerState
+    ) const {
         audioHost->setState(audioHostComponentState, audioHostControllerState);
         if (editorHost != nullptr)
           editorHost->setState(editorHostComponentState, editorHostControllerState);
@@ -81,11 +89,11 @@ struct Plugin {
     );
 
     void getState(
-        Steinberg::ResizableMemoryIBStream* audioHostComponentState,
-        Steinberg::ResizableMemoryIBStream* audioHostControllerState,
-        Steinberg::ResizableMemoryIBStream* editorHostComponentState,
-        Steinberg::ResizableMemoryIBStream* editorHostControllerState
-    ) {
+        ResizableMemoryIBStream* audioHostComponentState,
+        ResizableMemoryIBStream* audioHostControllerState,
+        ResizableMemoryIBStream* editorHostComponentState,
+        ResizableMemoryIBStream* editorHostControllerState
+    ) const {
         audioHost->getState(audioHostComponentState, audioHostControllerState);
         if (editorHost != nullptr)
           editorHost->getState(editorHostComponentState, editorHostControllerState);
