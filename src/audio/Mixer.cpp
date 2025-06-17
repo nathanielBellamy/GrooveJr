@@ -427,21 +427,25 @@ int Mixer::saveScene() const {
       std::vector<uint8_t> audioHostComponentBuffer (audioHostComponentStateSize);
       std::vector<uint8_t> audioHostControllerBuffer (audioHostControllerStateSize);
 
-      int32 audioHostComponentNumBytesRead = 0;
-      int32 audioHostControllerNumBytesRead = 0;
+      if (audioHostComponentStateSize > 0) {
+        int32 audioHostComponentNumBytesRead = 0;
+        audioHostComponentStateStream->read(
+          audioHostComponentBuffer.data(),
+          static_cast<int32>(audioHostComponentStateSize),
+          &audioHostComponentNumBytesRead
+        );
+      }
 
-      audioHostComponentStateStream->read(
-        audioHostComponentBuffer.data(),
-        static_cast<int32>(audioHostComponentStateSize),
-        &audioHostComponentNumBytesRead
-      );
+      if (audioHostControllerStateSize > 0) {
+        int32 audioHostControllerNumBytesRead = 0;
+        audioHostControllerStateStream->read(
+          audioHostControllerBuffer.data(),
+          static_cast<int32>(audioHostControllerStateSize),
+          &audioHostControllerNumBytesRead
+        );
+      }
 
-      audioHostControllerStateStream->read(
-        audioHostControllerBuffer.data(),
-        static_cast<int32>(audioHostControllerStateSize),
-        &audioHostControllerNumBytesRead
-      );
-
+      // TODO: debug here after editing TDR Nova state
       std::vector<uint8_t> editorHostComponentBuffer;
       std::vector<uint8_t> editorHostControllerBuffer;
       if (plugin->editorHost != nullptr) {
