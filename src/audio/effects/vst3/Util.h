@@ -38,7 +38,7 @@ struct Util {
       return ERROR;
     }
 
-    Steinberg::int64 end = 0;
+    int64 end = 0;
     if (const auto seekRes = stream->seek(-1, IBStream::kIBSeekEnd, &end); seekRes == kResultOk) {
       Logging::write(
         Info,
