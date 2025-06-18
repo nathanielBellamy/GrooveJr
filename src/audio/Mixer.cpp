@@ -445,19 +445,19 @@ int Mixer::saveScene() const {
         );
       }
 
-      // TODO: debug here after editing TDR Nova state
-      std::vector<uint8_t> editorHostComponentBuffer;
-      std::vector<uint8_t> editorHostControllerBuffer;
-      if (plugin->editorHost != nullptr) {
-        if (const auto populateRes = plugin->populateEditorHostStateBuffers(editorHostComponentBuffer, editorHostControllerBuffer);
-            populateRes != OK) {
-          Logging::write(
-            Error,
-            "Audio::Mixer::saveScene",
-            "Unable to populate editorHost buffers and thus unable to persist Plugin: " + plugin->name + " Status: " + std::to_string(populateRes)
-          );
-        }
-      }
+      // TODO: debugged. do we need editorhost state? editorhost seems to get state from audiohost
+      const std::vector<uint8_t> editorHostComponentBuffer(0);
+      const std::vector<uint8_t> editorHostControllerBuffer(0);
+      // if (plugin->editorHost != nullptr) {
+      //   if (const auto populateRes = plugin->populateEditorHostStateBuffers(editorHostComponentBuffer, editorHostControllerBuffer);
+      //       populateRes != OK) {
+      //     Logging::write(
+      //       Error,
+      //       "Audio::Mixer::saveScene",
+      //       "Unable to populate editorHost buffers and thus unable to persist Plugin: " + plugin->name + " Status: " + std::to_string(populateRes)
+      //     );
+      //   }
+      // }
 
       const auto dbEffect = Db::Effect(
         plugin->path,
