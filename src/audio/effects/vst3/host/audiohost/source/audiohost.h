@@ -38,6 +38,7 @@
 #pragma once
 
 #include "../../../../../../AppState.h"
+#include "../../../../../../Logging.h"
 
 #include "./media/audioclient.h"
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/iapplication.h"

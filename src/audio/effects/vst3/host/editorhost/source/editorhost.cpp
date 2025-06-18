@@ -233,11 +233,10 @@ void App::createViewAndShow (IEditController* controller)
 		"Will call window->show()"
 	);
 	window->show ();
-	// TODO
+
 	try {
 		windowController->onShow(*window.get());
 	} catch (const std::exception& e) {
-		std::cout << e.what () << std::endl;
 		Gj::Audio::Logging::write(
 			Gj::Audio::LogSeverityLevel::Error,
 			"EditorHost::createViewAndShow",

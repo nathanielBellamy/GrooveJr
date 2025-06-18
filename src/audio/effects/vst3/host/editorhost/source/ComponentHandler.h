@@ -20,22 +20,18 @@ class ComponentHandler : public IComponentHandler
 public:
 	tresult PLUGIN_API beginEdit (ParamID id) override
 	{
-		std::cout << "beginEdit called" << id << std::endl;
 		return kNotImplemented;
 	}
 	tresult PLUGIN_API performEdit (ParamID id, ParamValue valueNormalized) override
 	{
-		std::cout << "performEdit called " << id << valueNormalized << std::endl;
 		return kNotImplemented;
 	}
 	tresult PLUGIN_API endEdit (ParamID id) override
 	{
-		std::cout << "endEdit called" << id << std::endl;
 		return kNotImplemented;
 	}
 	tresult PLUGIN_API restartComponent (int32 flags) override
 	{
-		std::cout << "restartComponent called " << flags << std::endl;
 		return kNotImplemented;
 	}
 

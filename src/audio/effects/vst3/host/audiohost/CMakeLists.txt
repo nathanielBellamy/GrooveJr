@@ -3,6 +3,8 @@ list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
 include(SMTG_FindJack)
 
+find_package(Boost REQUIRED COMPONENTS log_setup log)
+
 if(${LIBJACK_FOUND})
     set(audiohost_sources
         "${VST3SDK_HOME}/public.sdk/samples/vst-hosting/editorhost/source/platform/iapplication.h"
@@ -84,6 +86,8 @@ if(${LIBJACK_FOUND})
             "-framework CoreFoundation" # macOS
             "-framework Foundation"     #  and Objective C
             ${LIBJACK_LIBRARY}
+            Boost::log
+            ${Boost_LIBRARIES}
     )
     target_include_directories(${target}
         PRIVATE

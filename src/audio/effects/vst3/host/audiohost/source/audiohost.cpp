@@ -107,17 +107,23 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
 		else
 			error = "No VST3 Audio Module Class found in file ";
 		error += path;
-		std::cout << error << std::endl;
+
+		// TODO: debug linking Logging
+		// Gj::Audio::Logging::write(
+		// 	Gj::Audio::LogSeverityLevel::Error,
+		// 	"Audio::Steinberg::Vst::AudioHost::App::startAudioClient",
+		// 	"Unable to start audio client. Message: " + error
+		// );
+
 		// EditorHost::IPlatform::instance ().kill (-1, error);
         return;
 	}
 
 	component = plugProvider->getComponent ();
 	editController = plugProvider->getController ();
-	auto midiMapping = U::cast<IMidiMapping> (editController);
+	const auto midiMapping = U::cast<IMidiMapping> (editController);
 
-	std::string name;
-	name = plugProvider->getClassInfo().name();
+	std::string name = plugProvider->getClassInfo().name();
 	audioClient = AudioClient::create (name, component, midiMapping, jackClient);
 }
 
