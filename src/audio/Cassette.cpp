@@ -291,8 +291,6 @@ int Cassette::setupAudioData() {
     return 3;
   }
 
-  ThreadStatics::setReadCount(audioData.readCount);
-
   if (!setupInputBuffers()) {
     Logging::write(
       Error,

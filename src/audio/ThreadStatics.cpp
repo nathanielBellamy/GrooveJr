@@ -14,7 +14,6 @@ sf_count_t ThreadStatics::frameId = 0;
 std::mutex ThreadStatics::frameIdMutex;
 
 std::atomic<bool> ThreadStatics::userSettingFrameId { false };
-std::atomic<sf_count_t> ThreadStatics::readCount { 0 };
 
 PlayState ThreadStatics::playState = STOP;
 std::mutex ThreadStatics::playStateMutex;
@@ -102,14 +101,6 @@ long ThreadStatics::incrThreadId() {
 long ThreadStatics::getThreadId() {
   std::lock_guard guard(threadIdMutex);
   return threadId;
-}
-
-sf_count_t ThreadStatics::getReadCount() {
-  return readCount.load();
-}
-
-void ThreadStatics::setReadCount(const sf_count_t newReadCount) {
-  readCount.store(newReadCount);
 }
 
 void ThreadStatics::setUserSettingFrameId(const bool newUserSettingFrameId) {

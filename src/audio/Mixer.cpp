@@ -482,15 +482,14 @@ int Mixer::saveScene() const {
   return sceneId;
 }
 
-Result Mixer::setFrameIdFromPercent(const float percent) {
+Result Mixer::setFrameIdFromPercent(const float percent, const sf_count_t totalFrames) {
   Logging::write(
     Info,
     "Audio::Mixer::setFramePercent",
     "User setting frameId from percent."
   );
 
-  const sf_count_t readCount = ThreadStatics::getReadCount();
-  const auto newFrameId = static_cast<long>(std::floor(percent * static_cast<float>(readCount)));
+  const auto newFrameId = static_cast<long>(std::floor(percent * static_cast<float>(totalFrames)));
 
   Logging::write(
     Info,

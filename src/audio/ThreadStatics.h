@@ -51,9 +51,6 @@ public:
   static long incrThreadId();
   static long getThreadId();
 
-  static void setReadCount(const sf_count_t newReadCount);
-  static sf_count_t getReadCount();
-
   static void setUserSettingFrameId(bool newUserSettingFrameId);
   static bool getUserSettingFrameId();
 };

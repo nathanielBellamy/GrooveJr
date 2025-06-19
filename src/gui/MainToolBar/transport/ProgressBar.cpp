@@ -18,13 +18,13 @@ ProgressBar::ProgressBar(QWidget* parent, Audio::Mixer* mixer, sf_count_t frame)
   {
 
   mixer->setUpdateProgressBarFunc(
-    [this](sf_count_t readCount, sf_count_t newFrame) { updateProgressBar(readCount, newFrame); }
+    [this](const sf_count_t readCount, const sf_count_t newFrame) { updateProgressBar(readCount, newFrame); }
   );
 
   setStyle();
 }
 
-void ProgressBar::updateProgressBar(sf_count_t readCount, sf_count_t newFrame) {
+void ProgressBar::updateProgressBar(const sf_count_t readCount, const sf_count_t newFrame) {
   totalFrames = readCount;
   frame = newFrame;
   update();
@@ -37,7 +37,7 @@ void ProgressBar::setStyle() {
 }
 
 void ProgressBar::paintEvent(QPaintEvent* event) {
-  float progress = (static_cast<float>(frame) / static_cast<float>(totalFrames)) * width();
+  const float progress = (static_cast<float>(frame) / static_cast<float>(totalFrames)) * width();
   painter.begin(this);
   painter.setPen(pen);
   painter.fillRect(0, 0, progress, height(), Qt::white);
@@ -47,7 +47,8 @@ void ProgressBar::paintEvent(QPaintEvent* event) {
 void ProgressBar::mousePressEvent(QMouseEvent* event) {
   const float x = static_cast<float>(event->position().x());
   const float percent = x / static_cast<float>(width());
-  mixer->setFrameIdFromPercent(percent);
+
+  mixer->setFrameIdFromPercent(percent, totalFrames);
 }
 
 } // Gui
