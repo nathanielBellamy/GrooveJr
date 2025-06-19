@@ -11,6 +11,8 @@ jack_port_t* outPortL;
 jack_port_t* outPortR;
 
 constexpr size_t EffectsSettings_RB_SIZE = 2 * MAX_EFFECTS_CHANNELS * sizeof(float);
+constexpr size_t PlaybackSettings_RB_SIZE = 2 * sizeof(sf_count_t);
+  // PlaybackSettings: [frameId,
 
 Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
   : actorSystem(actorSystem)
@@ -157,7 +159,36 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
 
   // retrieve AudioData
   const auto audioData = static_cast<AudioData*>(arg);
+
+  // // read playbackSettingsToAudioThreadRingBuffer
+  // if (jack_ringbuffer_read_space(audioData->playbackSettingsToAudioThreadRB) >= PlaybackSettings_RB_SIZE) {
+  //   jack_ringbuffer_read(
+  //     audioData->playbackSettingsToAudioThreadRB,
+  //     reinterpret_cast<char*>(audioData->playbackSettingsToAudioThread),
+  //     PlaybackSettings_RB_SIZE
+  //   );
+  // }
+  //
+  // if (audioData->playbackSettingsToAudioThread[0] == 1) { // user set frame Id
+  //   audioData->index = audioData->playbackSettingsToAudioThread[1];
+  //   audioData->playbackSettingsFromAudioThread[0] = 1; // done setting frameId
+  // } else {
+  //   audioData->playbackSettingsFromAudioThread[0] = 0;
+  // }
+
   const sf_count_t audioDataIndex = audioData->index;
+
+  audioData->playbackSettingsFromAudioThread[0] = 0;
+  audioData->playbackSettingsFromAudioThread[1] = audioData->index;
+
+  // write to playbackSettingsFromAudioThread ring buffer
+  if (jack_ringbuffer_write_space(audioData->playbackSettingsFromAudioThreadRB) >= PlaybackSettings_RB_SIZE) {
+    jack_ringbuffer_write(
+      audioData->playbackSettingsFromAudioThreadRB,
+      reinterpret_cast<char*>(audioData->playbackSettingsFromAudioThread),
+      PlaybackSettings_RB_SIZE
+    );
+  }
 
   // update process head
   audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioDataIndex;
@@ -343,10 +374,10 @@ int Cassette::setupAudioData() {
 
   // populate initial channel settings
   for (int i = 0; i < mixer->getEffectsChannelsCount() + 1; i++) {
-    effectsSettingsBuffer[4 * i]     = mixer->getEffectsChannel(i)->getGain();
-    effectsSettingsBuffer[4 * i + 1] = mixer->getEffectsChannel(i)->getMute();
-    effectsSettingsBuffer[4 * i + 2] = mixer->getEffectsChannel(i)->getSolo();
-    effectsSettingsBuffer[4 * i + 3] = mixer->getEffectsChannel(i)->getPan();
+    effectsChannelsSettings[4 * i]     = mixer->getEffectsChannel(i)->getGain();
+    effectsChannelsSettings[4 * i + 1] = mixer->getEffectsChannel(i)->getMute();
+    effectsChannelsSettings[4 * i + 2] = mixer->getEffectsChannel(i)->getSolo();
+    effectsChannelsSettings[4 * i + 3] = mixer->getEffectsChannel(i)->getPan();
   }
 
   Logging::write(
@@ -706,15 +737,47 @@ bool Cassette::deleteBuffers() const {
   return true;
 }
 
-int Cassette::updateAudioDataFromMixer(jack_ringbuffer_t* effectsChannelsSettingsRB, const int channelCount) {
-  // TODO:
-  // - pass frame through a ring buffer
-  mixer->getUpdateProgressBarFunc()(audioData.readCount, audioData.index);
+int Cassette::updateAudioDataFromMixer(
+  jack_ringbuffer_t* effectsChannelsSettingsRB,
+  jack_ringbuffer_t* playbackSettingsToAudioThreadRB,
+  jack_ringbuffer_t* playbackSettingsFromAudioThreadRB,
+  const int channelCount
+  ) {
 
-  // TODO: pass thru ring buffer
+  // read playbackSettingsFromAudioThread ring buffer
+  if (jack_ringbuffer_read_space(playbackSettingsFromAudioThreadRB) >= PlaybackSettings_RB_SIZE) {
+    jack_ringbuffer_read(
+      playbackSettingsFromAudioThreadRB,
+      reinterpret_cast<char*>(playbackSettingsFromAudioThread),
+      PlaybackSettings_RB_SIZE
+    );
+  }
+
+  const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
+  mixer->getUpdateProgressBarFunc()(audioData.readCount, currentFrameId);
+
+  std::cout << " ps from at: " << playbackSettingsFromAudioThread[0] << " --- " << playbackSettingsFromAudioThread[1] << std::endl;
+  if (playbackSettingsFromAudioThread[0] == 1) { // done setting frameId
+    playbackSettingsToAudioThread[0] = 0;
+    playbackSettingsToAudioThread[1] = 0;
+  }
+
   if (ThreadStatics::getUserSettingFrameId()) {
-    audioData.index = ThreadStatics::getFrameId();
+    const sf_count_t newFrameId = ThreadStatics::getFrameId();
+    playbackSettingsToAudioThread[0] = 1;
+    playbackSettingsToAudioThread[1] = newFrameId;
+
     ThreadStatics::setUserSettingFrameId(false);
+  }
+
+  // std::cout << "ps to at: " << playbackSettingsToAudioThread[0] << " --- " << playbackSettingsToAudioThread[1] << std::endl;
+  // write to playbackSettingsToAudioThread ring buffer
+  if (jack_ringbuffer_write_space(playbackSettingsToAudioThreadRB) >= PlaybackSettings_RB_SIZE) {
+    jack_ringbuffer_write(
+      playbackSettingsToAudioThreadRB,
+      reinterpret_cast<char*>(playbackSettingsToAudioThread),
+      PlaybackSettings_RB_SIZE
+    );
   }
 
   const float channelCountF = static_cast<float>(channelCount);
@@ -759,28 +822,28 @@ int Cassette::updateAudioDataFromMixer(jack_ringbuffer_t* effectsChannelsSetting
     const float panL = effectsChannel->getPanL();
     const float panR = effectsChannel->getPanR();
 
-    effectsSettingsBuffer[4 * i] = AudioData::factorLL(
+    effectsChannelsSettings[4 * i] = AudioData::factorLL(
       gain, gainL, gainR,
       mute, muteL, muteR,
       solo, soloL, soloR,
       pan, panL, panR,
       channelCountF
     );
-    effectsSettingsBuffer[4 * i + 1] = AudioData::factorLR(
+    effectsChannelsSettings[4 * i + 1] = AudioData::factorLR(
       gain, gainL, gainR,
       mute, muteL, muteR,
       solo, soloL, soloR,
       pan, panL, panR,
       channelCountF
     );
-    effectsSettingsBuffer[4 * i + 2] = AudioData::factorRL(
+    effectsChannelsSettings[4 * i + 2] = AudioData::factorRL(
       gain, gainL, gainR,
       mute, muteL, muteR,
       solo, soloL, soloR,
       pan, panL, panR,
       channelCountF
     );
-    effectsSettingsBuffer[4 * i + 3] = AudioData::factorRR(
+    effectsChannelsSettings[4 * i + 3] = AudioData::factorRR(
       gain, gainL, gainR,
       mute, muteL, muteR,
       solo, soloL, soloR,
@@ -789,9 +852,9 @@ int Cassette::updateAudioDataFromMixer(jack_ringbuffer_t* effectsChannelsSetting
     );
   }
 
-  // write to ring buffer
+  // write to effectsSettings ring buffer
   if (jack_ringbuffer_write_space(effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE) {
-    jack_ringbuffer_write(effectsChannelsSettingsRB, reinterpret_cast<char*>(effectsSettingsBuffer), EffectsSettings_RB_SIZE);
+    jack_ringbuffer_write(effectsChannelsSettingsRB, reinterpret_cast<char*>(effectsChannelsSettings), EffectsSettings_RB_SIZE);
   }
 
   return 0;
@@ -810,6 +873,12 @@ int Cassette::play() {
 
   jack_ringbuffer_t* effectsChannelsSettingsRB = jack_ringbuffer_create(EffectsSettings_RB_SIZE);
   audioData.effectsChannelsSettingsRB = effectsChannelsSettingsRB;
+
+  jack_ringbuffer_t* playbackSettingsToAudioThreadRB = jack_ringbuffer_create(PlaybackSettings_RB_SIZE);
+  audioData.playbackSettingsToAudioThreadRB = playbackSettingsToAudioThreadRB;
+
+  jack_ringbuffer_t* playbackSettingsFromAudioThreadRB = jack_ringbuffer_create(PlaybackSettings_RB_SIZE);
+  audioData.playbackSettingsFromAudioThreadRB = playbackSettingsFromAudioThreadRB;
 
   while(
           audioData.playState != STOP
@@ -839,7 +908,12 @@ int Cassette::play() {
         audioData.volume += 0.01;
     }
 
-    updateAudioDataFromMixer(effectsChannelsSettingsRB, channelCount);
+    updateAudioDataFromMixer(
+      effectsChannelsSettingsRB,
+      playbackSettingsToAudioThreadRB,
+      playbackSettingsFromAudioThreadRB,
+      channelCount
+    );
 
     if ( threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
       if (audioData.fadeOut < 0.01) { // break + cleanup

@@ -34,7 +34,14 @@ struct AudioData {
                                      // eCS[4k+3] = {factorRR channel k}
     float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{};
     jack_ringbuffer_t*               effectsChannelsSettingsRB{nullptr};
-    jack_ringbuffer_data_t*          effectsChannelsSettingsReadVector[2]{nullptr, nullptr};
+    sf_count_t                       playbackSettingsToAudioThread[2]{};
+    jack_ringbuffer_t*               playbackSettingsToAudioThreadRB{nullptr};
+                                     // pSTATRB[0] = userSettingFrameId bool
+                                     // pSTATRB[1] = newFrameId sf_count_t
+    sf_count_t                       playbackSettingsFromAudioThread[2]{};
+    jack_ringbuffer_t*               playbackSettingsFromAudioThreadRB{nullptr};
+                                     // pSFATRB[0] = doneSettingFrameId bool
+                                     // pSFATRB[1] = frameId sf_count_t
     float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
 
     AudioData(
