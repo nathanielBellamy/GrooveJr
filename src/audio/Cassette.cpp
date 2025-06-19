@@ -47,8 +47,7 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
   float* buffersBPtrPre[2] = { &buffersB[0], &buffersB[MAX_AUDIO_FRAMES_PER_BUFFER] };
   buffersBPtr = buffersBPtrPre;
 
-  int audioDataRes = setupAudioData();
-  if (audioDataRes > 0) {
+  if (int audioDataRes = setupAudioData(); audioDataRes > 0) {
     Logging::write(
       Error,
       "Audio::Cassette::Cassette",
@@ -65,10 +64,7 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
     "Initialized AudioData with index: " + std::to_string(audioData.index)
   );
 
-  if (
-    const int setupJackStatus = setupJack();
-    setupJackStatus == 0
-  ) {
+  if (const int setupJackStatus = setupJack(); setupJackStatus == 0) {
     Logging::write(
       Info,
       "Audio::Cassette::Cassette",
@@ -294,6 +290,8 @@ int Cassette::setupAudioData() {
     );
     return 3;
   }
+
+  ThreadStatics::setReadCount(audioData.readCount);
 
   if (!setupInputBuffers()) {
     Logging::write(
@@ -715,6 +713,12 @@ int Cassette::updateAudioDataFromMixer(jack_ringbuffer_t* effectsChannelsSetting
   // - pass frame through a ring buffer
   mixer->getUpdateProgressBarFunc()(audioData.readCount, audioData.index);
 
+  // TODO: pass thru ring buffer
+  if (ThreadStatics::getUserSettingFrameId()) {
+    audioData.index = ThreadStatics::getFrameId();
+    ThreadStatics::setUserSettingFrameId(false);
+  }
+
   const float channelCountF = static_cast<float>(channelCount);
 
   Effects::EffectsChannel* effectsChannels[MAX_EFFECTS_CHANNELS] {nullptr};
@@ -840,28 +844,27 @@ int Cassette::play() {
     updateAudioDataFromMixer(effectsChannelsSettingsRB, channelCount);
 
     if ( threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
-        if (audioData.fadeOut < 0.01) { // break + cleanup
-            break;
-        } else { // continue fading out
-            audioData.volume -= 0.001;
-            audioData.fadeOut -= 0.001;
-        }
+      if (audioData.fadeOut < 0.01) { // break + cleanup
+          break;
+      } else { // continue fading out
+          audioData.volume -= 0.001;
+          audioData.fadeOut -= 0.001;
+      }
     } else {
-        audioData.playbackSpeed = ThreadStatics::getPlaybackSpeed();
-        audioData.playState = ThreadStatics::getPlayState();
-        ThreadStatics::setFrameId( audioData.index );
+      audioData.playbackSpeed = ThreadStatics::getPlaybackSpeed();
+      audioData.playState = ThreadStatics::getPlayState();
+      ThreadStatics::setFrameId( audioData.index );
     }
 
     std::this_thread::sleep_for( std::chrono::milliseconds(10) );
   } // end of while loop
 
   if ( threadId == ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
-      if (audioData.playState == PLAY) {
-          ThreadStatics::setPlayState(STOP);
-      } else {
-          ThreadStatics::setPlayState(audioData.playState);
-      }
-      ThreadStatics::setReadComplete(true);
+    if (audioData.playState == PLAY)
+        ThreadStatics::setPlayState(STOP);
+    else
+        ThreadStatics::setPlayState(audioData.playState);
+    ThreadStatics::setReadComplete(true);
   }
 
   if (jackClientIsActive)

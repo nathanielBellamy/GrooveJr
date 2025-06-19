@@ -10,8 +10,11 @@ namespace Audio {
 const char* ThreadStatics::filePath = "/Users/ns/Music/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac";
 std::mutex ThreadStatics::filePathMutex;
 
-long ThreadStatics::frameId = 0;
+sf_count_t ThreadStatics::frameId = 0;
 std::mutex ThreadStatics::frameIdMutex;
+
+std::atomic<bool> ThreadStatics::userSettingFrameId { false };
+std::atomic<sf_count_t> ThreadStatics::readCount { 0 };
 
 PlayState ThreadStatics::playState = STOP;
 std::mutex ThreadStatics::playStateMutex;
@@ -35,12 +38,12 @@ void ThreadStatics::setFilePath(const char* newFilePath) {
   filePath = newFilePath;
 }
 
-long ThreadStatics::getFrameId() {
+sf_count_t ThreadStatics::getFrameId() {
   std::lock_guard guard(frameIdMutex);
   return frameId;
 }
 
-void ThreadStatics::setFrameId(long newId) {
+void ThreadStatics::setFrameId(sf_count_t newId) {
   std::lock_guard guard(frameIdMutex);
   frameId = newId;
 }
@@ -99,6 +102,22 @@ long ThreadStatics::incrThreadId() {
 long ThreadStatics::getThreadId() {
   std::lock_guard guard(threadIdMutex);
   return threadId;
+}
+
+sf_count_t ThreadStatics::getReadCount() {
+  return readCount.load();
+}
+
+void ThreadStatics::setReadCount(const sf_count_t newReadCount) {
+  readCount.store(newReadCount);
+}
+
+void ThreadStatics::setUserSettingFrameId(const bool newUserSettingFrameId) {
+  userSettingFrameId.store(newUserSettingFrameId);
+}
+
+bool ThreadStatics::getUserSettingFrameId() {
+  return userSettingFrameId.load();
 }
 
 } // Audio

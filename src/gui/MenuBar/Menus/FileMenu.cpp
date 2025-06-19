@@ -10,10 +10,10 @@ namespace Gj {
 namespace Gui {
 
 FileMenu::FileMenu(actor_system& actorSystem, QWidget* parent)
-    : QMenu("&File", parent)
-    , actorSystem(actorSystem)
-    , renderAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Render"), this)
-    {
+  : QMenu("&File", parent)
+  , actorSystem(actorSystem)
+  , renderAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Render"), this)
+  {
 
   renderAction.setStatusTip(tr("Render Audio"));
 
@@ -22,7 +22,6 @@ FileMenu::FileMenu(actor_system& actorSystem, QWidget* parent)
     // TODO
     std::cout << " kOffline Render Audio " << std::endl;
   });
-
 }
 
 } // Gui

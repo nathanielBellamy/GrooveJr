@@ -23,7 +23,11 @@ EffectsMenu::EffectsMenu(actor_system& actorSystem, QWidget* parent)
 
   connect(&addEffectAction, &QAction::triggered, [&]() {
     if (vstSelect.exec() == QDialog::Accepted) {
-      std::cout << "vst selected: " << vstUrl.toDisplayString().toStdString() << std::endl;
+      Logging::write(
+        Info,
+        "Gui::EffectsMenu::addEffectAction",
+        "Selected vst: " + vstUrl.toDisplayString().toStdString()
+      );
     }
   });
 }

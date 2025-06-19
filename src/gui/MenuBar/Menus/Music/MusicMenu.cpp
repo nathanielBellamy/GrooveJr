@@ -23,7 +23,11 @@ MusicMenu::MusicMenu(actor_system& actorSystem, QWidget* parent)
 
   connect(&addFolderToLibraryAction, &QAction::triggered, [&]() {
     if (folderSelect.exec() == QDialog::Accepted) {
-      std::cout << "folder selected: " << folderUrl.toDisplayString().toStdString() << std::endl;
+      Logging::write(
+        Info,
+        "Gui::MusicMenu::addFolderToLibraryAction",
+        "Selected : " + folderUrl.toDisplayString().toStdString()
+      );
     }
   });
 }

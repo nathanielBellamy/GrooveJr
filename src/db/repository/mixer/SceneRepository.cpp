@@ -31,7 +31,6 @@ std::vector<Scene> SceneRepository::getAll() const {
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     const auto scene = Scene::deser(stmt);
-    std::cout << "Scene: id = " << scene.id << ", sceneIndex = " << scene.sceneIndex << ", name = " << scene.name << ", version = " << scene.version << std::endl;
     scenes.push_back(scene);
   }
 

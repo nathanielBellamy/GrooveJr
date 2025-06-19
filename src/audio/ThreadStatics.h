@@ -5,8 +5,10 @@
 #ifndef THREADSTATICS_H
 #define THREADSTATICS_H
 
-#include <iostream>
+#include <atomic>
 #include <mutex>
+
+#include <sndfile.h>
 
 #include "Logging.h"
 #include "../enums/PlayState.h"
@@ -15,38 +17,45 @@ namespace Gj {
 namespace Audio {
 
 class ThreadStatics {
-  private:
-    static const char* filePath;
-    static long frameId;
-    static PlayState playState;
-    static float playbackSpeed;
-    static bool readComplete;
-    static long threadId;
+  static const char* filePath;
+  static sf_count_t frameId;
+  static std::atomic<bool> userSettingFrameId;
+  static std::atomic<sf_count_t> readCount;
+  static PlayState playState;
+  static float playbackSpeed;
+  static bool readComplete;
+  static long threadId;
 
-  public:
-    static std::mutex filePathMutex;
-    static void setFilePath(const char* path);
-    static const char* getFilePath();
+public:
+  static std::mutex filePathMutex;
+  static void setFilePath(const char* path);
+  static const char* getFilePath();
 
-    static std::mutex frameIdMutex;
-    static void setFrameId(long frameId);
-    static long getFrameId();
+  static std::mutex frameIdMutex;
+  static void setFrameId(sf_count_t frameId);
+  static sf_count_t getFrameId();
 
-    static std::mutex playbackSpeedMutex;
-    static float getPlaybackSpeed();
-    static void setPlaybackSpeed(float playbackSpeed);
+  static std::mutex playbackSpeedMutex;
+  static float getPlaybackSpeed();
+  static void setPlaybackSpeed(float playbackSpeed);
 
-    static std::mutex playStateMutex;
-    static PlayState getPlayState();
-    static void setPlayState(PlayState playState);
+  static std::mutex playStateMutex;
+  static PlayState getPlayState();
+  static void setPlayState(PlayState playState);
 
-    static std::mutex readCompleteMutex;
-    static bool getReadComplete();
-    static void setReadComplete(bool readComplete);
+  static std::mutex readCompleteMutex;
+  static bool getReadComplete();
+  static void setReadComplete(bool readComplete);
 
-    static std::mutex threadIdMutex;
-    static long incrThreadId();
-    static long getThreadId();
+  static std::mutex threadIdMutex;
+  static long incrThreadId();
+  static long getThreadId();
+
+  static void setReadCount(const sf_count_t newReadCount);
+  static sf_count_t getReadCount();
+
+  static void setUserSettingFrameId(bool newUserSettingFrameId);
+  static bool getUserSettingFrameId();
 };
 
 } // Act

@@ -5,8 +5,6 @@
 #ifndef MUSICMENU_H
 #define MUSICMENU_H
 
-#include <iostream>
-
 #include "caf/actor_from_state.hpp"
 #include "caf/actor_ostream.hpp"
 #include "caf/actor_registry.hpp"
@@ -21,6 +19,8 @@
 #include <QList>
 #include <QUrl>
 #include <QString>
+
+#include "../../../../Logging.h"
 
 #include "./FolderSelect.h"
 
