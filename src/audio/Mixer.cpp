@@ -482,5 +482,11 @@ int Mixer::saveScene() const {
   return sceneId;
 }
 
+Result Mixer::setFrameIdFromPercent(const float percent) {
+  // TODO
+  // ThreadStatics::setFrameId(percent * readCount);
+  return OK;
+}
+
 } // Audio
 } // Gj

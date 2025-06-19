@@ -6,6 +6,8 @@
 #define PROGRESSBAR_H
 
 #include <sndfile.hh>
+
+#include <QMouseEvent>
 #include <QRect>
 #include <QPainter>
 #include <QPaintEvent>
@@ -32,6 +34,8 @@ class ProgressBar final : public QWidget {
 
     void setStyle();
     void paintEvent(QPaintEvent *event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+
 
 };
 

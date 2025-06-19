@@ -44,6 +44,11 @@ void ProgressBar::paintEvent(QPaintEvent* event) {
   painter.end();
 }
 
+void ProgressBar::mousePressEvent(QMouseEvent* event) {
+  const float x = static_cast<float>(event->position().x());
+  const float percent = 100.0f * x / static_cast<float>(width());
+  mixer->setFrameIdFromPercent(percent);
+}
 
 } // Gui
 } // Gj

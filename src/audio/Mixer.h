@@ -24,19 +24,20 @@
 #include "./effects/EffectsChannel.h"
 #include "../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
 #include "effects/vst3/Util.h"
+#include "ThreadStatics.h"
 
 namespace Gj {
 namespace Audio {
 
 class Mixer {
-    AppState* gAppState;
-    Db::Dao* dao;
-    std::shared_ptr<JackClient> jackClient;
-    float channelCount;
-    std::vector<Effects::EffectsChannel*> effectsChannels;
-    std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
+  AppState* gAppState;
+  Db::Dao* dao;
+  std::shared_ptr<JackClient> jackClient;
+  float channelCount;
+  std::vector<Effects::EffectsChannel*> effectsChannels;
+  std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
 
-    void incorporateLatencySamples(int latencySamples) const;
+  void incorporateLatencySamples(int latencySamples) const;
 
 public:
   explicit Mixer(AppState*, Db::Dao*);
@@ -102,7 +103,7 @@ public:
   int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);
   int setEffects(const std::vector<Db::Effect>& effects) const;
   int saveScene() const;
-
+  static Result setFrameIdFromPercent(float percent) ;
 };
 
 } // Audio
