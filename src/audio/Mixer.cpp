@@ -489,7 +489,7 @@ Result Mixer::setFrameIdFromPercent(const float percent, const sf_count_t totalF
     "User setting frameId from percent."
   );
 
-  const auto newFrameId = static_cast<long>(std::floor(percent * static_cast<float>(totalFrames)));
+  const auto newFrameId = static_cast<long>(std::floor(percent * static_cast<float>(totalFrames) / 2.0f));
 
   Logging::write(
     Info,

@@ -37,7 +37,7 @@ void ProgressBar::setStyle() {
 }
 
 void ProgressBar::paintEvent(QPaintEvent* event) {
-  const float progress = (static_cast<float>(frame) / static_cast<float>(totalFrames)) * width();
+  const float progress = (static_cast<float>(frame) / (static_cast<float>(totalFrames) / 2.0f)) * width();
   painter.begin(this);
   painter.setPen(pen);
   painter.fillRect(0, 0, progress, height(), Qt::white);
