@@ -40,7 +40,7 @@ struct AudioData {
                                      // pSTATRB[1] = newFrameId sf_count_t
     sf_count_t                       playbackSettingsFromAudioThread[2]{};
     jack_ringbuffer_t*               playbackSettingsFromAudioThreadRB{nullptr};
-                                     // pSFATRB[0] = doneSettingFrameId bool
+                                     // pSFATRB[0] = unused
                                      // pSFATRB[1] = frameId sf_count_t
     float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
 

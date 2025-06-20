@@ -159,21 +159,17 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   // retrieve AudioData
   const auto audioData = static_cast<AudioData*>(arg);
 
-  // // read playbackSettingsToAudioThreadRingBuffer
-  // if (jack_ringbuffer_read_space(audioData->playbackSettingsToAudioThreadRB) >= PlaybackSettings_RB_SIZE) {
-  //   jack_ringbuffer_read(
-  //     audioData->playbackSettingsToAudioThreadRB,
-  //     reinterpret_cast<char*>(audioData->playbackSettingsToAudioThread),
-  //     PlaybackSettings_RB_SIZE
-  //   );
-  // }
-  //
-  // if (audioData->playbackSettingsToAudioThread[0] == 1) { // user set frame Id
-  //   audioData->index = audioData->playbackSettingsToAudioThread[1];
-  //   audioData->playbackSettingsFromAudioThread[0] = 1; // done setting frameId
-  // } else {
-  //   audioData->playbackSettingsFromAudioThread[0] = 0;
-  // }
+  // read playbackSettingsToAudioThreadRingBuffer
+  if (jack_ringbuffer_read_space(audioData->playbackSettingsToAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
+    jack_ringbuffer_read(
+      audioData->playbackSettingsToAudioThreadRB,
+      reinterpret_cast<char*>(audioData->playbackSettingsToAudioThread),
+      PlaybackSettings_RB_SIZE
+    );
+  }
+
+  if (audioData->playbackSettingsToAudioThread[0] == 1) // user set frame Id
+    audioData->index = audioData->playbackSettingsToAudioThread[1];
 
   const sf_count_t audioDataIndex = audioData->index;
 
@@ -755,10 +751,10 @@ int Cassette::updateAudioDataFromMixer(
   const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
   mixer->getUpdateProgressBarFunc()(audioData.readCount, currentFrameId);
 
-  if (playbackSettingsFromAudioThread[0] == 1) { // done setting frameId
+  // if (playbackSettingsFromAudioThread[0] == 1) { // done setting frameId
     playbackSettingsToAudioThread[0] = 0;
     playbackSettingsToAudioThread[1] = 0;
-  }
+  // }
 
   if (ThreadStatics::getUserSettingFrameId()) {
     const sf_count_t newFrameId = ThreadStatics::getFrameId();
@@ -769,7 +765,7 @@ int Cassette::updateAudioDataFromMixer(
   }
 
   // write to playbackSettingsToAudioThread ring buffer
-  if (jack_ringbuffer_write_space(playbackSettingsToAudioThreadRB) >= PlaybackSettings_RB_SIZE) {
+  if (jack_ringbuffer_write_space(playbackSettingsToAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
     jack_ringbuffer_write(
       playbackSettingsToAudioThreadRB,
       reinterpret_cast<char*>(playbackSettingsToAudioThread),
