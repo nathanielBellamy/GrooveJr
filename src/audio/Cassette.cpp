@@ -12,7 +12,6 @@ jack_port_t* outPortR;
 
 constexpr size_t EffectsSettings_RB_SIZE = 2 * MAX_EFFECTS_CHANNELS * sizeof(float);
 constexpr size_t PlaybackSettings_RB_SIZE = 2 * sizeof(sf_count_t);
-  // PlaybackSettings: [frameId,
 
 Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
   : actorSystem(actorSystem)
@@ -182,7 +181,7 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   audioData->playbackSettingsFromAudioThread[1] = audioData->index;
 
   // write to playbackSettingsFromAudioThread ring buffer
-  if (jack_ringbuffer_write_space(audioData->playbackSettingsFromAudioThreadRB) >= PlaybackSettings_RB_SIZE) {
+  if (jack_ringbuffer_write_space(audioData->playbackSettingsFromAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
     jack_ringbuffer_write(
       audioData->playbackSettingsFromAudioThreadRB,
       reinterpret_cast<char*>(audioData->playbackSettingsFromAudioThread),
@@ -745,7 +744,7 @@ int Cassette::updateAudioDataFromMixer(
   ) {
 
   // read playbackSettingsFromAudioThread ring buffer
-  if (jack_ringbuffer_read_space(playbackSettingsFromAudioThreadRB) >= PlaybackSettings_RB_SIZE) {
+  if (jack_ringbuffer_read_space(playbackSettingsFromAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
     jack_ringbuffer_read(
       playbackSettingsFromAudioThreadRB,
       reinterpret_cast<char*>(playbackSettingsFromAudioThread),
@@ -756,7 +755,6 @@ int Cassette::updateAudioDataFromMixer(
   const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
   mixer->getUpdateProgressBarFunc()(audioData.readCount, currentFrameId);
 
-  std::cout << " ps from at: " << playbackSettingsFromAudioThread[0] << " --- " << playbackSettingsFromAudioThread[1] << std::endl;
   if (playbackSettingsFromAudioThread[0] == 1) { // done setting frameId
     playbackSettingsToAudioThread[0] = 0;
     playbackSettingsToAudioThread[1] = 0;
@@ -770,7 +768,6 @@ int Cassette::updateAudioDataFromMixer(
     ThreadStatics::setUserSettingFrameId(false);
   }
 
-  // std::cout << "ps to at: " << playbackSettingsToAudioThread[0] << " --- " << playbackSettingsToAudioThread[1] << std::endl;
   // write to playbackSettingsToAudioThread ring buffer
   if (jack_ringbuffer_write_space(playbackSettingsToAudioThreadRB) >= PlaybackSettings_RB_SIZE) {
     jack_ringbuffer_write(
