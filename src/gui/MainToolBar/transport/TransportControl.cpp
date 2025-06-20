@@ -33,6 +33,7 @@ int TransportControl::hydrateState(const AppStatePacket& appStatePacket) {
     "Received app state with playState - " + std::to_string(appStatePacket.playState)
   );
 
+  progressBar.hydrateState(appStatePacket);
   setPlayState(intToPs(appStatePacket.playState));
   return 0;
 }

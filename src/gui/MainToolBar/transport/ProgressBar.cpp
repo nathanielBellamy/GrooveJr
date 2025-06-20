@@ -51,5 +51,11 @@ void ProgressBar::mousePressEvent(QMouseEvent* event) {
   mixer->setFrameIdFromPercent(percent, totalFrames);
 }
 
+int ProgressBar::hydrateState(const AppStatePacket &appStatePacket) {
+  if (appStatePacket.playState == STOP)
+    updateProgressBar(1, 0);
+}
+
+
 } // Gui
 } // Gj

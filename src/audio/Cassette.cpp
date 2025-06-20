@@ -937,6 +937,9 @@ int Cassette::play() {
 
   jackClientIsActive = false;
 
+  if (ThreadStatics::getPlayState() == STOP)
+    mixer->getUpdateProgressBarFunc()(audioData.readCount, 0);
+
   return 0;
 };
 

@@ -499,6 +499,10 @@ Result Mixer::setFrameIdFromPercent(const float percent, const sf_count_t totalF
 
   ThreadStatics::setFrameId(newFrameId);
   ThreadStatics::setUserSettingFrameId(true);
+
+  // TODO: bring back ThreadStatics::ReadCount
+  // - pass it here to updateProgressBarFunc
+  // - update progress bar not during playback
   return OK;
 }
 
