@@ -62,7 +62,7 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
   Logging::write(
     Info,
     "Audio::Cassette::Cassette",
-    "Initialized AudioData with index: " + std::to_string(audioData.index)
+    "Initialized AudioData with frameId: " + std::to_string(audioData.frameId)
   );
 
   if (const int setupJackStatus = setupJack(); setupJackStatus == 0) {
@@ -169,12 +169,12 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
   }
 
   if (audioData->playbackSettingsToAudioThread[0] == 1) // user set frame Id
-    audioData->index = audioData->playbackSettingsToAudioThread[1];
+    audioData->frameId = audioData->playbackSettingsToAudioThread[1];
 
-  const sf_count_t audioDataIndex = audioData->index;
+  const sf_count_t audioDataIndex = audioData->frameId;
 
   audioData->playbackSettingsFromAudioThread[0] = 0;
-  audioData->playbackSettingsFromAudioThread[1] = audioData->index;
+  audioData->playbackSettingsFromAudioThread[1] = audioData->frameId;
 
   // write to playbackSettingsFromAudioThread ring buffer
   if (jack_ringbuffer_write_space(audioData->playbackSettingsFromAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
@@ -262,7 +262,7 @@ int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
     outR[i] = factorLR * audioData->mainOutBuffers[0][i] + factorRR * audioData->mainOutBuffers[1][i];
   }
 
-  audioData->index += nframes;
+  audioData->frameId += nframes;
   return 0;
 }
 
@@ -352,8 +352,8 @@ int Cassette::setupAudioData() {
   audioData.inputBuffers[0] = inputBuffers[0];
   audioData.inputBuffers[1] = inputBuffers[1];
 
-  audioData.inputBuffersProcessHead[0] = inputBuffers[0] + audioData.index;
-  audioData.inputBuffersProcessHead[1] = inputBuffers[1] + audioData.index;
+  audioData.inputBuffersProcessHead[0] = inputBuffers[0] + audioData.frameId;
+  audioData.inputBuffersProcessHead[1] = inputBuffers[1] + audioData.frameId;
 
   audioData.mainInBuffers[0] = buffersAPtr[0];
   audioData.mainInBuffers[1] = buffersAPtr[1];
@@ -878,8 +878,8 @@ int Cassette::play() {
   while(
           audioData.playState != STOP
             && audioData.playState != PAUSE
-            && audioData.index > -1
-            && audioData.index < sfInfo.frames
+            && audioData.frameId > -1
+            && audioData.frameId < sfInfo.frames
   ) {
     // hold thread open until stopped
 
@@ -920,7 +920,7 @@ int Cassette::play() {
     } else {
       audioData.playbackSpeed = ThreadStatics::getPlaybackSpeed();
       audioData.playState = ThreadStatics::getPlayState();
-      ThreadStatics::setFrameId( audioData.index );
+      ThreadStatics::setFrameId( audioData.frameId );
     }
 
     std::this_thread::sleep_for( std::chrono::milliseconds(10) );

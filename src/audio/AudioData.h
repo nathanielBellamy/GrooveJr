@@ -14,7 +14,7 @@ namespace Audio {
 
 struct AudioData {
     sf_count_t                       readCount;
-    sf_count_t                       index;
+    sf_count_t                       frameId;
     PlayState                        playState;
     float                            playbackSpeed;
     bool                             readComplete;
@@ -45,12 +45,12 @@ struct AudioData {
     float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
 
     AudioData(
-      const sf_count_t index,
+      const sf_count_t frameId,
       const PlayState playState,
       const float playbackSpeed,
       const float channelCount,
       const int effectsChannelCount)
-        : index(index)
+        : frameId(frameId)
         , playState(playState)
         , playbackSpeed(playbackSpeed)
         , readComplete(false)
