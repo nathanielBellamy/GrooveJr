@@ -482,27 +482,16 @@ int Mixer::saveScene() const {
   return sceneId;
 }
 
-Result Mixer::setFrameIdFromPercent(const float percent, const sf_count_t totalFrames) {
+Result Mixer::setFrameId(const sf_count_t frameId) {
   Logging::write(
     Info,
     "Audio::Mixer::setFramePercent",
-    "User setting frameId from percent."
+    "Setting frameId: " + std::to_string(frameId)
   );
 
-  const auto newFrameId = static_cast<long>(std::floor(percent * static_cast<float>(totalFrames) / 2.0f));
-
-  Logging::write(
-    Info,
-    "Audio::Mixer::setFramePercent",
-    "Setting percent: " + std::to_string(percent) + " to frameId: " + std::to_string(newFrameId)
-  );
-
-  ThreadStatics::setFrameId(newFrameId);
+  ThreadStatics::setFrameId(frameId);
   ThreadStatics::setUserSettingFrameId(true);
 
-  // TODO: bring back ThreadStatics::ReadCount
-  // - pass it here to updateProgressBarFunc
-  // - update progress bar not during playback
   return OK;
 }
 

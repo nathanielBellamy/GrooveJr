@@ -8,10 +8,10 @@
 namespace Gj {
 namespace Gui {
 
-ProgressBar::ProgressBar(QWidget* parent, Audio::Mixer* mixer, sf_count_t frame)
+ProgressBar::ProgressBar(QWidget* parent, Audio::Mixer* mixer, const sf_count_t frameId)
   : QWidget(parent)
   , totalFrames(1)
-  , frame(frame)
+  , frameId(frameId)
   , mixer(mixer)
   , painter(this)
   , pen(Qt::NoPen)
@@ -24,9 +24,9 @@ ProgressBar::ProgressBar(QWidget* parent, Audio::Mixer* mixer, sf_count_t frame)
   setStyle();
 }
 
-void ProgressBar::updateProgressBar(const sf_count_t readCount, const sf_count_t newFrame) {
+void ProgressBar::updateProgressBar(const sf_count_t readCount, const sf_count_t newFrameId) {
   totalFrames = readCount;
-  frame = newFrame;
+  frameId = newFrameId;
   update();
 }
 
@@ -37,7 +37,7 @@ void ProgressBar::setStyle() {
 }
 
 void ProgressBar::paintEvent(QPaintEvent* event) {
-  const float progress = (static_cast<float>(frame) / (static_cast<float>(totalFrames) / 2.0f)) * width();
+  const float progress = (static_cast<float>(frameId) / (static_cast<float>(totalFrames) / 2.0f)) * width();
   painter.begin(this);
   painter.setPen(pen);
   painter.fillRect(0, 0, progress, height(), Qt::white);
@@ -48,14 +48,15 @@ void ProgressBar::mousePressEvent(QMouseEvent* event) {
   const float x = static_cast<float>(event->position().x());
   const float percent = x / static_cast<float>(width());
 
-  mixer->setFrameIdFromPercent(percent, totalFrames);
+  frameId = static_cast<sf_count_t>(std::floor(percent * static_cast<float>(totalFrames) / 2.0f));
+  mixer->setFrameId(frameId);
+  update();
 }
 
 int ProgressBar::hydrateState(const AppStatePacket &appStatePacket) {
   if (appStatePacket.playState == STOP)
     updateProgressBar(1, 0);
 }
-
 
 } // Gui
 } // Gj

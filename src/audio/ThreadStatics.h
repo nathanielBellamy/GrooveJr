@@ -53,6 +53,9 @@ public:
 
   static void setUserSettingFrameId(bool newUserSettingFrameId);
   static bool getUserSettingFrameId();
+
+  static sf_count_t getReadCount();
+  static void setReadCount(sf_count_t readCount);
 };
 
 } // Act

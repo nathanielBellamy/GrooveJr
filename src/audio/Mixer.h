@@ -103,7 +103,7 @@ public:
   int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);
   int setEffects(const std::vector<Db::Effect>& effects) const;
   int saveScene() const;
-  static Result setFrameIdFromPercent(float percent, sf_count_t totalFrames) ;
+  static Result setFrameId(sf_count_t frameId);
 };
 
 } // Audio
