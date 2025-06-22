@@ -26,58 +26,71 @@ using namespace Steinberg::Vst;
 //  jack Client
 //------------------------------------------------------------------------
 class JackClient final : public IMediaServer {
-
 public:
-//--------------------------------------------------------------------
-	using JackPorts = std::vector<jack_port_t*>;
-	using JackName = std::string;
+  //--------------------------------------------------------------------
+  using JackPorts = std::vector<jack_port_t *>;
+  using JackName = std::string;
 
-	JackClient () = default;
-	~JackClient () override;
+  JackClient() = default;
 
-	[[nodiscard]]
-	jack_client_t* getJackClient() const {
-		return jackClient;
-	}
+  ~JackClient() override;
 
-	// IMediaServer interface
-	bool registerAudioClient (IAudioClient* client) override;
-	bool registerMidiClient (IMidiClient* client) override;
+  [[nodiscard]]
+  jack_client_t *getJackClient() const {
+    return jackClient;
+  }
 
-	bool initialize (JackName name);
-	int setup(AudioData* audioData) const;
-	[[nodiscard]] Result deactivate() const;
+  // IMediaServer interface
+  bool registerAudioClient(IAudioClient *client) override;
 
-	// jack process callback
-	int process (jack_nframes_t nframes); // example
-  static int processCallback(jack_nframes_t nframes, void* arg);
+  bool registerMidiClient(IMidiClient *client) override;
 
-//--------------------------------------------------------------------
+  bool initialize(JackName name);
+
+  int setup(AudioData *audioData) const;
+
+  [[nodiscard]] Result deactivate() const;
+
+  // jack process callback
+  int process(jack_nframes_t nframes); // example
+  static int processCallback(jack_nframes_t nframes, void *arg);
+
+  //--------------------------------------------------------------------
 private:
-	jack_client_t* registerClient (JackName name);
-	bool registerAudioPorts (IAudioClient* processor);
-	bool registerMidiPorts (IMidiClient* processor);
-	bool addAudioOutputPort (JackName name);
-	bool addAudioInputPort (JackName name);
-	bool addMidiInputPort (JackName name);
-	int processMidi (jack_nframes_t nframes);
-	bool setupJackProcessCallbacks (jack_client_t* client);
-	bool autoConnectAudioPorts (jack_client_t* client);
-	bool autoConnectMidiPorts (jack_client_t* client);
-	void updateAudioBuffers (jack_nframes_t nframes);
+  jack_client_t *registerClient(JackName name);
 
-	// Jack objects
-	jack_client_t* jackClient = nullptr;
-	JackPorts audioOutputPorts;
-	JackPorts audioInputPorts;
-	JackPorts midiInputPorts;
+  bool registerAudioPorts(IAudioClient *processor);
 
-	IAudioClient* audioClient = nullptr;
-	IMidiClient* midiClient = nullptr;
-	using BufferPointers = std::vector<jack_default_audio_sample_t*>;
-	BufferPointers audioOutputPointers;
-	BufferPointers audioInputPointers;
-	IAudioClient::Buffers buffers {nullptr};
+  bool registerMidiPorts(IMidiClient *processor);
+
+  bool addAudioOutputPort(JackName name);
+
+  bool addAudioInputPort(JackName name);
+
+  bool addMidiInputPort(JackName name);
+
+  int processMidi(jack_nframes_t nframes);
+
+  bool setupJackProcessCallbacks(jack_client_t *client);
+
+  bool autoConnectAudioPorts(jack_client_t *client);
+
+  bool autoConnectMidiPorts(jack_client_t *client);
+
+  void updateAudioBuffers(jack_nframes_t nframes);
+
+  // Jack objects
+  jack_client_t *jackClient = nullptr;
+  JackPorts audioOutputPorts;
+  JackPorts audioInputPorts;
+  JackPorts midiInputPorts;
+
+  IAudioClient *audioClient = nullptr;
+  IMidiClient *midiClient = nullptr;
+  using BufferPointers = std::vector<jack_default_audio_sample_t *>;
+  BufferPointers audioOutputPointers;
+  BufferPointers audioInputPointers;
+  IAudioClient::Buffers buffers{nullptr};
 };
 
 } // Audio
