@@ -510,6 +510,8 @@ int Cassette::updateAudioDataFromMixer(
     );
   }
 
+  std::cout << " readCount " << audioData.readCount << "  frameId " << playbackSettingsFromAudioThread[1] << " outL[0] " << playbackSettingsFromAudioThread[0]  << std::endl;
+
   const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
   mixer->getUpdateProgressBarFunc()(audioData.readCount, currentFrameId);
 
@@ -658,10 +660,10 @@ int Cassette::play() {
         break;
     }
 
-    if (audioData.fadeIn > 0.01) {
-        audioData.fadeIn -= 0.01;
-        audioData.volume += 0.01;
-    }
+    // if (audioData.fadeIn > 0.01) {
+    //     audioData.fadeIn -= 0.01;
+    //     audioData.volume += 0.01;
+    // }
 
     updateAudioDataFromMixer(
       effectsChannelsSettingsRB,
@@ -671,12 +673,12 @@ int Cassette::play() {
     );
 
     if ( threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
-      if (audioData.fadeOut < 0.01) { // break + cleanup
-          break;
-      } else { // continue fading out
-          audioData.volume -= 0.001;
-          audioData.fadeOut -= 0.001;
-      }
+      // if (audioData.fadeOut < 0.01) { // break + cleanup
+      //     break;
+      // } else { // continue fading out
+      //     audioData.volume -= 0.001;
+      //     audioData.fadeOut -= 0.001;
+      // }
     } else {
       audioData.playbackSpeed = ThreadStatics::getPlaybackSpeed();
       audioData.playState = ThreadStatics::getPlayState();
@@ -694,8 +696,15 @@ int Cassette::play() {
     ThreadStatics::setReadComplete(true);
   }
 
-  if (jackClientIsActive)
-    jackClient->deactivate();
+  if (jackClientIsActive) {
+    if (jackClient->deactivate() != OK) {
+      Logging::write(
+        Error,
+        "Audio::Cassette::play",
+        "An error occurred deactivating the JackClient"
+      );
+    }
+  }
 
   jackClientIsActive = false;
 

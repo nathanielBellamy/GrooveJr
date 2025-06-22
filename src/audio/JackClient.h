@@ -25,7 +25,7 @@ using namespace Steinberg::Vst;
 //------------------------------------------------------------------------
 //  jack Client
 //------------------------------------------------------------------------
-class JackClient : public IMediaServer {
+class JackClient final : public IMediaServer {
 
 public:
 //--------------------------------------------------------------------
@@ -46,7 +46,7 @@ public:
 
 	bool initialize (JackName name);
 	int setup(AudioData* audioData) const;
-	Result deactivate() const;
+	[[nodiscard]] Result deactivate() const;
 
 	// jack process callback
 	int process (jack_nframes_t nframes); // example
