@@ -150,6 +150,7 @@ int Cassette::setupAudioData() {
   // > When opening a file for read, the format field should be set to zero before calling sf_open().
   sfInfo.format = 0;
   file = sf_open(fileName, SFM_READ, &sfInfo);
+
   if (file == nullptr) {
     Logging::write(
       Error,
@@ -436,7 +437,7 @@ bool Cassette::populateInputBuffers() const {
   }
 
   // de-interlace audio into shared input buffers
-  for (int i = 0; i < sfInfo.frames / 2; i++) {
+  for (int i = 0; i < sfInfo.frames; i++) {
     inputBuffers[0][i] = buffer[2 * i];
     inputBuffers[1][i] = buffer[2 * i + 1];
   }
@@ -509,8 +510,6 @@ int Cassette::updateAudioDataFromMixer(
       PlaybackSettings_RB_SIZE
     );
   }
-
-  std::cout << " readCount " << audioData.readCount << "  frameId " << playbackSettingsFromAudioThread[1] << " outL[0] " << playbackSettingsFromAudioThread[0]  << std::endl;
 
   const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
   mixer->getUpdateProgressBarFunc()(audioData.readCount, currentFrameId);

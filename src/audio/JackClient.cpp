@@ -381,7 +381,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
 
   const sf_count_t audioDataIndex = audioData->frameId;
 
-  audioData->playbackSettingsFromAudioThread[0] = static_cast<sf_count_t>(100.0f * outL[0]);
+  audioData->playbackSettingsFromAudioThread[0] = 0; // debug value
   audioData->playbackSettingsFromAudioThread[1] = audioData->frameId;
 
   // write to playbackSettingsFromAudioThread ring buffer
@@ -448,6 +448,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
       }
     }
   }
+
 
   // process summed down mix through main effects
   auto [effectCount, processFuncs, buffers] = audioData->effectsChannelsProcessData[0];
