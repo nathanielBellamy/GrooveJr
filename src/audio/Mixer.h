@@ -44,8 +44,8 @@ public:
   ~Mixer();
 
   [[nodiscard]]
-  jack_client_t* getJackClient() const {
-    return jackClient.get()->getJackClient();
+  std::shared_ptr<JackClient> getGjJackClient() const {
+    return jackClient;
   };
 
   [[nodiscard]]

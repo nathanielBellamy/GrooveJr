@@ -49,6 +49,9 @@ static const int kJackSuccess = 0;
 namespace Gj {
 namespace Audio {
 
+jack_port_t* outPortL;
+jack_port_t* outPortR;
+
 using namespace Steinberg;
 
 //------------------------------------------------------------------------
@@ -183,6 +186,130 @@ bool JackClient::initialize (JackClient::JackName name)
 	return true;
 }
 
+int JackClient::setup(AudioData* audioData) const {
+  const int setProcessStatus = jack_set_process_callback(
+    jackClient,
+    &JackClient::processCallback,
+    audioData
+  );
+  if ( setProcessStatus == 0) {
+    Logging::write(
+      Info,
+      "Audio::JackClient::setup",
+      "Set Jack process callback"
+    );
+  } else {
+    Logging::write(
+      Error,
+      "Audio::JackClient::setup",
+      "Unable to set process callback - status: " + std::to_string(setProcessStatus)
+    );
+    return 1;
+  }
+
+  if (outPortL == nullptr) {
+      outPortL = jack_port_register(
+        jackClient,
+        "out_port_L",
+        JACK_DEFAULT_AUDIO_TYPE,
+        JackPortIsOutput,
+        0
+      );
+  }
+
+  if (outPortL == nullptr) {
+    Logging::write(
+      Error,
+      "Audio::JackClient::setup",
+      "Unable to create Jack outPortL"
+    );
+    return 2;
+  }
+
+  if (outPortR == nullptr) {
+    outPortR = jack_port_register(
+      jackClient,
+      "out_port_R",
+      JACK_DEFAULT_AUDIO_TYPE,
+      JackPortIsOutput,
+      0
+    );
+  }
+  if (outPortR == nullptr) {
+    Logging::write(
+      Error,
+      "Audio::JackClient::setup",
+      "Unable to create Jack outPortR"
+    );
+    return 3;
+  }
+
+  if (const int jackActivateStatus = jack_activate(jackClient); jackActivateStatus == 0) {
+    Logging::write(
+      Info,
+      "Audio::JackClient::setup",
+      "Jack activated successfully"
+    );
+  } else {
+    Logging::write(
+      Error,
+      "Audio::JackClient::setup",
+      "Unable to activate jack - status: " + std::to_string(jackActivateStatus)
+    );
+    return 4;
+  }
+
+  if (
+    const int connectStatusL = jack_connect(jackClient, jack_port_name(outPortL), "system:playback_1");
+    connectStatusL != 0
+  ) {
+    Logging::write(
+      Error,
+      "Audio::JackClient::setup",
+      "Unable to connect out_port_L - status: " + std::to_string(connectStatusL)
+    );
+    return 5;
+  }
+
+  if (
+    const int connectStatusR = jack_connect(jackClient, jack_port_name(outPortR), "system:playback_2");
+    connectStatusR != 0
+  ) {
+      Logging::write(
+        Error,
+        "Audio::JackClient::setup",
+        "Unable to connect out_port_R - status: " + std::to_string(connectStatusR)
+      );
+      return 6;
+  }
+
+  // TESTING SHOW PORTS
+  // const char** ports = jack_get_ports(jackClient, nullptr, nullptr, 0);
+  // if (ports == nullptr) {
+  //   printf("No ports found.\n");
+  // } else {
+  //   for (int i = 0; ports[i] != nullptr; i++) {
+  //     printf("Port: %s\n", ports[i]);
+  //   }
+  // }
+  // TESTING SHOW PORTS
+
+  return 0;
+}
+
+Result JackClient::deactivate() const {
+	if (const auto jackDeactivateStatus = jack_deactivate(jackClient); jackDeactivateStatus != 0) {
+		Logging::write(
+			Error,
+			"Audio::JackClient::deactivate",
+			"Unable to deactivate JackClient. Status: " + std::to_string(jackDeactivateStatus)
+		);
+		return ERROR;
+	} else {
+		return OK;
+	}
+}
+
 //------------------------------------------------------------------------
 void JackClient::updateAudioBuffers (jack_nframes_t nframes)
 {
@@ -223,6 +350,128 @@ int JackClient::process (jack_nframes_t nframes)
 	}
 
 	return kJackSuccess;
+}
+
+// jack process callback
+// do not allocate/free memory within this method
+// as it may be called at system-interrupt level
+int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
+  // get port buffers
+  auto* outL = static_cast<jack_default_audio_sample_t*>(
+    jack_port_get_buffer(outPortL, nframes)
+  );
+  auto* outR = static_cast<jack_default_audio_sample_t*>(
+    jack_port_get_buffer(outPortR, nframes)
+  );
+
+  // retrieve AudioData
+  const auto audioData = static_cast<AudioData*>(arg);
+
+  // read playbackSettingsToAudioThreadRingBuffer
+  if (jack_ringbuffer_read_space(audioData->playbackSettingsToAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
+    jack_ringbuffer_read(
+      audioData->playbackSettingsToAudioThreadRB,
+      reinterpret_cast<char*>(audioData->playbackSettingsToAudioThread),
+      PlaybackSettings_RB_SIZE
+    );
+  }
+
+  if (audioData->playbackSettingsToAudioThread[0] == 1) // user set frame Id
+    audioData->frameId = audioData->playbackSettingsToAudioThread[1];
+
+  const sf_count_t audioDataIndex = audioData->frameId;
+
+  audioData->playbackSettingsFromAudioThread[0] = 0;
+  audioData->playbackSettingsFromAudioThread[1] = audioData->frameId;
+
+  // write to playbackSettingsFromAudioThread ring buffer
+  if (jack_ringbuffer_write_space(audioData->playbackSettingsFromAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
+    jack_ringbuffer_write(
+      audioData->playbackSettingsFromAudioThreadRB,
+      reinterpret_cast<char*>(audioData->playbackSettingsFromAudioThread),
+      PlaybackSettings_RB_SIZE
+    );
+  }
+
+  // update process head
+  audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioDataIndex;
+  audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioDataIndex;
+  float** processHead = audioData->inputBuffersProcessHead;
+
+  // process effects channels
+  // main channel is effectsChannelIdx 0
+  for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
+    auto [effectCount, processFuncs, buffers] = audioData->effectsChannelsProcessData[effectsChannelIdx];
+    for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
+      if (pluginIdx == 0) {
+        buffers[pluginIdx].inputs = processHead;
+      }
+      buffers[pluginIdx].numSamples = nframes;
+
+      processFuncs[pluginIdx](
+        buffers[pluginIdx],
+        nframes
+      );
+    }
+  }
+
+  // read channel settings from ringbuffer
+  jack_ringbuffer_t* ringBuffer = audioData->effectsChannelsSettingsRB;
+  if (jack_ringbuffer_read_space(ringBuffer) >= EffectsSettings_RB_SIZE) {
+    jack_ringbuffer_read(ringBuffer, reinterpret_cast<char*>(audioData->effectsChannelsSettings), EffectsSettings_RB_SIZE);
+  }
+
+  // sum down into mainInBuffers
+  for (int i = 0; i < nframes; i++) {
+    for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
+      const float factorLL = audioData->effectsChannelsSettings[4 * effectsChannelIdx];
+      const float factorLR = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 1];
+      const float factorRL = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 2];
+      const float factorRR = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 3];
+
+      if (effectsChannelIdx == 1) {
+        if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
+          audioData->mainInBuffers[0][i] = factorLL * processHead[0][i] + factorRL * processHead[1][i];
+          audioData->mainInBuffers[1][i] = factorLR * processHead[0][i] + factorRR * processHead[1][i];
+        } else {
+          audioData->mainInBuffers[0][i] = factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+          audioData->mainInBuffers[1][i] = factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+        }
+      } else {
+        if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
+          audioData->mainInBuffers[0][i] += factorLL * processHead[0][i] + factorRL * processHead[1][i];
+          audioData->mainInBuffers[1][i] += factorLR * processHead[0][i] + factorRR * processHead[1][i];
+        } else {
+          audioData->mainInBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+          audioData->mainInBuffers[1][i] += factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+        }
+      }
+    }
+  }
+
+  // process summed down mix through main effects
+  auto [effectCount, processFuncs, buffers] = audioData->effectsChannelsProcessData[0];
+  for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
+    buffers[pluginIdx].numSamples = nframes;
+
+    processFuncs[pluginIdx](
+      buffers[pluginIdx],
+      nframes
+    );
+  }
+
+  // write out processed main channel to audio out
+  const float factorLL = audioData->effectsChannelsSettings[0];
+  const float factorLR = audioData->effectsChannelsSettings[1];
+  const float factorRL = audioData->effectsChannelsSettings[2];
+  const float factorRR = audioData->effectsChannelsSettings[3];
+  for (int i = 0; i < nframes; i++) {
+    outL[i] = factorLL * audioData->mainOutBuffers[0][i] + factorRL * audioData->mainOutBuffers[1][i];
+    outR[i] = factorLR * audioData->mainOutBuffers[0][i] + factorRR * audioData->mainOutBuffers[1][i];
+  }
+
+  audioData->frameId += nframes;
+  return 0;
 }
 
 //------------------------------------------------------------------------

@@ -7,19 +7,13 @@ using namespace caf;
 namespace Gj {
 namespace Audio {
 
-jack_port_t* outPortL;
-jack_port_t* outPortR;
-
-constexpr size_t EffectsSettings_RB_SIZE = 2 * MAX_EFFECTS_CHANNELS * sizeof(float);
-constexpr size_t PlaybackSettings_RB_SIZE = 2 * sizeof(sf_count_t);
-
 Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
   : actorSystem(actorSystem)
   , threadId(ThreadStatics::incrThreadId())
   , fileName(ThreadStatics::getFilePath())
   , gAppState(gAppState)
   , mixer(mixer)
-  , jackClient(mixer->getJackClient())
+  , jackClient(mixer->getGjJackClient())
   , sfInfo()
   , effectsChannelsWriteOutBuffer(nullptr)
   , audioData(
@@ -65,12 +59,13 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
     "Initialized AudioData with frameId: " + std::to_string(audioData.frameId)
   );
 
-  if (const int setupJackStatus = setupJack(); setupJackStatus == 0) {
+  if (const int setupJackStatus = jackClient->setup(&audioData); setupJackStatus == 0) {
     Logging::write(
       Info,
       "Audio::Cassette::Cassette",
       "Setup Jack"
     );
+    jackClientIsActive = true;
   } else {
     Logging::write(
       Error,
@@ -107,14 +102,13 @@ void Cassette::cleanup() {
   );
 
   if (jackClientIsActive) {
-    if (jack_deactivate(jackClient)) {
-      std::cerr << "Unable to deactivate jack client" << std::endl;
+    if (jackClient->deactivate() != OK) {
       Logging::write(
         Error,
         "Audio::Cassette::cleanup",
-        "Unable to deactivate JackClient"
+        "Unable to deactivate jackClient"
       );
-    };
+    }
   }
   jackClientIsActive = false;
 
@@ -136,6 +130,7 @@ void Cassette::cleanup() {
     "Audio::Cassette::cleanup",
     "Deleted buffers"
   );
+
   sf_close(file);
   Logging::write(
     Info,
@@ -143,128 +138,6 @@ void Cassette::cleanup() {
     "Done freeing resources for file" + std::string(fileName)
   );
 };
-
-// jack process callback
-// do not allocate/free memory within this method
-// as it may be called at system-interrupt level
-int Cassette::jackProcessCallback(jack_nframes_t nframes, void* arg) {
-  // get port buffers
-  auto* outL = static_cast<jack_default_audio_sample_t*>(
-    jack_port_get_buffer(outPortL, nframes)
-  );
-  auto* outR = static_cast<jack_default_audio_sample_t*>(
-    jack_port_get_buffer(outPortR, nframes)
-  );
-
-  // retrieve AudioData
-  const auto audioData = static_cast<AudioData*>(arg);
-
-  // read playbackSettingsToAudioThreadRingBuffer
-  if (jack_ringbuffer_read_space(audioData->playbackSettingsToAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
-    jack_ringbuffer_read(
-      audioData->playbackSettingsToAudioThreadRB,
-      reinterpret_cast<char*>(audioData->playbackSettingsToAudioThread),
-      PlaybackSettings_RB_SIZE
-    );
-  }
-
-  if (audioData->playbackSettingsToAudioThread[0] == 1) // user set frame Id
-    audioData->frameId = audioData->playbackSettingsToAudioThread[1];
-
-  const sf_count_t audioDataIndex = audioData->frameId;
-
-  audioData->playbackSettingsFromAudioThread[0] = 0;
-  audioData->playbackSettingsFromAudioThread[1] = audioData->frameId;
-
-  // write to playbackSettingsFromAudioThread ring buffer
-  if (jack_ringbuffer_write_space(audioData->playbackSettingsFromAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
-    jack_ringbuffer_write(
-      audioData->playbackSettingsFromAudioThreadRB,
-      reinterpret_cast<char*>(audioData->playbackSettingsFromAudioThread),
-      PlaybackSettings_RB_SIZE
-    );
-  }
-
-  // update process head
-  audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioDataIndex;
-  audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioDataIndex;
-  float** processHead = audioData->inputBuffersProcessHead;
-
-  // process effects channels
-  // main channel is effectsChannelIdx 0
-  for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
-    auto [effectCount, processFuncs, buffers] = audioData->effectsChannelsProcessData[effectsChannelIdx];
-    for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
-      if (pluginIdx == 0) {
-        buffers[pluginIdx].inputs = processHead;
-      }
-      buffers[pluginIdx].numSamples = nframes;
-
-      processFuncs[pluginIdx](
-        buffers[pluginIdx],
-        nframes
-      );
-    }
-  }
-
-  // read channel settings from ringbuffer
-  jack_ringbuffer_t* ringBuffer = audioData->effectsChannelsSettingsRB;
-  if (jack_ringbuffer_read_space(ringBuffer) >= EffectsSettings_RB_SIZE) {
-    jack_ringbuffer_read(ringBuffer, reinterpret_cast<char*>(audioData->effectsChannelsSettings), EffectsSettings_RB_SIZE);
-  }
-
-  // sum down into mainInBuffers
-  for (int i = 0; i < nframes; i++) {
-    for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
-      const float factorLL = audioData->effectsChannelsSettings[4 * effectsChannelIdx];
-      const float factorLR = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 1];
-      const float factorRL = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 2];
-      const float factorRR = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 3];
-
-      if (effectsChannelIdx == 1) {
-        if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] = factorLL * processHead[0][i] + factorRL * processHead[1][i];
-          audioData->mainInBuffers[1][i] = factorLR * processHead[0][i] + factorRR * processHead[1][i];
-        } else {
-          audioData->mainInBuffers[0][i] = factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          audioData->mainInBuffers[1][i] = factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-        }
-      } else {
-        if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] += factorLL * processHead[0][i] + factorRL * processHead[1][i];
-          audioData->mainInBuffers[1][i] += factorLR * processHead[0][i] + factorRR * processHead[1][i];
-        } else {
-          audioData->mainInBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          audioData->mainInBuffers[1][i] += factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] + factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-        }
-      }
-    }
-  }
-
-  // process summed down mix through main effects
-  auto [effectCount, processFuncs, buffers] = audioData->effectsChannelsProcessData[0];
-  for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
-    buffers[pluginIdx].numSamples = nframes;
-
-    processFuncs[pluginIdx](
-      buffers[pluginIdx],
-      nframes
-    );
-  }
-
-  // write out processed main channel to audio out
-  const float factorLL = audioData->effectsChannelsSettings[0];
-  const float factorLR = audioData->effectsChannelsSettings[1];
-  const float factorRL = audioData->effectsChannelsSettings[2];
-  const float factorRR = audioData->effectsChannelsSettings[3];
-  for (int i = 0; i < nframes; i++) {
-    outL[i] = factorLL * audioData->mainOutBuffers[0][i] + factorRL * audioData->mainOutBuffers[1][i];
-    outR[i] = factorLR * audioData->mainOutBuffers[0][i] + factorRR * audioData->mainOutBuffers[1][i];
-  }
-
-  audioData->frameId += nframes;
-  return 0;
-}
 
 int Cassette::setupAudioData() {
   Logging::write(
@@ -505,119 +378,6 @@ IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* 
     audioFramesPerBuffer
   };
   return buffers;
-}
-
-int Cassette::setupJack() {
-  const int setProcessStatus = jack_set_process_callback(
-    jackClient,
-    &Cassette::jackProcessCallback,
-    &audioData
-  );
-  if ( setProcessStatus == 0) {
-    Logging::write(
-      Info,
-      "Audio::Cassette::setupJack",
-      "Set Jack process callback"
-    );
-  } else {
-    Logging::write(
-      Error,
-      "Audio::Cassette::setupJack",
-      "Unable to set process callback - status: " + std::to_string(setProcessStatus)
-    );
-    return 1;
-  }
-
-  if (outPortL == nullptr) {
-      outPortL = jack_port_register(
-        jackClient,
-        "out_port_L",
-        JACK_DEFAULT_AUDIO_TYPE,
-        JackPortIsOutput,
-        0
-      );
-  }
-
-  if (outPortL == nullptr) {
-    Logging::write(
-      Error,
-      "Audio::Cassette::setupJack",
-      "Unable to create Jack outPortL"
-    );
-    return 2;
-  }
-
-  if (outPortR == nullptr) {
-    outPortR = jack_port_register(
-      jackClient,
-      "out_port_R",
-      JACK_DEFAULT_AUDIO_TYPE,
-      JackPortIsOutput,
-      0
-    );
-  }
-  if (outPortR == nullptr) {
-    Logging::write(
-      Error,
-      "Audio::Cassette::setupJack",
-      "Unable to create Jack outPortR"
-    );
-    return 3;
-  }
-
-  int jackActivateStatus = jack_activate(jackClient);
-  jackClientIsActive = true;
-  if (jackActivateStatus == 0) {
-    Logging::write(
-      Info,
-      "Audio::Cassette::setupJack",
-      "Jack activated successfully"
-    );
-  } else {
-    Logging::write(
-      Error,
-      "Audio::Cassette::setupJack",
-      "Unable to activate jack - status: " + std::to_string(jackActivateStatus)
-    );
-    return 4;
-  }
-
-  if (
-    const int connectStatusL = jack_connect(jackClient, jack_port_name(outPortL), "system:playback_1");
-    connectStatusL != 0
-  ) {
-    Logging::write(
-      Error,
-      "Audio::Cassette::setupJack",
-      "Unable to connect out_port_L - status: " + std::to_string(connectStatusL)
-    );
-    return 5;
-  }
-
-  if (
-    const int connectStatusR = jack_connect(jackClient, jack_port_name(outPortR), "system:playback_2");
-    connectStatusR != 0
-  ) {
-      Logging::write(
-        Error,
-        "Audio::Cassette::setupJack",
-        "Unable to connect out_port_R - status: " + std::to_string(connectStatusR)
-      );
-      return 6;
-  }
-
-  // TESTING SHOW PORTS
-  // const char** ports = jack_get_ports(jackClient, nullptr, nullptr, 0);
-  // if (ports == nullptr) {
-  //   printf("No ports found.\n");
-  // } else {
-  //   for (int i = 0; ports[i] != nullptr; i++) {
-  //     printf("Port: %s\n", ports[i]);
-  //   }
-  // }
-  // TESTING SHOW PORTS
-
-  return 0;
 }
 
 bool Cassette::allocateProcessBuffers() {
@@ -935,7 +695,7 @@ int Cassette::play() {
   }
 
   if (jackClientIsActive)
-    jack_deactivate(jackClient);
+    jackClient->deactivate();
 
   jackClientIsActive = false;
 

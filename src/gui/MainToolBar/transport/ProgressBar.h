@@ -16,6 +16,7 @@
 
 #include "../../../audio/Mixer.h"
 #include "../../../enums/PlayState.h"
+#include "../../../enums/Result.h"
 
 namespace Gj {
 namespace Gui {
@@ -25,7 +26,7 @@ class ProgressBar final : public QWidget {
   public:
     ProgressBar(QWidget* parent, Audio::Mixer* mixer, sf_count_t frameId);
     void updateProgressBar(sf_count_t readCount, sf_count_t newFrameId);
-    int hydrateState(const AppStatePacket& appStatePacket);
+    Result hydrateState(const AppStatePacket& appStatePacket);
 
   private:
     sf_count_t totalFrames;

@@ -12,7 +12,10 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 
+#include "AudioData.h"
 #include "Logging.h"
+#include "../enums/Result.h"
+#include "Constants.h"
 
 namespace Gj {
 namespace Audio {
@@ -35,16 +38,19 @@ public:
 	[[nodiscard]]
 	jack_client_t* getJackClient() const {
 		return jackClient;
-	};
+	}
 
 	// IMediaServer interface
 	bool registerAudioClient (IAudioClient* client) override;
 	bool registerMidiClient (IMidiClient* client) override;
 
 	bool initialize (JackName name);
+	int setup(AudioData* audioData) const;
+	Result deactivate() const;
 
 	// jack process callback
-	int process (jack_nframes_t nframes);
+	int process (jack_nframes_t nframes); // example
+  static int processCallback(jack_nframes_t nframes, void* arg);
 
 //--------------------------------------------------------------------
 private:
@@ -66,12 +72,12 @@ private:
 	JackPorts audioInputPorts;
 	JackPorts midiInputPorts;
 
-	Steinberg::Vst::IAudioClient* audioClient = nullptr;
-	Steinberg::Vst::IMidiClient* midiClient = nullptr;
+	IAudioClient* audioClient = nullptr;
+	IMidiClient* midiClient = nullptr;
 	using BufferPointers = std::vector<jack_default_audio_sample_t*>;
 	BufferPointers audioOutputPointers;
 	BufferPointers audioInputPointers;
-	Steinberg::Vst::IAudioClient::Buffers buffers {nullptr};
+	IAudioClient::Buffers buffers {nullptr};
 };
 
 } // Audio

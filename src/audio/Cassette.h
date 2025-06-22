@@ -22,6 +22,7 @@
 #include "./Mixer.h"
 #include "./ThreadStatics.h"
 #include "../AppState.h"
+#include "JackClient.h"
 #include "Logging.h"
 
 using namespace caf;
@@ -37,7 +38,7 @@ class Cassette
   long initialFrameId;
   AppState* gAppState;
   Mixer* mixer;
-  jack_client_t* jackClient;
+  std::shared_ptr<JackClient> jackClient;
   bool jackClientIsActive;
   float* buffer{};
   SF_INFO sfInfo;
@@ -55,11 +56,9 @@ class Cassette
   sf_count_t playbackSettingsFromAudioThread[2]{};
   AudioData audioData;
 
-  static int jackProcessCallback(jack_nframes_t nframes, void* arg);
   int setupAudioData();
   IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int channelIdx, int pluginIdx, const AudioData &audioData) const;
   IAudioClient::Buffers getPluginBuffersMain(int pluginIdx) const;
-  int setupJack();
 
   bool allocateInputBuffers();
   bool populateInputBuffers() const;
