@@ -151,6 +151,8 @@ int Cassette::setupAudioData() {
   sfInfo.format = 0;
   file = sf_open(fileName, SFM_READ, &sfInfo);
 
+  audioData.frames = sfInfo.frames;
+
   if (file == nullptr) {
     Logging::write(
       Error,
@@ -181,8 +183,7 @@ int Cassette::setupAudioData() {
   }
 
   // Read the audio data into buffer
-  audioData.readCount = sf_read_float(file, buffer, sfInfo.frames * sfInfo.channels);
-  if (audioData.readCount == 0) {
+  if (const auto readCount = sf_read_float(file, buffer, sfInfo.frames * sfInfo.channels); readCount != sfInfo.frames * sfInfo.channels) {
     Logging::write(
       Error,
       "Audio::Cassette::setupAudioData",
@@ -191,7 +192,7 @@ int Cassette::setupAudioData() {
     return 3;
   }
 
-  ThreadStatics::setReadCount(audioData.readCount);
+  ThreadStatics::setFrames(audioData.frames);
 
   if (!setupInputBuffers()) {
     Logging::write(
@@ -512,7 +513,7 @@ int Cassette::updateAudioDataFromMixer(
   }
 
   const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
-  mixer->getUpdateProgressBarFunc()(audioData.readCount, currentFrameId);
+  mixer->getUpdateProgressBarFunc()(audioData.frames, currentFrameId);
 
   // if (playbackSettingsFromAudioThread[0] == 1) { // done setting frameId
     playbackSettingsToAudioThread[0] = 0;
@@ -708,7 +709,7 @@ int Cassette::play() {
   jackClientIsActive = false;
 
   if (ThreadStatics::getPlayState() == STOP)
-    mixer->getUpdateProgressBarFunc()(audioData.readCount, 0);
+    mixer->getUpdateProgressBarFunc()(audioData.frames, 0);
 
   return 0;
 };

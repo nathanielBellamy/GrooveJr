@@ -20,7 +20,7 @@ class ThreadStatics {
   static const char* filePath;
   static sf_count_t frameId;
   static std::atomic<bool> userSettingFrameId;
-  static std::atomic<sf_count_t> readCount;
+  static std::atomic<sf_count_t> frames;
   static PlayState playState;
   static float playbackSpeed;
   static bool readComplete;
@@ -54,8 +54,8 @@ public:
   static void setUserSettingFrameId(bool newUserSettingFrameId);
   static bool getUserSettingFrameId();
 
-  static sf_count_t getReadCount();
-  static void setReadCount(sf_count_t readCount);
+  static sf_count_t getFrames();
+  static void setFrames(sf_count_t readCount);
 };
 
 } // Act

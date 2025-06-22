@@ -13,8 +13,8 @@ namespace Gj {
 namespace Audio {
 
 struct AudioData {
-    sf_count_t                       readCount;
     sf_count_t                       frameId;
+    sf_count_t                       frames; // total # of frames
     PlayState                        playState;
     float                            playbackSpeed;
     bool                             readComplete;

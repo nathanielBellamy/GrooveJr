@@ -5,6 +5,8 @@
 #ifndef PROGRESSBAR_H
 #define PROGRESSBAR_H
 
+#include <cmath>
+
 #include <sndfile.hh>
 
 #include <QMouseEvent>
@@ -25,11 +27,11 @@ class ProgressBar final : public QWidget {
 
   public:
     ProgressBar(QWidget* parent, Audio::Mixer* mixer, sf_count_t frameId);
-    void updateProgressBar(sf_count_t readCount, sf_count_t newFrameId);
+    void updateProgressBar(sf_count_t frames, sf_count_t newFrameId);
     Result hydrateState(const AppStatePacket& appStatePacket);
 
   private:
-    sf_count_t totalFrames;
+    sf_count_t frames;
     sf_count_t frameId;
     Audio::Mixer* mixer;
     QPainter painter;

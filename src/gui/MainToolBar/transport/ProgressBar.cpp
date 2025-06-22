@@ -10,7 +10,7 @@ namespace Gui {
 
 ProgressBar::ProgressBar(QWidget* parent, Audio::Mixer* mixer, const sf_count_t frameId)
   : QWidget(parent)
-  , totalFrames(1)
+  , frames(1)
   , frameId(frameId)
   , mixer(mixer)
   , painter(this)
@@ -18,14 +18,14 @@ ProgressBar::ProgressBar(QWidget* parent, Audio::Mixer* mixer, const sf_count_t 
   {
 
   mixer->setUpdateProgressBarFunc(
-    [this](const sf_count_t readCount, const sf_count_t newFrame) { updateProgressBar(readCount, newFrame); }
+    [this](const sf_count_t newFrames, const sf_count_t newFrame) { updateProgressBar(newFrames, newFrame); }
   );
 
   setStyle();
 }
 
-void ProgressBar::updateProgressBar(const sf_count_t readCount, const sf_count_t newFrameId) {
-  totalFrames = readCount;
+void ProgressBar::updateProgressBar(const sf_count_t newFrames, const sf_count_t newFrameId) {
+  frames = newFrames;
   frameId = newFrameId;
   update();
 }
@@ -37,7 +37,9 @@ void ProgressBar::setStyle() {
 }
 
 void ProgressBar::paintEvent(QPaintEvent* event) {
-  const float progress = (static_cast<float>(frameId) / (static_cast<float>(totalFrames) / 2.0f)) * width();
+  const int progress = static_cast<int>(
+    std::floor((static_cast<float>(frameId) / static_cast<float>(frames)) * static_cast<float>(width()))
+  );
   painter.begin(this);
   painter.setPen(pen);
   painter.fillRect(0, 0, progress, height(), Qt::white);
@@ -48,8 +50,8 @@ void ProgressBar::mousePressEvent(QMouseEvent* event) {
   const float x = static_cast<float>(event->position().x());
   const float percent = x / static_cast<float>(width());
 
-  frameId = static_cast<sf_count_t>(std::floor(percent * static_cast<float>(totalFrames) / 2.0f));
-  mixer->setFrameId(frameId);
+  frameId = static_cast<sf_count_t>(std::floor(percent * static_cast<float>(frames)));
+  Audio::Mixer::setFrameId(frameId);
   update();
 }
 

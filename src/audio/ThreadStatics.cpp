@@ -14,7 +14,7 @@ sf_count_t ThreadStatics::frameId = 0;
 std::mutex ThreadStatics::frameIdMutex;
 
 std::atomic<bool> ThreadStatics::userSettingFrameId { false };
-std::atomic<sf_count_t> ThreadStatics::readCount { 0 };
+std::atomic<sf_count_t> ThreadStatics::frames { 0 };
 
 PlayState ThreadStatics::playState = STOP;
 std::mutex ThreadStatics::playStateMutex;
@@ -112,12 +112,12 @@ bool ThreadStatics::getUserSettingFrameId() {
   return userSettingFrameId.load();
 }
 
-sf_count_t ThreadStatics::getReadCount() {
-  return readCount.load();
+sf_count_t ThreadStatics::getFrames() {
+  return frames.load();
 }
 
-void ThreadStatics::setReadCount(sf_count_t newReadCount) {
-  readCount.store(newReadCount);
+void ThreadStatics::setFrames(const sf_count_t newFrames) {
+  frames.store(newFrames);
 }
 
 } // Audio
