@@ -472,6 +472,9 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   }
 
   audioData->frameId += nframes;
+	if (audioData->frameId >= audioData->frames - nframes)
+		audioData->readComplete = true;
+
   return 0;
 }
 

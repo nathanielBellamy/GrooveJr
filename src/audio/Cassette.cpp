@@ -637,6 +637,8 @@ int Cassette::play() {
   jack_ringbuffer_t* playbackSettingsFromAudioThreadRB = jack_ringbuffer_create(PlaybackSettings_RB_SIZE);
   audioData.playbackSettingsFromAudioThreadRB = playbackSettingsFromAudioThreadRB;
 
+  ThreadStatics::setReadComplete(false);
+
   while(
           audioData.playState != STOP
             && audioData.playState != PAUSE
@@ -649,9 +651,9 @@ int Cassette::play() {
     // and
     // make it accessible to our running audio callback through the audioData obj
 
+    // TODO: pass readComplete thru ring buffer
     if (audioData.readComplete) { // reached end of input file
         ThreadStatics::setPlayState(STOP);
-        ThreadStatics::setReadComplete(true);
         Logging::write(
           Info,
           "Audio::Cassette::play",
