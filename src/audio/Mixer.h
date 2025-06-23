@@ -80,7 +80,7 @@ public:
   void initEditorHostOnChannel(int idx, int newEffectChannel, std::shared_ptr<Gui::VstWindow> vstWindow) const;
   void terminateEditorHostsOnChannel(int idx) const;
 
-  bool setSampleRate(int sampleRate) const;
+  Result setSampleRate(uint32_t sampleRate) const;
 
   bool replaceEffectOnChannel(int channelIdx, int effectIdx, std::string effectPath) const;
   bool removeEffectFromChannel(int channelIdx, int effectIdx) const;

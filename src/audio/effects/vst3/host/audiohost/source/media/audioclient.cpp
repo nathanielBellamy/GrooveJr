@@ -318,7 +318,7 @@ void AudioClient::postprocess (Buffers& buffers)
 }
 
 //------------------------------------------------------------------------
-bool AudioClient::setSamplerate (SampleRate value)
+bool AudioClient::setSamplerate (const SampleRate value)
 {
 	if (sampleRate == value)
 		return true;

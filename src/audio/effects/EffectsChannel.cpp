@@ -197,7 +197,7 @@ Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
 }
 
 
-void EffectsChannel::setSampleRate(const int sampleRate) const {
+void EffectsChannel::setSampleRate(const double sampleRate) const {
 	for (auto&& plugin : vst3Plugins) {
 		plugin->audioHost->audioClient->setSamplerate(sampleRate);
 		plugin->audioHost->audioClient->setBlockSize(gAppState->audioFramesPerBuffer);

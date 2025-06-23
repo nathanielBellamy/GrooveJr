@@ -12,7 +12,7 @@ using namespace Steinberg;
 Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
   : gAppState(gAppState)
   , dao(dao)
-  , jackClient(new JackClient())
+  , jackClient(new JackClient(this))
   , channelCount(1.0f)
   {
 
@@ -124,11 +124,12 @@ bool Mixer::removeEffectsChannel(const int idx) {
   return true;
 }
 
-bool Mixer::setSampleRate(const int sampleRate) const {
+Result Mixer::setSampleRate(const uint32_t sampleRate) const {
+  const auto sampleRateD = static_cast<double>(sampleRate);
   for (const auto effectsChannel : effectsChannels) {
-    effectsChannel->setSampleRate(sampleRate);
+    effectsChannel->setSampleRate(sampleRateD);
   }
-  return true;
+  return OK;
 }
 
 void Mixer::incorporateLatencySamples(const int latencySamples) const {

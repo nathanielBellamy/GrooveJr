@@ -20,6 +20,9 @@
 namespace Gj {
 namespace Audio {
 
+// forward decl
+class Mixer;
+
 using namespace Steinberg::Vst;
 
 //------------------------------------------------------------------------
@@ -31,7 +34,7 @@ public:
   using JackPorts = std::vector<jack_port_t *>;
   using JackName = std::string;
 
-  JackClient() = default;
+  explicit JackClient(Mixer* mixer);
 
   ~JackClient() override;
 
@@ -53,10 +56,13 @@ public:
 
   // jack process callback
   int process(jack_nframes_t nframes); // example
-  static int processCallback(jack_nframes_t nframes, void *arg);
 
   //--------------------------------------------------------------------
 private:
+  Mixer* mixer;
+  static int processCallback(jack_nframes_t nframes, void *arg);
+  static int setSampleRateCallback(jack_nframes_t nframes, void *arg);
+
   jack_client_t *registerClient(JackName name);
 
   bool registerAudioPorts(IAudioClient *processor);
@@ -85,8 +91,8 @@ private:
   JackPorts audioInputPorts;
   JackPorts midiInputPorts;
 
-  IAudioClient *audioClient = nullptr;
-  IMidiClient *midiClient = nullptr;
+  IAudioClient* audioClient = nullptr;
+  IMidiClient* midiClient = nullptr;
   using BufferPointers = std::vector<jack_default_audio_sample_t *>;
   BufferPointers audioOutputPointers;
   BufferPointers audioInputPointers;
@@ -96,4 +102,4 @@ private:
 } // Audio
 } // Gj
 
-#endif //JACKCLIENT_H
+#endif //GJAUDIOJACKCLIENT_H

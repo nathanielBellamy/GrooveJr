@@ -36,11 +36,13 @@
 //-----------------------------------------------------------------------------
 
 #include "JackClient.h"
+#include "Mixer.h"
 
 //------------------------------------------------------------------------
 namespace Steinberg {
   namespace Vst {
-    static const int kJackSuccess = 0;
+    static constexpr int kJackSuccess = 0;
+    static constexpr int kJackError = 1;
   } // Vst
 } // Steinberg
 
@@ -51,6 +53,10 @@ jack_port_t *outPortL;
 jack_port_t *outPortR;
 
 using namespace Steinberg;
+
+JackClient::JackClient(Mixer* mixer)
+  : mixer(mixer)
+  {}
 
 //------------------------------------------------------------------------
 int jack_on_process(jack_nframes_t nframes, void *arg) {
@@ -74,7 +80,7 @@ int jack_on_set_block_size(jack_nframes_t nframes, void *arg) {
 
 //------------------------------------------------------------------------
 IMediaServerPtr createMediaServer(const AudioClientName &name) {
-  auto client = std::make_shared<JackClient>();
+  auto client = std::make_shared<JackClient>(nullptr);
   client->initialize(name);
   return client;
 }
@@ -439,7 +445,6 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     }
   }
 
-
   // process summed down mix through main effects
   auto [effectCount, processFuncs, buffers] = audioData->effectsChannelsProcessData[0];
   for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
@@ -465,7 +470,14 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   if (audioData->frameId >= audioData->frames - nframes)
     audioData->readComplete = true;
 
-  return 0;
+  return kJackSuccess;
+}
+
+int JackClient::setSampleRateCallback(jack_nframes_t nframes, void *arg) {
+  if (auto* mixer = static_cast<Mixer*>(arg); mixer->setSampleRate(nframes) != OK)
+    return kJackError;
+
+  return kJackSuccess;
 }
 
 //------------------------------------------------------------------------
