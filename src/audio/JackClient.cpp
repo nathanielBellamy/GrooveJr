@@ -182,7 +182,50 @@ bool JackClient::initialize(JackClient::JackName name) {
   return true;
 }
 
-int JackClient::setup(AudioData *audioData) const {
+Result JackClient::activate(AudioData* audioData) const {
+  Logging::write(
+    Info,
+    "Audio::JackClient::setup",
+    "Setting up JackClient"
+  );
+
+  if (setCallbacks(audioData) != OK) {
+    Logging::write(
+      Error,
+      "Audio::JackClient::setup",
+      "Unable to set callbacks"
+    );
+    return ERROR;
+  }
+
+  if (setPorts() != OK) {
+    Logging::write(
+      Error,
+      "Audio::JackClient::setup",
+      "Unable to set ports"
+    );
+    return ERROR;
+  }
+
+  if (activateAndConnectPorts() != OK) {
+    Logging::write(
+      Error,
+      "Audio::JackClient::setup",
+      "Unable to activate jackClient and/or connect ports"
+    );
+    return ERROR;
+  }
+
+  return OK;
+}
+
+Result JackClient::setCallbacks(AudioData* audioData) const {
+  Logging::write(
+    Info,
+    "Audio::JackClient::setCallbacks",
+    "Setting Jack callbacks"
+  );
+
   const int setProcessStatus = jack_set_process_callback(
     jackClient,
     &JackClient::processCallback,
@@ -194,14 +237,23 @@ int JackClient::setup(AudioData *audioData) const {
       "Audio::JackClient::setup",
       "Set Jack process callback"
     );
+    return OK;
   } else {
     Logging::write(
       Error,
       "Audio::JackClient::setup",
       "Unable to set process callback - status: " + std::to_string(setProcessStatus)
     );
-    return 1;
+    return ERROR;
   }
+}
+
+Result JackClient::setPorts() const {
+  Logging::write(
+    Info,
+    "Audio::JackClient::setPorts",
+    "Setting Jack ports"
+  );
 
   if (outPortL == nullptr) {
     outPortL = jack_port_register(
@@ -212,14 +264,13 @@ int JackClient::setup(AudioData *audioData) const {
       0
     );
   }
-
   if (outPortL == nullptr) {
     Logging::write(
       Error,
       "Audio::JackClient::setup",
       "Unable to create Jack outPortL"
     );
-    return 2;
+    return ERROR;
   }
 
   if (outPortR == nullptr) {
@@ -237,8 +288,18 @@ int JackClient::setup(AudioData *audioData) const {
       "Audio::JackClient::setup",
       "Unable to create Jack outPortR"
     );
-    return 3;
+    return ERROR;
   }
+
+  return OK;
+}
+
+Result JackClient::activateAndConnectPorts() const {
+  Logging::write(
+    Info,
+    "Audio::JackClient::activateAndConnectPorts",
+    "Activating Jack client and connecting ports"
+  );
 
   if (const int jackActivateStatus = jack_activate(jackClient); jackActivateStatus == 0) {
     Logging::write(
@@ -252,9 +313,10 @@ int JackClient::setup(AudioData *audioData) const {
       "Audio::JackClient::setup",
       "Unable to activate jack - status: " + std::to_string(jackActivateStatus)
     );
-    return 4;
+    return ERROR;
   }
 
+  // connect ports after activating client!
   if (
     const int connectStatusL = jack_connect(jackClient, jack_port_name(outPortL), "system:playback_1");
     connectStatusL != 0
@@ -264,7 +326,7 @@ int JackClient::setup(AudioData *audioData) const {
       "Audio::JackClient::setup",
       "Unable to connect out_port_L - status: " + std::to_string(connectStatusL)
     );
-    return 5;
+    return ERROR;
   }
 
   if (
@@ -276,7 +338,7 @@ int JackClient::setup(AudioData *audioData) const {
       "Audio::JackClient::setup",
       "Unable to connect out_port_R - status: " + std::to_string(connectStatusR)
     );
-    return 6;
+    return ERROR;
   }
 
   // TESTING SHOW PORTS
@@ -290,8 +352,9 @@ int JackClient::setup(AudioData *audioData) const {
   // }
   // TESTING SHOW PORTS
 
-  return 0;
+  return OK;
 }
+
 
 Result JackClient::deactivate() const {
   if (const auto jackDeactivateStatus = jack_deactivate(jackClient); jackDeactivateStatus != 0) {

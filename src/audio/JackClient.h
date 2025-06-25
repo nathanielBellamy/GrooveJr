@@ -50,7 +50,7 @@ public:
 
   bool initialize(JackName name);
 
-  int setup(AudioData *audioData) const;
+  [[nodiscard]] Result activate(AudioData *audioData) const;
 
   [[nodiscard]] Result deactivate() const;
 
@@ -60,8 +60,12 @@ public:
   //--------------------------------------------------------------------
 private:
   Mixer* mixer;
+  Result setCallbacks(AudioData* audioData) const;
   static int processCallback(jack_nframes_t nframes, void *arg);
   static int setSampleRateCallback(jack_nframes_t nframes, void *arg);
+
+  Result setPorts() const;
+  Result activateAndConnectPorts() const;
 
   jack_client_t *registerClient(JackName name);
 

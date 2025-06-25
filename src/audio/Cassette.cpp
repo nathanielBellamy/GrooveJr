@@ -59,23 +59,24 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
     "Initialized AudioData with frameId: " + std::to_string(audioData.frameId)
   );
 
-  if (const int setupJackStatus = jackClient->setup(&audioData); setupJackStatus == 0) {
-    Logging::write(
-      Info,
-      "Audio::Cassette::Cassette",
-      "Setup Jack"
-    );
-    jackClientIsActive = true;
-  } else {
+  if (jackClient->activate(&audioData) != OK) {
     Logging::write(
       Error,
       "Audio::Cassette::Cassette",
-      "Unable to setup Jack - status: " + std::to_string(setupJackStatus)
+      "Unable to activate Jack"
     );
     throw std::runtime_error(
-      "Unable to instantiate Cassette - Jack status: " + std::to_string(setupJackStatus)
+      "Unable to instantiate Cassette"
     );
   }
+
+  jackClientIsActive = true;
+
+  Logging::write(
+    Info,
+    "Audio::Cassette::Cassette",
+    "Cassette initialized"
+  );
 }
 
 Cassette::~Cassette() {
