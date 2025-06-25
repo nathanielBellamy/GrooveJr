@@ -197,12 +197,38 @@ Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
 }
 
 
-void EffectsChannel::setSampleRate(const double sampleRate) const {
+Result EffectsChannel::setSampleRate(const double sampleRate) const {
+	bool warning = false;
 	for (auto&& plugin : vst3Plugins) {
-		plugin->audioHost->audioClient->setSamplerate(sampleRate);
-		plugin->audioHost->audioClient->setBlockSize(gAppState->audioFramesPerBuffer);
+		if (!plugin->audioHost->audioClient->setSamplerate(sampleRate)) {
+			Logging::write(
+				Warning,
+				"Audio::EffectsChannel::setSampleRate",
+				"Unable to set Sample Rate of " + std::to_string(sampleRate) + " for plugin " + plugin->getName() + " channelIndex " + std::to_string(index)
+			);
+			warning = true;
+		}
 	}
+
+	return warning ? WARNING : OK;
 }
+
+Result EffectsChannel::setBlockSize(const jack_nframes_t blockSize) const {
+	bool warning = false;
+	const auto blockSize32 = static_cast<int32>(blockSize);
+	for (auto&& plugin : vst3Plugins) {
+		if (!plugin->audioHost->audioClient->setBlockSize(blockSize32)) {
+			Logging::write(
+				Warning,
+				"Audio::EffectsChannel::setBlockSize",
+				"Unable to set Block Size of " + std::to_string(blockSize32) + " + for plugin " + plugin->getName() + " channelIndex " + std::to_string(index)
+			);
+			warning = true;
+		}
+	}
+	return warning ? WARNING : OK;
+}
+
 
 int EffectsChannel::effectCount() const {
 	return static_cast<int>(vst3Plugins.size());

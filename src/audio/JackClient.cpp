@@ -36,6 +36,10 @@
 //-----------------------------------------------------------------------------
 
 #include "JackClient.h"
+
+#include <caf/log/core.hpp>
+#include <caf/log/level.hpp>
+
 #include "Mixer.h"
 
 //------------------------------------------------------------------------
@@ -231,13 +235,12 @@ Result JackClient::setCallbacks(AudioData* audioData) const {
     &JackClient::processCallback,
     audioData
   );
-  if (setProcessStatus == 0) {
+  if (setProcessStatus == kJackSuccess) {
     Logging::write(
       Info,
       "Audio::JackClient::setup",
       "Set Jack process callback"
     );
-    return OK;
   } else {
     Logging::write(
       Error,
@@ -246,6 +249,27 @@ Result JackClient::setCallbacks(AudioData* audioData) const {
     );
     return ERROR;
   }
+
+  bool warning = false;
+  if (const auto success = jack_set_buffer_size_callback(jackClient, &JackClient::setBufferSizeCallback, mixer); success != kJackSuccess) {
+    Logging::write(
+      Warning,
+      "Audio::JackClient::setCallbacks",
+      "Unable to set buffer size callback"
+    );
+    warning = true;
+  }
+
+  if (const auto success = jack_set_sample_rate_callback(jackClient, &JackClient::setSampleRateCallback, mixer); success != kJackSuccess) {
+    Logging::write(
+      Warning,
+      "Audio::JackClient::setCallbacks",
+      "Unable to set sample rate callback"
+    );
+    warning = true;
+  }
+
+  return warning ? WARNING : OK;
 }
 
 Result JackClient::setPorts() const {
@@ -537,11 +561,19 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 }
 
 int JackClient::setSampleRateCallback(jack_nframes_t nframes, void *arg) {
-  if (auto* mixer = static_cast<Mixer*>(arg); mixer->setSampleRate(nframes) != OK)
+  if (const auto* mixer = static_cast<Mixer*>(arg); mixer->setSampleRate(nframes) != OK)
     return kJackError;
 
   return kJackSuccess;
 }
+
+int JackClient::setBufferSizeCallback(jack_nframes_t nframes, void *arg) {
+  if (const auto* mixer = static_cast<Mixer*>(arg); mixer->setAudioFramesPerBuffer(nframes) != OK)
+    return kJackError;
+
+  return kJackSuccess;
+}
+
 
 //------------------------------------------------------------------------
 bool JackClient::registerAudioPorts(IAudioClient *processor) {

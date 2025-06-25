@@ -6,7 +6,7 @@
 
 namespace Gj {
 
-AppState::AppState(const int id, const int audioFramesPerBuffer, const PlayState playState, const int sceneId, const int sceneIndex)
+AppState::AppState(const int id, const jack_nframes_t audioFramesPerBuffer, const PlayState playState, const int sceneId, const int sceneIndex)
   : id(id)
   , audioFramesPerBuffer(audioFramesPerBuffer)
   , playState(playState)

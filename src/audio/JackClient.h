@@ -63,9 +63,10 @@ private:
   Result setCallbacks(AudioData* audioData) const;
   static int processCallback(jack_nframes_t nframes, void *arg);
   static int setSampleRateCallback(jack_nframes_t nframes, void *arg);
+  static int setBufferSizeCallback(jack_nframes_t nframes, void *arg);
 
-  Result setPorts() const;
-  Result activateAndConnectPorts() const;
+  [[nodiscard]] Result setPorts() const;
+  [[nodiscard]] Result activateAndConnectPorts() const;
 
   jack_client_t *registerClient(JackName name);
 

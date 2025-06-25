@@ -164,9 +164,9 @@ int Cassette::setupAudioData() {
   };
 
   // update plugin effects with info about audio to be processed
-  if (!mixer->setSampleRate(sfInfo.samplerate)) {
+  if (mixer->setSampleRate(sfInfo.samplerate) != OK) {
     Logging::write(
-      Error,
+      Warning,
       "Audio::Cassette::setupAudioData",
       "Unable to set sample rate: " + std::to_string(sfInfo.samplerate)
     );

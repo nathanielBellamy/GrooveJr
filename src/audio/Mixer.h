@@ -86,7 +86,7 @@ public:
   bool removeEffectFromChannel(int channelIdx, int effectIdx) const;
 
   int getAudioFramesPerBuffer() const { return gAppState->audioFramesPerBuffer; };
-  void setAudioFramesPerBuffer(int framesPerBuffer) const { gAppState->audioFramesPerBuffer = framesPerBuffer; };
+  Result setAudioFramesPerBuffer(jack_nframes_t framesPerBuffer) const;
 
   bool setGainOnChannel(int channelIdx, float gain) const;
 

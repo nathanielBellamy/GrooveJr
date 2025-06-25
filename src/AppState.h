@@ -8,6 +8,8 @@
 #include <atomic>
 #include <string>
 
+#include <jack/jack.h>
+
 #include "./enums/PlayState.h"
 
 #include "./db/entity/AppStateEntity.h"
@@ -16,7 +18,7 @@ namespace Gj {
 
 struct AppStatePacket {
     int id;
-    int audioFramesPerBuffer;
+    jack_nframes_t audioFramesPerBuffer;
     int playState;
     int sceneId;
     int sceneIndex;
@@ -29,13 +31,13 @@ bool inspect(Inspector& f, AppStatePacket& x) {
 
 struct AppState {
   std::atomic<int> id{};
-  std::atomic<int> audioFramesPerBuffer{};
+  std::atomic<jack_nframes_t> audioFramesPerBuffer{};
   std::atomic<PlayState> playState{};
   std::atomic<int> sceneId{};
   std::atomic<int> sceneIndex{};
 
   AppState();
-  AppState(int id, int audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
+  AppState(int id, jack_nframes_t audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
   AppStatePacket toPacket() const;
   static AppState fromAppStateEntity(Db::AppStateEntity appStateEntity);
 
@@ -48,12 +50,10 @@ struct AppState {
     sceneIndex.store(appStateEntity.sceneIndex);
   };
 
-  int getAudioFramesPerBuffer() const {
+  jack_nframes_t getAudioFramesPerBuffer() const {
     return audioFramesPerBuffer.load();
   };
-  void setAudioFramesPerBuffer(const int val) {
-    if (val < 0)
-      return;
+  void setAudioFramesPerBuffer(const jack_nframes_t val) {
     audioFramesPerBuffer.store(val);
   }
 

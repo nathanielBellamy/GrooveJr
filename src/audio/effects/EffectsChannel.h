@@ -211,7 +211,8 @@ class EffectsChannel {
 
     bool addReplaceEffect(int effectIdx, const std::string& effectPath);
     Result loadEffect(const Db::Effect& effectEntity);
-    void setSampleRate(double sampleRate) const;
+    Result setSampleRate(double sampleRate) const;
+    Result setBlockSize(jack_nframes_t blockSize) const;
 
     int effectCount() const;
     void initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;

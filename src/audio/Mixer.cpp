@@ -105,6 +105,24 @@ bool Mixer::addEffectsChannel() {
     return true;
 }
 
+Result Mixer::setAudioFramesPerBuffer(jack_nframes_t framesPerBuffer) const {
+  bool warning = false;
+  gAppState->setAudioFramesPerBuffer(framesPerBuffer);
+  for (const auto channel : effectsChannels) {
+    if (channel->setBlockSize(framesPerBuffer) != OK) {
+      Logging::write(
+        Warning,
+        "Audio::Mixer::setAudioFramesPerBuffer",
+        "Failed to set audio frames per buffer on channel " + std::to_string(channel->getIndex())
+      );
+      warning = true;
+    }
+  }
+
+  return warning ? WARNING : OK;
+}
+
+
 bool Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) {
     effectsChannels.push_back(
       new Effects::EffectsChannel(
