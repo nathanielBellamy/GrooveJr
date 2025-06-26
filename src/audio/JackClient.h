@@ -61,9 +61,11 @@ public:
 private:
   Mixer* mixer;
   Result setCallbacks(AudioData* audioData) const;
-  static int processCallback(jack_nframes_t nframes, void *arg);
-  static int setSampleRateCallback(jack_nframes_t nframes, void *arg);
-  static int setBufferSizeCallback(jack_nframes_t nframes, void *arg);
+  static int processCallback(jack_nframes_t nframes, void* arg);
+  static int setSampleRateCallback(jack_nframes_t nframes, void* arg);
+  static int setBufferSizeCallback(jack_nframes_t nframes, void* arg);
+  static int xRunCallback(void* arg);
+  static Result logXRun();
 
   [[nodiscard]] Result setPorts() const;
   [[nodiscard]] Result activateAndConnectPorts() const;

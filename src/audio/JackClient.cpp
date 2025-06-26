@@ -269,8 +269,25 @@ Result JackClient::setCallbacks(AudioData* audioData) const {
     warning = true;
   }
 
+  if (const auto success = jack_set_xrun_callback(jackClient, &JackClient::xRunCallback, mixer); success != kJackSuccess) {
+    Logging::write(
+      Warning,
+      "Audio::JackClient::setCallbacks",
+      "Unable to set xrun callback"
+    );
+  }
+
   return warning ? WARNING : OK;
 }
+
+Result JackClient::logXRun() {
+  Logging::write(
+    Error,
+    "Audio::JackClient::logXRun",
+    "Jack xRun occurred"
+  );
+}
+
 
 Result JackClient::setPorts() const {
   Logging::write(
@@ -574,6 +591,10 @@ int JackClient::setBufferSizeCallback(jack_nframes_t nframes, void *arg) {
   return kJackSuccess;
 }
 
+int JackClient::xRunCallback(void* arg) {
+  logXRun();
+  return kJackSuccess;
+}
 
 //------------------------------------------------------------------------
 bool JackClient::registerAudioPorts(IAudioClient *processor) {
