@@ -53,6 +53,13 @@ public:
 private:
   Mixer* mixer;
 
+  // Jack objects
+  jack_client_t* jackClient = nullptr;
+  JackPorts midiInputPorts;
+
+  IAudioClient* audioClient = nullptr;
+  IMidiClient* midiClient = nullptr;
+
   jack_client_t* registerClient(JackName name);
   Result setCallbacks(AudioData* audioData) const;
 
@@ -69,15 +76,6 @@ private:
   bool addMidiInputPort(JackName name);
   int processMidi(jack_nframes_t nframes);
   bool autoConnectMidiPorts(jack_client_t *client);
-
-  // Jack objects
-  jack_client_t *jackClient = nullptr;
-  JackPorts audioOutputPorts;
-  JackPorts audioInputPorts;
-  JackPorts midiInputPorts;
-
-  IAudioClient* audioClient = nullptr;
-  IMidiClient* midiClient = nullptr;
 };
 
 } // Audio
