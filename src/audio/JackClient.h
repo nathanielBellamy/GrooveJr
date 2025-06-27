@@ -35,32 +35,27 @@ public:
   using JackName = std::string;
 
   explicit JackClient(Mixer* mixer);
-
   ~JackClient() override;
+
+  Result initialize(JackName name);
+  [[nodiscard]] Result activate(AudioData *audioData) const;
+  [[nodiscard]] Result deactivate() const;
 
   [[nodiscard]]
   jack_client_t *getJackClient() const {
     return jackClient;
   }
 
-  // IMediaServer interface
-  bool registerAudioClient(IAudioClient *client) override;
-
+  bool registerAudioClient(IAudioClient* client) override;
   bool registerMidiClient(IMidiClient *client) override;
-
-  bool initialize(JackName name);
-
-  [[nodiscard]] Result activate(AudioData *audioData) const;
-
-  [[nodiscard]] Result deactivate() const;
-
-  // jack process callback
-  int process(jack_nframes_t nframes); // example
 
   //--------------------------------------------------------------------
 private:
   Mixer* mixer;
+
+  jack_client_t* registerClient(JackName name);
   Result setCallbacks(AudioData* audioData) const;
+
   static int processCallback(jack_nframes_t nframes, void* arg);
   static int setSampleRateCallback(jack_nframes_t nframes, void* arg);
   static int setBufferSizeCallback(jack_nframes_t nframes, void* arg);
@@ -70,27 +65,10 @@ private:
   [[nodiscard]] Result setPorts() const;
   [[nodiscard]] Result activateAndConnectPorts() const;
 
-  jack_client_t *registerClient(JackName name);
-
-  bool registerAudioPorts(IAudioClient *processor);
-
   bool registerMidiPorts(IMidiClient *processor);
-
-  bool addAudioOutputPort(JackName name);
-
-  bool addAudioInputPort(JackName name);
-
   bool addMidiInputPort(JackName name);
-
   int processMidi(jack_nframes_t nframes);
-
-  bool setupJackProcessCallbacks(jack_client_t *client);
-
-  bool autoConnectAudioPorts(jack_client_t *client);
-
   bool autoConnectMidiPorts(jack_client_t *client);
-
-  void updateAudioBuffers(jack_nframes_t nframes);
 
   // Jack objects
   jack_client_t *jackClient = nullptr;
@@ -100,10 +78,6 @@ private:
 
   IAudioClient* audioClient = nullptr;
   IMidiClient* midiClient = nullptr;
-  using BufferPointers = std::vector<jack_default_audio_sample_t *>;
-  BufferPointers audioOutputPointers;
-  BufferPointers audioInputPointers;
-  IAudioClient::Buffers buffers{nullptr};
 };
 
 } // Audio
