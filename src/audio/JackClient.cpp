@@ -365,8 +365,6 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   if (audioData->playbackSettingsToAudioThread[0] == 1) // user set frame Id
     audioData->frameId = audioData->playbackSettingsToAudioThread[1];
 
-  const sf_count_t audioDataIndex = audioData->frameId;
-
   audioData->playbackSettingsFromAudioThread[0] = 0; // debug value
   audioData->playbackSettingsFromAudioThread[1] = audioData->frameId;
 
@@ -380,8 +378,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   }
 
   // update process head
-  audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioDataIndex;
-  audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioDataIndex;
+  audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioData->frameId;
+  audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioData->frameId;
   float **processHead = audioData->inputBuffersProcessHead;
 
   // process effects channels
