@@ -32,6 +32,7 @@ struct Track {
 
   bool isLossless;
   bool isVariableBitRate;
+  AudioCodec audioCodec;
 
   Track(int id, const std::string& filePath, const std::string& title);
   static Track deser(sqlite3_stmt* stmt);

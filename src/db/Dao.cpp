@@ -70,6 +70,7 @@ int Dao::initSchema() const {
       createdAt datetime default current_timestamp
     );
 
+    -- mixer
     create table if not exists scenes (
       id integer primary key autoincrement,
       sceneIndex integer not null,
@@ -135,13 +136,19 @@ int Dao::initSchema() const {
       foreign key (effectId) references effects(id) on delete cascade
     );
 
+    -- music library
     create table if not exists tracks (
       id integer primary key autoincrement,
       filePath text not null,
       title text,
-      frames integer not null,
-      sampleRate integer not null,
-      channels integer not null,
+      bitRate integer not null,
+
+      sf_frames integer not null,
+      sf_sampleRate integer not null,
+      sf_channels integer not null,
+      sf_format integer not null,
+      sf_sections integer not null,
+      sf_seekable integer not null,
       createdAt datetime default current_timestamp
     );
   )sql";
