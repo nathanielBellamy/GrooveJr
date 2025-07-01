@@ -339,11 +339,11 @@ Result JackClient::activateAndConnectPorts() const {
 }
 
 // plabackSpeed in [0.5, 2.0]
-int JackClient::fillPlaybackBuffer(float** processHead, float** playbackBuffer, float playbackSpeed, jack_nframes_t nframes, AudioData* audioData) {
+int JackClient::fillPlaybackBuffer(AudioData* audioData, const float playbackSpeed, const jack_nframes_t nframes) {
   if (playbackSpeed == 1.0f) {
     for (jack_nframes_t i = 0; i < nframes; i++) {
-      playbackBuffer[0][i] = processHead[0][i];
-      playbackBuffer[1][i] = processHead[1][i];
+      audioData->playbackBuffer[0][i] = audioData->inputBuffersProcessHead[0][i];
+      audioData->playbackBuffer[1][i] = audioData->inputBuffersProcessHead[1][i];
     }
     return 0;
   }
@@ -359,11 +359,11 @@ int JackClient::fillPlaybackBuffer(float** processHead, float** playbackBuffer, 
     jack_nframes_t doubleCounter = 0;
     jack_nframes_t doubledCount = 0;
     for (jack_nframes_t i = 0; i < nframes; i++) {
-      playbackBuffer[0][i] = processHead[0][i];
-      playbackBuffer[1][i] = processHead[1][i];
+      audioData->playbackBuffer[0][i] = audioData->inputBuffersProcessHead[0][i];
+      audioData->playbackBuffer[1][i] = audioData->inputBuffersProcessHead[1][i];
       if (doubleCounter == doubleFactor) {
-        playbackBuffer[0][i+1] = processHead[0][i];
-        playbackBuffer[1][i+1] = processHead[1][i];
+        audioData->playbackBuffer[0][i+1] = audioData->inputBuffersProcessHead[0][i];
+        audioData->playbackBuffer[1][i+1] = audioData->inputBuffersProcessHead[1][i];
         i++; // double increment
         doubleCounter = 0;
         doubledCount++;
@@ -390,15 +390,14 @@ int JackClient::fillPlaybackBuffer(float** processHead, float** playbackBuffer, 
       dropCounter = 0;
       droppedCount++;
     }
-    playbackBuffer[0][i] = processHead[0][i];
-    playbackBuffer[1][i] = processHead[1][i];
+    audioData->playbackBuffer[0][i] = audioData->inputBuffersProcessHead[0][i];
+    audioData->playbackBuffer[1][i] = audioData->inputBuffersProcessHead[1][i];
     dropCounter++;
   }
 
   audioData->frameId += nframes + droppedCount;
   return 0;
 }
-
 
 // jack process callback
 // do not allocate/free memory within this method
