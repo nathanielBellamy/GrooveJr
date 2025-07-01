@@ -338,6 +338,68 @@ Result JackClient::activateAndConnectPorts() const {
   return OK;
 }
 
+// plabackSpeed in [0.5, 2.0]
+int JackClient::fillPlaybackBuffer(float** processHead, float** playbackBuffer, float playbackSpeed, jack_nframes_t nframes, AudioData* audioData) {
+  if (playbackSpeed == 1.0f) {
+    for (jack_nframes_t i = 0; i < nframes; i++) {
+      playbackBuffer[0][i] = processHead[0][i];
+      playbackBuffer[1][i] = processHead[1][i];
+    }
+    return 0;
+  }
+
+  if (playbackSpeed < 1.0f) {
+    // we will double some frames
+    const auto doubleFactor = static_cast<jack_nframes_t>(
+      std::floor(
+        ((static_cast<float>(nframes) - 1.0f) / 0.5f) * (playbackSpeed - 0.5f) + 1.0f
+      )
+    );
+
+    jack_nframes_t doubleCounter = 0;
+    jack_nframes_t doubledCount = 0;
+    for (jack_nframes_t i = 0; i < nframes; i++) {
+      playbackBuffer[0][i] = processHead[0][i];
+      playbackBuffer[1][i] = processHead[1][i];
+      if (doubleCounter == doubleFactor) {
+        playbackBuffer[0][i+1] = processHead[0][i];
+        playbackBuffer[1][i+1] = processHead[1][i];
+        i++; // double increment
+        doubleCounter = 0;
+        doubledCount++;
+      }
+      doubleCounter++;
+    }
+
+    audioData->frameId += nframes - doubledCount;
+    return 0;
+  }
+
+  // playbackSpeed > 1.0f
+  // we will drop some frames
+  const auto dropFactor = static_cast<jack_nframes_t>(
+    std::floor(
+      (1.0f - static_cast<float>(nframes)) * (playbackSpeed - 1.0f) + static_cast<float>(nframes)
+    )
+  );
+  jack_nframes_t dropCounter = 0;
+  jack_nframes_t droppedCount = 0;
+  for (jack_nframes_t i = 0; i < nframes; i++) {
+    if (dropCounter == dropFactor) {
+      i++; // double increment
+      dropCounter = 0;
+      droppedCount++;
+    }
+    playbackBuffer[0][i] = processHead[0][i];
+    playbackBuffer[1][i] = processHead[1][i];
+    dropCounter++;
+  }
+
+  audioData->frameId += nframes + droppedCount;
+  return 0;
+}
+
+
 // jack process callback
 // do not allocate/free memory within this method
 // as it may be called at system-interrupt level
