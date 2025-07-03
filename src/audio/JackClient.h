@@ -48,6 +48,7 @@ public:
 
   bool registerAudioClient(IAudioClient* client) override;
   bool registerMidiClient(IMidiClient *client) override;
+  static int fillPlaybackBuffer(AudioData* audioData, float playbackSpeed, jack_nframes_t nframes);
 
   //--------------------------------------------------------------------
 private:
@@ -62,8 +63,6 @@ private:
 
   jack_client_t* registerClient(JackName name);
   Result setCallbacks(AudioData* audioData) const;
-
-  static int fillPlaybackBuffer(AudioData* audioData, float playbackSpeed, jack_nframes_t nframes);
 
   static int processCallback(jack_nframes_t nframes, void* arg);
   static int setSampleRateCallback(jack_nframes_t nframes, void* arg);

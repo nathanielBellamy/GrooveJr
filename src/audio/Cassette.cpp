@@ -225,6 +225,8 @@ int Cassette::setupAudioData() {
     "Setting up AudioData buffers"
   );
 
+  audioData.fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
+
   audioData.inputBuffers[0] = inputBuffers[0];
   audioData.inputBuffers[1] = inputBuffers[1];
 

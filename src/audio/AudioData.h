@@ -44,6 +44,7 @@ struct AudioData {
                                    // pSFATRB[0] = unused (debug)
                                    // pSFATRB[1] = frameId sf_count_t
   float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
+  std::function<int(AudioData*, float, jack_nframes_t)> fillPlaybackBuffer;
 
   AudioData(
     const sf_count_t frameId,
