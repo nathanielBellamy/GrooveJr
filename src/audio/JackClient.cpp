@@ -350,13 +350,14 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const float playbackSpe
 
   if (playbackSpeed < 1.0f) {
     // we will double some frames
-    const auto doubleFactor = static_cast<jack_nframes_t>(
-      std::floor(
-        ((static_cast<float>(nframes) - 1.0f) / 0.5f) * (playbackSpeed - 0.5f) + 1.0f
-      )
-    );
+    const sf_count_t doubleFactor = 4;
+    // static_cast<jack_nframes_t>(
+    //   std::floor(
+    //     (((static_cast<float>(nframes) - 1.0f) / 0.5f) * (playbackSpeed - 0.5f)) + 1.0f
+    //   )
+    // );
 
-    jack_nframes_t doubleCounter = 0;
+    jack_nframes_t doubleCounter = 1;
     jack_nframes_t doubledCount = 0;
     for (jack_nframes_t i = 0; i < nframes; i++) {
       audioData->playbackBuffer[0][i] = audioData->inputBuffersProcessHead[0][i];
@@ -382,6 +383,7 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const float playbackSpe
       (1.0f - static_cast<float>(nframes)) * (playbackSpeed - 1.0f) + static_cast<float>(nframes)
     )
   );
+
   jack_nframes_t dropCounter = 0;
   jack_nframes_t droppedCount = 0;
   for (jack_nframes_t i = 0; i < nframes; i++) {
@@ -441,7 +443,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   // update process head
   audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioData->frameId;
   audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioData->frameId;
-  float **processHead = audioData->inputBuffersProcessHead;
+
+  audioData->fillPlaybackBuffer(audioData, 0.6f, nframes);
 
   // process effects channels
   // main channel is effectsChannelIdx 0
@@ -449,7 +452,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     auto [effectCount, processFuncs, buffers] = audioData->effectsChannelsProcessData[effectsChannelIdx];
     for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
       if (pluginIdx == 0) {
-        buffers[pluginIdx].inputs = processHead;
+        buffers[pluginIdx].inputs = static_cast<float**>(audioData->playbackBuffer);
       }
       buffers[pluginIdx].numSamples = static_cast<int32_t>(nframes);
 
@@ -477,8 +480,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
       if (effectsChannelIdx == 1) {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] = factorLL * processHead[0][i] + factorRL * processHead[1][i];
-          audioData->mainInBuffers[1][i] = factorLR * processHead[0][i] + factorRR * processHead[1][i];
+          audioData->mainInBuffers[0][i] = factorLL * audioData->playbackBuffer[0][i] + factorRL * audioData->playbackBuffer[1][i];
+          audioData->mainInBuffers[1][i] = factorLR * audioData->playbackBuffer[0][i] + factorRR * audioData->playbackBuffer[1][i];
         } else {
           audioData->mainInBuffers[0][i] = factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                            factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
@@ -487,8 +490,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
         }
       } else {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] += factorLL * processHead[0][i] + factorRL * processHead[1][i];
-          audioData->mainInBuffers[1][i] += factorLR * processHead[0][i] + factorRR * processHead[1][i];
+          audioData->mainInBuffers[0][i] += factorLL * audioData->playbackBuffer[0][i] + factorRL * audioData->playbackBuffer[1][i];
+          audioData->mainInBuffers[1][i] += factorLR * audioData->playbackBuffer[0][i] + factorRR * audioData->playbackBuffer[1][i];
         } else {
           audioData->mainInBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
               factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
@@ -520,7 +523,6 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     outR[i] = factorLR * audioData->mainOutBuffers[0][i] + factorRR * audioData->mainOutBuffers[1][i];
   }
 
-  audioData->frameId += nframes;
   if (audioData->frameId >= audioData->frames - nframes)
     audioData->readComplete = true;
 
