@@ -527,7 +527,7 @@ int Cassette::updateAudioDataFromMixer(
     const sf_count_t newFrameId = ThreadStatics::getFrameId();
     playbackSettingsToAudioThread[0] = 1;
     playbackSettingsToAudioThread[1] = newFrameId;
-    playbackSettingsToAudioThread[2] = mixer->getPlaybackSpeed();
+    playbackSettingsToAudioThread[2] = ThreadStatics::getPlaybackSpeed();
 
     ThreadStatics::setUserSettingFrameId(false);
   }

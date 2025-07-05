@@ -38,8 +38,6 @@ class Mixer {
   float channelCount;
   std::vector<Effects::EffectsChannel*> effectsChannels;
   std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
-  std::atomic<sf_count_t> playbackSpeed;
-
 
   void incorporateLatencySamples(int latencySamples) const;
 
@@ -53,16 +51,12 @@ public:
   };
 
   Result setPlaybackSpeed(const int newPlaybackSpeed) {
-    // TODO: debug store
-    std::cout << "settingPlaybackSpeed " << newPlaybackSpeed << std::endl;
-    playbackSpeed.store(newPlaybackSpeed);
-
-    std::cout << "setPlaybackSpeed: " << playbackSpeed.load() << std::endl;
+    ThreadStatics::setPlaybackSpeed(newPlaybackSpeed);
     return OK;
   }
 
   sf_count_t getPlaybackSpeed() const {
-    return playbackSpeed.load();
+    return ThreadStatics::getPlaybackSpeed();
   }
 
   [[nodiscard]]

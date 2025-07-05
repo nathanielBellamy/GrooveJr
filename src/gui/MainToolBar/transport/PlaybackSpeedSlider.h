@@ -5,8 +5,6 @@
 #ifndef PLAYBACKSPEEDSLIDER_H
 #define PLAYBACKSPEEDSLIDER_H
 
-#include <iostream>
-
 #include <QSlider>
 
 #include "../../../audio/Mixer.h"

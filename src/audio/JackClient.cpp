@@ -338,10 +338,9 @@ Result JackClient::activateAndConnectPorts() const {
   return OK;
 }
 
-// plabackSpeed in [0.5, 2.0]
+// plabackSpeed in [-2.0, 2.0]
 int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
   const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
-  // const float playbackSpeedF = 0.8f;
   float playbackPos = 0.0f;
   jack_nframes_t idx;
   for (jack_nframes_t i = 0; i < nframes; i++) {

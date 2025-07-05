@@ -14,7 +14,6 @@ Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
   , dao(dao)
   , jackClient(new JackClient(this))
   , channelCount(1.0f)
-  , playbackSpeed(100)
   {
 
   Logging::write(
