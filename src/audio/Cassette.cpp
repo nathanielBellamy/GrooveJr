@@ -518,16 +518,14 @@ int Cassette::updateAudioDataFromMixer(
   const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
   mixer->getUpdateProgressBarFunc()(audioData.frames, currentFrameId);
 
-  // if (playbackSettingsFromAudioThread[0] == 1) { // done setting frameId
-    playbackSettingsToAudioThread[0] = 0;
-    playbackSettingsToAudioThread[1] = 0;
-  // }
+  playbackSettingsToAudioThread[0] = 0;
+  playbackSettingsToAudioThread[1] = 0;
+  playbackSettingsToAudioThread[2] = ThreadStatics::getPlaybackSpeed();
 
   if (ThreadStatics::getUserSettingFrameId()) {
     const sf_count_t newFrameId = ThreadStatics::getFrameId();
     playbackSettingsToAudioThread[0] = 1;
     playbackSettingsToAudioThread[1] = newFrameId;
-    playbackSettingsToAudioThread[2] = ThreadStatics::getPlaybackSpeed();
 
     ThreadStatics::setUserSettingFrameId(false);
   }
