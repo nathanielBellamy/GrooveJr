@@ -9,6 +9,8 @@
 #include <cmath>
 #include <algorithm>
 #include <memory>
+#include <atomic>
+
 #include <sndfile.hh>
 
 #include "public.sdk/source/vst/utility/memoryibstream.h"
@@ -36,6 +38,8 @@ class Mixer {
   float channelCount;
   std::vector<Effects::EffectsChannel*> effectsChannels;
   std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
+  std::atomic<sf_count_t> playbackSpeed;
+
 
   void incorporateLatencySamples(int latencySamples) const;
 
@@ -47,6 +51,19 @@ public:
   std::shared_ptr<JackClient> getGjJackClient() const {
     return jackClient;
   };
+
+  Result setPlaybackSpeed(const int newPlaybackSpeed) {
+    // TODO: debug store
+    std::cout << "settingPlaybackSpeed " << newPlaybackSpeed << std::endl;
+    playbackSpeed.store(newPlaybackSpeed);
+
+    std::cout << "setPlaybackSpeed: " << playbackSpeed.load() << std::endl;
+    return OK;
+  }
+
+  sf_count_t getPlaybackSpeed() const {
+    return playbackSpeed.load();
+  }
 
   [[nodiscard]]
   std::vector<Effects::EffectsChannel*> getEffectsChannels() const {

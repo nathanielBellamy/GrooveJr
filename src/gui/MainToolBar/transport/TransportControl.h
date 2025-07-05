@@ -25,6 +25,7 @@
 
 #include "TransportControlButton.h"
 #include "ProgressBar.h"
+#include "PlaybackSpeedSlider.h"
 
 namespace Gj {
 namespace Gui {
@@ -43,6 +44,7 @@ class TransportControl final : public QWidget {
     QGridLayout grid;
 
     ProgressBar progressBar;
+    PlaybackSpeedSlider playbackSpeedSlider;
     TransportControlButton playButton;
     TransportControlButton pauseButton;
     TransportControlButton stopButton;

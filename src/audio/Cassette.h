@@ -52,8 +52,8 @@ class Cassette
   float** buffersBPtr;
   float* effectsChannelsWriteOutBuffer;
   float effectsChannelsSettings[2 * MAX_EFFECTS_CHANNELS]{};
-  sf_count_t playbackSettingsToAudioThread[2]{};
-  sf_count_t playbackSettingsFromAudioThread[2]{};
+  sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
+  sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
   AudioData audioData;
 
   int setupAudioData();

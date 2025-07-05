@@ -35,11 +35,12 @@ struct AudioData {
                                    // eCS[4k+3] = {factorRR channel k}
   float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{};
   jack_ringbuffer_t*               effectsChannelsSettingsRB{nullptr};
-  sf_count_t                       playbackSettingsToAudioThread[2]{};
+  sf_count_t                       playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
   jack_ringbuffer_t*               playbackSettingsToAudioThreadRB{nullptr};
                                    // pSTATRB[0] = userSettingFrameId bool
-                                   // pSTATRB[1] = newFrameId sf_count_t
-  sf_count_t                       playbackSettingsFromAudioThread[2]{};
+                                   // pSTATRB[1] = newFrameId         sf_count_t
+                                   // pSTATRB[2] = newPlaybackSpeed   sf_count_t
+  sf_count_t                       playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
   jack_ringbuffer_t*               playbackSettingsFromAudioThreadRB{nullptr};
                                    // pSFATRB[0] = unused (debug)
                                    // pSFATRB[1] = frameId sf_count_t

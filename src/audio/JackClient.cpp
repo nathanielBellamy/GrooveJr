@@ -339,15 +339,17 @@ Result JackClient::activateAndConnectPorts() const {
 }
 
 // plabackSpeed in [0.5, 2.0]
-int JackClient::fillPlaybackBuffer(AudioData* audioData, const float playbackSpeed, const jack_nframes_t nframes) {
+int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
+  const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
+  // const float playbackSpeedF = 0.8f;
   float playbackPos = 0.0f;
   jack_nframes_t idx;
   for (jack_nframes_t i = 0; i < nframes; i++) {
     idx = static_cast<jack_nframes_t>(playbackPos);
-    const float frac = playbackPos - idx;
+    const float frac = playbackPos - std::floor(playbackPos);
     audioData->playbackBuffer[0][i] = (1.0f - frac) * audioData->inputBuffersProcessHead[0][idx] + frac * audioData->inputBuffersProcessHead[0][idx+1];
     audioData->playbackBuffer[1][i] = (1.0f - frac) * audioData->inputBuffersProcessHead[1][idx] + frac * audioData->inputBuffersProcessHead[1][idx+1];
-    playbackPos += playbackSpeed;
+    playbackPos += playbackSpeedF;
   }
 
   audioData->frameId += idx;
@@ -367,14 +369,14 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   );
 
   // retrieve AudioData
-  const auto audioData = static_cast<AudioData *>(arg);
+  const auto audioData = static_cast<AudioData*>(arg);
 
   // read playbackSettingsToAudioThreadRingBuffer
-  if (jack_ringbuffer_read_space(audioData->playbackSettingsToAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
+  if (jack_ringbuffer_read_space(audioData->playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE - 2) {
     jack_ringbuffer_read(
       audioData->playbackSettingsToAudioThreadRB,
       reinterpret_cast<char *>(audioData->playbackSettingsToAudioThread),
-      PlaybackSettings_RB_SIZE
+      PlaybackSettingsToAudioThread_RB_SIZE
     );
   }
 
@@ -385,11 +387,11 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   audioData->playbackSettingsFromAudioThread[1] = audioData->frameId;
 
   // write to playbackSettingsFromAudioThread ring buffer
-  if (jack_ringbuffer_write_space(audioData->playbackSettingsFromAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
+  if (jack_ringbuffer_write_space(audioData->playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
     jack_ringbuffer_write(
       audioData->playbackSettingsFromAudioThreadRB,
       reinterpret_cast<char *>(audioData->playbackSettingsFromAudioThread),
-      PlaybackSettings_RB_SIZE
+      PlaybackSettingsFromAudioThread_RB_SIZE
     );
   }
 
@@ -397,7 +399,11 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioData->frameId;
   audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioData->frameId;
 
-  audioData->fillPlaybackBuffer(audioData, 0.75f, nframes);
+  audioData->fillPlaybackBuffer(
+    audioData,
+    audioData->playbackSettingsToAudioThread[2],
+    nframes
+  );
 
   // process effects channels
   // main channel is effectsChannelIdx 0

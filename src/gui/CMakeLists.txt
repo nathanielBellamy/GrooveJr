@@ -79,6 +79,8 @@ qt_add_library(GjGui STATIC
         MainToolBar/CurrentlyPlaying.cpp
         MainToolBar/MainToolBar.h
         MainToolBar/MainToolBar.cpp
+        MainToolBar/transport/PlaybackSpeedSlider.h
+        MainToolBar/transport/PlaybackSpeedSlider.cpp
         MainToolBar/transport/ProgressBar.h
         MainToolBar/transport/ProgressBar.cpp
         MainToolBar/transport/TransportControl.h

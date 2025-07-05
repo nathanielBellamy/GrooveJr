@@ -507,11 +507,11 @@ int Cassette::updateAudioDataFromMixer(
   ) {
 
   // read playbackSettingsFromAudioThread ring buffer
-  if (jack_ringbuffer_read_space(playbackSettingsFromAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
+  if (jack_ringbuffer_read_space(playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
     jack_ringbuffer_read(
       playbackSettingsFromAudioThreadRB,
       reinterpret_cast<char*>(playbackSettingsFromAudioThread),
-      PlaybackSettings_RB_SIZE
+      PlaybackSettingsFromAudioThread_RB_SIZE
     );
   }
 
@@ -527,16 +527,17 @@ int Cassette::updateAudioDataFromMixer(
     const sf_count_t newFrameId = ThreadStatics::getFrameId();
     playbackSettingsToAudioThread[0] = 1;
     playbackSettingsToAudioThread[1] = newFrameId;
+    playbackSettingsToAudioThread[2] = mixer->getPlaybackSpeed();
 
     ThreadStatics::setUserSettingFrameId(false);
   }
 
   // write to playbackSettingsToAudioThread ring buffer
-  if (jack_ringbuffer_write_space(playbackSettingsToAudioThreadRB) > PlaybackSettings_RB_SIZE - 2) {
+  if (jack_ringbuffer_write_space(playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE - 2) {
     jack_ringbuffer_write(
       playbackSettingsToAudioThreadRB,
       reinterpret_cast<char*>(playbackSettingsToAudioThread),
-      PlaybackSettings_RB_SIZE
+      PlaybackSettingsToAudioThread_RB_SIZE
     );
   }
 
@@ -634,10 +635,10 @@ int Cassette::play() {
   jack_ringbuffer_t* effectsChannelsSettingsRB = jack_ringbuffer_create(EffectsSettings_RB_SIZE);
   audioData.effectsChannelsSettingsRB = effectsChannelsSettingsRB;
 
-  jack_ringbuffer_t* playbackSettingsToAudioThreadRB = jack_ringbuffer_create(PlaybackSettings_RB_SIZE);
+  jack_ringbuffer_t* playbackSettingsToAudioThreadRB = jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE);
   audioData.playbackSettingsToAudioThreadRB = playbackSettingsToAudioThreadRB;
 
-  jack_ringbuffer_t* playbackSettingsFromAudioThreadRB = jack_ringbuffer_create(PlaybackSettings_RB_SIZE);
+  jack_ringbuffer_t* playbackSettingsFromAudioThreadRB = jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE);
   audioData.playbackSettingsFromAudioThreadRB = playbackSettingsFromAudioThreadRB;
 
   ThreadStatics::setReadComplete(false);

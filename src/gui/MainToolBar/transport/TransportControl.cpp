@@ -14,6 +14,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mi
   , sys(sys)
   , grid(this)
   , progressBar(this, mixer, 0)
+  , playbackSpeedSlider(this, mixer)
   , playButton(this, &playTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay))
   , pauseButton(this, &pauseTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause))
   , stopButton(this, &stopTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop))
@@ -127,6 +128,7 @@ void TransportControl::setupGrid() {
   grid.addWidget(&rwButton, 0, 3, 1, 1);
   grid.addWidget(&ffButton, 0, 4, 1, 1);
   grid.addWidget(&progressBar, 1, 0, 1, -1);
+  grid.addWidget(&playbackSpeedSlider, 2, 0, 1, -1);
 
   setLayout(&grid);
 }

@@ -48,7 +48,7 @@ public:
 
   bool registerAudioClient(IAudioClient* client) override;
   bool registerMidiClient(IMidiClient *client) override;
-  static int fillPlaybackBuffer(AudioData* audioData, float playbackSpeed, jack_nframes_t nframes);
+  static int fillPlaybackBuffer(AudioData* audioData, sf_count_t playbackSpeed, jack_nframes_t nframes);
 
   //--------------------------------------------------------------------
 private:
