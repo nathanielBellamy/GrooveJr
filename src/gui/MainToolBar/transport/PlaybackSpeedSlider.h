@@ -17,6 +17,7 @@ class PlaybackSpeedSlider final : public QSlider {
 
   public:
     PlaybackSpeedSlider(QWidget* parent, Audio::Mixer* mixer);
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
 };
 
 } // Gui

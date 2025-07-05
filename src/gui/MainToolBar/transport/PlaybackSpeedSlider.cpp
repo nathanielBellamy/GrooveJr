@@ -21,5 +21,9 @@ PlaybackSpeedSlider::PlaybackSpeedSlider(QWidget* parent, Audio::Mixer* mixer)
   });
 }
 
+void PlaybackSpeedSlider::mouseDoubleClickEvent(QMouseEvent* event) {
+  setValue(100);
+}
+
 } // Gui
 } // Gj

@@ -342,10 +342,10 @@ Result JackClient::activateAndConnectPorts() const {
 int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
   const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
   float playbackPos = 0.0f;
-  jack_nframes_t idx;
+  jack_nframes_t idx = 0;
   for (jack_nframes_t i = 0; i < nframes; i++) {
     idx = static_cast<jack_nframes_t>(playbackPos);
-    const float frac = playbackPos - std::floor(playbackPos);
+    const float frac = playbackPos - std::trunc(playbackPos);
     audioData->playbackBuffer[0][i] = (1.0f - frac) * audioData->inputBuffersProcessHead[0][idx] + frac * audioData->inputBuffersProcessHead[0][idx+1];
     audioData->playbackBuffer[1][i] = (1.0f - frac) * audioData->inputBuffersProcessHead[1][idx] + frac * audioData->inputBuffersProcessHead[1][idx+1];
     playbackPos += playbackSpeedF;
