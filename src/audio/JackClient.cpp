@@ -340,64 +340,17 @@ Result JackClient::activateAndConnectPorts() const {
 
 // plabackSpeed in [0.5, 2.0]
 int JackClient::fillPlaybackBuffer(AudioData* audioData, const float playbackSpeed, const jack_nframes_t nframes) {
-  if (playbackSpeed == 1.0f) {
-    for (jack_nframes_t i = 0; i < nframes; i++) {
-      audioData->playbackBuffer[0][i] = audioData->inputBuffersProcessHead[0][i];
-      audioData->playbackBuffer[1][i] = audioData->inputBuffersProcessHead[1][i];
-    }
-    return 0;
-  }
-
-  if (playbackSpeed < 1.0f) {
-    // we will double some frames
-    const sf_count_t doubleFactor = 4;
-    // static_cast<jack_nframes_t>(
-    //   std::floor(
-    //     (((static_cast<float>(nframes) - 1.0f) / 0.5f) * (playbackSpeed - 0.5f)) + 1.0f
-    //   )
-    // );
-
-    jack_nframes_t doubleCounter = 1;
-    jack_nframes_t doubledCount = 0;
-    for (jack_nframes_t i = 0; i < nframes; i++) {
-      audioData->playbackBuffer[0][i] = audioData->inputBuffersProcessHead[0][i];
-      audioData->playbackBuffer[1][i] = audioData->inputBuffersProcessHead[1][i];
-      if (doubleCounter == doubleFactor) {
-        audioData->playbackBuffer[0][i+1] = audioData->inputBuffersProcessHead[0][i];
-        audioData->playbackBuffer[1][i+1] = audioData->inputBuffersProcessHead[1][i];
-        i++; // double increment
-        doubleCounter = 0;
-        doubledCount++;
-      }
-      doubleCounter++;
-    }
-
-    audioData->frameId += nframes - doubledCount;
-    return 0;
-  }
-
-  // playbackSpeed > 1.0f
-  // we will drop some frames
-  const auto dropFactor = static_cast<jack_nframes_t>(
-    std::floor(
-      (1.0f - static_cast<float>(nframes)) * (playbackSpeed - 1.0f) + static_cast<float>(nframes)
-    )
-  );
-
-  jack_nframes_t dropCounter = 0;
-  jack_nframes_t droppedCount = 0;
+  float playbackPos = 0.0f;
+  jack_nframes_t idx;
   for (jack_nframes_t i = 0; i < nframes; i++) {
-    if (dropCounter == dropFactor) {
-      i++; // double increment
-      dropCounter = 0;
-      droppedCount++;
-    }
-    audioData->playbackBuffer[0][i] = audioData->inputBuffersProcessHead[0][i];
-    audioData->playbackBuffer[1][i] = audioData->inputBuffersProcessHead[1][i];
-    dropCounter++;
+    idx = static_cast<jack_nframes_t>(playbackPos);
+    const float frac = playbackPos - idx;
+    audioData->playbackBuffer[0][i] = (1.0f - frac) * audioData->inputBuffersProcessHead[0][idx] + frac * audioData->inputBuffersProcessHead[0][idx+1];
+    audioData->playbackBuffer[1][i] = (1.0f - frac) * audioData->inputBuffersProcessHead[1][idx] + frac * audioData->inputBuffersProcessHead[1][idx+1];
+    playbackPos += playbackSpeed;
   }
 
-  audioData->frameId += nframes + droppedCount;
+  audioData->frameId += idx;
   return 0;
 }
 
@@ -444,7 +397,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioData->frameId;
   audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioData->frameId;
 
-  audioData->fillPlaybackBuffer(audioData, 0.6f, nframes);
+  audioData->fillPlaybackBuffer(audioData, 0.75f, nframes);
 
   // process effects channels
   // main channel is effectsChannelIdx 0
