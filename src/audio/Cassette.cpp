@@ -315,25 +315,23 @@ int Cassette::setupAudioData() {
 IAudioClient::Buffers Cassette::getPluginBuffersMain(const int pluginIdx) const {
   const int32_t audioFramesPerBuffer = gAppState->getAudioFramesPerBuffer();
   if (pluginIdx % 2 == 0) {
-    const IAudioClient::Buffers buffers = {
+    return {
       buffersAPtr,
       2,
       buffersBPtr,
       2,
       audioFramesPerBuffer
     };
-    return buffers;
   }
 
   // pluginIdx % 2 == 1
-  const IAudioClient::Buffers buffers = {
+  return {
     buffersBPtr,
     2,
     buffersAPtr,
     2,
     audioFramesPerBuffer
   };
-  return buffers;
 }
 
 IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, const AudioData& audioData) const {
@@ -342,47 +340,43 @@ IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* 
   if (pluginIdx % 2 == 0) {
     if (pluginIdx == effectsCount - 1) {
       const auto writeOut = const_cast<float**>(audioData.effectsChannelsWriteOut[channelIdx]);
-      const IAudioClient::Buffers buffers = {
+      return {
         buffersBPtr, // if pluginIdx == 0, this will be updated to processHead in jackProcessCallBAck
         2,
         writeOut,
         2,
         audioFramesPerBuffer
       };
-      return buffers;
     }
 
-    const IAudioClient::Buffers buffers = {
+    return {
       buffersBPtr,
       2,
       buffersAPtr,
       2,
       audioFramesPerBuffer
     };
-    return buffers;
   }
 
   // pluginIdx % 2 == 1
   if (pluginIdx == effectsCount - 1) {
     const auto writeOut = const_cast<float**>(audioData.effectsChannelsWriteOut[channelIdx]);
-    const IAudioClient::Buffers buffers = {
+    return {
       buffersAPtr,
       2,
       writeOut,
       2,
       audioFramesPerBuffer
     };
-    return buffers;
   }
 
-  const IAudioClient::Buffers buffers = {
+  return {
     buffersAPtr,
     2,
     buffersBPtr,
     2,
     audioFramesPerBuffer
   };
-  return buffers;
 }
 
 bool Cassette::allocateProcessBuffers() {
