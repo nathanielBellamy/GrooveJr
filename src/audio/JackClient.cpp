@@ -341,8 +341,8 @@ Result JackClient::activateAndConnectPorts() const {
 // plabackSpeed in [-2.0, 2.0]
 int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
   // update process head
-  audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioData->frameId;
-  audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioData->frameId;
+  const float* processHeadL = audioData->inputBuffers[0] + audioData->frameId;
+  const float* processHeadR = audioData->inputBuffers[1] + audioData->frameId;
 
   const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
   float playbackPos = 0.0f;
@@ -352,8 +352,8 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
     playbackPosTrunc = std::trunc(playbackPos);
     idx = static_cast<int>(playbackPosTrunc);
     const float frac = playbackPos - playbackPosTrunc;
-    audioData->playbackBuffer[0][i] = (1.0f - frac) * audioData->inputBuffersProcessHead[0][idx] + frac * audioData->inputBuffersProcessHead[0][idx+1];
-    audioData->playbackBuffer[1][i] = (1.0f - frac) * audioData->inputBuffersProcessHead[1][idx] + frac * audioData->inputBuffersProcessHead[1][idx+1];
+    audioData->playbackBuffers[0][i] = (1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1];
+    audioData->playbackBuffers[1][i] = (1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1];
     playbackPos += playbackSpeedF;
   }
 
@@ -412,7 +412,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     auto [effectCount, processFuncs, buffers] = audioData->effectsChannelsProcessData[effectsChannelIdx];
     for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
       if (pluginIdx == 0) {
-        buffers[pluginIdx].inputs = static_cast<float**>(audioData->playbackBuffer);
+        buffers[pluginIdx].inputs = static_cast<float**>(audioData->playbackBuffers);
       }
       buffers[pluginIdx].numSamples = static_cast<int32_t>(nframes);
 
@@ -424,13 +424,12 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   }
 
   // read channel settings from ringbuffer
-  jack_ringbuffer_t *ringBuffer = audioData->effectsChannelsSettingsRB;
-  if (jack_ringbuffer_read_space(ringBuffer) >= EffectsSettings_RB_SIZE) {
+  if (jack_ringbuffer_t* ringBuffer = audioData->effectsChannelsSettingsRB; jack_ringbuffer_read_space(ringBuffer) >= EffectsSettings_RB_SIZE) {
     jack_ringbuffer_read(ringBuffer, reinterpret_cast<char *>(audioData->effectsChannelsSettings),
                          EffectsSettings_RB_SIZE);
   }
 
-  // sum down into mainBuffers
+  // sum down
   for (int i = 0; i < nframes; i++) {
     for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
       const float factorLL = audioData->effectsChannelsSettings[4 * effectsChannelIdx];
@@ -440,22 +439,22 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
       if (effectsChannelIdx == 1) {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainBuffers[0][i] = factorLL * audioData->playbackBuffer[0][i] + factorRL * audioData->playbackBuffer[1][i];
-          audioData->mainBuffers[1][i] = factorLR * audioData->playbackBuffer[0][i] + factorRR * audioData->playbackBuffer[1][i];
+          audioData->processBuffers[0][i] = factorLL * audioData->playbackBuffers[0][i] + factorRL * audioData->playbackBuffers[1][i];
+          audioData->processBuffers[1][i] = factorLR * audioData->playbackBuffers[0][i] + factorRR * audioData->playbackBuffers[1][i];
         } else {
-          audioData->mainBuffers[0][i] = factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+          audioData->processBuffers[0][i] = factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                            factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          audioData->mainBuffers[1][i] = factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+          audioData->processBuffers[1][i] = factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                            factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
       } else {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainBuffers[0][i] += factorLL * audioData->playbackBuffer[0][i] + factorRL * audioData->playbackBuffer[1][i];
-          audioData->mainBuffers[1][i] += factorLR * audioData->playbackBuffer[0][i] + factorRR * audioData->playbackBuffer[1][i];
+          audioData->processBuffers[0][i] += factorLL * audioData->playbackBuffers[0][i] + factorRL * audioData->playbackBuffers[1][i];
+          audioData->processBuffers[1][i] += factorLR * audioData->playbackBuffers[0][i] + factorRR * audioData->playbackBuffers[1][i];
         } else {
-          audioData->mainBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+          audioData->processBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                             factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          audioData->mainBuffers[1][i] += factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+          audioData->processBuffers[1][i] += factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                             factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
       }
@@ -479,8 +478,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   const float factorRL = audioData->effectsChannelsSettings[2];
   const float factorRR = audioData->effectsChannelsSettings[3];
   for (int i = 0; i < nframes; i++) {
-    outL[i] = factorLL * audioData->mainBuffers[0][i] + factorRL * audioData->mainBuffers[1][i];
-    outR[i] = factorLR * audioData->mainBuffers[0][i] + factorRR * audioData->mainBuffers[1][i];
+    outL[i] = factorLL * audioData->processBuffers[0][i] + factorRL * audioData->processBuffers[1][i];
+    outR[i] = factorLR * audioData->processBuffers[0][i] + factorRR * audioData->processBuffers[1][i];
   }
 
   if (audioData->frameId >= audioData->frames - nframes)

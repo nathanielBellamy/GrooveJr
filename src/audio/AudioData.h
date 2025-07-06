@@ -14,7 +14,7 @@ namespace Audio {
 
 struct AudioData {
   sf_count_t                       frameId;
-  sf_count_t                       frames; // total # of frames
+  sf_count_t                       frames { 0 }; // total # of frames
   PlayState                        playState;
   float                            playbackSpeed;
   bool                             readComplete;
@@ -22,9 +22,10 @@ struct AudioData {
   float                            fadeIn;
   float                            fadeOut;
   float*                           inputBuffers[2]{nullptr, nullptr};
-  float*                           inputBuffersProcessHead[2]{nullptr, nullptr};
-  float*                           playbackBuffer[2]{nullptr, nullptr};
-  float*                           mainBuffers[2]{nullptr, nullptr};
+  float*                           processBuffers[2]{nullptr, nullptr};
+  float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
+  float*                           playbackBuffers[2]{nullptr, nullptr};
+  float                            playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
   float                            channelCount;
   int                              effectsChannelCount;
   std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
@@ -63,8 +64,11 @@ struct AudioData {
       , effectsChannelCount(effectsChannelCount)
       {
 
-    playbackBuffer[0] = new float[MAX_AUDIO_FRAMES_PER_BUFFER * 2];
-    playbackBuffer[1] = playbackBuffer[0] + MAX_AUDIO_FRAMES_PER_BUFFER;
+    processBuffers[0] = &playbackBuffersBuffer[0];
+    processBuffers[1] = &processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
+
+    playbackBuffers[0] = &playbackBuffersBuffer[0];
+    playbackBuffers[1] = &playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
 
     Logging::write(
       Info,
@@ -74,7 +78,6 @@ struct AudioData {
   }
 
   ~AudioData() {
-    delete[] playbackBuffer[0];
     Logging::write(
       Info,
       "Audio::AudioData::~AudioData",

@@ -46,8 +46,6 @@ class Cassette
   float* inputBuffer{};
   float* inputBuffers[2]{}; // full song audio data
   float* inputBuffersProcessHead[2]{}; // where jack process callback should start
-  float buffersA[2 * MAX_AUDIO_FRAMES_PER_BUFFER]{};
-  float** buffersAPtr;
   float* effectsChannelsWriteOutBuffer;
   float effectsChannelsSettings[2 * MAX_EFFECTS_CHANNELS]{};
   sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
@@ -55,13 +53,13 @@ class Cassette
   AudioData audioData;
 
   int setupAudioData();
-  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int channelIdx, int pluginIdx, const AudioData &audioData) const;
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int channelIdx, int pluginIdx, AudioData& audioData);
 
   bool allocateInputBuffers();
   bool populateInputBuffers() const;
   bool setupInputBuffers();
 
-  bool allocateProcessBuffers();
+  bool allocateEffectsChannelsWriteOutBuffers();
   [[nodiscard]]
   bool deleteBuffers() const;
 
