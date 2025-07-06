@@ -39,9 +39,6 @@ Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
   float* buffersAPtrPre[2] = { &buffersA[0], &buffersA[MAX_AUDIO_FRAMES_PER_BUFFER] };
   buffersAPtr = buffersAPtrPre;
 
-  float* buffersBPtrPre[2] = { &buffersB[0], &buffersB[MAX_AUDIO_FRAMES_PER_BUFFER] };
-  buffersBPtr = buffersBPtrPre;
-
   if (int audioDataRes = setupAudioData(); audioDataRes > 0) {
     Logging::write(
       Error,
@@ -310,32 +307,11 @@ int Cassette::setupAudioData() {
 IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, const AudioData& audioData) const {
   const int32_t audioFramesPerBuffer = gAppState->getAudioFramesPerBuffer();
   const int effectsCount = effectsChannel->effectCount(); // should always be >0
-  if (pluginIdx % 2 == 0) {
-    if (pluginIdx == effectsCount - 1) {
-      const auto writeOut = const_cast<float**>(audioData.effectsChannelsWriteOut[channelIdx]);
-      return {
-        buffersBPtr, // if pluginIdx == 0, this will be updated to processHead in jackProcessCallBAck
-        2,
-        writeOut,
-        2,
-        audioFramesPerBuffer
-      };
-    }
 
-    return {
-      buffersBPtr,
-      2,
-      buffersAPtr,
-      2,
-      audioFramesPerBuffer
-    };
-  }
-
-  // pluginIdx % 2 == 1
   if (pluginIdx == effectsCount - 1) {
     const auto writeOut = const_cast<float**>(audioData.effectsChannelsWriteOut[channelIdx]);
     return {
-      buffersAPtr,
+      buffersAPtr, // if pluginIdx == 0, this will be updated to processHead in jackProcessCallBAck
       2,
       writeOut,
       2,
@@ -344,9 +320,9 @@ IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* 
   }
 
   return {
-    buffersAPtr,
+    buffersAPtr, // if pluginIdx == 0, this will be updated to processHead in jackProcessCallBAck
     2,
-    buffersBPtr,
+    buffersAPtr,
     2,
     audioFramesPerBuffer
   };

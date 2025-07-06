@@ -47,9 +47,7 @@ class Cassette
   float* inputBuffers[2]{}; // full song audio data
   float* inputBuffersProcessHead[2]{}; // where jack process callback should start
   float buffersA[2 * MAX_AUDIO_FRAMES_PER_BUFFER]{};
-  float buffersB[2 * MAX_AUDIO_FRAMES_PER_BUFFER]{};
   float** buffersAPtr;
-  float** buffersBPtr;
   float* effectsChannelsWriteOutBuffer;
   float effectsChannelsSettings[2 * MAX_EFFECTS_CHANNELS]{};
   sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
