@@ -454,9 +454,9 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
           audioData->mainInBuffers[1][i] += factorLR * audioData->playbackBuffer[0][i] + factorRR * audioData->playbackBuffer[1][i];
         } else {
           audioData->mainInBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
-              factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+                                            factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
           audioData->mainInBuffers[1][i] += factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
-              factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+                                            factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
       }
     }
