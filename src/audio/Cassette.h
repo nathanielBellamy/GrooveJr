@@ -58,7 +58,6 @@ class Cassette
 
   int setupAudioData();
   IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int channelIdx, int pluginIdx, const AudioData &audioData) const;
-  IAudioClient::Buffers getPluginBuffersMain(int pluginIdx) const;
 
   bool allocateInputBuffers();
   bool populateInputBuffers() const;

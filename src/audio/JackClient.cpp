@@ -430,7 +430,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
                          EffectsSettings_RB_SIZE);
   }
 
-  // sum down into mainInBuffers
+  // sum down into mainBuffers
   for (int i = 0; i < nframes; i++) {
     for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
       const float factorLL = audioData->effectsChannelsSettings[4 * effectsChannelIdx];
@@ -440,22 +440,22 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
       if (effectsChannelIdx == 1) {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] = factorLL * audioData->playbackBuffer[0][i] + factorRL * audioData->playbackBuffer[1][i];
-          audioData->mainInBuffers[1][i] = factorLR * audioData->playbackBuffer[0][i] + factorRR * audioData->playbackBuffer[1][i];
+          audioData->mainBuffers[0][i] = factorLL * audioData->playbackBuffer[0][i] + factorRL * audioData->playbackBuffer[1][i];
+          audioData->mainBuffers[1][i] = factorLR * audioData->playbackBuffer[0][i] + factorRR * audioData->playbackBuffer[1][i];
         } else {
-          audioData->mainInBuffers[0][i] = factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+          audioData->mainBuffers[0][i] = factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                            factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          audioData->mainInBuffers[1][i] = factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+          audioData->mainBuffers[1][i] = factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                            factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
       } else {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          audioData->mainInBuffers[0][i] += factorLL * audioData->playbackBuffer[0][i] + factorRL * audioData->playbackBuffer[1][i];
-          audioData->mainInBuffers[1][i] += factorLR * audioData->playbackBuffer[0][i] + factorRR * audioData->playbackBuffer[1][i];
+          audioData->mainBuffers[0][i] += factorLL * audioData->playbackBuffer[0][i] + factorRL * audioData->playbackBuffer[1][i];
+          audioData->mainBuffers[1][i] += factorLR * audioData->playbackBuffer[0][i] + factorRR * audioData->playbackBuffer[1][i];
         } else {
-          audioData->mainInBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+          audioData->mainBuffers[0][i] += factorLL * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                             factorRL * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          audioData->mainInBuffers[1][i] += factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+          audioData->mainBuffers[1][i] += factorLR * audioData->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                             factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
       }
@@ -479,8 +479,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   const float factorRL = audioData->effectsChannelsSettings[2];
   const float factorRR = audioData->effectsChannelsSettings[3];
   for (int i = 0; i < nframes; i++) {
-    outL[i] = factorLL * audioData->mainOutBuffers[0][i] + factorRL * audioData->mainOutBuffers[1][i];
-    outR[i] = factorLR * audioData->mainOutBuffers[0][i] + factorRR * audioData->mainOutBuffers[1][i];
+    outL[i] = factorLL * audioData->mainBuffers[0][i] + factorRL * audioData->mainBuffers[1][i];
+    outR[i] = factorLR * audioData->mainBuffers[0][i] + factorRR * audioData->mainBuffers[1][i];
   }
 
   if (audioData->frameId >= audioData->frames - nframes)

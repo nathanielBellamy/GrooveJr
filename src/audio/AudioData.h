@@ -24,8 +24,7 @@ struct AudioData {
   float*                           inputBuffers[2]{nullptr, nullptr};
   float*                           inputBuffersProcessHead[2]{nullptr, nullptr};
   float*                           playbackBuffer[2]{nullptr, nullptr};
-  float*                           mainInBuffers[2]{nullptr, nullptr};
-  float*                           mainOutBuffers[2]{nullptr, nullptr};
+  float*                           mainBuffers[2]{nullptr, nullptr};
   float                            channelCount;
   int                              effectsChannelCount;
   std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
