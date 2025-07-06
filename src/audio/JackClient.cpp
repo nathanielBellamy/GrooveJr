@@ -340,6 +340,10 @@ Result JackClient::activateAndConnectPorts() const {
 
 // plabackSpeed in [-2.0, 2.0]
 int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
+  // update process head
+  audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioData->frameId;
+  audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioData->frameId;
+
   const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
   float playbackPos = 0.0f;
   float playbackPosTrunc = 0.0f;
@@ -395,10 +399,6 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
       PlaybackSettingsFromAudioThread_RB_SIZE
     );
   }
-
-  // update process head
-  audioData->inputBuffersProcessHead[0] = audioData->inputBuffers[0] + audioData->frameId;
-  audioData->inputBuffersProcessHead[1] = audioData->inputBuffers[1] + audioData->frameId;
 
   audioData->fillPlaybackBuffer(
     audioData,
