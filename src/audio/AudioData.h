@@ -64,8 +64,8 @@ struct AudioData {
       , effectsChannelCount(effectsChannelCount)
       {
 
-    playbackBuffer[0] = new float[2048]; // upper bound on jack nframes
-    playbackBuffer[1] = new float[2048]; // these will likely not be entirely filled
+    playbackBuffer[0] = new float[2048 * 2]; // upper bound on jack nframes
+    playbackBuffer[1] = playbackBuffer[0] + 2048; // these will likely not be entirely filled
 
     Logging::write(
       Info,
@@ -75,8 +75,7 @@ struct AudioData {
   }
 
   ~AudioData() {
-    delete playbackBuffer[0];
-    delete playbackBuffer[1];
+    delete[] playbackBuffer[0];
     Logging::write(
       Info,
       "Audio::AudioData::~AudioData",
