@@ -45,7 +45,6 @@ class Cassette
   SNDFILE* file{};
   float* inputBuffer{};
   float* inputBuffers[2]{}; // full song audio data
-  float* inputBuffersProcessHead[2]{}; // where jack process callback should start
   float* effectsChannelsWriteOutBuffer;
   float effectsChannelsSettings[2 * MAX_EFFECTS_CHANNELS]{};
   sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
