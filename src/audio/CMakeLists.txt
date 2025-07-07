@@ -19,6 +19,10 @@ find_package(Boost REQUIRED COMPONENTS log_setup log)
 # handle Vst3 Windows in Qt
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
+# fftw
+set(FFTW_ROOT "/opt/homebrew/opt/fftw/lib")
+find_library(FFTW_LIB fftw3 HINTS ${FFTW_ROOT})
+
 # jack audio
 if(NOT ${LIBJACK_FOUND})
     message(INFO " --GjAudio--LIBJACK--NOT--FOUND--")
@@ -110,8 +114,10 @@ target_link_libraries(GjAudio PUBLIC
     Qt6::Widgets
     ${LIBJACK_LIBRARY}
     GjDb
+    ${FFTW_LIB}
 )
 target_include_directories(GjAudio
         PRIVATE
         ${LIBJACK_INCLUDE_DIR}
+        ${FFTW_ROOT}
 )
