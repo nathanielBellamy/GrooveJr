@@ -12,7 +12,7 @@
 #include "../../../../AppState.h"
 #include "../../../../Logging.h"
 
-#include "../../../../audio/ChannelAtomic.h"
+#include "../../../../audio/Channel.h"
 #include "../../../../audio/Mixer.h"
 
 #include "../MuteButton.h"

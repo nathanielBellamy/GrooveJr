@@ -77,7 +77,7 @@ add_library(GjAudio SHARED
         Mixer.cpp
         JackClient.h
         JackClient.cpp
-        ChannelAtomic.h
+        Channel.h
         Logging.h
         Logging.cpp
         Constants.h

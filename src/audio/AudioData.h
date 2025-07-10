@@ -26,6 +26,7 @@ struct AudioData {
   float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
   float*                           playbackBuffers[2]{nullptr, nullptr};
   float                            playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
+  float                            fftFreqBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
   float                            channelCount;
   int                              effectsChannelCount;
   std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};

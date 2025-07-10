@@ -9,7 +9,7 @@
 #include <string>
 
 #include "./vst3/Plugin.h"
-#include "../ChannelAtomic.h"
+#include "../Channel.h"
 #include "../../AppState.h"
 #include "../../enums/Result.h"
 #include "../../db/entity/mixer/Effect.h"
@@ -31,7 +31,7 @@ class EffectsChannel {
   std::vector<Vst3::Plugin*> vst3Plugins;
 
   public:
-    ChannelAtomic channel;
+    Channel channel;
 
     EffectsChannel(
       AppState* gAppState,

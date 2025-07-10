@@ -2,8 +2,8 @@
 // Created by ns on 5/5/25.
 //
 
-#ifndef CHANNELATOMIC_H
-#define CHANNELATOMIC_H
+#ifndef GJAUDIOCHANNEL_H
+#define GJAUDIOCHANNEL_H
 
 #include <atomic>
 
@@ -12,7 +12,7 @@
 namespace Gj {
 namespace Audio {
 
-struct ChannelAtomic {
+struct Channel {
   std::atomic<float> gain = { 1.0f };
   std::atomic<float> mute = { 0.0f };
   std::atomic<float> solo = { 0.0f };
@@ -33,4 +33,4 @@ struct ChannelAtomic {
 
 
 
-#endif //CHANNELATOMIC_H
+#endif //CHANNEL_H
