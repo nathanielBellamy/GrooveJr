@@ -27,6 +27,7 @@ struct AudioData {
   float*                           inputBuffers[2]{nullptr, nullptr};
   float                            fft_time[MAX_AUDIO_FRAMES_PER_BUFFER]{};
   fftwf_complex                    fft_freq[MAX_AUDIO_FRAMES_PER_BUFFER / 2 + 1]{};
+  fftwf_complex                    fft_freq_shift[MAX_AUDIO_FRAMES_PER_BUFFER / 2 + 1]{};
   fftwf_plan                       fft_plan_r2c[4]{};
   fftwf_plan                       fft_plan_c2r[4]{};
   float*                           processBuffers[2]{nullptr, nullptr};
