@@ -1,5 +1,8 @@
 #ifndef GJAUDIOAUDIODATA_H
 #define GJAUDIOAUDIODATA_H
+
+#include <fftw3.h>
+
 #include <sndfile.hh>
 #include "../enums/PlayState.h"
 #include "./effects/EffectsChannelProcessData.h"
@@ -22,6 +25,10 @@ struct AudioData {
   float                            fadeIn;
   float                            fadeOut;
   float*                           inputBuffers[2]{nullptr, nullptr};
+  float                            fft_time[MAX_AUDIO_FRAMES_PER_BUFFER]{};
+  fftwf_complex                    fft_freq[MAX_AUDIO_FRAMES_PER_BUFFER / 2 + 1]{};
+  fftwf_plan                       fft_plan_r2c[4]{};
+  fftwf_plan                       fft_plan_c2r[4]{};
   float*                           processBuffers[2]{nullptr, nullptr};
   float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
   float*                           playbackBuffers[2]{nullptr, nullptr};
@@ -71,6 +78,18 @@ struct AudioData {
     playbackBuffers[0] = &playbackBuffersBuffer[0];
     playbackBuffers[1] = &playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
 
+    fft_plan_r2c[0] = fftwf_plan_dft_r2c_1d(128, fft_time, fft_freq, FFTW_ESTIMATE);
+    fft_plan_c2r[0] = fftwf_plan_dft_c2r_1d(128, fft_freq, fft_time, FFTW_ESTIMATE);
+
+    fft_plan_r2c[1] = fftwf_plan_dft_r2c_1d(256, fft_time, fft_freq, FFTW_ESTIMATE);
+    fft_plan_c2r[1] = fftwf_plan_dft_c2r_1d(256, fft_freq, fft_time, FFTW_ESTIMATE);
+
+    fft_plan_r2c[2] = fftwf_plan_dft_r2c_1d(512, fft_time, fft_freq, FFTW_ESTIMATE);
+    fft_plan_c2r[2] = fftwf_plan_dft_c2r_1d(512, fft_freq, fft_time, FFTW_ESTIMATE);
+
+    fft_plan_r2c[3] = fftwf_plan_dft_r2c_1d(MAX_AUDIO_FRAMES_PER_BUFFER, fft_time, fft_freq, FFTW_ESTIMATE);
+    fft_plan_c2r[3] = fftwf_plan_dft_c2r_1d(MAX_AUDIO_FRAMES_PER_BUFFER, fft_freq, fft_time, FFTW_ESTIMATE);
+
     Logging::write(
       Info,
       "Audio::AudioData::AudioData",
@@ -79,6 +98,17 @@ struct AudioData {
   }
 
   ~AudioData() {
+    Logging::write(
+      Info,
+      "Audio::AudioData::~AudioData",
+      "Destroying AudioData"
+    );
+
+    for (int i = 0; i < 4; i++) {
+      fftwf_destroy_plan(fft_plan_r2c[i]);
+      fftwf_destroy_plan(fft_plan_c2r[i]);
+    }
+
     Logging::write(
       Info,
       "Audio::AudioData::~AudioData",

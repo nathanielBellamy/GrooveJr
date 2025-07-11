@@ -19,10 +19,6 @@ find_package(Boost REQUIRED COMPONENTS log_setup log)
 # handle Vst3 Windows in Qt
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
-# fftw
-set(FFTW_ROOT "/opt/homebrew/opt/fftw/lib")
-find_library(FFTW_LIB fftw3 HINTS ${FFTW_ROOT})
-
 # jack audio
 if(NOT ${LIBJACK_FOUND})
     message(INFO " --GjAudio--LIBJACK--NOT--FOUND--")
@@ -31,6 +27,7 @@ endif()
 set (C_LIBS_INCLUDE_FLAGS
         -I${C_LIBS_HOME}/libsndfile/1.2.2/include
         -I${C_LIBS_HOME}/portaudio/19.7.0/include
+        -I${C_LIBS_HOME}/fftw/3.3.10_2/include
 )
 
 set (CXX_LIBS_INCLUDE_FLAGS
@@ -53,6 +50,8 @@ set (LINK_FLAGS
         -lsdk_hosting
         -L${VST3SDK_HOME}/build/lib/Release
         -lpluginterfaces
+        -L${C_LIBS_HOME}/fftw/3.3.10_2/lib
+        -lfftw3f
 )
 
 # compile vst3 audiohost
@@ -114,10 +113,9 @@ target_link_libraries(GjAudio PUBLIC
     Qt6::Widgets
     ${LIBJACK_LIBRARY}
     GjDb
-    ${FFTW_LIB}
 )
 target_include_directories(GjAudio
         PRIVATE
+        ${INCLUDE_FLAGS}
         ${LIBJACK_INCLUDE_DIR}
-        ${FFTW_ROOT}
 )
