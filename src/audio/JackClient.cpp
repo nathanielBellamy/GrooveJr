@@ -373,7 +373,9 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
     const int bins = nframes / 2 + 1;
 
     for (int k_dst = 0; k_dst < bins; k_dst++) {
-      if (const int k_src = static_cast<int>(k_dst / 0.89f); k_src < bins) {
+      const float frac = static_cast<float>(k_dst) / 0.79f;
+
+      if (const int k_src = static_cast<int>(frac); k_src < bins) {
         audioData->fft_freq_shift[k_dst][0] = audioData->fft_freq[k_src][0];
         audioData->fft_freq_shift[k_dst][1] = audioData->fft_freq[k_src][1];
       } else {
@@ -382,14 +384,9 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
       }
     }
 
-    for (int i = 0; i < nframes; i++) {
-      audioData->fft_freq[i][0] = audioData->fft_freq_shift[i][0];
-      audioData->fft_freq[i][1] = audioData->fft_freq_shift[i][1];
-    }
-
     fftwf_execute_dft_c2r(
       audioData->fft_plan_c2r[planIndex],
-      audioData->fft_freq,
+      audioData->fft_freq_shift,
       audioData->fft_time
     );
 
@@ -398,7 +395,6 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
   }
   audioData->frameId += nframes;
   return 0;
-
 
   // playbackSpeed
   const float* processHeadL = audioData->inputBuffers[0] + audioData->frameId;
