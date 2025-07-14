@@ -341,13 +341,31 @@ Result JackClient::activateAndConnectPorts() const {
 // plabackSpeed in [-2.0, 2.0]
 int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
   const float nframesF = static_cast<float>(nframes);
+  const size_t fftSize = nframes * 4;
+
+  // set hann window
+  for (size_t i = 0; i < fftSize; i++)
+
+  const float pitchShiftSemitones = 2.0f;
+  const float pitchRatio = powf(2.0f, pitchShiftSemitones / 12.0f);
+  const float stretch = 1.0f / pitchRatio;
+  const int nframesStretch = static_cast<int>(nframes * stretch);
+  const int numBins = 2 * nframes + 1;
+
+  // set freqs
+  for (size_t i = 0; i < numBins; i++)
+    audioData->fft_freq_bin[i] =;
 
   // playbackPitch
   for (int chan = 0; chan < 2; chan++) {
-    const float* processHead = audioData->inputBuffers[chan] + audioData->frameId;
+    const float* processHead = audioData->frameId > nframes * 4
+      ? audioData->inputBuffers[chan] + audioData->frameId
+      : audioData->inputBuffers[chan] + audioData->frameId - nframes * 1 + nframes / 2;
 
-    for (int i = 0; i < nframes; i++)
-      audioData->fft_time[i] = processHead[i];
+    for (int i = 0; i < fftSize; i++) {
+      const float hannFactor = 0.5f * (1.0f - std::cosf(TWO_PI * i / fftSize));
+      audioData->fft_time[i] = processHead[i] * hannFactor;
+    }
 
     int planIndex = 0;
     switch (nframes) {
@@ -370,18 +388,26 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
       audioData->fft_freq
     );
 
-    const int bins = nframes / 2 + 1;
+    for (int k = 0; k < numBins; k++) {
+      const float re = audioData->fft_freq[k][0];
+      const float im = audioData->fft_freq[k][1];
 
-    for (int k_dst = 0; k_dst < bins; k_dst++) {
-      const float frac = static_cast<float>(k_dst) / 0.79f;
+      const float mag = std::hypot(re, im);
+      const float phase = std::atan2(im, re);
 
-      if (const int k_src = static_cast<int>(frac); k_src < bins) {
-        audioData->fft_freq_shift[k_dst][0] = audioData->fft_freq[k_src][0];
-        audioData->fft_freq_shift[k_dst][1] = audioData->fft_freq[k_src][1];
-      } else {
-        audioData->fft_freq_shift[k_dst][0] = 0.0f;
-        audioData->fft_freq_shift[k_dst][1] = 0.0f;
-      }
+      const float phaseDelta = phase - audioData->fft_prev_phase[k];
+      audioData->fft_prev_phase[k] = phase;
+
+      const float freqBin = TWO_PI * k / fftSize;
+      const float expected = freqBin * nframes;
+      float delta = phaseDelta - expected;
+      delta -= TWO_PI * std::roundf(delta / TWO_PI);
+      float trueFreq = freqBin + delta / nframes;
+
+      audioData->fft_sum_phase[k] += trueFreq * nframes;
+
+      audioData->fft_freq_shift[k][0] = mag * cosf(audioData->fft_sum_phase[k]);
+      audioData->fft_freq_shift[k][1] = mag * sinf(audioData->fft_sum_phase[k]);
     }
 
     fftwf_execute_dft_c2r(
