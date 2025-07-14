@@ -343,18 +343,11 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
   const float nframesF = static_cast<float>(nframes);
   const size_t fftSize = nframes * 4;
 
-  // set hann window
-  for (size_t i = 0; i < fftSize; i++)
-
   const float pitchShiftSemitones = 2.0f;
   const float pitchRatio = powf(2.0f, pitchShiftSemitones / 12.0f);
   const float stretch = 1.0f / pitchRatio;
   const int nframesStretch = static_cast<int>(nframes * stretch);
   const int numBins = 2 * nframes + 1;
-
-  // set freqs
-  for (size_t i = 0; i < numBins; i++)
-    audioData->fft_freq_bin[i] =;
 
   // playbackPitch
   for (int chan = 0; chan < 2; chan++) {
@@ -404,7 +397,7 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
       delta -= TWO_PI * std::roundf(delta / TWO_PI);
       float trueFreq = freqBin + delta / nframes;
 
-      audioData->fft_sum_phase[k] += trueFreq * nframes;
+      audioData->fft_sum_phase[k] += trueFreq * nframesStretch;
 
       audioData->fft_freq_shift[k][0] = mag * cosf(audioData->fft_sum_phase[k]);
       audioData->fft_freq_shift[k][1] = mag * sinf(audioData->fft_sum_phase[k]);

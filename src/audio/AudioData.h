@@ -30,7 +30,6 @@ struct AudioData {
   fftwf_complex                    fft_freq_shift[MAX_FFT_FREQ_SIZE]{};
   float                            fft_prev_phase[MAX_FFT_FREQ_SIZE]{};
   float                            fft_sum_phase[MAX_FFT_FREQ_SIZE]{};
-  float                            fft_freq_bin[MAX_FFT_FREQ_SIZE]{};
   fftwf_plan                       fft_plan_r2c[4]{};
   fftwf_plan                       fft_plan_c2r[4]{};
   float*                           processBuffers[2]{nullptr, nullptr};
