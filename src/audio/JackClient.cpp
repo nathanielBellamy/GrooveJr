@@ -342,21 +342,22 @@ Result JackClient::activateAndConnectPorts() const {
 int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
   const float nframesF = static_cast<float>(nframes);
   const size_t fftSize = nframes * 4;
+  const float fftSizeF = static_cast<float>(fftSize);
 
-  const float pitchShiftSemitones = 2.0f;
+  const float pitchShiftSemitones = 12.0f;
   const float pitchRatio = powf(2.0f, pitchShiftSemitones / 12.0f);
   const float stretch = 1.0f / pitchRatio;
-  const int nframesStretch = static_cast<int>(nframes * stretch);
+  const int nframesStretch = static_cast<int>(nframesF * stretch);
   const int numBins = 2 * nframes + 1;
 
   // playbackPitch
   for (int chan = 0; chan < 2; chan++) {
-    const float* processHead = audioData->frameId > nframes * 4
-      ? audioData->inputBuffers[chan] + audioData->frameId
-      : audioData->inputBuffers[chan] + audioData->frameId - nframes * 1 + nframes / 2;
+    const float* processHead = audioData->frameId > nframes * 2
+      ? audioData->inputBuffers[chan] + audioData->frameId - nframes - nframes / 2
+      : audioData->inputBuffers[chan] + audioData->frameId;
 
     for (int i = 0; i < fftSize; i++) {
-      const float hannFactor = 0.5f * (1.0f - std::cosf(TWO_PI * i / fftSize));
+      const float hannFactor = 0.5f * (1.0f - std::cosf(TWO_PI * static_cast<float>(i) / fftSizeF));
       audioData->fft_time[i] = processHead[i] * hannFactor;
     }
 
@@ -391,13 +392,13 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
       const float phaseDelta = phase - audioData->fft_prev_phase[k];
       audioData->fft_prev_phase[k] = phase;
 
-      const float freqBin = TWO_PI * k / fftSize;
-      const float expected = freqBin * nframes;
+      const float freqBin = TWO_PI * static_cast<float>(k) / fftSizeF;
+      const float expected = freqBin * nframesF;
       float delta = phaseDelta - expected;
       delta -= TWO_PI * std::roundf(delta / TWO_PI);
-      float trueFreq = freqBin + delta / nframes;
+      const float trueFreq = freqBin + delta / nframesF;
 
-      audioData->fft_sum_phase[k] += trueFreq * nframesStretch;
+      audioData->fft_sum_phase[k] += trueFreq * static_cast<float>(nframesStretch);
 
       audioData->fft_freq_shift[k][0] = mag * cosf(audioData->fft_sum_phase[k]);
       audioData->fft_freq_shift[k][1] = mag * sinf(audioData->fft_sum_phase[k]);
@@ -410,7 +411,7 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
     );
 
     for (int i = 0; i < nframes; i++)
-      audioData->playbackBuffers[chan][i] = audioData->fft_time[i] / nframesF;
+      audioData->playbackBuffers[chan][i] = audioData->fft_time[i + nframes + nframes / 2] / fftSizeF;
   }
   audioData->frameId += nframes;
   return 0;
