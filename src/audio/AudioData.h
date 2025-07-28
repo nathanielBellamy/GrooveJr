@@ -34,6 +34,7 @@ struct AudioData {
   fftwf_plan                       fft_plan_c2r[4]{};
   float*                           processBuffers[2]{nullptr, nullptr};
   float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
+  float                            playbackBuffersPre[2][MAX_AUDIO_FRAMES_PER_BUFFER]{};
   float*                           playbackBuffers[2]{nullptr, nullptr};
   float                            playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
   float                            fftFreqBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
