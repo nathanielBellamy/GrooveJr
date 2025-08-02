@@ -403,19 +403,26 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
         // expected_phase_advance[k] = 2πk * hopSize / windowSize
         // phase_deviation[k] = princarg(ϕ_current[k] - ϕ_previous_analysis[k] - expected_phase_advance[k])
 
-        const float phaseDelta = phase - audioData->fft_prev_phase[chan][k];
-        audioData->fft_prev_phase[chan][k] = phase;
+        float phaseDelta;
+        if (!hop) {
+          phaseDelta = phase - audioData->fft_prev_phase[chan][hop][k];
+        } else {
+          phaseDelta = phase - audioData->fft_prev_phase[chan][hop - 1][k];
+        }
         const float freqBin = TWO_PI * kF / fftSizeF;
         const float expectedPhase = freqBin * hopAnalysisF;
         float delta = phaseDelta - expectedPhase;
 
         delta = std::atan2(std::sin(delta), std::cos(delta));
-        const float phaseSynthesis = audioData->fft_prev_phase[chan][k] - delta;
+        const float phaseSynthesis = audioData->fft_prev_phase[chan][hop][k] - delta;
+        audioData->fft_prev_phase[chan][hop][k] = phase;
 
+        if (!hop)
+          audioData->fft_sum_phase[chan][k] = 0.0f;
         audioData->fft_sum_phase[chan][k] += phaseSynthesis;
 
-        audioData->fft_freq_shift[k][0] = mag * cosf(audioData->fft_sum_phase[chan][k]);
-        audioData->fft_freq_shift[k][1] = mag * sinf(audioData->fft_sum_phase[chan][k]);
+        audioData->fft_freq_shift[k][0] = mag * cosf(phaseSynthesis); //audioData->fft_sum_phase[chan][k]);
+        audioData->fft_freq_shift[k][1] = mag * sinf(phaseSynthesis); //audioData->fft_sum_phase[chan][k]);
       }
 
       fftwf_execute_dft_c2r(
