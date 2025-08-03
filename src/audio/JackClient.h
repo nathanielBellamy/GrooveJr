@@ -77,6 +77,7 @@ private:
   bool addMidiInputPort(JackName name);
   int processMidi(jack_nframes_t nframes);
   bool autoConnectMidiPorts(jack_client_t *client);
+  static float princArg(float input);
 };
 
 } // Audio
