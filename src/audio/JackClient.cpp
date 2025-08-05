@@ -352,6 +352,7 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
   const int fftSize = 4 * hopAnalysis;
   const float fftSizeF = 4.0f * hopAnalysisF;
 
+
   int planIndex = 0;
   switch (hopAnalysis) {
     case 128:
@@ -377,11 +378,10 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
 
   // playbackPitch
   for (int chan = 0; chan < 2; chan++) {
+    std::fill_n(audioData->fft_ola_buffer[chan], MAX_FFT_TIME_SIZE, 0.0f);
+
     for (int hop = 0; hop < hopCount; hop++) {
       const float* processHead = audioData->inputBuffers[chan] + audioData->frameId + hop * hopAnalysis;
-        // audioData->frameId > 2 * hopAnalysis
-        // ? audioData->inputBuffers[chan] + audioData->frameId - hopAnalysis - hopAnalysis / 2 + hop * hopAnalysis
-        // : audioData->inputBuffers[chan] + audioData->frameId + hop * hopAnalysis;
 
       for (int i = 0; i < fftSize; i++) {
         const float hannFactor = 0.5f * (1.0f - std::cosf(TWO_PI * static_cast<float>(i) / fftSizeF));
@@ -408,20 +408,18 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
         // phase_deviation[k] = princarg(ϕ_current[k] - ϕ_previous_analysis[k] - expected_phase_advance[k])
 
         const float freqBin = TWO_PI * kF / fftSizeF;
-        const float expectedPhase =
-          (!hop)
-            ? princArg(freqBin * static_cast<float>(audioData->frameAdvance) + audioData->fft_prev_phase[chan][hop][k])
-            : princArg(freqBin * hopAnalysisF + audioData->fft_prev_phase[chan][hop][k]);
+        const float expectedPhaseAdvance = freqBin * hopAnalysisF;
 
-        if (!hop) {
-          audioData->fft_delta_phase[chan][hop][k] = expectedPhase + princArg(phase - audioData->fft_prev_phase[chan][hop][k] - expectedPhase);
-          audioData->fft_sum_phase[chan][hop][k] = phase; //audioData->fft_delta_phase[chan][hop][k];
-        } else {
-          audioData->fft_delta_phase[chan][hop][k] = expectedPhase + princArg(phase - audioData->fft_prev_phase[chan][hop - 1][k] - expectedPhase);
-          audioData->fft_sum_phase[chan][hop][k] = princArg(audioData->fft_sum_phase[chan][hop - 1][k] + audioData->fft_delta_phase[chan][hop - 1][k] * pitchRatio);
-        }
+        float phaseDiff = princArg(phase - audioData->fft_prev_phase[chan][k]);
+        float deltaPhi = princArg(phaseDiff - expectedPhaseAdvance);
+        float trueFreq = expectedPhaseAdvance + deltaPhi;
 
-        audioData->fft_prev_phase[chan][hop][k] = phase;
+        const float prevSynthPhase = hop == 0
+          ? audioData->fft_sum_phase[chan][hopCount - 1][k]
+          : audioData->fft_sum_phase[chan][hop - 1][k];
+
+        audioData->fft_sum_phase[chan][hop][k] = princArg(prevSynthPhase + trueFreq);
+        audioData->fft_prev_phase[chan][k] = phase;
 
         audioData->fft_freq_shift[k][0] = mag * cosf(audioData->fft_sum_phase[chan][hop][k]);
         audioData->fft_freq_shift[k][1] = mag * sinf(audioData->fft_sum_phase[chan][hop][k]);
@@ -433,20 +431,18 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
         audioData->fft_time
       );
 
+      const float normFactor = 2.0f;
       const int indexC = hop * hopSynthesis;
       for (int i = 0; i < fftSize; i++) {
-        if (const int index = i + indexC; index < fftSize - 1) {
+        if (const int index = i + indexC; index < MAX_FFT_TIME_SIZE) {
           const float hannFactor = 0.5f * (1.0f - std::cosf(TWO_PI * static_cast<float>(i) / fftSizeF));
-          const float val = hannFactor * audioData->fft_time[i] / fftSizeF;
-          if (!hop)
-            audioData->fft_ola_buffer[chan][index] = 0.0f;
+          const float val = normFactor * hannFactor * audioData->fft_time[i] / fftSizeF;
           audioData->fft_ola_buffer[chan][index] += val;
         }
       }
     }
-
     for (int i = 0; i < nframes; i++)
-      audioData->playbackBuffersPre[chan][i] = audioData->fft_ola_buffer[chan][i + hopAnalysis + hopAnalysis / 2];
+      audioData->playbackBuffersPre[chan][i] = audioData->fft_ola_buffer[chan][i];
   }
 
   // playbackSpeed
