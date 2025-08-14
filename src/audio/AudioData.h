@@ -26,15 +26,15 @@ struct AudioData {
   float                            fadeIn;
   float                            fadeOut;
   float*                           inputBuffers[2]{nullptr, nullptr};
-  float                            fft_time[MAX_FFT_TIME_SIZE]{};
-  float                            fft_ola_buffer[2][2 * MAX_FFT_TIME_SIZE]{};
-  fftwf_complex                    fft_freq[MAX_FFT_FREQ_SIZE]{};
-  fftwf_complex                    fft_freq_shift[MAX_FFT_FREQ_SIZE]{};
-  float                            fft_phase_sum[2][MAX_FFT_FREQ_SIZE]{};
-  float                            fft_phase_prev[2][MAX_FFT_FREQ_SIZE]{};
-  float                            fft_phase_prev_init[2][MAX_FFT_FREQ_SIZE]{};
-  fftwf_plan                       fft_plan_r2c[4]{};
-  fftwf_plan                       fft_plan_c2r[4]{};
+  float                            fft_time[FFT_TIME_SIZE]{};
+  float                            fft_ola_buffer[2][2 * FFT_TIME_SIZE]{};
+  fftwf_complex                    fft_freq[FFT_FREQ_SIZE]{};
+  fftwf_complex                    fft_freq_shift[FFT_FREQ_SIZE]{};
+  float                            fft_phase_sum[2][FFT_FREQ_SIZE]{};
+  float                            fft_phase_prev[2][FFT_FREQ_SIZE]{};
+  float                            fft_phase_prev_init[2][FFT_FREQ_SIZE]{};
+  fftwf_plan                       fft_plan_r2c;
+  fftwf_plan                       fft_plan_c2r;
   float*                           processBuffers[2]{nullptr, nullptr};
   float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
   float                            playbackBuffersPre[2][MAX_AUDIO_FRAMES_PER_BUFFER]{};
@@ -85,17 +85,8 @@ struct AudioData {
     playbackBuffers[0] = &playbackBuffersBuffer[0];
     playbackBuffers[1] = &playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
 
-    fft_plan_r2c[0] = fftwf_plan_dft_r2c_1d(512, fft_time, fft_freq, FFTW_ESTIMATE);
-    fft_plan_c2r[0] = fftwf_plan_dft_c2r_1d(257, fft_freq_shift, fft_time, FFTW_ESTIMATE);
-
-    fft_plan_r2c[1] = fftwf_plan_dft_r2c_1d(1024, fft_time, fft_freq, FFTW_ESTIMATE);
-    fft_plan_c2r[1] = fftwf_plan_dft_c2r_1d(513, fft_freq_shift, fft_time, FFTW_ESTIMATE);
-
-    fft_plan_r2c[2] = fftwf_plan_dft_r2c_1d(2048, fft_time, fft_freq, FFTW_ESTIMATE);
-    fft_plan_c2r[2] = fftwf_plan_dft_c2r_1d(1025, fft_freq_shift, fft_time, FFTW_ESTIMATE);
-
-    fft_plan_r2c[3] = fftwf_plan_dft_r2c_1d(MAX_FFT_TIME_SIZE, fft_time, fft_freq, FFTW_ESTIMATE);
-    fft_plan_c2r[3] = fftwf_plan_dft_c2r_1d(2049, fft_freq_shift, fft_time, FFTW_ESTIMATE);
+    fft_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_TIME_SIZE, fft_time, fft_freq, FFTW_ESTIMATE);
+    fft_plan_c2r = fftwf_plan_dft_c2r_1d(FFT_FREQ_SIZE, fft_freq_shift, fft_time, FFTW_ESTIMATE);
 
     Logging::write(
       Info,
@@ -111,10 +102,8 @@ struct AudioData {
       "Destroying AudioData"
     );
 
-    for (int i = 0; i < 4; i++) {
-      fftwf_destroy_plan(fft_plan_r2c[i]);
-      fftwf_destroy_plan(fft_plan_c2r[i]);
-    }
+    fftwf_destroy_plan(fft_plan_r2c);
+    fftwf_destroy_plan(fft_plan_c2r);
 
     Logging::write(
       Info,

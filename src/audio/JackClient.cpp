@@ -346,26 +346,10 @@ float JackClient::princArg(const float phaseIn) {
 
 // plabackSpeed in [-2.0, 2.0]
 int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
-  const float nframesF = static_cast<float>(nframes);
-  const int hopAnalysis = nframes;;
-  const float hopAnalysisF = nframesF;
+  const int hopAnalysis = FFT_HOP_ANALYSIS;
+  const float hopAnalysisF = FFT_HOP_ANALYSISF;
   const int fftSize = FFT_HOP_COUNT * hopAnalysis;
   const float fftSizeF = static_cast<float>(fftSize);
-
-  int planIndex = 0;
-  switch (hopAnalysis) {
-    case 128:
-        planIndex = 0;
-      break;
-    case 256:
-        planIndex = 1;
-      break;
-    case 512:
-        planIndex = 2;
-      break;
-    case MAX_AUDIO_FRAMES_PER_BUFFER:
-        planIndex = 3;
-  }
 
   const float pitchShiftSemitones = 0.0f;
   const float pitchRatio = powf(2.0f, pitchShiftSemitones / 12.0f);
@@ -376,7 +360,7 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
 
   // playbackPitch
   for (int chan = 0; chan < 2; chan++) {
-    std::fill_n(audioData->fft_ola_buffer[chan], 2 * MAX_FFT_TIME_SIZE, 0.0f);
+    std::fill_n(audioData->fft_ola_buffer[chan], 2 * FFT_TIME_SIZE, 0.0f);
 
     for (int hop = 0; hop < FFT_HOP_COUNT; hop++) {
       const float* processHead = audioData->inputBuffers[chan] + audioData->frameId + hop * hopAnalysis;
@@ -387,7 +371,7 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
       }
 
       fftwf_execute_dft_r2c(
-        audioData->fft_plan_r2c[planIndex],
+        audioData->fft_plan_r2c,
         audioData->fft_time,
         audioData->fft_freq
       );
@@ -433,7 +417,7 @@ int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playba
       }
 
       fftwf_execute_dft_c2r(
-        audioData->fft_plan_c2r[planIndex],
+        audioData->fft_plan_c2r,
         audioData->fft_freq_shift,
         audioData->fft_time
       );

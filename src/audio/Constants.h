@@ -11,8 +11,10 @@ namespace Audio {
   constexpr unsigned int MAX_EFFECTS_CHANNELS = 50;
   constexpr unsigned int MAX_PLUGINS_PER_CHANNEL = 50;
   constexpr unsigned int MAX_AUDIO_FRAMES_PER_BUFFER = 1024;
-  constexpr unsigned int MAX_FFT_TIME_SIZE = 4 * MAX_AUDIO_FRAMES_PER_BUFFER;
-  constexpr unsigned int MAX_FFT_FREQ_SIZE = 2 * MAX_AUDIO_FRAMES_PER_BUFFER + 1;
+  constexpr unsigned int FFT_TIME_SIZE = 1024;
+  constexpr unsigned int FFT_FREQ_SIZE = 513;
+  constexpr unsigned int FFT_HOP_ANALYSIS = 256;
+  constexpr float FFT_HOP_ANALYSISF = 256.0f;
   constexpr unsigned int FFT_HOP_COUNT = 4;
   constexpr float PI = 3.14159265358979323846;
   constexpr float TWO_PI = 2.0f * PI;
