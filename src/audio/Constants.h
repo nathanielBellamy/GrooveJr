@@ -12,6 +12,7 @@ namespace Audio {
   constexpr unsigned int MAX_PLUGINS_PER_CHANNEL = 50;
   constexpr unsigned int MAX_AUDIO_FRAMES_PER_BUFFER = 1024;
   constexpr unsigned int FFT_TIME_SIZE = 1024;
+  constexpr unsigned int FFT_TIME_SIZEF = 1024.0f;
   constexpr unsigned int FFT_FREQ_SIZE = 513;
   constexpr unsigned int FFT_HOP_ANALYSIS = 256;
   constexpr float FFT_HOP_ANALYSISF = 256.0f;

@@ -348,8 +348,8 @@ float JackClient::princArg(const float phaseIn) {
 int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
   const int hopAnalysis = FFT_HOP_ANALYSIS;
   const float hopAnalysisF = FFT_HOP_ANALYSISF;
-  const int fftSize = FFT_HOP_COUNT * hopAnalysis;
-  const float fftSizeF = static_cast<float>(fftSize);
+  const int fftSize = FFT_TIME_SIZE;
+  const float fftSizeF = FFT_TIME_SIZEF;
 
   const float pitchShiftSemitones = 0.0f;
   const float pitchRatio = powf(2.0f, pitchShiftSemitones / 12.0f);
