@@ -27,7 +27,7 @@ struct AudioData {
   float                            fadeOut;
   float*                           inputBuffers[2]{nullptr, nullptr};
   float                            fft_time[FFT_TIME_SIZE]{};
-  float                            fft_ola_buffer[2][2 * FFT_TIME_SIZE]{};
+  float                            fft_ola_buffer[2][FFT_OLA_BUFFER_SIZE]{};
   fftwf_complex                    fft_freq[FFT_FREQ_SIZE]{};
   fftwf_complex                    fft_freq_shift[FFT_FREQ_SIZE]{};
   float                            fft_phase_sum[2][FFT_FREQ_SIZE]{};
