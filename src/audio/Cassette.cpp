@@ -437,6 +437,7 @@ int Cassette::updateAudioDataFromMixer(
   jack_ringbuffer_t* effectsChannelsSettingsRB,
   jack_ringbuffer_t* playbackSettingsToAudioThreadRB,
   jack_ringbuffer_t* playbackSettingsFromAudioThreadRB,
+  jack_ringbuffer_t* fft_eq_ring_buffer,
   const int channelCount
   ) {
 
@@ -448,6 +449,20 @@ int Cassette::updateAudioDataFromMixer(
       PlaybackSettingsFromAudioThread_RB_SIZE
     );
   }
+
+  // read fft_eq_ring_buffer
+  if (jack_ringbuffer_read_space(fft_eq_ring_buffer) > FFT_EQ_RING_BUFFER_SIZE - 2) {
+    jack_ringbuffer_read(
+      fft_eq_ring_buffer,
+      reinterpret_cast<char*>(fft_eq_buffer),
+      FFT_EQ_RING_BUFFER_SIZE
+    );
+  }
+
+  std::cout << "eq 0: " << fft_eq_buffer[0] << std::endl;
+  std::cout << "eq 1: " << fft_eq_buffer[1] << std::endl;
+  std::cout << "eq 2: " << fft_eq_buffer[2] << std::endl;
+  std::cout << "eq 3: " << fft_eq_buffer[3] << std::endl;
 
   const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
   mixer->getUpdateProgressBarFunc()(audioData.frames, currentFrameId);
@@ -573,6 +588,9 @@ int Cassette::play() {
   jack_ringbuffer_t* playbackSettingsFromAudioThreadRB = jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE);
   audioData.playbackSettingsFromAudioThreadRB = playbackSettingsFromAudioThreadRB;
 
+  jack_ringbuffer_t* fft_eq_ring_buffer = jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE);
+  audioData.fft_eq_ring_buffer = fft_eq_ring_buffer;
+
   ThreadStatics::setReadComplete(false);
 
   while(
@@ -607,6 +625,7 @@ int Cassette::play() {
       effectsChannelsSettingsRB,
       playbackSettingsToAudioThreadRB,
       playbackSettingsFromAudioThreadRB,
+      fft_eq_ring_buffer,
       channelCount
     );
 

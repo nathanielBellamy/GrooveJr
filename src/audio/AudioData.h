@@ -26,6 +26,12 @@ struct AudioData {
   float                            fadeIn;
   float                            fadeOut;
   float*                           inputBuffers[2]{nullptr, nullptr};
+  float                            fft_eq_time[2][FFT_EQ_TIME_SIZE]{};
+  fftwf_complex                    fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
+  float                            fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{};
+  fftwf_plan                       fft_eq_0_plan_r2c;
+  fftwf_plan                       fft_eq_1_plan_r2c;
+  jack_ringbuffer_t*               fft_eq_ring_buffer{nullptr};
   float                            fft_pv_time[FFT_PV_TIME_SIZE]{};
   float                            fft_pv_ola_buffer[2][FFT_PV_OLA_BUFFER_SIZE]{};
   fftwf_complex                    fft_pv_freq[FFT_PV_FREQ_SIZE]{};
@@ -85,6 +91,9 @@ struct AudioData {
     playbackBuffers[0] = &playbackBuffersBuffer[0];
     playbackBuffers[1] = &playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
 
+    fft_eq_0_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[0], fft_eq_freq[0], FFTW_ESTIMATE);
+    fft_eq_1_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[1], fft_eq_freq[1], FFTW_ESTIMATE);
+
     fft_pv_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_PV_TIME_SIZE, fft_pv_time, fft_pv_freq, FFTW_ESTIMATE);
     fft_pv_plan_c2r = fftwf_plan_dft_c2r_1d(FFT_PV_FREQ_SIZE, fft_pv_freq_shift, fft_pv_time, FFTW_ESTIMATE);
 
@@ -102,6 +111,8 @@ struct AudioData {
       "Destroying AudioData"
     );
 
+    fftwf_destroy_plan(fft_eq_0_plan_r2c);
+    fftwf_destroy_plan(fft_eq_1_plan_r2c);
     fftwf_destroy_plan(fft_pv_plan_r2c);
     fftwf_destroy_plan(fft_pv_plan_c2r);
 

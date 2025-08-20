@@ -561,10 +561,45 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   const float factorLR = audioData->effectsChannelsSettings[1];
   const float factorRL = audioData->effectsChannelsSettings[2];
   const float factorRR = audioData->effectsChannelsSettings[3];
+
+  // TODO: adjust fft_eq to nframes, right now assume 256
   for (int i = 0; i < nframes; i++) {
-    outL[i] = factorLL * audioData->processBuffers[0][i] + factorRL * audioData->processBuffers[1][i];
-    outR[i] = factorLR * audioData->processBuffers[0][i] + factorRR * audioData->processBuffers[1][i];
+    const float valL = factorLL * audioData->processBuffers[0][i] + factorRL * audioData->processBuffers[1][i];
+    const float valR = factorLR * audioData->processBuffers[0][i] + factorRR * audioData->processBuffers[1][i];
+
+    audioData->fft_eq_time[0][i] = valL;
+    audioData->fft_eq_time[1][i] = valR;
+
+    outL[i] = valL;
+    outR[i] = valR;
   }
+
+  fftwf_execute_dft_r2c(
+    audioData->fft_eq_0_plan_r2c,
+    audioData->fft_eq_time[0],
+    audioData->fft_eq_freq[0]
+  );
+
+  fftwf_execute_dft_r2c(
+    audioData->fft_eq_1_plan_r2c,
+    audioData->fft_eq_time[1],
+    audioData->fft_eq_freq[1]
+  );
+
+  // compute + write magnitudes to ring buffer
+  for (int i = 0; i < FFT_EQ_FREQ_SIZE; i++) {
+    audioData->fft_eq_write_out_buffer[2 * i] = std::hypot(audioData->fft_eq_freq[0][i][0], audioData->fft_eq_freq[0][i][1]);
+    audioData->fft_eq_write_out_buffer[2 * i + 1] = std::hypot(audioData->fft_eq_freq[1][i][0], audioData->fft_eq_freq[1][i][1]);
+  }
+
+  if (jack_ringbuffer_write_space(audioData->fft_eq_ring_buffer) > FFT_EQ_RING_BUFFER_SIZE - 2) {
+    jack_ringbuffer_write(
+      audioData->fft_eq_ring_buffer,
+      reinterpret_cast<char*>(audioData->fft_eq_write_out_buffer),
+      FFT_EQ_RING_BUFFER_SIZE
+    );
+  }
+
 
   if (audioData->frameId >= audioData->frames - nframes)
     audioData->readComplete = true;
