@@ -38,6 +38,7 @@ class Mixer {
   float channelCount;
   std::vector<Effects::EffectsChannel*> effectsChannels;
   std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
+  std::function<void(float* eqBuffer)> updateEqGraphFunc;
 
   void incorporateLatencySamples(int latencySamples) const;
 
@@ -103,6 +104,9 @@ public:
 
   void setUpdateProgressBarFunc(std::function<void(sf_count_t, sf_count_t)> func) { updateProgressBarFunc = func; };
   std::function<void(sf_count_t, sf_count_t)> getUpdateProgressBarFunc() { return updateProgressBarFunc; };
+
+  void setUpdateEqGraphFunc(std::function<void(float* eqBuffer)> func) { updateEqGraphFunc = func; };
+  std::function<void(float* eqBuffer)> getUpdateEqGraphFunc() { return updateEqGraphFunc; };
 
   std::string getPluginName(const int channelIdx, const int pluginIndex) const {
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);

@@ -455,8 +455,7 @@ int Cassette::updateAudioDataFromMixer(
   std::cout << "eq 2: " << fft_eq_buffer[2] << std::endl;
   std::cout << "eq 3: " << fft_eq_buffer[3] << std::endl;
 
-  // TODO
-  // mixer->getUpdateEqGraphFunc()(&fft_eq_buffer);
+  mixer->getUpdateEqGraphFunc()(&fft_eq_buffer[0]);
 
   // read playbackSettingsFromAudioThread ring buffer
   if (jack_ringbuffer_read_space(playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
