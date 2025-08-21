@@ -1,13 +1,9 @@
 //
-// Created by ns on 5/18/25.
+// Created by ns on 8/20/25.
 //
 
-#ifndef PROGRESSBAR_H
-#define PROGRESSBAR_H
-
-#include <cmath>
-
-#include <sndfile.hh>
+#ifndef EQGRAPH_H
+#define EQGRAPH_H
 
 #include <QMouseEvent>
 #include <QRect>
@@ -16,6 +12,7 @@
 #include <QPen>
 #include <QWidget>
 
+#include "../../../audio/Constants.h"
 #include "../../../audio/Mixer.h"
 #include "../../../enums/PlayState.h"
 #include "../../../enums/Result.h"
@@ -23,19 +20,18 @@
 namespace Gj {
 namespace Gui {
 
-class ProgressBar final : public QWidget {
+class EqGraph : public QWidget {
 
   public:
-    ProgressBar(QWidget* parent, Audio::Mixer* mixer, sf_count_t frameId);
-    void updateProgressBar(sf_count_t frames, sf_count_t newFrameId);
+    EqGraph(QWidget* parent, Audio::Mixer* mixer);
+    void updateEqGraph(float* newEqBuffer);
     Result hydrateState(const AppStatePacket& appStatePacket);
 
   private:
-    sf_count_t frames;
-    sf_count_t frameId;
     Audio::Mixer* mixer;
     QPainter painter;
     QPen pen;
+    float* eqBuffer;
 
     void setStyle();
     void paintEvent(QPaintEvent *event) override;
@@ -47,4 +43,4 @@ class ProgressBar final : public QWidget {
 
 
 
-#endif //PROGRESSBAR_H
+#endif //EQGRAPH_H
