@@ -12,6 +12,8 @@
 #include <QPen>
 #include <QWidget>
 
+#include <sndfile.hh>
+
 #include "../../../audio/Constants.h"
 #include "../../../audio/Mixer.h"
 #include "../../../enums/PlayState.h"
