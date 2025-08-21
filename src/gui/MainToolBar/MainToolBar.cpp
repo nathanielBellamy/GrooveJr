@@ -15,6 +15,7 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer
   , scenes(this, sys, mixer, sceneLoadAction)
   , currentlyPlaying(this, sys, mixer)
   , transportControl(this, sys, mixer)
+  , eqGraph(this, mixer)
   {
 
   title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
@@ -26,6 +27,8 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer
   addWidget(&currentlyPlaying);
   addSeparator();
   addWidget(&transportControl);
+  addSeparator();
+  addWidget(&eqGraph);
   addSeparator();
   addWidget(&scenes);
 }

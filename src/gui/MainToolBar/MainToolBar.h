@@ -24,6 +24,7 @@
 #include "../Color.h"
 
 #include "CurrentlyPlaying.h"
+#include "eq/EqGraph.h"
 #include "transport/TransportControl.h"
 #include "scenes/Scenes.h"
 
@@ -43,6 +44,7 @@ class MainToolBar final : public QToolBar {
     Scenes scenes;
     CurrentlyPlaying currentlyPlaying;
     TransportControl transportControl;
+    EqGraph eqGraph;
 };
 
 
