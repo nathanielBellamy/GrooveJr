@@ -34,6 +34,7 @@ class EqGraph : public QWidget {
     QPainter painter;
     QPen pen;
     float* eqBuffer;
+    int trim = 150;
 
     void setStyle();
     void paintEvent(QPaintEvent *event) override;
