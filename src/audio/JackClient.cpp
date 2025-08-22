@@ -562,13 +562,20 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   const float factorRL = audioData->effectsChannelsSettings[2];
   const float factorRR = audioData->effectsChannelsSettings[3];
 
-  // TODO: adjust fft_eq to nframes, right now assume 256
+  for (int chan = 0; chan < 2; chan++) {
+    std::copy(
+      std::begin(audioData->fft_eq_time[chan]) + nframes,
+      std::end(audioData->fft_eq_time[chan]),
+      std::begin(audioData->fft_eq_time[chan])
+    );
+  }
+
   for (int i = 0; i < nframes; i++) {
     const float valL = factorLL * audioData->processBuffers[0][i] + factorRL * audioData->processBuffers[1][i];
     const float valR = factorLR * audioData->processBuffers[0][i] + factorRR * audioData->processBuffers[1][i];
 
-    audioData->fft_eq_time[0][i] = valL;
-    audioData->fft_eq_time[1][i] = valR;
+    audioData->fft_eq_time[0][FFT_EQ_TIME_SIZE - nframes + i] = valL;
+    audioData->fft_eq_time[1][FFT_EQ_TIME_SIZE - nframes + i] = valR;
 
     outL[i] = valL;
     outR[i] = valR;

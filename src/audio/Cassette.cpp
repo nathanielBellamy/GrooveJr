@@ -450,11 +450,6 @@ int Cassette::updateAudioDataFromMixer(
     );
   }
 
-  std::cout << "eq 0: " << fft_eq_buffer[0] << std::endl;
-  std::cout << "eq 1: " << fft_eq_buffer[1] << std::endl;
-  std::cout << "eq 2: " << fft_eq_buffer[2] << std::endl;
-  std::cout << "eq 3: " << fft_eq_buffer[3] << std::endl;
-
   mixer->getUpdateEqGraphFunc()(&fft_eq_buffer[0]);
 
   // read playbackSettingsFromAudioThread ring buffer

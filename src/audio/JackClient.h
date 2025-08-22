@@ -7,6 +7,7 @@
 
 #include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 
+#include <algorithm>
 #include <cassert>
 
 #include <jack/jack.h>
