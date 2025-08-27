@@ -34,8 +34,8 @@ class ProgressBar final : public QWidget {
     sf_count_t frames;
     sf_count_t frameId;
     Audio::Mixer* mixer;
-    QPainter painter;
-    QPen pen;
+    // QPainter painter;
+    // QPen pen;
 
     void setStyle();
     void paintEvent(QPaintEvent *event) override;

@@ -8,6 +8,12 @@ set(LLVM_INSTALL_DIR /opt/homebrew/opt/llvm)
 
 list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
+include(SMTG_FindJack)
+
+# jack audio
+if(NOT ${LIBJACK_FOUND})
+    message(INFO " --GjGui--LIBJACK--NOT--FOUND--")
+endif()
 
 # logging
 find_package(Boost REQUIRED COMPONENTS log_setup log)
@@ -118,4 +124,10 @@ target_link_libraries(GjGui
         -lsdk
         Boost::log
         ${Boost_LIBRARIES}
+        ${LIBJACK_LIBRARY}
+)
+
+target_include_directories(GjGui
+        PRIVATE
+        ${LIBJACK_INCLUDE_DIR}
 )

@@ -68,6 +68,7 @@ class Cassette
     jack_ringbuffer_t* playbackSettingsToAudioThreadRB,
     jack_ringbuffer_t* playbackSettingsFromAudioThreadRB,
     jack_ringbuffer_t* fft_eq_ring_buffer,
+    jack_ringbuffer_t* fft_eq_ring_buffer_out,
     int channelCount
   );
 

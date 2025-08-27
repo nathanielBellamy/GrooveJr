@@ -5,14 +5,18 @@
 #ifndef EQGRAPH_H
 #define EQGRAPH_H
 
+#include <mutex>
+
 #include <QMouseEvent>
 #include <QRect>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPen>
+#include <QTimer>
 #include <QWidget>
 
 #include <sndfile.hh>
+#include <jack/ringbuffer.h>
 
 #include "../../../audio/Constants.h"
 #include "../../../audio/Mixer.h"
@@ -26,15 +30,23 @@ class EqGraph : public QWidget {
 
   public:
     EqGraph(QWidget* parent, Audio::Mixer* mixer);
-    void updateEqGraph(float* newEqBuffer);
+    void setEqRingBuffer(jack_ringbuffer_t* eqRingBuffer);
+    void animationStart();
+    void animationStop();
     Result hydrateState(const AppStatePacket& appStatePacket);
 
+  private slots:
+    void animationLoop();
+
   private:
+    int h = 75;
     Audio::Mixer* mixer;
-    QPainter painter;
-    QPen pen;
-    float* eqBuffer;
-    int trim = 150;
+    jack_ringbuffer_t* eqRingBuffer;
+    std::mutex eqBufferMutex;
+    float eqBuffer[Audio::FFT_EQ_RING_BUFFER_SIZE]{ 0.0f };
+    unsigned int trim = 150;
+    unsigned int barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * 150]{ 0 };
+    QTimer animationTimer;
 
     void setStyle();
     void paintEvent(QPaintEvent *event) override;
