@@ -18,6 +18,7 @@
 #include <sndfile.hh>
 #include <jack/ringbuffer.h>
 
+#include "EqGraphWorker.h"
 #include "../../../audio/Constants.h"
 #include "../../../audio/Mixer.h"
 #include "../../../enums/PlayState.h"
