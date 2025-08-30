@@ -43,6 +43,7 @@ int MainToolBar::hydrateState(const AppStatePacket& appStatePacket) {
   currentlyPlaying.hydrateState(appStatePacket);
   transportControl.hydrateState(appStatePacket);
   scenes.hydrateState(appStatePacket);
+  eqGraph.hydrateState(appStatePacket);
 
   return 0;
 }

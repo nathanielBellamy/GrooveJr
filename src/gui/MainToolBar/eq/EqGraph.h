@@ -5,7 +5,9 @@
 #ifndef EQGRAPH_H
 #define EQGRAPH_H
 
-#include <mutex>
+#include <atomic>
+#include <chrono>
+#include <thread>
 
 #include <QMouseEvent>
 #include <QRect>
@@ -18,7 +20,6 @@
 #include <sndfile.hh>
 #include <jack/ringbuffer.h>
 
-#include "EqGraphWorker.h"
 #include "../../../audio/Constants.h"
 #include "../../../audio/Mixer.h"
 #include "../../../enums/PlayState.h"
@@ -31,6 +32,7 @@ class EqGraph : public QWidget {
 
   public:
     EqGraph(QWidget* parent, Audio::Mixer* mixer);
+    ~EqGraph();
     void setEqRingBuffer(jack_ringbuffer_t* eqRingBuffer);
     void animationStart();
     void animationStop();
@@ -41,17 +43,22 @@ class EqGraph : public QWidget {
 
   private:
     int h = 75;
+    int maxBarH = 30;
     Audio::Mixer* mixer;
     jack_ringbuffer_t* eqRingBuffer;
     std::mutex eqBufferMutex;
     float eqBuffer[Audio::FFT_EQ_RING_BUFFER_SIZE]{ 0.0f };
     unsigned int trim = 150;
-    unsigned int barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * 150]{ 0 };
+    std::atomic<unsigned int> barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * 150]{ 0 };
+    std::atomic<bool> stopEqWorkerThread = false;
+    std::thread eqWorkerThread;
     QTimer animationTimer;
 
     void setStyle();
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent* event) override;
+    void startWorker();
+    void stopWorker();
 };
 
 } // Gui

@@ -24,8 +24,11 @@ EqGraph::EqGraph(QWidget* parent, Audio::Mixer* mixer)
 //  );
 
   setStyle();
-
   animationStart();
+}
+
+EqGraph::~EqGraph() {
+  animationStop();
 }
 
 void EqGraph::setEqRingBuffer(jack_ringbuffer_t* newEqRingBuffer) {
@@ -33,29 +36,50 @@ void EqGraph::setEqRingBuffer(jack_ringbuffer_t* newEqRingBuffer) {
 }
 
 void EqGraph::animationStart() {
-  animationTimer.setInterval(16); // ~60Hz
+  animationTimer.setInterval(32);
   connect(&animationTimer, &QTimer::timeout, this, &EqGraph::animationLoop);
   animationTimer.start();
 }
 
 void EqGraph::animationStop() {
+  stopWorker();
   animationTimer.stop();
 }
 
-// TODO: move animation loop to its own QThread
 void EqGraph::animationLoop() {
   if (eqRingBuffer == nullptr)
     return;
 
-  if (jack_ringbuffer_read_space(eqRingBuffer) > Audio::FFT_EQ_RING_BUFFER_SIZE - 2) {
-    jack_ringbuffer_read(
-      eqRingBuffer,
-      reinterpret_cast<char*>(eqBuffer),
-      Audio::FFT_EQ_RING_BUFFER_SIZE
-    );
+  repaint();
+}
 
-    repaint();
-  }
+void EqGraph::startWorker() {
+  stopEqWorkerThread.store(false);
+  eqWorkerThread = std::thread([this]() {
+    while (!stopEqWorkerThread.load()) {
+      if (eqRingBuffer == nullptr)
+        continue;
+
+      if (jack_ringbuffer_read_space(eqRingBuffer) > Audio::FFT_EQ_RING_BUFFER_SIZE - 2) {
+        jack_ringbuffer_read(
+          eqRingBuffer,
+          reinterpret_cast<char*>(eqBuffer),
+          Audio::FFT_EQ_RING_BUFFER_SIZE
+        );
+
+        for (int i = trim; i < Audio::FFT_EQ_FREQ_SIZE - trim - 10; i++) {
+          const int c = i % 2 == 0 ? 1 : -1;
+          barHeightBuffer[i - trim].store(c * std::min(static_cast<int>(eqBuffer[i] * 10), maxBarH));
+        }
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+  });
+  eqWorkerThread.detach();
+}
+
+void EqGraph::stopWorker() {
+  stopEqWorkerThread.store(true);
 }
 
 void EqGraph::setStyle() {
@@ -65,19 +89,15 @@ void EqGraph::setStyle() {
 }
 
 void EqGraph::paintEvent(QPaintEvent* event) {
-  const int barWidth = 1; // width() / Audio::FFT_EQ_FREQ_SIZE;
-  const int maxH = h / 2 - 3;
-  for (int i = trim; i < Audio::FFT_EQ_FREQ_SIZE - trim - 10; i++) {
-    const int c = i % 2 == 0 ? 1 : -1;
-    barHeightBuffer[i - trim] = c * std::min(static_cast<int>(eqBuffer[i] * (h / 2)), maxH);
-  }
   QPainter painter(this);
   QPen pen(Qt::NoPen);
   if (!painter.isActive())
     painter.begin(this);
   painter.setPen(pen);
-  for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim; i++) {
-    painter.fillRect(i, h / 2, barWidth, barHeightBuffer[i], Qt::white);
+  for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim; i += 8) {
+//    painter.drawLine(QLine(trim, 0, trim, 0, h));
+    painter.fillRect(i, h / 2, 4, barHeightBuffer[i].load(), Qt::white);
+    painter.fillRect(i, h / 2, 4, barHeightBuffer[i+1].load(), Qt::white);
   }
   painter.end();
 }
@@ -86,9 +106,16 @@ void EqGraph::mousePressEvent(QMouseEvent* event) {
   // todo
 }
 
-Result EqGraph::hydrateState(const AppStatePacket &appStatePacket) {
-  if (appStatePacket.playState == STOP)
-    // TODO: clear
+Result EqGraph::hydrateState(const AppStatePacket& appStatePacket) {
+  switch (appStatePacket.playState) {
+    case PLAY:
+      startWorker();
+      break;
+    case PAUSE:
+    case STOP:
+      stopWorker();
+      break;
+  }
 
   return OK;
 }
