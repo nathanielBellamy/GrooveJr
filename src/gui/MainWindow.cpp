@@ -25,7 +25,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState*
     , mixerWindow(&container, actorSystem, mixer)
     {
 
-  container.setMinimumSize(QSize(1200, 700));
+  container.setMinimumSize(QSize(1300, 700));
   setCentralWidget(&container);
   setupGrid();
   setStyleSheet(

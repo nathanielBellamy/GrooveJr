@@ -42,25 +42,31 @@ void EqGraph::initializeGL() {
   initializeOpenGLFunctions();
   glClearColor(0.0f, 0.20f, 0.20f, 1.0f);
   static const char* vertexShaderSource = R"(
-      #version 330 core
-      layout(location = 0) in vec2 position;
-      void main() {
-          gl_Position = vec4(position, 0.0, 1.0);
+      attribute highp vec4 vertex;
+      // uniform highp mat4 matrix;
+      void main(void) {
+        gl_Position = vertex; // matrix * vertex;
       }
   )";
 
   static const char* fragmentShaderSource = R"(
-      #version 330 core
-      out vec4 fragColor;
-      void main() {
-          fragColor = vec4(1.0, 0.0, 1.0, 1.0);
-      }
+    uniform mediump vec4 color;
+    void main(void) {
+       gl_FragColor = color;
+    }
   )";
 
   program = new QOpenGLShaderProgram();
   program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
   program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
   program->link();
+  program->bind();
+
+  int vertexLocation = program->attributeLocation("vertex");
+  int matrixLocation = program->uniformLocation("matrix");
+  int colorLocation = program->uniformLocation("color");
+
+  QColor color(0, 0, 255, 255);
 
   // Rectangle defined as two triangles
   float vertices[] = {
@@ -72,6 +78,11 @@ void EqGraph::initializeGL() {
      0.5f,  0.5f, // top-right
     -0.5f,  0.5f  // top-left
   };
+
+  program->enableAttributeArray(vertexLocation);
+//  program->setAttributeArray(vertexLocation, vertices, 3);
+//  program->setUniformValue(matrixLocation, pmvMatrix);
+  program->setUniformValue(colorLocation, color);
 
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
