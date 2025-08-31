@@ -37,15 +37,16 @@ void ProgressBar::setStyle() {
 }
 
 void ProgressBar::paintEvent(QPaintEvent* event) {
-  // const int progress = static_cast<int>(
-  //   std::floor((static_cast<float>(frameId) / static_cast<float>(frames)) * static_cast<float>(width()))
-  // );
-  // QPainter painter(this);
-  // const QPen pen(Qt::NoPen);
-  // painter.begin(this);
-  // painter.setPen(pen);
-  // // painter.fillRect(0, 0, progress, height(), Qt::white);
-  // painter.end();
+  const int progress = static_cast<int>(
+    std::floor((static_cast<float>(frameId) / static_cast<float>(frames)) * static_cast<float>(width()))
+  );
+  QPainter painter(this);
+  const QPen pen(Qt::NoPen);
+  if (!painter.isActive())
+    painter.begin(this);
+  painter.setPen(pen);
+  painter.fillRect(0, 0, progress, height(), Qt::white);
+  painter.end();
 }
 
 void ProgressBar::mousePressEvent(QMouseEvent* event) {

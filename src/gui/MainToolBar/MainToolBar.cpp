@@ -18,7 +18,7 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer
   , eqGraph(this, mixer)
   {
 
-  title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+  title.setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   title.setText("GrooveJr");
   title.setFont({title.font().family(), 36});
 

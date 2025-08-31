@@ -8,7 +8,7 @@ namespace Gj {
 namespace Gui {
 
 EqGraph::EqGraph(QWidget* parent, Audio::Mixer* mixer)
-  : QWidget(parent)
+  : QOpenGLWidget(parent)
   , mixer(mixer)
   , eqRingBuffer(nullptr)
   {
@@ -27,6 +27,27 @@ EqGraph::EqGraph(QWidget* parent, Audio::Mixer* mixer)
   animationStart();
 }
 
+void EqGraph::initializeGL() {
+  std::cout << "initializeGL" << std::endl;
+  initializeOpenGLFunctions();
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+}
+
+void EqGraph::paintGL() {
+  std::cout << "paintGL" << std::endl;
+
+//  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//  glColor3f(1.0f, 0.0f, 0.0f);
+//
+//  glBegin(GL_QUADS);
+
+}
+
+void EqGraph::resizeGL(int w, int h) {
+  std::cout << "resizeGL. w: " << w << " h: " << h << std::endl;
+  glViewport(0, 0, w, h);
+}
+
 EqGraph::~EqGraph() {
   animationStop();
 }
@@ -36,7 +57,7 @@ void EqGraph::setEqRingBuffer(jack_ringbuffer_t* newEqRingBuffer) {
 }
 
 void EqGraph::animationStart() {
-  animationTimer.setInterval(32);
+  animationTimer.setInterval(64);
   connect(&animationTimer, &QTimer::timeout, this, &EqGraph::animationLoop);
   animationTimer.start();
 }
@@ -50,7 +71,7 @@ void EqGraph::animationLoop() {
   if (eqRingBuffer == nullptr)
     return;
 
-  repaint();
+  update();
 }
 
 void EqGraph::startWorker() {
@@ -89,17 +110,17 @@ void EqGraph::setStyle() {
 }
 
 void EqGraph::paintEvent(QPaintEvent* event) {
-  QPainter painter(this);
-  QPen pen(Qt::NoPen);
-  if (!painter.isActive())
-    painter.begin(this);
-  painter.setPen(pen);
-  for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim; i += 8) {
-//    painter.drawLine(QLine(trim, 0, trim, 0, h));
-    painter.fillRect(i, h / 2, 4, barHeightBuffer[i].load(), Qt::white);
-    painter.fillRect(i, h / 2, 4, barHeightBuffer[i+1].load(), Qt::white);
-  }
-  painter.end();
+//  QPainter painter(this);
+//  QPen pen(Qt::NoPen);
+//  if (!painter.isActive())
+//    painter.begin(this);
+//  painter.setPen(pen);
+//  for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim; i += 16) {
+////    painter.drawLine(QLine(trim, 0, trim, 0, h));
+//    painter.fillRect(i, h / 2, 8, barHeightBuffer[i].load(), Qt::white);
+//    painter.fillRect(i, h / 2, 8, barHeightBuffer[i+1].load(), Qt::white);
+//  }
+//  painter.end();
 }
 
 void EqGraph::mousePressEvent(QMouseEvent* event) {

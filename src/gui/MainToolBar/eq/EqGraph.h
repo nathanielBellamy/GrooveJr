@@ -9,6 +9,8 @@
 #include <chrono>
 #include <thread>
 
+#include <QtOpenGLWidgets/QOpenGLWidget>
+#include <QOpenGLFunctions>
 #include <QMouseEvent>
 #include <QRect>
 #include <QPainter>
@@ -28,7 +30,7 @@
 namespace Gj {
 namespace Gui {
 
-class EqGraph : public QWidget {
+class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
 
   public:
     EqGraph(QWidget* parent, Audio::Mixer* mixer);
@@ -57,6 +59,9 @@ class EqGraph : public QWidget {
     void setStyle();
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent* event) override;
+    void initializeGL() override;
+    void paintGL() override;
+    void resizeGL(int w, int h) override;
     void startWorker();
     void stopWorker();
 };

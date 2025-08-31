@@ -25,7 +25,7 @@ find_package(Boost REQUIRED COMPONENTS log_setup log)
 
 # setup Qt
 list(APPEND CMAKE_PREFIX_PATH "${GJ_BASE_DIR}/qt6-build/qtbase/lib/cmake")
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets gui)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGLWidgets gui)
 if (Qt6_FOUND)
     message(INFO " --Qt6--FOUND--")
 endif()
@@ -95,6 +95,7 @@ target_link_libraries(GrooveJr
         Qt6::Core
         Qt6::Widgets
         Qt6::Gui
+        Qt6::OpenGLWidgets
         Boost::log
         ${Boost_LIBRARIES}
         SQLite::SQLite3
