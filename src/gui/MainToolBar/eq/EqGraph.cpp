@@ -11,6 +11,9 @@ EqGraph::EqGraph(QWidget* parent, Audio::Mixer* mixer)
   : QOpenGLWidget(parent)
   , mixer(mixer)
   , eqRingBuffer(nullptr)
+  , vao(0)
+  , vbo(0)
+  , program(nullptr)
   {
 
   mixer->setSetEqRingBufferFunc(
@@ -27,29 +30,78 @@ EqGraph::EqGraph(QWidget* parent, Audio::Mixer* mixer)
   animationStart();
 }
 
+EqGraph::~EqGraph() {
+  animationStop();
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
+  delete program;
+}
+
 void EqGraph::initializeGL() {
   std::cout << "initializeGL" << std::endl;
   initializeOpenGLFunctions();
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClearColor(0.0f, 0.20f, 0.20f, 1.0f);
+  static const char* vertexShaderSource = R"(
+      #version 330 core
+      layout(location = 0) in vec2 position;
+      void main() {
+          gl_Position = vec4(position, 0.0, 1.0);
+      }
+  )";
+
+  static const char* fragmentShaderSource = R"(
+      #version 330 core
+      out vec4 fragColor;
+      void main() {
+          fragColor = vec4(1.0, 0.0, 1.0, 1.0);
+      }
+  )";
+
+  program = new QOpenGLShaderProgram();
+  program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
+  program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
+  program->link();
+
+  // Rectangle defined as two triangles
+  float vertices[] = {
+    -0.5f, -0.5f, // bottom-left
+     0.5f, -0.5f, // bottom-right
+     0.5f,  0.5f, // top-right
+
+    -0.5f, -0.5f, // bottom-left
+     0.5f,  0.5f, // top-right
+    -0.5f,  0.5f  // top-left
+  };
+
+  glGenVertexArrays(1, &vao);
+  glGenBuffers(1, &vbo);
+
+  glBindVertexArray(vao);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
+
+  glBindVertexArray(0);
 }
 
 void EqGraph::paintGL() {
   std::cout << "paintGL" << std::endl;
 
-//  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//  glColor3f(1.0f, 0.0f, 0.0f);
-//
-//  glBegin(GL_QUADS);
+  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
 
+  program->bind();
+  glBindVertexArray(vao);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindVertexArray(0);
+  program->release();
 }
 
 void EqGraph::resizeGL(int w, int h) {
   std::cout << "resizeGL. w: " << w << " h: " << h << std::endl;
   glViewport(0, 0, w, h);
-}
-
-EqGraph::~EqGraph() {
-  animationStop();
 }
 
 void EqGraph::setEqRingBuffer(jack_ringbuffer_t* newEqRingBuffer) {
@@ -109,7 +161,7 @@ void EqGraph::setStyle() {
   setStyleSheet("border: 2px solid white");
 }
 
-void EqGraph::paintEvent(QPaintEvent* event) {
+//void EqGraph::paintEvent(QPaintEvent* event) {
 //  QPainter painter(this);
 //  QPen pen(Qt::NoPen);
 //  if (!painter.isActive())
@@ -121,7 +173,7 @@ void EqGraph::paintEvent(QPaintEvent* event) {
 //    painter.fillRect(i, h / 2, 8, barHeightBuffer[i+1].load(), Qt::white);
 //  }
 //  painter.end();
-}
+//}
 
 void EqGraph::mousePressEvent(QMouseEvent* event) {
   // todo

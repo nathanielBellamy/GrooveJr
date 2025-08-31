@@ -11,6 +11,7 @@
 
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include <QtOpenGL/QOpenGLShaderProgram>
 #include <QMouseEvent>
 #include <QRect>
 #include <QPainter>
@@ -55,9 +56,11 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
     std::atomic<bool> stopEqWorkerThread = false;
     std::thread eqWorkerThread;
     QTimer animationTimer;
+    GLuint vao, vbo;
+    QOpenGLShaderProgram* program;
 
     void setStyle();
-    void paintEvent(QPaintEvent *event) override;
+    // void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent* event) override;
     void initializeGL() override;
     void paintGL() override;
