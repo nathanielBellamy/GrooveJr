@@ -38,7 +38,6 @@ EqGraph::~EqGraph() {
 }
 
 void EqGraph::initializeGL() {
-  std::cout << "initializeGL" << std::endl;
   initializeOpenGLFunctions();
   glClearColor(0.0f, 0.20f, 0.20f, 1.0f);
   static const char* vertexShaderSource = R"(
@@ -66,7 +65,7 @@ void EqGraph::initializeGL() {
   int matrixLocation = program->uniformLocation("matrix");
   int colorLocation = program->uniformLocation("color");
 
-  QColor color(0, 0, 255, 255);
+  QColor color(0, 197, 170, 255);
 
   program->enableAttributeArray(vertexLocation);
 //  program->setAttributeArray(vertexLocation, vertices, 3);
@@ -87,8 +86,6 @@ void EqGraph::initializeGL() {
 }
 
 void EqGraph::paintGL() {
-  std::cout << "paintGL" << std::endl;
-
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -96,12 +93,11 @@ void EqGraph::paintGL() {
   glBindVertexArray(vao);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glDrawArrays(GL_TRIANGLES, 0, (Audio::FFT_EQ_FREQ_SIZE - 2 * trim) * 6);
   program->release();
 }
 
 void EqGraph::resizeGL(int w, int h) {
-  std::cout << "resizeGL. w: " << w << " h: " << h << std::endl;
   glViewport(0, 0, w, h);
 }
 
@@ -110,7 +106,7 @@ void EqGraph::setEqRingBuffer(jack_ringbuffer_t* newEqRingBuffer) {
 }
 
 void EqGraph::animationStart() {
-  animationTimer.setInterval(64);
+  animationTimer.setInterval(32);
   connect(&animationTimer, &QTimer::timeout, this, &EqGraph::animationLoop);
   animationTimer.start();
 }
@@ -147,16 +143,27 @@ void EqGraph::startWorker() {
           barHeightBuffer[i - trim].store(c * std::min(eqBuffer[i] * 10.0f, maxBarHf) / maxBarHf );
         }
 
-        // Rectangle defined as two triangles
-        vertices[1] = barHeightBuffer[0]; // bottom-left
-        vertices[3] = barHeightBuffer[1]; // bottom-right
-        vertices[5] = barHeightBuffer[2];
-        vertices[7] = barHeightBuffer[3];
+        const float wF = static_cast<float>(Audio::FFT_EQ_FREQ_SIZE - 2 * trim);
+        const float xZero = (Audio::FFT_EQ_FREQ_SIZE - 2 * trim) / 2;
+        const float barWidth = 2.0f / wF;
 
-        for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim; i++) {
-          // todo
-        //          vertices[i] =
+        for (int i = 0.; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim; i += 12) {
+          const float x = static_cast<float>(i) * barWidth - 1.0f;
+          // bottom triangle
+          vertices[i] = x;
+          vertices[i+1] = barHeightBuffer[i + 1];
+          vertices[i+2] = x + barWidth;
+          vertices[i+3] = barHeightBuffer[i + 1];
+          vertices[i+4] = x + barWidth;
+          vertices[i+5] = barHeightBuffer[i];
 
+          // top triangle
+          vertices[i+6] = x;
+          vertices[i+7] = barHeightBuffer[i + 1];
+          vertices[i+8] = x + barWidth;
+          vertices[i+9] = barHeightBuffer[i];
+          vertices[i+10] = x;
+          vertices[i+11] = barHeightBuffer[i];
         }
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(10));

@@ -56,15 +56,7 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
     unsigned int trim = 150;
     unsigned int barHeightBufferSize = 150;
     std::atomic<float> barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * 150]{ 0 };
-    float vertices[12]{
-      -0.5f, -0.5f, // bottom-left
-       0.5f, -0.5f, // bottom-right
-       0.5f,  0.5f, // top-right
-
-      -0.5f, -0.5f, // bottom-left
-       0.5f,  0.5f, // top-right
-      -0.5f,  0.5f  // top-left
-    }; // (Audio::FFT_EQ_FREQ_SIZE - 2 * 150) * 6] { 0.0f };
+    float vertices[(Audio::FFT_EQ_FREQ_SIZE - 2 * 150) * 6] { 0.0f };
 
     std::atomic<bool> stopEqWorkerThread = false;
     std::thread eqWorkerThread;
