@@ -68,17 +68,6 @@ void EqGraph::initializeGL() {
 
   QColor color(0, 0, 255, 255);
 
-  // Rectangle defined as two triangles
-  float vertices[] = {
-    -0.5f, -0.5f, // bottom-left
-     0.5f, -0.5f, // bottom-right
-     0.5f,  0.5f, // top-right
-
-    -0.5f, -0.5f, // bottom-left
-     0.5f,  0.5f, // top-right
-    -0.5f,  0.5f  // top-left
-  };
-
   program->enableAttributeArray(vertexLocation);
 //  program->setAttributeArray(vertexLocation, vertices, 3);
 //  program->setUniformValue(matrixLocation, pmvMatrix);
@@ -89,7 +78,7 @@ void EqGraph::initializeGL() {
 
   glBindVertexArray(vao);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
@@ -105,8 +94,9 @@ void EqGraph::paintGL() {
 
   program->bind();
   glBindVertexArray(vao);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
   glDrawArrays(GL_TRIANGLES, 0, 6);
-  glBindVertexArray(0);
   program->release();
 }
 
@@ -151,9 +141,22 @@ void EqGraph::startWorker() {
           Audio::FFT_EQ_RING_BUFFER_SIZE
         );
 
+
         for (int i = trim; i < Audio::FFT_EQ_FREQ_SIZE - trim - 10; i++) {
-          const int c = i % 2 == 0 ? 1 : -1;
-          barHeightBuffer[i - trim].store(c * std::min(static_cast<int>(eqBuffer[i] * 10), maxBarH));
+          const float c = i % 2 == 0 ? 1.0f : -1.0f;
+          barHeightBuffer[i - trim].store(c * std::min(eqBuffer[i] * 10.0f, maxBarHf) / maxBarHf );
+        }
+
+        // Rectangle defined as two triangles
+        vertices[1] = barHeightBuffer[0]; // bottom-left
+        vertices[3] = barHeightBuffer[1]; // bottom-right
+        vertices[5] = barHeightBuffer[2];
+        vertices[7] = barHeightBuffer[3];
+
+        for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim; i++) {
+          // todo
+        //          vertices[i] =
+
         }
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(10));

@@ -5,6 +5,7 @@
 #ifndef EQGRAPH_H
 #define EQGRAPH_H
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <thread>
@@ -47,12 +48,24 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
   private:
     int h = 75;
     int maxBarH = 30;
+    float maxBarHf = 30.0f;
     Audio::Mixer* mixer;
     jack_ringbuffer_t* eqRingBuffer;
     std::mutex eqBufferMutex;
     float eqBuffer[Audio::FFT_EQ_RING_BUFFER_SIZE]{ 0.0f };
     unsigned int trim = 150;
-    std::atomic<unsigned int> barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * 150]{ 0 };
+    unsigned int barHeightBufferSize = 150;
+    std::atomic<float> barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * 150]{ 0 };
+    float vertices[12]{
+      -0.5f, -0.5f, // bottom-left
+       0.5f, -0.5f, // bottom-right
+       0.5f,  0.5f, // top-right
+
+      -0.5f, -0.5f, // bottom-left
+       0.5f,  0.5f, // top-right
+      -0.5f,  0.5f  // top-left
+    }; // (Audio::FFT_EQ_FREQ_SIZE - 2 * 150) * 6] { 0.0f };
+
     std::atomic<bool> stopEqWorkerThread = false;
     std::thread eqWorkerThread;
     QTimer animationTimer;
