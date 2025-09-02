@@ -138,7 +138,7 @@ void EqGraph::startWorker() {
         );
 
 
-        for (int i = trim; i < Audio::FFT_EQ_FREQ_SIZE - trim - 10; i++) {
+        for (int i = trim; i < Audio::FFT_EQ_FREQ_SIZE - trim - 1; i++) {
           const float c = i % 2 == 0 ? 1.0f : -1.0f;
           barHeightBuffer[i - trim].store(c * std::min(eqBuffer[i] * 10.0f, maxBarHf) / maxBarHf );
         }
@@ -147,23 +147,25 @@ void EqGraph::startWorker() {
         const float xZero = (Audio::FFT_EQ_FREQ_SIZE - 2 * trim) / 2;
         const float barWidth = 2.0f / wF;
 
-        for (int i = 0.; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim; i += 12) {
+
+        for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim - 1; i += 2) {
+          const int sixI = i * 6;
           const float x = static_cast<float>(i) * barWidth - 1.0f;
           // bottom triangle
-          vertices[i] = x;
-          vertices[i+1] = barHeightBuffer[i + 1];
-          vertices[i+2] = x + barWidth;
-          vertices[i+3] = barHeightBuffer[i + 1];
-          vertices[i+4] = x + barWidth;
-          vertices[i+5] = barHeightBuffer[i];
+          vertices[sixI] = x;
+          vertices[sixI+1] = barHeightBuffer[i + 1];
+          vertices[sixI+2] = x + barWidth;
+          vertices[sixI+3] = barHeightBuffer[i + 1];
+          vertices[sixI+4] = x + barWidth;
+          vertices[sixI+5] = barHeightBuffer[i];
 
           // top triangle
-          vertices[i+6] = x;
-          vertices[i+7] = barHeightBuffer[i + 1];
-          vertices[i+8] = x + barWidth;
-          vertices[i+9] = barHeightBuffer[i];
-          vertices[i+10] = x;
-          vertices[i+11] = barHeightBuffer[i];
+          vertices[sixI+6] = x;
+          vertices[sixI+7] = barHeightBuffer[i + 1];
+          vertices[sixI+8] = x + barWidth;
+          vertices[sixI+9] = barHeightBuffer[i];
+          vertices[sixI+10] = x;
+          vertices[sixI+11] = barHeightBuffer[i];
         }
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
