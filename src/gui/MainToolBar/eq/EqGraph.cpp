@@ -74,7 +74,7 @@ void EqGraph::initializeGL() {
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
 
-  glBindVertexArray(0);
+//  glBindVertexArray(0);
 }
 
 void EqGraph::paintGL() {
@@ -121,6 +121,7 @@ void EqGraph::startWorker() {
   stopEqWorkerThread.store(false);
   eqWorkerThread = std::thread([this]() {
     while (!stopEqWorkerThread.load()) {
+      avgIndex = (avgIndex + 1) % avgSize;
       if (eqRingBuffer == nullptr)
         continue;
 
@@ -131,10 +132,17 @@ void EqGraph::startWorker() {
           Audio::FFT_EQ_RING_BUFFER_SIZE
         );
 
-
         for (int i = trim; i < Audio::FFT_EQ_FREQ_SIZE - trim - 1; i++) {
           const float c = i % 2 == 0 ? 1.0f : -1.0f;
-          barHeightBuffer[i - trim].store(c * std::min(eqBuffer[i] * 10.0f, maxBarHf) / maxBarHf );
+          barHeightBufferAvg[avgIndex][i - trim] = c * std::min(eqBuffer[i] * 20.0f, maxBarHf) / maxBarHf;
+
+          float avg = 0.0f;
+          for (int j = 0; j < avgSize; j++) {
+            avg += barHeightBufferAvg[j][i - trim];
+          }
+          avg /= avgSize;
+
+          barHeightBuffer[i - trim].store(avg);
         }
 
         const float wF = static_cast<float>(Audio::FFT_EQ_FREQ_SIZE - 2 * trim);
@@ -175,7 +183,6 @@ void EqGraph::stopWorker() {
 void EqGraph::setStyle() {
   setFixedWidth(w);
   setFixedHeight(h);
-  setStyleSheet("border: 2px solid white");
 }
 
 void EqGraph::mousePressEvent(QMouseEvent* event) {
