@@ -19,12 +19,6 @@ EqGraph::EqGraph(QWidget* parent, Audio::Mixer* mixer)
   mixer->setSetEqRingBufferFunc(
     [this](jack_ringbuffer_t* eqRingBuffer) { setEqRingBuffer(eqRingBuffer); }
   );
-//  mixer->setEqAnimationStartFunc(
-//    [this]() { animationStart(); }
-//  );
-//  mixer->setEqAnimationStopFunc(
-//    [this]() { animationStop(); }
-//  );
 
   setStyle();
   animationStart();

@@ -111,11 +111,6 @@ public:
   void setSetEqRingBufferFunc(std::function<void(jack_ringbuffer_t* eqBuffer)> func) { setEqRingBufferFunc = func; };
   std::function<void(jack_ringbuffer_t* eqBuffer)> getSetEqRingBufferFunc() { return setEqRingBufferFunc; };
 
-  void setEqAnimationStartFunc(std::function<void()> func) { eqAnimationStartFunc = func; };
-  std::function<void()> getEqAnimationStartFunc() { return eqAnimationStartFunc; };
-  void setEqAnimationStopFunc(std::function<void()> func) { eqAnimationStopFunc = func; };
-  std::function<void()> getEqAnimationStopFunc() { return eqAnimationStopFunc; };
-
   std::string getPluginName(const int channelIdx, const int pluginIndex) const {
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);
   };
