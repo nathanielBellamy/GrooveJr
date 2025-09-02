@@ -24,6 +24,7 @@
 #include "EffectsSlots.h"
 #include "MuteSoloContainer.h"
 #include "RemoveEffectsChannelButton.h"
+#include "VuMeter.h"
 #include "./Effects/EffectsContainer.h"
 #include "../../../Shared/VstSelect.h"
 #include "../../../Color.h"
@@ -95,6 +96,7 @@ class EffectsChannel final : public QWidget {
     QScrollArea effectsSlotsScrollArea;
     EffectsSlots effectsSlots;
     MuteSoloContainer muteSoloContainer;
+    VuMeter vuMeter;
     void setStyle();
     void setupGrid();
     void setupTitle();

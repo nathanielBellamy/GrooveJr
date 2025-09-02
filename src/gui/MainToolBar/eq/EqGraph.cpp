@@ -33,7 +33,9 @@ EqGraph::~EqGraph() {
 
 void EqGraph::initializeGL() {
   initializeOpenGLFunctions();
-  glClearColor(0.0f, 0.20f, 0.20f, 1.0f);
+  QColor bg = colors.at(backgroundColorIndex);
+  glClearColor(bg.red(), bg.green(), bg.blue(), bg.alpha());
+
   static const char* vertexShaderSource = R"(
       attribute highp vec4 vertex;
       // uniform highp mat4 matrix;
@@ -56,13 +58,8 @@ void EqGraph::initializeGL() {
   program->bind();
 
   int vertexLocation = program->attributeLocation("vertex");
-  int matrixLocation = program->uniformLocation("matrix");
-  colorLocation = program->uniformLocation("color");
-
   program->enableAttributeArray(vertexLocation);
-//  program->setAttributeArray(vertexLocation, vertices, 3);
-//  program->setUniformValue(matrixLocation, pmvMatrix);
-  program->setUniformValue(colorLocation, colors.at(colorIndex));
+  colorLocation = program->uniformLocation("color");
 
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
@@ -73,8 +70,6 @@ void EqGraph::initializeGL() {
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
-
-//  glBindVertexArray(0);
 }
 
 void EqGraph::paintGL() {
@@ -148,7 +143,6 @@ void EqGraph::startWorker() {
         const float wF = static_cast<float>(Audio::FFT_EQ_FREQ_SIZE - 2 * trim);
         const float xZero = (Audio::FFT_EQ_FREQ_SIZE - 2 * trim) / 2;
         const float barWidth = 2.0f / wF;
-
 
         for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim - 1; i += 2) {
           const int sixI = i * 6;

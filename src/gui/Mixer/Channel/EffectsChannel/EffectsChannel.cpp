@@ -56,6 +56,7 @@ EffectsChannel::EffectsChannel(
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction
   )
+  , vuMeter(this, mixer)
   {
   if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
     // can't remove main, must have at least one non-main effects channel
@@ -142,20 +143,21 @@ void EffectsChannel::setupGrid() {
 
   // can't delete main, must have at least one non-main channel
   grid.addWidget(&removeEffectsChannelButton, 0, 4, 1, 1);
-  grid.addWidget(&gainSlider, 1, 0, 3, 1);
-  grid.addWidget(&gainLabel, 4, 0, 1, 1);
-  grid.addWidget(&gainLSlider, 1, 1, 3, 1);
-  grid.addWidget(&gainLLabel, 4, 1, 1, 1);
-  grid.addWidget(&gainRSlider, 1, 2, 3, 1);
-  grid.addWidget(&gainRLabel, 4, 2, 1, 1);
-  grid.addWidget(&effectsSlotsScrollArea, 1, 3, 1, 1);
-  grid.addWidget(&addEffectButton, 1, 4, 1, 1);
+  grid.addWidget(&vuMeter, 1, 0, 1, 3);
+  grid.addWidget(&gainSlider, 1, 1, 3, 1);
+  grid.addWidget(&gainLabel, 4, 1, 1, 1);
+  grid.addWidget(&gainLSlider, 1, 2, 3, 1);
+  grid.addWidget(&gainLLabel, 4, 2, 1, 1);
+  grid.addWidget(&gainRSlider, 1, 3, 3, 1);
+  grid.addWidget(&gainRLabel, 4, 3, 1, 1);
+  grid.addWidget(&effectsSlotsScrollArea, 1, 4, 1, 1);
+  grid.addWidget(&addEffectButton, 1, 5, 1, 1);
   // grid.addWidget(&panSlider, 2, 3, 1, 1);
   // grid.addWidget(&panLabel, 2, 4, 1, 1);
-  grid.addWidget(&panLSlider, 2, 3, 1, 1);
-  grid.addWidget(&panLLabel, 2, 4, 1, 1);
-  grid.addWidget(&panRSlider, 3, 3, 1, 1);
-  grid.addWidget(&panRLabel, 3, 4, 1, 1);
+  grid.addWidget(&panLSlider, 2, 4, 1, 1);
+  grid.addWidget(&panLLabel, 2, 5, 1, 1);
+  grid.addWidget(&panRSlider, 3, 4, 1, 1);
+  grid.addWidget(&panRLabel, 3, 5, 1, 1);
   grid.addWidget(&muteSoloContainer, 4, 0, 1, -1);
 
   grid.setVerticalSpacing(2);
