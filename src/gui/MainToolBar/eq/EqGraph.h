@@ -63,8 +63,10 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
     std::atomic<int> colorIndex = 0;
     std::vector<QColor> colors = {
       QColor(0, 197, 170, 255),
-      QColor(50, 0, 200, 255),
-      QColor(200, 0, 200, 255),
+      QColor(0, 176, 169, 255),
+      QColor(255, 0, 255, 255),
+      QColor(255, 255, 255, 255),
+      QColor(0, 0, 0, 255),
     };
 
     std::atomic<bool> stopEqWorkerThread = false;
