@@ -73,6 +73,8 @@ qt_add_library(GjGui STATIC
         Mixer/Channel/EffectsChannel/EffectsSlots.cpp
         Mixer/Channel/EffectsChannel/MuteSoloContainer.h
         Mixer/Channel/EffectsChannel/MuteSoloContainer.cpp
+        Mixer/Channel/EffectsChannel/VuMeter.h
+        Mixer/Channel/EffectsChannel/VuMeter.cpp
         Mixer/Channel/EffectsChannel/Effects/EffectsContainer.h
         Mixer/Channel/EffectsChannel/Effects/EffectsContainer.cpp
         Mixer/Channel/EffectsChannel/Effects/VstWindow.h
