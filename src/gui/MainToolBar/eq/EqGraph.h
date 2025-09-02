@@ -33,6 +33,8 @@
 namespace Gj {
 namespace Gui {
 
+  constexpr int trim = 150;
+
 class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
 
   public:
@@ -48,17 +50,16 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
 
   private:
     int h = 75;
-    int w = Audio::FFT_EQ_FREQ_SIZE - 2 * 150;
+    int w = Audio::FFT_EQ_FREQ_SIZE - 2 * trim;
     int maxBarH = 30;
     float maxBarHf = 30.0f;
     Audio::Mixer* mixer;
     jack_ringbuffer_t* eqRingBuffer;
     std::mutex eqBufferMutex;
     float eqBuffer[Audio::FFT_EQ_RING_BUFFER_SIZE]{ 0.0f };
-    unsigned int trim = 150;
-    unsigned int barHeightBufferSize = 150;
-    std::atomic<float> barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * 150]{ 0 };
-    float vertices[(Audio::FFT_EQ_FREQ_SIZE - 2 * 150) * 6] { 0.0f };
+    std::atomic<float> barHeightBufferAvg[4][Audio::FFT_EQ_FREQ_SIZE - 2 * trim]{ 0.0f };
+    std::atomic<float> barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * trim]{ 0.0f };
+    float vertices[(Audio::FFT_EQ_FREQ_SIZE - 2 * trim) * 6] { 0.0f };
 
     int colorLocation;
     std::atomic<int> colorIndex = 0;
