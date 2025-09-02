@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <vector>
 #include <thread>
 
 #include <QtOpenGLWidgets/QOpenGLWidget>
@@ -58,6 +59,14 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
     std::atomic<float> barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * 150]{ 0 };
     float vertices[(Audio::FFT_EQ_FREQ_SIZE - 2 * 150) * 6] { 0.0f };
 
+    int colorLocation;
+    std::atomic<int> colorIndex = 0;
+    std::vector<QColor> colors = {
+      QColor(0, 197, 170, 255),
+      QColor(50, 0, 200, 255),
+      QColor(200, 0, 200, 255),
+    };
+
     std::atomic<bool> stopEqWorkerThread = false;
     std::thread eqWorkerThread;
     QTimer animationTimer;
@@ -65,7 +74,6 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
     QOpenGLShaderProgram* program;
 
     void setStyle();
-    // void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent* event) override;
     void initializeGL() override;
     void paintGL() override;
