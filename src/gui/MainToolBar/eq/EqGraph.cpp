@@ -78,7 +78,8 @@ void EqGraph::initializeGL() {
 }
 
 void EqGraph::paintGL() {
-  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+  QColor bg = colors.at(backgroundColorIndex);
+  glClearColor(bg.red(), bg.green(), bg.blue(), bg.alpha());
   glClear(GL_COLOR_BUFFER_BIT);
 
   program->bind();
@@ -172,13 +173,25 @@ void EqGraph::stopWorker() {
 }
 
 void EqGraph::setStyle() {
-  setFixedWidth(Audio::FFT_EQ_FREQ_SIZE - 2 * trim);
+  setFixedWidth(w);
   setFixedHeight(h);
   setStyleSheet("border: 2px solid white");
 }
 
 void EqGraph::mousePressEvent(QMouseEvent* event) {
-  colorIndex = (colorIndex + 1) % colors.size();
+  const float x = static_cast<float>(event->position().x());
+  const float percentX = x / static_cast<float>(w);
+
+  const float y = static_cast<float>(event->position().y());
+  const float percentY = y / static_cast<float>(h);
+
+  if (percentX > 0.5f)
+    colorIndex = (colorIndex + 1) % colors.size();
+
+  if (percentY < 0.5f)
+    backgroundColorIndex = (backgroundColorIndex + 1) % colors.size();
+
+  update();
 }
 
 Result EqGraph::hydrateState(const AppStatePacket& appStatePacket) {

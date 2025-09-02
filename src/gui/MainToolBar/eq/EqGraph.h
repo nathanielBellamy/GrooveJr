@@ -48,6 +48,7 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
 
   private:
     int h = 75;
+    int w = Audio::FFT_EQ_FREQ_SIZE - 2 * 150;
     int maxBarH = 30;
     float maxBarHf = 30.0f;
     Audio::Mixer* mixer;
@@ -61,10 +62,11 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
 
     int colorLocation;
     std::atomic<int> colorIndex = 0;
+    std::atomic<int> backgroundColorIndex = 4;
     std::vector<QColor> colors = {
       QColor(0, 197, 170, 255),
-      QColor(0, 176, 169, 255),
       QColor(255, 0, 255, 255),
+      QColor(24, 147, 224, 255),
       QColor(255, 255, 255, 255),
       QColor(0, 0, 0, 255),
     };
