@@ -15,6 +15,10 @@ VuMeter::VuMeter(QWidget* parent, Audio::Mixer* mixer)
   , program(nullptr)
   {
 
+  mixer->setSetEqRingBufferFunc(
+    [this](jack_ringbuffer_t* eqRingBuffer) { setVuRingBuffer(eqRingBuffer); }
+  );
+
   animationStart();
   setStyle();
 }
@@ -77,33 +81,33 @@ void VuMeter::paintGL() {
 
   program->bind();
 
-  for (int i = 0; i < blockCount; i++) {
-    if (i == blockCount - 1)
-      program->setUniformValue(colorLocation, red);
-    else if (i == blockCount -2 || i == blockCount - 3)
-      program->setUniformValue(colorLocation, yellow);
+  for (int i = 0; i < VU_METER_BLOCK_COUNT; i++) {
+    if (i == VU_METER_BLOCK_COUNT - 1)
+      program->setUniformValue(colorLocation, VU_METER_RED);
+    else if (i == VU_METER_BLOCK_COUNT -2 || i == VU_METER_BLOCK_COUNT - 3)
+      program->setUniformValue(colorLocation, VU_METER_YELLOW);
     else
-      program->setUniformValue(colorLocation, green);
+      program->setUniformValue(colorLocation, VU_METER_GREEN);
 
     // todo: if vol >= .1 * blockcount
     const float iF = static_cast<float>(i);
-    const float yBottom = -1.0f + iF * (blockHeight + gap) + gap;
-    const float yTop = yBottom + blockHeight;
+    const float yBottom = -1.0f + iF * (VU_METER_BLOCK_HEIGHT + VU_METER_GAP) + VU_METER_GAP;
+    const float yTop = yBottom + VU_METER_BLOCK_HEIGHT;
 
     // top triangle
-    vertices[0] = xLeft;
+    vertices[0] = VU_METER_X_LEFT;
     vertices[1] = yTop;
-    vertices[2] = xRight;
+    vertices[2] = VU_METER_X_RIGHT;
     vertices[3] = yTop;
-    vertices[4] = xRight;
+    vertices[4] = VU_METER_X_RIGHT;
     vertices[5] = yBottom;
 
     // bottom triangle
-    vertices[6] = xLeft;
+    vertices[6] = VU_METER_X_LEFT;
     vertices[7] = yTop;
-    vertices[8] = xRight;
+    vertices[8] = VU_METER_X_RIGHT;
     vertices[9] = yBottom;
-    vertices[10] = xLeft;
+    vertices[10] = VU_METER_X_LEFT;
     vertices[11] = yBottom;
 
     glBindVertexArray(vao);

@@ -13,6 +13,7 @@
 #include <QTimer>
 
 #include <sndfile.hh>
+#include <jack/ringbuffer.h>
 
 #include "../../../../audio/Constants.h"
 #include "../../../../audio/Mixer.h"
@@ -21,15 +22,16 @@
 
 namespace Gj {
 namespace Gui {
-  constexpr int blockCount = 16;
-  constexpr float blockHeight = 1.3f / static_cast<float>(blockCount);
-  constexpr float gap = 0.7f / static_cast<float>(blockCount + 1);
-  constexpr float xLeft = -0.75f;
-  constexpr float xRight = 0.75f;
-  constexpr QColor black = QColor(0, 0, 0, 255);
-  constexpr QColor green = QColor(0, 255, 0, 255);
-  constexpr QColor yellow = QColor(255, 255, 0, 255);
-  constexpr QColor red = QColor(255, 0, 0, 255);
+  constexpr int VU_METER_AVG_SIZE = 4;
+  constexpr int VU_METER_BLOCK_COUNT = 16;
+  constexpr float VU_METER_BLOCK_HEIGHT = 1.3f / static_cast<float>(VU_METER_BLOCK_COUNT);
+  constexpr float VU_METER_GAP = 0.7f / static_cast<float>(VU_METER_BLOCK_COUNT + 1);
+  constexpr float VU_METER_X_LEFT = -0.75f;
+  constexpr float VU_METER_X_RIGHT = 0.75f;
+  constexpr QColor VU_METER_BLACK = QColor(0, 0, 0, 255);
+  constexpr QColor VU_METER_GREEN = QColor(0, 255, 0, 255);
+  constexpr QColor VU_METER_YELLOW = QColor(255, 255, 0, 255);
+  constexpr QColor VU_METER_RED = QColor(255, 0, 0, 255);
 
 class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
 
@@ -42,7 +44,7 @@ class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
     void animationLoop();
 
   private:
-    int w = 25;
+    int w = 30;
     float vertices[12] { 0.0f };
     GLuint vao, vbo;
     int colorLocation;

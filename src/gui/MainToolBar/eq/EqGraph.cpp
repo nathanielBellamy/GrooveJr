@@ -82,7 +82,7 @@ void EqGraph::paintGL() {
   glBindVertexArray(vao);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-  glDrawArrays(GL_TRIANGLES, 0, (Audio::FFT_EQ_FREQ_SIZE - 2 * trim) * 6);
+  glDrawArrays(GL_TRIANGLES, 0, (Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM) * 6);
   program->release();
 }
 
@@ -116,7 +116,7 @@ void EqGraph::startWorker() {
   stopEqWorkerThread.store(false);
   eqWorkerThread = std::thread([this]() {
     while (!stopEqWorkerThread.load()) {
-      avgIndex = (avgIndex + 1) % avgSize;
+      avgIndex = (avgIndex + 1) % EG_GRAPH_AVG_SIZE;
       if (eqRingBuffer == nullptr)
         continue;
 
@@ -127,24 +127,24 @@ void EqGraph::startWorker() {
           Audio::FFT_EQ_RING_BUFFER_SIZE
         );
 
-        for (int i = trim; i < Audio::FFT_EQ_FREQ_SIZE - trim - 1; i++) {
+        for (int i = EG_GRAPH_TRIM; i < Audio::FFT_EQ_FREQ_SIZE - EG_GRAPH_TRIM - 1; i++) {
           const float c = i % 2 == 0 ? 1.0f : -1.0f;
-          barHeightBufferAvg[avgIndex][i - trim] = c * std::min(eqBuffer[i] * 20.0f, maxBarHf) / maxBarHf;
+          barHeightBufferAvg[avgIndex][i - EG_GRAPH_TRIM] = c * std::min(eqBuffer[i] * 20.0f, maxBarHf) / maxBarHf;
 
           float avg = 0.0f;
-          for (int j = 0; j < avgSize; j++) {
-            avg += barHeightBufferAvg[j][i - trim];
+          for (int j = 0; j < EG_GRAPH_AVG_SIZE; j++) {
+            avg += barHeightBufferAvg[j][i - EG_GRAPH_TRIM];
           }
-          avg /= avgSize;
+          avg /= EG_GRAPH_AVG_SIZE;
 
-          barHeightBuffer[i - trim].store(avg);
+          barHeightBuffer[i - EG_GRAPH_TRIM].store(avg);
         }
 
-        const float wF = static_cast<float>(Audio::FFT_EQ_FREQ_SIZE - 2 * trim);
-        const float xZero = (Audio::FFT_EQ_FREQ_SIZE - 2 * trim) / 2;
+        const float wF = static_cast<float>(Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM);
+        const float xZero = (Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM) / 2;
         const float barWidth = 2.0f / wF;
 
-        for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * trim - 1; i += 2) {
+        for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM - 1; i += 2) {
           const int sixI = i * 6;
           const float x = static_cast<float>(i) * barWidth - 1.0f;
           // bottom triangle

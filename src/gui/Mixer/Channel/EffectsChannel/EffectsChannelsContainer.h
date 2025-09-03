@@ -58,6 +58,7 @@ class EffectsChannelsContainer final : public QWidget {
     void clearEffectsChannels();
     void setEffects() const;
     void setChannels();
+    Result setVuRingBuffer(jack_ringbuffer_t* vuRingBuffer);
 
   private:
     actor_system& actorSystem;
@@ -77,11 +78,15 @@ class EffectsChannelsContainer final : public QWidget {
     QAction* soloChannelAction;
     QAction* soloLChannelAction;
     QAction* soloRChannelAction;
+
+    jack_ringbuffer_t* vuRingBuffer;
+    float vuBuffer[Audio::MAX_EFFECTS_CHANNELS]{ 0.0f };
+    float vuBufferAvg[VU_METER_AVG_SIZE][Audio::MAX_EFFECTS_CHANNELS]{ 0.0f };
+
     void connectActions();
     void setStyle();
     void setupGrid();
     void setupChannelsScrollArea();
-
 };
 
 } // Gui
