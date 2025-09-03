@@ -114,6 +114,7 @@ void EffectsChannel::hydrateState(const AppStatePacket& appStatePacket, const in
     removeEffectsChannelButton.hydrateState(appStatePacket, channelIndex);
 
   effectsSlots.hydrateState(appStatePacket, channelIndex);
+  vuMeter.hydrateState(appStatePacket);
 
   setupTitle();
   // setupGrid();
@@ -143,7 +144,7 @@ void EffectsChannel::setupGrid() {
 
   // can't delete main, must have at least one non-main channel
   grid.addWidget(&removeEffectsChannelButton, 0, 4, 1, 1);
-  grid.addWidget(&vuMeter, 1, 0, 1, 3);
+  grid.addWidget(&vuMeter, 1, 0, 3, 1);
   grid.addWidget(&gainSlider, 1, 1, 3, 1);
   grid.addWidget(&gainLabel, 4, 1, 1, 1);
   grid.addWidget(&gainLSlider, 1, 2, 3, 1);

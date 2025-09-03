@@ -42,8 +42,6 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
     EqGraph(QWidget* parent, Audio::Mixer* mixer);
     ~EqGraph();
     void setEqRingBuffer(jack_ringbuffer_t* eqRingBuffer);
-    void animationStart();
-    void animationStop();
     Result hydrateState(const AppStatePacket& appStatePacket);
 
   private slots:
@@ -79,6 +77,9 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
     QTimer animationTimer;
     GLuint vao, vbo;
     QOpenGLShaderProgram* program;
+
+    void animationStart();
+    void animationStop();
 
     void setStyle();
     void mousePressEvent(QMouseEvent* event) override;

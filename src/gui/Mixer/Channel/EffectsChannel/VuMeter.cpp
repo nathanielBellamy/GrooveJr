@@ -15,6 +15,7 @@ VuMeter::VuMeter(QWidget* parent, Audio::Mixer* mixer)
   , program(nullptr)
   {
 
+  animationStart();
   setStyle();
 }
 
@@ -75,22 +76,19 @@ void VuMeter::paintGL() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   program->bind();
+
   for (int i = 0; i < blockCount; i++) {
-    if (i == blockCount - 2)
+    if (i == blockCount - 1)
       program->setUniformValue(colorLocation, red);
-    else if (i == blockCount - 2 || i == blockCount - 3)
+    else if (i == blockCount -2 || i == blockCount - 3)
       program->setUniformValue(colorLocation, yellow);
     else
       program->setUniformValue(colorLocation, green);
 
     // todo: if vol >= .1 * blockcount
     const float iF = static_cast<float>(i);
-    const float blockHeight = 0.09f;
-    const float gap = 0.01f;
-    const float xLeft = -0.9f;
-    const float xRight = 0.9f;
-    const float yBottom = 1.0f - iF * (blockHeight + gap);
-    const float yTop = 1.0f - iF * (2 * blockHeight);
+    const float yBottom = -1.0f + iF * (blockHeight + gap) + gap;
+    const float yTop = yBottom + blockHeight;
 
     // top triangle
     vertices[0] = xLeft;
@@ -111,7 +109,7 @@ void VuMeter::paintGL() {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-    glDrawArrays(GL_TRIANGLES, 0,  2);
+    glDrawArrays(GL_TRIANGLES, 0,  10);
   }
   program->release();
 
@@ -120,6 +118,35 @@ void VuMeter::paintGL() {
 void VuMeter::resizeGL(int w, int h) {
   glViewport(0, 0, w, h);
 }
+
+void VuMeter::animationLoop() {
+  program->bind();
+  program->release();
+}
+
+void VuMeter::animationStart() {
+  animationTimer.setInterval(32);
+  connect(&animationTimer, &QTimer::timeout, this, &VuMeter::animationLoop);
+  animationTimer.start();
+}
+
+void VuMeter::animationStop() {
+  animationTimer.stop();
+}
+
+Result VuMeter::hydrateState(const AppStatePacket& appStatePacket) {
+  switch (appStatePacket.playState) {
+    case PLAY:
+//      animationStart();
+      break;
+    case PAUSE:
+    case STOP:
+//      animationStop();
+      break;
+  }
+
+  return OK;
+};
 
 } // Gui
 } // Gj
