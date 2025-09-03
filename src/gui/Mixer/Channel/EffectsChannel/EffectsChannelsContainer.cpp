@@ -39,6 +39,10 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   , soloRChannelAction(soloRChannelAction)
   {
 
+  mixer->setSetVuRingBufferFunc(
+    [this](jack_ringbuffer_t* vuRingBuffer) { setVuRingBuffer(vuRingBuffer); }
+  );
+
   setChannels();
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   connectActions();
@@ -53,17 +57,55 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
     "Hydrating effects channels state"
   );
 
-  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
+  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW)
     addEffectsChannelButton.setEnabled(false);
-  } else {
+  else
     addEffectsChannelButton.setEnabled(true);
-  }
 
   for (int i = 0; i < channels.size(); i++)
     channels.at(i)->hydrateState(appState, i+1);
 
   setupGrid();
   update();
+}
+
+Result EffectsChannelsContainer::vuWorkerStart() {
+  stopVuWorker.store(false);
+  vuWorker = std::thread([this]() {
+    while (!stopVuWorker.load()) {
+      if (vuRingBuffer == nullptr)
+        continue;
+
+      if (jack_ringbuffer_read_space(vuRingBuffer) > Audio::VU_RING_BUFFER_SIZE - 2) {
+        jack_ringbuffer_read(
+          vuRingBuffer,
+          reinterpret_cast<char*>(vuBufferIn),
+          Audio::VU_RING_BUFFER_SIZE
+        );
+      }
+
+      for (int i = 0; i < Audio::VU_RING_BUFFER_SIZE; i++) {
+        vuBufferAvg[vuAvgIndex][i] = vuBufferIn[i];
+        float avg = 0.0f;
+        for (int j = 0; j < VU_METER_AVG_SIZE; j++) {
+          avg += vuBufferAvg[j][i];
+        }
+        avg /= VU_METER_AVG_SIZE;
+        vuBuffer[i].store(avg);
+      }
+
+      vuAvgIndex = (vuAvgIndex + 1) % VU_METER_AVG_SIZE;
+    }
+  });
+  vuWorker.detach();
+
+  return OK;
+}
+
+Result EffectsChannelsContainer::vuWorkerStop() {
+  stopVuWorker.store(true);
+
+  return OK;
 }
 
 void EffectsChannelsContainer::addEffectsChannel() {

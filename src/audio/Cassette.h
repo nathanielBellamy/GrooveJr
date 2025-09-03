@@ -50,6 +50,7 @@ class Cassette
   sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
   sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
   float fft_eq_buffer[FFT_EQ_RING_BUFFER_SIZE]{};
+  float vu_buffer[VU_RING_BUFFER_SIZE]{};
   AudioData audioData;
 
   int setupAudioData();
@@ -69,6 +70,8 @@ class Cassette
     jack_ringbuffer_t* playbackSettingsFromAudioThreadRB,
     jack_ringbuffer_t* fft_eq_ring_buffer,
     jack_ringbuffer_t* fft_eq_ring_buffer_out,
+    jack_ringbuffer_t* vu_ring_buffer,
+    jack_ringbuffer_t* vu_ring_buffer_out,
     int channelCount
   );
 

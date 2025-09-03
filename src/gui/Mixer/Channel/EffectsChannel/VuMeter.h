@@ -26,12 +26,14 @@ namespace Gui {
   constexpr int VU_METER_BLOCK_COUNT = 16;
   constexpr float VU_METER_BLOCK_HEIGHT = 1.3f / static_cast<float>(VU_METER_BLOCK_COUNT);
   constexpr float VU_METER_GAP = 0.7f / static_cast<float>(VU_METER_BLOCK_COUNT + 1);
-  constexpr float VU_METER_X_LEFT = -0.75f;
-  constexpr float VU_METER_X_RIGHT = 0.75f;
-  constexpr QColor VU_METER_BLACK = QColor(0, 0, 0, 255);
-  constexpr QColor VU_METER_GREEN = QColor(0, 255, 0, 255);
-  constexpr QColor VU_METER_YELLOW = QColor(255, 255, 0, 255);
-  constexpr QColor VU_METER_RED = QColor(255, 0, 0, 255);
+  constexpr float VU_METER_X_LEFT_LEFT = -0.9f;
+  constexpr float VU_METER_X_LEFT_RIGHT = -0.1f;
+  constexpr float VU_METER_X_RIGHT_LEFT = 0.1f;
+  constexpr float VU_METER_X_RIGHT_RIGHT = 0.9f;
+  constexpr auto VU_METER_BLACK = QColor(0, 0, 0, 255);
+  constexpr auto VU_METER_GREEN = QColor(0, 255, 0, 255);
+  constexpr auto VU_METER_YELLOW = QColor(255, 255, 0, 255);
+  constexpr auto VU_METER_RED = QColor(255, 0, 0, 255);
 
 class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
 
@@ -44,7 +46,8 @@ class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
     void animationLoop();
 
   private:
-    int w = 30;
+    int w = 40;
+    jack_ringbuffer_t* vuRingBuffer = nullptr;
     float vertices[12] { 0.0f };
     GLuint vao, vbo;
     int colorLocation;

@@ -41,6 +41,8 @@ struct AudioData {
   float                            fft_pv_phase_prev_init[2][FFT_PV_FREQ_SIZE]{};
   fftwf_plan                       fft_pv_plan_r2c;
   fftwf_plan                       fft_pv_plan_c2r;
+  float                            vu_buffer[VU_RING_BUFFER_SIZE]{ 0.0f };
+  jack_ringbuffer_t*               vu_ring_buffer{nullptr};
   float*                           processBuffers[2]{nullptr, nullptr};
   float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
   float                            playbackBuffersPre[2][MAX_AUDIO_FRAMES_PER_BUFFER]{};

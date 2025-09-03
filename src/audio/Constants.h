@@ -9,6 +9,7 @@ namespace Gj {
 namespace Audio {
 
   constexpr unsigned int MAX_EFFECTS_CHANNELS = 50;
+  constexpr unsigned int VU_RING_BUFFER_SIZE  = 2 * MAX_EFFECTS_CHANNELS;
   constexpr unsigned int MAX_PLUGINS_PER_CHANNEL = 50;
   constexpr unsigned int MAX_AUDIO_FRAMES_PER_BUFFER = 1024;
   constexpr unsigned int FFT_EQ_TIME_SIZE = 1024;

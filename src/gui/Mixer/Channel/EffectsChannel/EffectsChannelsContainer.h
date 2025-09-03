@@ -10,9 +10,11 @@
 #include "../../../../messaging/atoms.h"
 
 #include <algorithm>
+#include <atomic>
 #include <memory>
 #include <vector>
 #include <iterator>
+#include <thread>
 
 #include <QAction>
 #include <QGridLayout>
@@ -21,9 +23,11 @@
 
 #include "../../../../Logging.h"
 #include "../../../../AppState.h"
+#include "../../../../enums/Result.h"
 
 #include "../../../Color.h"
 #include "../../../../audio/Mixer.h"
+#include "../../../../audio/Constants.h"
 #include "EffectsChannel.h"
 #include "AddEffectsChannelButton.h"
 
@@ -58,7 +62,7 @@ class EffectsChannelsContainer final : public QWidget {
     void clearEffectsChannels();
     void setEffects() const;
     void setChannels();
-    Result setVuRingBuffer(jack_ringbuffer_t* vuRingBuffer);
+    void setVuRingBuffer(jack_ringbuffer_t* ringBuffer) { vuRingBuffer = ringBuffer; }
 
   private:
     actor_system& actorSystem;
@@ -79,9 +83,16 @@ class EffectsChannelsContainer final : public QWidget {
     QAction* soloLChannelAction;
     QAction* soloRChannelAction;
 
+    std::thread vuWorker;
+    std::atomic<bool> stopVuWorker;
     jack_ringbuffer_t* vuRingBuffer;
-    float vuBuffer[Audio::MAX_EFFECTS_CHANNELS]{ 0.0f };
-    float vuBufferAvg[VU_METER_AVG_SIZE][Audio::MAX_EFFECTS_CHANNELS]{ 0.0f };
+    float vuBufferIn[Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
+    int vuAvgIndex = 0;
+    float vuBufferAvg[VU_METER_AVG_SIZE][Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
+    std::atomic<float> vuBuffer[Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
+
+    Result vuWorkerStart();
+    Result vuWorkerStop();
 
     void connectActions();
     void setStyle();

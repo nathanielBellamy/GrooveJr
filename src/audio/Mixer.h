@@ -39,7 +39,8 @@ class Mixer {
   float channelCount;
   std::vector<Effects::EffectsChannel*> effectsChannels;
   std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
-  std::function<void(jack_ringbuffer_t* eqBuffer)> setEqRingBufferFunc;
+  std::function<void(jack_ringbuffer_t* eqRingBuffer)> setEqRingBufferFunc;
+  std::function<void(jack_ringbuffer_t* vuRingBuffer)> setVuRingBufferFunc;
   std::function<void()> eqAnimationStartFunc;
   std::function<void()> eqAnimationStopFunc;
 
@@ -108,8 +109,11 @@ public:
   void setUpdateProgressBarFunc(std::function<void(sf_count_t, sf_count_t)> func) { updateProgressBarFunc = func; };
   std::function<void(sf_count_t, sf_count_t)> getUpdateProgressBarFunc() { return updateProgressBarFunc; };
 
-  void setSetEqRingBufferFunc(std::function<void(jack_ringbuffer_t* eqBuffer)> func) { setEqRingBufferFunc = func; };
-  std::function<void(jack_ringbuffer_t* eqBuffer)> getSetEqRingBufferFunc() { return setEqRingBufferFunc; };
+  void setSetEqRingBufferFunc(std::function<void(jack_ringbuffer_t* eqRingBuffer)> func) { setEqRingBufferFunc = func; };
+  std::function<void(jack_ringbuffer_t* eqRingBuffer)> getSetEqRingBufferFunc() { return setEqRingBufferFunc; };
+
+  void setSetVuRingBufferFunc(std::function<void(jack_ringbuffer_t* vuRingBuffer)> func) { setVuRingBufferFunc = func; };
+  std::function<void(jack_ringbuffer_t* vuRingBuffer)> getSetVuRingBufferFunc() { return setVuRingBufferFunc; };
 
   std::string getPluginName(const int channelIdx, const int pluginIndex) const {
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);

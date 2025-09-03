@@ -439,8 +439,27 @@ int Cassette::updateAudioDataFromMixer(
   jack_ringbuffer_t* playbackSettingsFromAudioThreadRB,
   jack_ringbuffer_t* fft_eq_ring_buffer,
   jack_ringbuffer_t* fft_eq_ring_buffer_out,
+  jack_ringbuffer_t* vu_ring_buffer,
+  jack_ringbuffer_t* vu_ring_buffer_out,
   const int channelCount
   ) {
+
+  // read vu_ring_buffer
+  if (jack_ringbuffer_read_space(vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
+    jack_ringbuffer_read(
+      vu_ring_buffer,
+      reinterpret_cast<char*>(vu_buffer),
+      VU_RING_BUFFER_SIZE
+    );
+  }
+
+  if (jack_ringbuffer_write_space(vu_ring_buffer_out) > VU_RING_BUFFER_SIZE - 2) {
+    jack_ringbuffer_write(
+      vu_ring_buffer_out,
+      reinterpret_cast<char*>(vu_buffer),
+      VU_RING_BUFFER_SIZE
+    );
+  }
 
   // read fft_eq_ring_buffer
   if (jack_ringbuffer_read_space(fft_eq_ring_buffer) > FFT_EQ_RING_BUFFER_SIZE - 2) {
@@ -598,6 +617,12 @@ int Cassette::play() {
   jack_ringbuffer_t* fft_eq_ring_buffer_out = jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE);
   mixer->getSetEqRingBufferFunc()(fft_eq_ring_buffer_out);
 
+  jack_ringbuffer_t* vu_ring_buffer = jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS);
+  audioData.vu_ring_buffer = vu_ring_buffer;
+
+  jack_ringbuffer_t* vu_ring_buffer_out = jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS);
+  mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
+
   ThreadStatics::setReadComplete(false);
 
   while(
@@ -634,6 +659,8 @@ int Cassette::play() {
       playbackSettingsFromAudioThreadRB,
       fft_eq_ring_buffer,
       fft_eq_ring_buffer_out,
+      vu_ring_buffer,
+      vu_ring_buffer_out,
       channelCount
     );
 
@@ -676,6 +703,7 @@ int Cassette::play() {
   if (ThreadStatics::getPlayState() == STOP) {
     mixer->getUpdateProgressBarFunc()(audioData.frames, 0);
     mixer->getSetEqRingBufferFunc()(nullptr);
+    mixer->getSetVuRingBufferFunc()(nullptr);
   }
 
   return 0;
