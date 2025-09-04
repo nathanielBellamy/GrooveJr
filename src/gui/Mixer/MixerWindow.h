@@ -11,6 +11,8 @@
 #include <QLabel>
 #include <QWidget>
 
+#include <jack/ringbuffer.h>
+
 #include "./Channel/MainChannelContainer.h"
 #include "./Channel/EffectsChannel/EffectsChannelsContainer.h"
 
@@ -29,6 +31,7 @@ class MixerWindow final : public QWidget {
     void hydrateState(const AppStatePacket& appStatePacket);
     void setChannels();
     void setEffects();
+    void setVuRingBuffer(jack_ringbuffer_t* ringBuffer) { vuRingBuffer = ringBuffer; }
 
   private:
     actor_system& actorSystem;
@@ -43,6 +46,17 @@ class MixerWindow final : public QWidget {
     QLabel title;
     MainChannelContainer mainChannelContainer;
     EffectsChannelsContainer effectsChannelsContainer;
+
+    std::thread vuWorker;
+    std::atomic<bool> stopVuWorker;
+    jack_ringbuffer_t* vuRingBuffer;
+    float vuBufferIn[Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
+    int vuAvgIndex = 0;
+    float vuBufferAvg[VU_METER_AVG_SIZE][Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
+    std::atomic<float> vuBuffer[Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
+
+    Result vuWorkerStart();
+    Result vuWorkerStop();
 
     void setStyle();
     void setupGrid();

@@ -16,12 +16,14 @@ MainChannelContainer::MainChannelContainer(
   QAction* muteRChannelAction,
   QAction* soloChannelAction,
   QAction* soloLChannelAction,
-  QAction* soloRChannelAction
+  QAction* soloRChannelAction,
+  std::atomic<float>* vuPtr
   )
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , grid(this)
+  , vuPtr(vuPtr)
   , muteChannelAction(muteChannelAction)
   , muteLChannelAction(muteLChannelAction)
   , muteRChannelAction(muteRChannelAction)
@@ -31,7 +33,8 @@ MainChannelContainer::MainChannelContainer(
   , mainChannel(std::make_unique<EffectsChannel>(
     this, actorSystem, mixer, 0, nullptr,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
-    soloChannelAction, soloLChannelAction, soloRChannelAction
+    soloChannelAction, soloLChannelAction, soloRChannelAction,
+    vuPtr
   ))
   {
   setupGrid();
@@ -71,7 +74,8 @@ void MainChannelContainer::setChannel() {
 
   mainChannel = std::make_unique<EffectsChannel>(this, actorSystem, mixer, 0, nullptr,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
-    soloChannelAction, soloLChannelAction, soloRChannelAction
+    soloChannelAction, soloLChannelAction, soloRChannelAction,
+    vuPtr
   );
 
   setupGrid();

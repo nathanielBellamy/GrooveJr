@@ -5,6 +5,8 @@
 #ifndef GUIEFFECTSCHANNEL_H
 #define GUIEFFECTSCHANNEL_H
 
+#include <atomic>
+
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
 #include "../../../../messaging/atoms.h"
@@ -50,7 +52,8 @@ class EffectsChannel final : public QWidget {
       QAction* muteRChannelAction,
       QAction* soloChannelAction,
       QAction* soloLChannelAction,
-      QAction* soloRChannelAction
+      QAction* soloRChannelAction,
+      std::atomic<float>* vuPtr
     );
     ~EffectsChannel() override;
     void hydrateState(const AppStatePacket& appStatePacket, int newChannelIndex);
@@ -69,6 +72,8 @@ class EffectsChannel final : public QWidget {
     actor_system& actorSystem;
     strong_actor_ptr appStateManagerPtr;
     Audio::Mixer* mixer;
+    std::atomic<float>* vuPtr;
+    VuMeter vuMeter;
     QAction* removeEffectsChannelAction;
     RemoveEffectsChannelButton removeEffectsChannelButton;
     QAction addEffectAction;
@@ -96,7 +101,6 @@ class EffectsChannel final : public QWidget {
     QScrollArea effectsSlotsScrollArea;
     EffectsSlots effectsSlots;
     MuteSoloContainer muteSoloContainer;
-    VuMeter vuMeter;
     void setStyle();
     void setupGrid();
     void setupTitle();

@@ -5,6 +5,8 @@
 #ifndef VUMETER_H
 #define VUMETER_H
 
+#include <atomic>
+
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QtOpenGL/QOpenGLShaderProgram>
@@ -38,7 +40,7 @@ namespace Gui {
 class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
 
   public:
-    VuMeter(QWidget* parent, Audio::Mixer* mixer);
+    VuMeter(QWidget* parent, Audio::Mixer* mixer, std::atomic<float>* vuPtr);
     ~VuMeter();
     Result hydrateState(const AppStatePacket& appStatePacket);
 
@@ -53,6 +55,8 @@ class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
     int colorLocation;
     QOpenGLShaderProgram* program;
     Audio::Mixer* mixer;
+    std::atomic<float>* vuPtr;
+    float vuVals[2] { 0.0f };
     QTimer animationTimer;
 
     void animationStart();

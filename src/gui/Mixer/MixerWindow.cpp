@@ -18,13 +18,19 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
   , mainChannelContainer(
     this, actorSystem, mixer,
     &muteChannelAction, &muteLChannelAction, &muteRChannelAction,
-    &soloChannelAction, &soloLChannelAction, &soloRChannelAction
+    &soloChannelAction, &soloLChannelAction, &soloRChannelAction,
+    reinterpret_cast<std::atomic<float>*>(&vuBuffer)
   )
   , effectsChannelsContainer(
     this, actorSystem, mixer,
     &muteChannelAction, &muteLChannelAction, &muteRChannelAction,
-    &soloChannelAction, &soloLChannelAction, &soloRChannelAction
+    &soloChannelAction, &soloLChannelAction, &soloRChannelAction,
+    reinterpret_cast<std::atomic<float>*>(&vuBuffer)
   ) {
+
+  mixer->setSetVuRingBufferFunc(
+    [this](jack_ringbuffer_t* vuRingBuffer) { setVuRingBuffer(vuRingBuffer); }
+  );
 
   title.setText("Mixer");
   title.setFont({title.font().family(), 18});
@@ -35,9 +41,53 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
   setupGrid();
 }
 
-void MixerWindow::hydrateState(const AppStatePacket &appStatePacket) {
-  mainChannelContainer.hydrateState(appStatePacket);
-  effectsChannelsContainer.hydrateState(appStatePacket);
+Result MixerWindow::vuWorkerStart() {
+  stopVuWorker.store(false);
+  vuWorker = std::thread([this]() {
+    while (!stopVuWorker.load()) {
+      if (vuRingBuffer == nullptr)
+        continue;
+
+      if (jack_ringbuffer_read_space(vuRingBuffer) > Audio::VU_RING_BUFFER_SIZE - 2) {
+        jack_ringbuffer_read(
+          vuRingBuffer,
+          reinterpret_cast<char*>(vuBufferIn),
+          Audio::VU_RING_BUFFER_SIZE
+        );
+      }
+
+      for (int i = 0; i < Audio::VU_RING_BUFFER_SIZE; i++) {
+        vuBufferAvg[vuAvgIndex][i] = vuBufferIn[i];
+        float avg = 0.0f;
+        for (int j = 0; j < VU_METER_AVG_SIZE; j++) {
+          avg += vuBufferAvg[j][i];
+        }
+        avg /= VU_METER_AVG_SIZE;
+        vuBuffer[i].store(avg);
+      }
+
+      vuAvgIndex = (vuAvgIndex + 1) % VU_METER_AVG_SIZE;
+    }
+  });
+  vuWorker.detach();
+
+  return OK;
+}
+
+Result MixerWindow::vuWorkerStop() {
+  stopVuWorker.store(true);
+
+  return OK;
+}
+
+void MixerWindow::hydrateState(const AppStatePacket &appState) {
+  mainChannelContainer.hydrateState(appState);
+  effectsChannelsContainer.hydrateState(appState);
+
+  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW)
+    vuWorkerStart();
+  else
+    vuWorkerStop();
 }
 
 void MixerWindow::setStyle() {

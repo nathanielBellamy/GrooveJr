@@ -48,7 +48,8 @@ class EffectsChannelsContainer final : public QWidget {
       QAction* muteRChannelAction,
       QAction* soloChannelAction,
       QAction* soloLChannelAction,
-      QAction* soloRChannelAction
+      QAction* soloRChannelAction,
+      std::atomic<float>* vuPtr
     );
     void hydrateState(const AppStatePacket& appState);
     void setMute(int channelIdx, float val) const;
@@ -62,7 +63,6 @@ class EffectsChannelsContainer final : public QWidget {
     void clearEffectsChannels();
     void setEffects() const;
     void setChannels();
-    void setVuRingBuffer(jack_ringbuffer_t* ringBuffer) { vuRingBuffer = ringBuffer; }
 
   private:
     actor_system& actorSystem;
@@ -82,17 +82,7 @@ class EffectsChannelsContainer final : public QWidget {
     QAction* soloChannelAction;
     QAction* soloLChannelAction;
     QAction* soloRChannelAction;
-
-    std::thread vuWorker;
-    std::atomic<bool> stopVuWorker;
-    jack_ringbuffer_t* vuRingBuffer;
-    float vuBufferIn[Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
-    int vuAvgIndex = 0;
-    float vuBufferAvg[VU_METER_AVG_SIZE][Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
-    std::atomic<float> vuBuffer[Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
-
-    Result vuWorkerStart();
-    Result vuWorkerStop();
+    std::atomic<float>* vuPtr;
 
     void connectActions();
     void setStyle();

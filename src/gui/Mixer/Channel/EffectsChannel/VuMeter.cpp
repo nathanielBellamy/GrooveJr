@@ -7,11 +7,12 @@
 namespace Gj {
 namespace Gui {
 
-VuMeter::VuMeter(QWidget* parent, Audio::Mixer* mixer)
+VuMeter::VuMeter(QWidget* parent, Audio::Mixer* mixer, std::atomic<float>* vuPtr)
   : QOpenGLWidget(parent)
   , mixer(mixer)
   , vao(0)
   , vbo(0)
+  , vuPtr(vuPtr)
   , program(nullptr)
   {
 
@@ -79,6 +80,9 @@ void VuMeter::paintGL() {
 
   for (int i = 0; i < VU_METER_BLOCK_COUNT; i++) {
     for (int chan = 0; chan < 2; chan++) {
+      if (vuVals[chan] < 0.01f * static_cast<float>(i))
+        continue;
+
       if (i == VU_METER_BLOCK_COUNT - 1)
         program->setUniformValue(colorLocation, VU_METER_RED);
       else if (i == VU_METER_BLOCK_COUNT - 2 || i == VU_METER_BLOCK_COUNT - 3)
@@ -124,8 +128,11 @@ void VuMeter::resizeGL(int w, int h) {
 }
 
 void VuMeter::animationLoop() {
-  program->bind();
-  program->release();
+  vuVals[0] = vuPtr[0].load();
+  vuVals[1] = vuPtr[1].load();
+  std::cout << "vu val 0: " << vuVals[0] << std::endl;
+  std::cout << "vu val 1: " << vuVals[1] << std::endl;
+  update();
 }
 
 void VuMeter::animationStart() {

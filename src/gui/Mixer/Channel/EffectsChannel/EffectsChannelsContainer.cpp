@@ -18,7 +18,8 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   QAction* muteRChannelAction,
   QAction* soloChannelAction,
   QAction* soloLChannelAction,
-  QAction* soloRChannelAction
+  QAction* soloRChannelAction,
+  std::atomic<float>* vuPtr
   )
   : QWidget(parent)
   , actorSystem(actorSystem)
@@ -37,11 +38,8 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   , soloChannelAction(soloChannelAction)
   , soloLChannelAction(soloLChannelAction)
   , soloRChannelAction(soloRChannelAction)
+  , vuPtr(vuPtr)
   {
-
-  mixer->setSetVuRingBufferFunc(
-    [this](jack_ringbuffer_t* vuRingBuffer) { setVuRingBuffer(vuRingBuffer); }
-  );
 
   setChannels();
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
@@ -50,7 +48,6 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   setupGrid();
 }
 
-
 void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
   Logging::write(
     Info,
@@ -58,13 +55,10 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
     "Hydrating effects channels state"
   );
 
-  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
+  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW)
     addEffectsChannelButton.setEnabled(false);
-    vuWorkerStart();
-  } else {
+  else
     addEffectsChannelButton.setEnabled(true);
-    vuWorkerStop();
-  }
 
   for (int i = 0; i < channels.size(); i++)
     channels.at(i)->hydrateState(appState, i+1);
@@ -73,54 +67,16 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
   update();
 }
 
-Result EffectsChannelsContainer::vuWorkerStart() {
-  stopVuWorker.store(false);
-  vuWorker = std::thread([this]() {
-    while (!stopVuWorker.load()) {
-      if (vuRingBuffer == nullptr)
-        continue;
-
-      if (jack_ringbuffer_read_space(vuRingBuffer) > Audio::VU_RING_BUFFER_SIZE - 2) {
-        jack_ringbuffer_read(
-          vuRingBuffer,
-          reinterpret_cast<char*>(vuBufferIn),
-          Audio::VU_RING_BUFFER_SIZE
-        );
-      }
-
-      for (int i = 0; i < Audio::VU_RING_BUFFER_SIZE; i++) {
-        vuBufferAvg[vuAvgIndex][i] = vuBufferIn[i];
-        float avg = 0.0f;
-        for (int j = 0; j < VU_METER_AVG_SIZE; j++) {
-          avg += vuBufferAvg[j][i];
-        }
-        avg /= VU_METER_AVG_SIZE;
-        std::cout << "avg " << avg << std::endl;
-        vuBuffer[i].store(avg);
-      }
-
-      vuAvgIndex = (vuAvgIndex + 1) % VU_METER_AVG_SIZE;
-    }
-  });
-  vuWorker.detach();
-
-  return OK;
-}
-
-Result EffectsChannelsContainer::vuWorkerStop() {
-  stopVuWorker.store(true);
-
-  return OK;
-}
-
 void EffectsChannelsContainer::addEffectsChannel() {
   if (channels.size() > Audio::MAX_EFFECTS_CHANNELS - 2)
     return;
 
+  const int channelIndex = channels.size() + 1;
   const auto effectsChannel = new EffectsChannel(
-    this, actorSystem, mixer, channels.size() + 1, &removeEffectsChannelAction,
+    this, actorSystem, mixer, channelIndex, &removeEffectsChannelAction,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
-    soloChannelAction, soloLChannelAction, soloRChannelAction
+    soloChannelAction, soloLChannelAction, soloRChannelAction,
+    &vuPtr[2 * channelIndex]
   );
   channels.push_back(effectsChannel);
 

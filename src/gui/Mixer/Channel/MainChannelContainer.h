@@ -5,6 +5,7 @@
 #ifndef MAINDRYCONTAINER_H
 #define MAINDRYCONTAINER_H
 
+#include <atomic>
 #include <memory>
 
 #include "caf/actor_system.hpp"
@@ -34,9 +35,11 @@ class MainChannelContainer final : public QWidget {
       QAction* muteRChannelAction,
       QAction* soloChannelAction,
       QAction* soloLChannelAction,
-      QAction* soloRChannelAction
+      QAction* soloRChannelAction,
+      std::atomic<float>* vuPtr
     );
     void hydrateState(const AppStatePacket& appState) const;
+
     void setMute(const float val) const {
       mainChannel->setMute(val);
     };
@@ -68,6 +71,7 @@ class MainChannelContainer final : public QWidget {
     actor_system& actorSystem;
     Audio::Mixer* mixer;
     QGridLayout grid;
+    std::atomic<float>* vuPtr;
     QAction* muteChannelAction;
     QAction* muteLChannelAction;
     QAction* muteRChannelAction;
@@ -77,6 +81,7 @@ class MainChannelContainer final : public QWidget {
     std::unique_ptr<EffectsChannel> mainChannel;
     void setStyle();
     void setupGrid();
+
 };
 
 } // Gui

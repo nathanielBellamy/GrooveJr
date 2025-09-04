@@ -19,13 +19,16 @@ EffectsChannel::EffectsChannel(
   QAction* muteRChannelAction,
   QAction* soloChannelAction,
   QAction* soloLChannelAction,
-  QAction* soloRChannelAction
+  QAction* soloRChannelAction,
+  std::atomic<float>* vuPtr
   )
   : QWidget(parent)
   , channelIndex(channelIndex)
   , actorSystem(actorSystem)
   , appStateManagerPtr(actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER))
   , mixer(mixer)
+  , vuPtr(vuPtr)
+  , vuMeter(this, mixer, vuPtr)
   , removeEffectsChannelAction(removeEffectsChannelAction)
   , removeEffectsChannelButton(this, channelIndex, removeEffectsChannelAction)
   , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
@@ -56,7 +59,6 @@ EffectsChannel::EffectsChannel(
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction
   )
-  , vuMeter(this, mixer)
   {
   if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
     // can't remove main, must have at least one non-main effects channel
