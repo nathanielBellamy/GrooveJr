@@ -59,9 +59,9 @@ Result MixerWindow::vuWorkerStart() {
       for (int i = 0; i < Audio::VU_RING_BUFFER_SIZE; i++) {
         vuBufferAvg[vuAvgIndex][i] = vuBufferIn[i];
         float avg = 0.0f;
-        for (int j = 0; j < VU_METER_AVG_SIZE; j++) {
+        for (int j = 0; j < VU_METER_AVG_SIZE; j++)
           avg += vuBufferAvg[j][i];
-        }
+
         avg /= VU_METER_AVG_SIZE;
         vuBuffer[i].store(avg);
       }
