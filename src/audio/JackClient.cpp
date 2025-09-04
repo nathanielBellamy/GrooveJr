@@ -515,8 +515,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
   // sum down
   for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
-    float maxL = 0.0f;
-    float maxR = 0.0f;
+    float rmsL = 0.0f;
+    float rmsR = 0.0f;
     for (int i = 0; i < nframes; i++) {
       const float factorLL = audioData->effectsChannelsSettings[4 * effectsChannelIdx];
       const float factorLR = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 1];
@@ -545,18 +545,16 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
                                             factorRR * audioData->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
       }
-      if (valL > maxL)
-        maxL = valL;
 
-      if (valR > maxR)
-        maxR = valR;
+      rmsL += valL * valL;
+      rmsR += valR * valR;
 
       audioData->processBuffers[0][i] = valL;
       audioData->processBuffers[1][i] = valR;
     }
 
-    audioData->vu_buffer_in[2 * effectsChannelIdx] = maxL;
-    audioData->vu_buffer_in[2 * effectsChannelIdx + 1] = maxR;
+    audioData->vu_buffer_in[2 * effectsChannelIdx] = std::sqrt(rmsL / static_cast<float>(nframes));
+    audioData->vu_buffer_in[2 * effectsChannelIdx + 1] = std::sqrt(rmsR / static_cast<float>(nframes));
   }
 
   // process summed down mix through main effects
@@ -584,18 +582,14 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     );
   }
 
-  float maxL = 0.0f;
-  float maxR = 0.0f;
+  float rmsL = 0.0f;
+  float rmsR = 0.0f;
   for (int i = 0; i < nframes; i++) {
     const float valL = factorLL * audioData->processBuffers[0][i] + factorRL * audioData->processBuffers[1][i];
     const float valR = factorLR * audioData->processBuffers[0][i] + factorRR * audioData->processBuffers[1][i];
 
-    if (valL > maxL)
-      maxL = valL;
-
-
-    if (valR > maxR)
-      maxR = valR;
+    rmsL += valL * valL;
+    rmsR += valR * valR;
 
 
     audioData->fft_eq_time[0][FFT_EQ_TIME_SIZE - nframes + i] = valL;
@@ -605,8 +599,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     outR[i] = valR;
   }
 
-  audioData->vu_buffer_in[0] = maxL;
-  audioData->vu_buffer_in[1] = maxR;
+  audioData->vu_buffer_in[0] = std::sqrt(rmsL / static_cast<float>(nframes));
+  audioData->vu_buffer_in[1] = std::sqrt(rmsR / static_cast<float>(nframes));
 
   if (jack_ringbuffer_write_space(audioData->vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
     jack_ringbuffer_write(

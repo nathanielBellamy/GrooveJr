@@ -134,7 +134,7 @@ void VuMeter::animationLoop() {
 }
 
 void VuMeter::animationStart() {
-  animationTimer.setInterval(32);
+  animationTimer.setInterval(64);
   connect(&animationTimer, &QTimer::timeout, this, &VuMeter::animationLoop);
   animationTimer.start();
 }
