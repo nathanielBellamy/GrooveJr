@@ -50,6 +50,7 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   setupGrid();
 }
 
+
 void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
   Logging::write(
     Info,
@@ -57,10 +58,13 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
     "Hydrating effects channels state"
   );
 
-  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW)
+  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
     addEffectsChannelButton.setEnabled(false);
-  else
+    vuWorkerStart();
+  } else {
     addEffectsChannelButton.setEnabled(true);
+    vuWorkerStop();
+  }
 
   for (int i = 0; i < channels.size(); i++)
     channels.at(i)->hydrateState(appState, i+1);
@@ -91,6 +95,7 @@ Result EffectsChannelsContainer::vuWorkerStart() {
           avg += vuBufferAvg[j][i];
         }
         avg /= VU_METER_AVG_SIZE;
+        std::cout << "avg " << avg << std::endl;
         vuBuffer[i].store(avg);
       }
 
