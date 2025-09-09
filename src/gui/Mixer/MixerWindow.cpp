@@ -60,7 +60,7 @@ Result MixerWindow::vuWorkerStart() {
         vuBufferAvg[vuAvgIndex][i] = vuBufferIn[i];
         float avg = 0.0f;
         for (int j = 0; j < VU_METER_AVG_SIZE; j++)
-          avg += vuBufferAvg[j][i];
+          avg += 20 * std::log10f(vuBufferAvg[j][i]);
 
         avg /= VU_METER_AVG_SIZE;
         vuBuffer[i].store(avg);

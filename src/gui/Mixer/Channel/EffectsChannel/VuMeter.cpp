@@ -80,7 +80,7 @@ void VuMeter::paintGL() {
 
   for (int i = 0; i < VU_METER_BLOCK_COUNT; i++) {
     for (int chan = 0; chan < 2; chan++) {
-      if (vuVals[chan] < 0.05f * static_cast<float>(i))
+      if (vuVals[chan] < static_cast<float>(i) * 6.6f - 60.0f)
         continue;
 
       if (i == VU_METER_BLOCK_COUNT - 1)
@@ -134,7 +134,7 @@ void VuMeter::animationLoop() {
 }
 
 void VuMeter::animationStart() {
-  animationTimer.setInterval(64);
+  animationTimer.setInterval(32);
   connect(&animationTimer, &QTimer::timeout, this, &VuMeter::animationLoop);
   animationTimer.start();
 }
