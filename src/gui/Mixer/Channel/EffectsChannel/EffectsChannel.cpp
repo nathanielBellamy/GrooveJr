@@ -28,7 +28,7 @@ EffectsChannel::EffectsChannel(
   , appStateManagerPtr(actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER))
   , mixer(mixer)
   , vuPtr(vuPtr)
-  , vuMeter(this, mixer, vuPtr)
+  , vuMeter(this, mixer, vuPtr, channelIndex)
   , removeEffectsChannelAction(removeEffectsChannelAction)
   , removeEffectsChannelButton(this, channelIndex, removeEffectsChannelAction)
   , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)

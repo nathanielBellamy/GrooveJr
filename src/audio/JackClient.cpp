@@ -513,9 +513,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
                          EffectsSettings_RB_SIZE);
   }
 
-  float rmsL[nframes];
-  float rmsR[nframes];
-  const float nframesF = static_cast<float>(nframes);
+  float rmsL[MAX_EFFECTS_CHANNELS] = { 0.0f };
+  float rmsR[MAX_EFFECTS_CHANNELS] = { 0.0f };
   // sum down
   for (int i = 0; i < nframes; i++) {
     for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
@@ -547,19 +546,19 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
         }
       }
 
-      rmsL[i] += valL * valL;
-      rmsR[i] += valR * valR;
+      rmsL[effectsChannelIdx] += valL * valL;
+      rmsR[effectsChannelIdx] += valR * valR;
 
       audioData->processBuffers[0][i] = valL;
       audioData->processBuffers[1][i] = valR;
     }
   }
 
+  const float nframesF = static_cast<float>(nframes);
   for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
-    for (int i = 0; i < nframes; i++) {
-      audioData->vu_buffer_in[2 * effectsChannelIdx] = std::sqrt(rmsL[i] / nframesF);
-      audioData->vu_buffer_in[2 * effectsChannelIdx + 1] = std::sqrt(rmsR[i] / nframesF);
-    }
+    const int bufferIndex = 2 * effectsChannelIdx;
+    audioData->vu_buffer_in[bufferIndex] = std::sqrt(rmsL[effectsChannelIdx] / nframesF);
+    audioData->vu_buffer_in[bufferIndex + 1] = std::sqrt(rmsR[effectsChannelIdx] / nframesF);
   }
 
   // process summed down mix through main effects

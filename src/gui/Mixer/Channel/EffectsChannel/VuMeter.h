@@ -40,7 +40,7 @@ namespace Gui {
 class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
 
   public:
-    VuMeter(QWidget* parent, Audio::Mixer* mixer, std::atomic<float>* vuPtr);
+    VuMeter(QWidget* parent, Audio::Mixer* mixer, std::atomic<float>* vuPtr, int channelIndex);
     ~VuMeter();
     Result hydrateState(const AppStatePacket& appStatePacket);
 
@@ -48,6 +48,7 @@ class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
     void animationLoop();
 
   private:
+    int channelIndex;
     int w = 40;
     jack_ringbuffer_t* vuRingBuffer = nullptr;
     float vertices[12] { 0.0f };
