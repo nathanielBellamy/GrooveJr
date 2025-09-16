@@ -539,9 +539,6 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
         }
         accumL = valL;
         accumR = valR;
-
-        rmsL[effectsChannelIdx] = valL * valL;
-        rmsR[effectsChannelIdx] = valR * valR;
       } else {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
           valL += factorLL * audioData->playbackBuffers[0][i] + factorRL * audioData->playbackBuffers[1][i];
@@ -555,10 +552,10 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
         accumL += valL;
         accumR += valR;
-
-        rmsL[effectsChannelIdx] += valL * valL;
-        rmsR[effectsChannelIdx] += valR * valR;
       }
+
+      rmsL[effectsChannelIdx] += valL * valL;
+      rmsR[effectsChannelIdx] += valR * valR;
     }
     audioData->processBuffers[0][i] = accumL;
     audioData->processBuffers[1][i] = accumR;
