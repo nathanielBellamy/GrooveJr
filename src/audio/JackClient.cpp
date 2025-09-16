@@ -517,13 +517,14 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   float rmsR[MAX_EFFECTS_CHANNELS] = { 0.0f };
   // sum down
   for (int i = 0; i < nframes; i++) {
+    float valL = 0.0f;
+    float valR = 0.0f;
     for (int effectsChannelIdx = 1; effectsChannelIdx < audioData->effectsChannelCount + 1; effectsChannelIdx++) {
       const float factorLL = audioData->effectsChannelsSettings[4 * effectsChannelIdx];
       const float factorLR = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 1];
       const float factorRL = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 2];
       const float factorRR = audioData->effectsChannelsSettings[4 * effectsChannelIdx + 3];
 
-      float valL, valR;
       if (effectsChannelIdx == 1) {
         if (audioData->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
           valL = factorLL * audioData->playbackBuffers[0][i] + factorRL * audioData->playbackBuffers[1][i];
@@ -548,10 +549,9 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
       rmsL[effectsChannelIdx] += valL * valL;
       rmsR[effectsChannelIdx] += valR * valR;
-
-      audioData->processBuffers[0][i] = valL;
-      audioData->processBuffers[1][i] = valR;
     }
+    audioData->processBuffers[0][i] = valL;
+    audioData->processBuffers[1][i] = valR;
   }
 
   const float nframesF = static_cast<float>(nframes);
