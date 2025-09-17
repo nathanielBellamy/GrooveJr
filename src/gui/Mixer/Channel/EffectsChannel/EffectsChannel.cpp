@@ -258,8 +258,8 @@ void EffectsChannel::setupPanSlider(const float pan) {
 }
 
 void EffectsChannel::setupPanLSlider(const float panL) {
-  panLSlider.setMinimum(-127);
-  panLSlider.setMaximum(127);
+  panLSlider.setMinimum(-100);
+  panLSlider.setMaximum(100);
   panLSlider.setTickInterval(1);
   panLSlider.setValue(
     Audio::Math::floatToInt127(panL)
@@ -273,8 +273,8 @@ void EffectsChannel::setupPanLSlider(const float panL) {
 }
 
 void EffectsChannel::setupPanRSlider(const float panR) {
-  panRSlider.setMinimum(-127);
-  panRSlider.setMaximum(127);
+  panRSlider.setMinimum(-100);
+  panRSlider.setMaximum(100);
   panRSlider.setTickInterval(1);
   panRSlider.setValue(
     Audio::Math::floatToInt127(panR)
