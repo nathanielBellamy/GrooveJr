@@ -35,8 +35,11 @@ namespace Gui {
   constexpr float VU_METER_X_RIGHT_RIGHT = 0.9f;
   constexpr auto VU_METER_BLACK = QColor(0, 0, 0, 255);
   constexpr auto VU_METER_GREEN = QColor(0, 255, 0, 255);
+  constexpr auto VU_METER_GREEN_TR = QColor(0, 75, 0, 100);
   constexpr auto VU_METER_YELLOW = QColor(255, 255, 0, 255);
+  constexpr auto VU_METER_YELLOW_TR = QColor(75, 75, 0, 100);
   constexpr auto VU_METER_RED = QColor(255, 0, 0, 255);
+  constexpr auto VU_METER_RED_TR = QColor(75, 0, 0, 100);
 
 class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
 
@@ -58,7 +61,8 @@ class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
     QOpenGLShaderProgram* program;
     Audio::Mixer* mixer;
     std::atomic<float>* vuPtr;
-    float vuVals[2] { -100.0f };
+    std::atomic<float> vuVals[2] { -100.0f, -100.0f };
+    std::atomic<bool> runAnimation = false;
     QTimer animationTimer;
 
     void animationStart();

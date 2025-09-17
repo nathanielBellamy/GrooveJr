@@ -74,31 +74,37 @@ void VuMeter::initializeGL() {
 }
 
 void VuMeter::paintGL() {
-  glClearColor(0, 0, 0, 255);
-  glClear(GL_COLOR_BUFFER_BIT);
+//  if (runAnimation.load()) {
+//    glClearColor(0, 0, 0, 255);
+//    glClear(GL_COLOR_BUFFER_BIT);
+//  } else {
+//    return;
+//  }
 
   program->bind();
 
   for (int i = 0; i < VU_METER_BLOCK_COUNT; i++) {
+    const float lim = -99.0f + 95.0f * (static_cast<float>(i) / static_cast<float>(VU_METER_BLOCK_COUNT));
+
     for (int chan = 0; chan < 2; chan++) {
       const float vuVal = vuVals[chan];
       const float val =
           vuVal < -100.0f
               ? -100.0f
-              : vuVal > 30.0f
-                ? 30.0f
+              : vuVal > 0.0f
+                ? 0.0f
                 : vuVal;
-      const float lim = 5.95f * static_cast<float>(i) - 100.0f;
 
-      if (val < lim)
-        continue;
+      bool opaque = false;
+      if (val > lim)
+        opaque = true;
 
-      if (i == VU_METER_BLOCK_COUNT - 1)
-        program->setUniformValue(colorLocation, VU_METER_RED);
-      else if (i == VU_METER_BLOCK_COUNT - 2 || i == VU_METER_BLOCK_COUNT - 3)
-        program->setUniformValue(colorLocation, VU_METER_YELLOW);
+      if (i == VU_METER_BLOCK_COUNT - 1 || i == VU_METER_BLOCK_COUNT - 2)
+        program->setUniformValue(colorLocation, opaque ? VU_METER_RED : VU_METER_RED_TR);
+      else if (i == VU_METER_BLOCK_COUNT - 3 || i == VU_METER_BLOCK_COUNT - 4 || i == VU_METER_BLOCK_COUNT - 5 || i == VU_METER_BLOCK_COUNT - 6)
+        program->setUniformValue(colorLocation, opaque ? VU_METER_YELLOW : VU_METER_YELLOW_TR);
       else
-        program->setUniformValue(colorLocation, VU_METER_GREEN);
+        program->setUniformValue(colorLocation, opaque ? VU_METER_GREEN : VU_METER_GREEN_TR);
 
       const float iF = static_cast<float>(i);
       const float yBottom = -1.0f + iF * (VU_METER_BLOCK_HEIGHT + VU_METER_GAP) + VU_METER_GAP;
@@ -137,6 +143,9 @@ void VuMeter::resizeGL(int w, int h) {
 }
 
 void VuMeter::animationLoop() {
+  if (!runAnimation.load())
+    return;
+
   vuVals[0] = vuPtr[0].load();
   vuVals[1] = vuPtr[1].load();
   update();
@@ -155,11 +164,11 @@ void VuMeter::animationStop() {
 Result VuMeter::hydrateState(const AppStatePacket& appStatePacket) {
   switch (appStatePacket.playState) {
     case PLAY:
-//      animationStart();
+      runAnimation.store(true);
       break;
     case PAUSE:
     case STOP:
-//      animationStop();
+      runAnimation.store(false);
       break;
   }
 
