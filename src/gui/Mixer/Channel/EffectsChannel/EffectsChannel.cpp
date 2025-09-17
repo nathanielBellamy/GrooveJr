@@ -196,6 +196,7 @@ void EffectsChannel::setupTitle() {
   title.setFont({title.font().family(), 16});
 }
 
+constexpr float gainFactor = 2.0f;
 void EffectsChannel::setupGainSlider(const float gain) {
   gainSlider.setMinimum(0);
   gainSlider.setMaximum(127);
@@ -206,7 +207,7 @@ void EffectsChannel::setupGainSlider(const float gain) {
   gainSlider.setTickPosition(QSlider::NoTicks);
   auto gainSliderConnection = connect(&gainSlider, &QSlider::valueChanged, [this](const int newGain) {
     mixer->getEffectsChannel(channelIndex)->setGain(
-      Audio::Math::uInt127ToFloat(newGain)
+      Audio::Math::uInt127ToFloat(newGain) * gainFactor
     );
   });
 }
@@ -221,7 +222,7 @@ void EffectsChannel::setupGainLSlider(const float gainL) {
   gainLSlider.setTickPosition(QSlider::NoTicks);
   auto gainSliderConnection = connect(&gainLSlider, &QSlider::valueChanged, [this](const int newGainL) {
     mixer->getEffectsChannel(channelIndex)->setGainL(
-      Audio::Math::uInt127ToFloat(newGainL)
+      Audio::Math::uInt127ToFloat(newGainL) * gainFactor
     );
   });
 }
@@ -236,7 +237,7 @@ void EffectsChannel::setupGainRSlider(const float gainR) {
   gainRSlider.setTickPosition(QSlider::NoTicks);
   auto gainSliderConnection = connect(&gainRSlider, &QSlider::valueChanged, [this](const int newGainR) {
     mixer->getEffectsChannel(channelIndex)->setGainR(
-      Audio::Math::uInt127ToFloat(newGainR)
+      Audio::Math::uInt127ToFloat(newGainR) * gainFactor
     );
   });
 }

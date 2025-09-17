@@ -6,6 +6,7 @@
 #define VUMETER_H
 
 #include <atomic>
+#include <cmath>
 
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -57,7 +58,7 @@ class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
     QOpenGLShaderProgram* program;
     Audio::Mixer* mixer;
     std::atomic<float>* vuPtr;
-    float vuVals[2] { 0.0f };
+    float vuVals[2] { -100.0f };
     QTimer animationTimer;
 
     void animationStart();

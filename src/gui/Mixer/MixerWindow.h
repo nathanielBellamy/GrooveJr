@@ -52,8 +52,8 @@ class MixerWindow final : public QWidget {
     jack_ringbuffer_t* vuRingBuffer;
     float vuBufferIn[Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
     int vuAvgIndex = 0;
-    float vuBufferAvg[VU_METER_AVG_SIZE][Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
-    std::atomic<float> vuBuffer[Audio::VU_RING_BUFFER_SIZE]{ 0.0f };
+    float vuBufferAvg[VU_METER_AVG_SIZE][Audio::VU_RING_BUFFER_SIZE]{ -100.0f };
+    std::atomic<float> vuBuffer[Audio::VU_RING_BUFFER_SIZE]{ -100.0f };
 
     Result vuWorkerStart();
     Result vuWorkerStop();

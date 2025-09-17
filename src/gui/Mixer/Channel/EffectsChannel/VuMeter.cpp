@@ -81,7 +81,16 @@ void VuMeter::paintGL() {
 
   for (int i = 0; i < VU_METER_BLOCK_COUNT; i++) {
     for (int chan = 0; chan < 2; chan++) {
-      if (vuVals[chan] < static_cast<float>(i) * 6.6f - 60.0f)
+      const float vuVal = vuVals[chan];
+      const float val =
+          vuVal < -100.0f
+              ? -100.0f
+              : vuVal > 30.0f
+                ? 30.0f
+                : vuVal;
+      const float lim = 5.95f * static_cast<float>(i) - 100.0f;
+
+      if (val < lim)
         continue;
 
       if (i == VU_METER_BLOCK_COUNT - 1)
