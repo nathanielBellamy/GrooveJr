@@ -15,6 +15,7 @@ Audio::Effects::Vst3::Host::App* PluginContext;
 AppState* gAppState;
 Audio::Mixer* Mixer;
 Db::Dao* Dao;
+Audio::AudioData AudioData();
 
 void shutdown_handler(const int sig) {
   Logging::write(

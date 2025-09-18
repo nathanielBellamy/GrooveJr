@@ -10,7 +10,8 @@
 namespace Gj {
 namespace Audio {
 
-struct DeckData {
+struct AudioDeck {
+  int                              deckIndex;
   sf_count_t                       frameId;
   sf_count_t                       frames { 0 }; // total # of frames
   sf_count_t                       frameAdvance;
@@ -19,7 +20,11 @@ struct DeckData {
   float                            fadeIn;
   float                            fadeOut;
   float*                           inputBuffers[2]{nullptr, nullptr};
-}
+
+  AudioDeck(int deckIndex)
+    : deckIndex(deckIndex)
+    {}
+};
 
 } // Audio
 } // Gj

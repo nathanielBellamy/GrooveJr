@@ -7,6 +7,7 @@
 #include "../enums/PlayState.h"
 #include "./effects/EffectsChannelProcessData.h"
 #include "./Constants.h"
+#include "./AudioDeck.h"
 
 #include <jack/ringbuffer.h>
 
@@ -15,7 +16,9 @@
 namespace Gj {
 namespace Audio {
 
+// TODO: Rename AudioCore
 struct AudioData {
+  AudioDeck                        decks[2] { AudioDeck(0), AudioDeck(1) };
   // TODO: DeckData decks[2]
   sf_count_t                       frameId;
   sf_count_t                       frames { 0 }; // total # of frames
@@ -71,6 +74,8 @@ struct AudioData {
                                    // pSFATRB[1] = frameId sf_count_t
   float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
   std::function<int(AudioData*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
+
+  AudioData() {}
 
   AudioData(
     const sf_count_t frameId,
