@@ -67,6 +67,8 @@ find_package (CAF
 
 # compile library
 add_library(GjAudio SHARED
+        AudioData.h
+        DeckData.h
         Cassette.h
         Cassette.cpp
         ThreadStatics.h

@@ -16,6 +16,7 @@ namespace Gj {
 namespace Audio {
 
 struct AudioData {
+  // TODO: DeckData decks[2]
   sf_count_t                       frameId;
   sf_count_t                       frames { 0 }; // total # of frames
   sf_count_t                       frameAdvance;
