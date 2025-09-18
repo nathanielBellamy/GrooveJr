@@ -21,6 +21,7 @@
 
 #include "../gui/MainWindow.h"
 #include "../audio/Mixer.h"
+#include "../audio/AudioData.h"
 
 using namespace caf;
 
@@ -43,7 +44,12 @@ struct SupervisorState {
      Gui::MainWindow* mainWindowPtr;
      bool running;
 
-     SupervisorState(Supervisor::pointer self, AppState* gAppState, Gui::MainWindow* mainWindowPtr, Audio::Mixer* mixer)
+     SupervisorState(
+       Supervisor::pointer self,
+       AppState* gAppState,
+       Gui::MainWindow* mainWindowPtr,
+       Audio::Mixer* mixer,
+       Audio::AudioData& audioData)
        : self(self)
        , mainWindowPtr(mainWindowPtr)
        , running(false)

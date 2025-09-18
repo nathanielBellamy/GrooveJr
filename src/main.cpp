@@ -15,7 +15,7 @@ Audio::Effects::Vst3::Host::App* PluginContext;
 AppState* gAppState;
 Audio::Mixer* Mixer;
 Db::Dao* Dao;
-Audio::AudioData AudioData();
+auto AudioData = Audio::AudioData();
 
 void shutdown_handler(const int sig) {
   Logging::write(
@@ -67,7 +67,14 @@ void shutdown_handler(const int sig) {
   exit(sig);
 }
 
-void caf_main(int argc, char *argv[], void (*shutdown_handler) (int), actor_system& sys, AppState* gAppState, Audio::Mixer* mixer) {
+void caf_main(
+  int argc,
+  char *argv[],
+  void (*shutdown_handler) (int),
+  actor_system& sys,
+  AppState* gAppState,
+  Audio::Mixer* mixer,
+  Audio::AudioData& audioData) {
   Logging::write(Info, "caf_main", "Starting caf_main");
 
   // init Qt App
@@ -81,7 +88,8 @@ void caf_main(int argc, char *argv[], void (*shutdown_handler) (int), actor_syst
     actor_from_state<Act::SupervisorState>,
     gAppState,
     &mainWindow,
-    mixer
+    mixer,
+    audioData
   );
 
   Logging::write(Info, "caf_main", "Supervisor actor spawned");
@@ -160,7 +168,7 @@ extern "C" {
         // Create the actor system.
         actor_system sys{cfg};
         // Run user-defined code.
-        caf_main(argc, argv, &shutdown_handler, sys, gAppState, Mixer);
+        caf_main(argc, argv, &shutdown_handler, sys, gAppState, Mixer, AudioData);
 
         return 0;
     }
