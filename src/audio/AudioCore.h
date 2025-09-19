@@ -17,7 +17,7 @@ namespace Gj {
 namespace Audio {
 
 // TODO: Rename AudioCore
-struct AudioData {
+struct AudioCore {
   AudioDeck                        decks[2] { AudioDeck(0), AudioDeck(1) };
   // TODO: DeckData decks[2]
   sf_count_t                       frameId;
@@ -73,11 +73,11 @@ struct AudioData {
                                    // pSFATRB[0] = unused (debug)
                                    // pSFATRB[1] = frameId sf_count_t
   float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
-  std::function<int(AudioData*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
+  std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
-  AudioData() {}
+  AudioCore() {}
 
-  AudioData(
+  AudioCore(
     const sf_count_t frameId,
     const PlayState playState,
     const float playbackSpeed,
@@ -113,7 +113,7 @@ struct AudioData {
     );
   }
 
-  ~AudioData() {
+  ~AudioCore() {
     Logging::write(
       Info,
       "Audio::AudioData::~AudioData",

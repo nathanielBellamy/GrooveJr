@@ -17,7 +17,7 @@
 #include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 #include "caf/actor_system.hpp"
 
-#include "./AudioData.h"
+#include "./AudioCore.h"
 #include "./Constants.h"
 #include "./Mixer.h"
 #include "./ThreadStatics.h"
@@ -51,10 +51,10 @@ class Cassette
   sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
   float fft_eq_buffer[FFT_EQ_RING_BUFFER_SIZE]{};
   float vu_buffer[VU_RING_BUFFER_SIZE]{};
-  AudioData audioData;
+  AudioCore audioData;
 
   int setupAudioData();
-  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int channelIdx, int pluginIdx, AudioData& audioData);
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, int channelIdx, int pluginIdx, AudioCore& audioData);
 
   bool allocateInputBuffers();
   bool populateInputBuffers() const;

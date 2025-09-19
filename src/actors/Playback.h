@@ -19,6 +19,7 @@
 
 #include "../AppState.h"
 #include "../audio/Mixer.h"
+#include "../audio/AudioCore.h"
 #include "../enums/PlayState.h"
 
 using namespace caf;
@@ -47,11 +48,18 @@ struct PlaybackState {
 
      AppState* gAppState;
      Audio::Mixer* mixer;
+     Audio::AudioCore& audioCore;
 
-     PlaybackState(Playback::pointer self, strong_actor_ptr supervisor, AppState* gAppState, Audio::Mixer* mixer) :
+     PlaybackState(
+       Playback::pointer self,
+       strong_actor_ptr supervisor,
+       AppState* gAppState,
+       Audio::Mixer* mixer,
+       Audio::AudioCore& audioCore) :
           self(self)
         , gAppState(gAppState)
         , mixer(mixer)
+        , audioCore(audioCore)
         , audioThread(nullptr)
         {
            self->link_to(supervisor);
@@ -97,7 +105,8 @@ struct PlaybackState {
                      actor_from_state<AudioThreadState>,
                      actor_cast<strong_actor_ptr>(self),
                      gAppState,
-                     mixer
+                     mixer,
+                     audioCore
                    );
                    audioThread = actor_cast<AudioThread::pointer>(audioThreadActor);
                    self->anon_send(

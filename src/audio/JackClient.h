@@ -13,7 +13,7 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 
-#include "AudioData.h"
+#include "AudioCore.h"
 #include "Logging.h"
 #include "../enums/Result.h"
 #include "Constants.h"
@@ -39,7 +39,7 @@ public:
   ~JackClient() override;
 
   Result initialize(JackName name);
-  [[nodiscard]] Result activate(AudioData *audioData) const;
+  [[nodiscard]] Result activate(AudioCore *audioData) const;
   [[nodiscard]] Result deactivate() const;
 
   [[nodiscard]]
@@ -49,7 +49,7 @@ public:
 
   bool registerAudioClient(IAudioClient* client) override;
   bool registerMidiClient(IMidiClient *client) override;
-  static int fillPlaybackBuffer(AudioData* audioData, sf_count_t playbackSpeed, jack_nframes_t nframes);
+  static int fillPlaybackBuffer(AudioCore* audioData, sf_count_t playbackSpeed, jack_nframes_t nframes);
 
   //--------------------------------------------------------------------
 private:
@@ -63,7 +63,7 @@ private:
   IMidiClient* midiClient = nullptr;
 
   jack_client_t* registerClient(JackName name);
-  Result setCallbacks(AudioData* audioData) const;
+  Result setCallbacks(AudioCore* audioData) const;
 
   static int processCallback(jack_nframes_t nframes, void* arg);
   static int setSampleRateCallback(jack_nframes_t nframes, void* arg);

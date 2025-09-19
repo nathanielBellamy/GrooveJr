@@ -16,6 +16,7 @@
 #include "./Playback.h"
 #include "../AppState.h"
 
+#include "../audio/AudioCore.h"
 #include "../audio/Mixer.h"
 #include "../audio/Cassette.h"
 #include "../Logging.h"
@@ -42,11 +43,19 @@ struct AudioThreadState {
      AudioThread::pointer self;
      AppState* gAppState;
      Audio::Mixer* mixer;
+     Audio::AudioCore& audioCore;
 
-     AudioThreadState(AudioThread::pointer self, strong_actor_ptr supervisor, AppState* gAppState, Audio::Mixer* mixer) :
+     AudioThreadState(
+       AudioThread::pointer self,
+       strong_actor_ptr supervisor,
+       AppState* gAppState,
+       Audio::Mixer* mixer,
+       Audio::AudioCore& audioCore
+    ) :
          self(self)
        , gAppState(gAppState)
        , mixer(mixer)
+       , audioCore(audioCore)
        {
            self->link_to(supervisor);
        }

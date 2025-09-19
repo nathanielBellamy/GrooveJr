@@ -115,7 +115,7 @@ Result JackClient::initialize(const JackName name) {
   return OK;
 }
 
-Result JackClient::activate(AudioData* audioData) const {
+Result JackClient::activate(AudioCore* audioData) const {
   Logging::write(
     Info,
     "Audio::JackClient::setup",
@@ -165,7 +165,7 @@ Result JackClient::activate(AudioData* audioData) const {
   }
 }
 
-Result JackClient::setCallbacks(AudioData* audioData) const {
+Result JackClient::setCallbacks(AudioCore* audioData) const {
   Logging::write(
     Info,
     "Audio::JackClient::setCallbacks",
@@ -343,7 +343,7 @@ float JackClient::princArg(const float phaseIn) {
 }
 
 // plabackSpeed in [-2.0, 2.0]
-int JackClient::fillPlaybackBuffer(AudioData* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
+int JackClient::fillPlaybackBuffer(AudioCore* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
   if constexpr (false) { // TODO: fix phase-tracking  in phase vocoder
     const int hopAnalysis = FFT_PV_HOP_ANALYSIS;
     const float hopAnalysisF = FFT_PV_HOP_ANALYSISF;
@@ -458,7 +458,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   );
 
   // retrieve AudioData
-  const auto audioData = static_cast<AudioData*>(arg);
+  const auto audioData = static_cast<AudioCore*>(arg);
 
   // read playbackSettingsToAudioThreadRingBuffer
   if (jack_ringbuffer_read_space(audioData->playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE - 2) {

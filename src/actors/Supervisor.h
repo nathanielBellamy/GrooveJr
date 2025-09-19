@@ -21,7 +21,7 @@
 
 #include "../gui/MainWindow.h"
 #include "../audio/Mixer.h"
-#include "../audio/AudioData.h"
+#include "../audio/AudioCore.h"
 
 using namespace caf;
 
@@ -49,7 +49,7 @@ struct SupervisorState {
        AppState* gAppState,
        Gui::MainWindow* mainWindowPtr,
        Audio::Mixer* mixer,
-       Audio::AudioData& audioData)
+       Audio::AudioCore& audioCore)
        : self(self)
        , mainWindowPtr(mainWindowPtr)
        , running(false)
@@ -60,7 +60,8 @@ struct SupervisorState {
              actor_from_state<PlaybackState>,
              actor_cast<strong_actor_ptr>(self),
              gAppState,
-             mixer
+             mixer,
+             audioCore
            );
            playbackActorPtr = actor_cast<strong_actor_ptr>(playback);
 

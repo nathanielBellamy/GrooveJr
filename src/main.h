@@ -27,7 +27,7 @@
 #include "./audio/effects/vst3/host/App.h"
 #include "./audio/effects/vst3/Plugin.h"
 #include "./audio/Mixer.h"
-#include "./audio/AudioData.h"
+#include "./audio/AudioCore.h"
 
 #include "./Logging.h"
 #include "./AppState.h"

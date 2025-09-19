@@ -295,7 +295,7 @@ int Cassette::setupAudioData() {
   return 0;
 }
 
-IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioData& audioData) {
+IAudioClient::Buffers Cassette::getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore& audioData) {
   const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
 
   // NOTE: input buffers will be updated to audioData->playbackBuffers when pluginIdx = 0 in JackClient::processCallback
@@ -553,28 +553,28 @@ int Cassette::updateAudioDataFromMixer(
     const float panL = effectsChannel->getPanL();
     const float panR = effectsChannel->getPanR();
 
-    effectsChannelsSettings[4 * i] = AudioData::factorLL(
+    effectsChannelsSettings[4 * i] = AudioCore::factorLL(
       gain, gainL, gainR,
       mute, muteL, muteR,
       solo, soloL, soloR,
       pan, panL, panR,
       channelCountF
     );
-    effectsChannelsSettings[4 * i + 1] = AudioData::factorLR(
+    effectsChannelsSettings[4 * i + 1] = AudioCore::factorLR(
       gain, gainL, gainR,
       mute, muteL, muteR,
       solo, soloL, soloR,
       pan, panL, panR,
       channelCountF
     );
-    effectsChannelsSettings[4 * i + 2] = AudioData::factorRL(
+    effectsChannelsSettings[4 * i + 2] = AudioCore::factorRL(
       gain, gainL, gainR,
       mute, muteL, muteR,
       solo, soloL, soloR,
       pan, panL, panR,
       channelCountF
     );
-    effectsChannelsSettings[4 * i + 3] = AudioData::factorRR(
+    effectsChannelsSettings[4 * i + 3] = AudioCore::factorRR(
       gain, gainL, gainR,
       mute, muteL, muteR,
       solo, soloL, soloR,
