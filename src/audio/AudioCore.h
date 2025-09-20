@@ -8,18 +8,24 @@
 #include "./effects/EffectsChannelProcessData.h"
 #include "./Constants.h"
 #include "./AudioDeck.h"
+#include "ThreadStatics.h"
 
 #include <jack/ringbuffer.h>
 
 #include "../Logging.h"
+#include "../enums/Result.h"
 
 namespace Gj {
 namespace Audio {
+  constexpr int AUDIO_CORE_DECK_COUNT = 2;
 
-// TODO: Rename AudioCore
+  // forward decl
+  class Cassette;
+
 struct AudioCore {
-  AudioDeck                        decks[2] { AudioDeck(0), AudioDeck(1) };
-  // TODO: DeckData decks[2]
+  long                             threadId;
+  AudioDeck                        decks[AUDIO_CORE_DECK_COUNT] { AudioDeck(0), AudioDeck(1) };
+  int                              deckIndex = 0;
   sf_count_t                       frameId;
   sf_count_t                       frames { 0 }; // total # of frames
   sf_count_t                       frameAdvance;
@@ -75,7 +81,9 @@ struct AudioCore {
   float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
   std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
-  AudioCore() {}
+  AudioCore() {
+    init();
+  }
 
   AudioCore(
     const sf_count_t frameId,
@@ -94,23 +102,7 @@ struct AudioCore {
       , effectsChannelCount(effectsChannelCount)
       {
 
-    processBuffers[0] = &playbackBuffersBuffer[0];
-    processBuffers[1] = &processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
-
-    playbackBuffers[0] = &playbackBuffersBuffer[0];
-    playbackBuffers[1] = &playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
-
-    fft_eq_0_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[0], fft_eq_freq[0], FFTW_ESTIMATE);
-    fft_eq_1_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[1], fft_eq_freq[1], FFTW_ESTIMATE);
-
-    fft_pv_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_PV_TIME_SIZE, fft_pv_time, fft_pv_freq, FFTW_ESTIMATE);
-    fft_pv_plan_c2r = fftwf_plan_dft_c2r_1d(FFT_PV_FREQ_SIZE, fft_pv_freq_shift, fft_pv_time, FFTW_ESTIMATE);
-
-    Logging::write(
-      Info,
-      "Audio::AudioData::AudioData",
-      "Instantiated AudioData"
-    );
+    init();
   }
 
   ~AudioCore() {
@@ -130,6 +122,28 @@ struct AudioCore {
       "Audio::AudioData::~AudioData",
       "Destroyed AudioData"
     );
+  }
+
+  Result init() {
+    processBuffers[0] = &playbackBuffersBuffer[0];
+    processBuffers[1] = &processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
+
+    playbackBuffers[0] = &playbackBuffersBuffer[0];
+    playbackBuffers[1] = &playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
+
+    fft_eq_0_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[0], fft_eq_freq[0], FFTW_ESTIMATE);
+    fft_eq_1_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[1], fft_eq_freq[1], FFTW_ESTIMATE);
+
+    fft_pv_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_PV_TIME_SIZE, fft_pv_time, fft_pv_freq, FFTW_ESTIMATE);
+    fft_pv_plan_c2r = fftwf_plan_dft_c2r_1d(FFT_PV_FREQ_SIZE, fft_pv_freq_shift, fft_pv_time, FFTW_ESTIMATE);
+
+    Logging::write(
+      Info,
+      "Audio::AudioData::AudioData",
+      "Instantiated AudioData"
+    );
+
+    return OK;
   }
 
   static float factorLL(
@@ -226,6 +240,16 @@ struct AudioCore {
                             ? 1.0f
                             : soloR;
     return soloVal * (1.0f - mute) * (1.0f - muteR) * panRVal * gain * gainR / channelCount;
+  }
+
+  Result addCassette(Cassette* cassette) {
+    const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    deckIndex = nextDeckIndex;
+    decks[deckIndex].setCassette(cassette);
+    if (decks[deckIndex].cassette == nullptr)
+      return ERROR;
+
+    return OK;
   }
 };
 

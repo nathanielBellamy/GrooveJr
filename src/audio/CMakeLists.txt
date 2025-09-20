@@ -69,6 +69,7 @@ find_package (CAF
 add_library(GjAudio SHARED
         AudioCore.h
         AudioDeck.h
+        AudioPlayer.h
         Cassette.h
         Cassette.cpp
         ThreadStatics.h

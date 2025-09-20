@@ -7,10 +7,15 @@
 
 #include <sndfile.h>
 
+#include "../Logging.h"
+#include "../enums/Result.h"
+
 namespace Gj {
 namespace Audio {
+  // forward decl
+  class Cassette;
 
-struct AudioDeck {
+  struct AudioDeck {
   int                              deckIndex;
   sf_count_t                       frameId;
   sf_count_t                       frames { 0 }; // total # of frames
@@ -20,10 +25,19 @@ struct AudioDeck {
   float                            fadeIn;
   float                            fadeOut;
   float*                           inputBuffers[2]{nullptr, nullptr};
+  Cassette*                        cassette;
 
   AudioDeck(int deckIndex)
     : deckIndex(deckIndex)
     {}
+
+  Result setCassette(Cassette* newCassette) {
+    cassette = newCassette;
+    if (cassette == nullptr)
+      return ERROR;
+
+    return OK;
+  }
 };
 
 } // Audio

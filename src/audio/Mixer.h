@@ -23,7 +23,7 @@
 #include "../db/entity/mixer/ChannelEntity.h"
 #include "../db/entity/mixer/Effect.h"
 #include "../db/entity/mixer/Scene.h"
-#include "JackClient.h"
+// #include "JackClient.h"
 #include "./effects/EffectsChannel.h"
 #include "../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
 #include "effects/vst3/Util.h"
@@ -31,6 +31,9 @@
 
 namespace Gj {
 namespace Audio {
+
+// forward decl
+class JackClient;
 
 class Mixer {
   AppState* gAppState;

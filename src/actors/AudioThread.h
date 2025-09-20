@@ -17,9 +17,11 @@
 #include "../AppState.h"
 
 #include "../audio/AudioCore.h"
+#include "../audio/AudioPlayer.h"
 #include "../audio/Mixer.h"
 #include "../audio/Cassette.h"
 #include "../Logging.h"
+#include "../enums/Result.h"
 
 using namespace caf;
 
@@ -74,7 +76,20 @@ struct AudioThreadState {
                   gAppState,
                   mixer
                );
-               cassette.play();
+               if (audioCore.addCassette(&cassette) == ERROR)
+                 Logging::write(
+                   Error,
+                   "Act::AudioThread::audio_thread_init_a",
+                   "Unable to add Cassette to audioCore"
+                  );
+               Audio::AudioPlayer audioPlayer (audioCore, mixer);
+               if (audioPlayer.play() == ERROR)
+                 Logging::write(
+                   Error,
+                   "Act::AudioThread::audio_thread_init_a",
+                   "An error occurred during playback."
+                 );
+               // cassette.play();
              } catch (std::runtime_error& e) {
                Logging::write(
                  Error,

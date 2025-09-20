@@ -15,7 +15,7 @@ Audio::Effects::Vst3::Host::App* PluginContext;
 AppState* gAppState;
 Audio::Mixer* Mixer;
 Db::Dao* Dao;
-auto AudioCore = Audio::AudioCore();
+auto audioCore = Audio::AudioCore();
 
 void shutdown_handler(const int sig) {
   Logging::write(
@@ -168,7 +168,7 @@ extern "C" {
         // Create the actor system.
         actor_system sys{cfg};
         // Run user-defined code.
-        caf_main(argc, argv, &shutdown_handler, sys, gAppState, Mixer, AudioCore);
+        caf_main(argc, argv, &shutdown_handler, sys, gAppState, Mixer, audioCore);
 
         return 0;
     }
