@@ -14,6 +14,7 @@
 #include "Mixer.h"
 #include "ThreadStatics.h"
 
+#include "../AppState.h"
 #include "../enums/Result.h"
 
 namespace Gj {
@@ -23,19 +24,256 @@ struct AudioPlayer {
 
   AudioCore& audioCore;
   Mixer* mixer;
+  AppState* gAppState;
   std::shared_ptr<JackClient> jackClient;
 
+  bool jackClientIsActive = false;
+  float* effectsChannelsWriteOutBuffer;
   float effectsChannelsSettings[2 * MAX_EFFECTS_CHANNELS]{};
   sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
   sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
   float fft_eq_buffer[FFT_EQ_RING_BUFFER_SIZE]{};
   float vu_buffer[VU_RING_BUFFER_SIZE]{};
 
-  AudioPlayer(AudioCore& audioCore, Mixer* mixer)
+  AudioPlayer(AudioCore& audioCore, Mixer* mixer, AppState* gAppState)
     : audioCore(audioCore)
     , mixer(mixer)
+    , gAppState(gAppState)
     , jackClient(mixer->getGjJackClient())
-    {}
+    {
+    if (jackClient == nullptr) {
+      Logging::write(
+        Error,
+        "Audio::AudioPlayer::AudioPlayer",
+        "jackClient is null"
+      );
+      throw std::runtime_error(
+        "Unable to instantiate AudioPlayer - null jackClient"
+      );
+    }
+
+    if (const int audioCoreRes = setupAudioData(); audioCoreRes > 0) {
+      Logging::write(
+        Error,
+        "Audio::AudioPlayer::Cassette",
+        "Unable to setup AudioData - status: " + std::to_string(audioCoreRes)
+      );
+      throw std::runtime_error(
+        "Unable to instantiate Cassette - AudioData status: " + std::to_string(audioCoreRes)
+      );
+    }
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::Cassette",
+      "Initialized AudioData with frameId: " + std::to_string(audioCore.frameId)
+    );
+
+    if (jackClient->activate(&audioCore) != OK) {
+      Logging::write(
+        Error,
+        "Audio::AudioPlayer::Cassette",
+        "Unable to activate Jack"
+      );
+      throw std::runtime_error(
+        "Unable to instantiate Cassette"
+      );
+    }
+
+    // jackClientIsActive = true;
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::Cassette",
+      "Cassette initialized"
+    );
+
+  }
+
+  ~AudioPlayer() {
+    delete[] effectsChannelsWriteOutBuffer;
+
+    if (jackClientIsActive) {
+      if (jackClient->deactivate() != OK) {
+        Logging::write(
+          Error,
+          "Audio::Cassette::cleanup",
+          "Unable to deactivate jackClient"
+        );
+      }
+    }
+    jackClientIsActive = false;
+  }
+
+  int setupAudioData() {
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::setupAudioData",
+      "Setting up Cassette AudioData"
+    );
+
+    // update plugin effects with info about audio to be processed
+    // if (mixer->setSampleRate(sfInfo.samplerate) != OK) {
+    //   Logging::write(
+    //     Warning,
+    //     "Audio::AudioPlayer::setupAudioData",
+    //     "Unable to set sample rate: " + std::to_string(sfInfo.samplerate)
+    //   );
+    // }
+
+    // ThreadStatics::setFrames(audioCore.frames);
+
+    if (setupInputBuffers() != OK) {
+      Logging::write(
+        Error,
+        "Audio::AudioPlayer::setupAudioData",
+        "Unable to setup inputBuffers"
+      );
+      return 4;
+    };
+
+    if (allocateEffectsChannelsWriteOutBuffers() != OK) {
+      Logging::write(
+        Error,
+        "Audio::AudioPlayer::setupAudioData",
+        "Unable to allocate processBuffers"
+      );
+      return 4;
+    }
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::setupAudioData",
+      "Allocated process buffers"
+    );
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::setupAudioData",
+      "Setting up AudioData buffers"
+    );
+
+    audioCore.fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
+
+    // audioCore.inputBuffers[0] = inputBuffers[0];
+    // audioCore.inputBuffers[1] = inputBuffers[1];
+
+    for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
+      audioCore.effectsChannelsWriteOut[i][0] = effectsChannelsWriteOutBuffer + (2 * i * MAX_AUDIO_FRAMES_PER_BUFFER);
+      audioCore.effectsChannelsWriteOut[i][1] = effectsChannelsWriteOutBuffer + ((2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER);
+    }
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::setupAudioData",
+      "Successfully setup AudioData buffers."
+    );
+
+    // populate initial channel settings
+    for (int i = 0; i < mixer->getEffectsChannelsCount() + 1; i++) {
+      effectsChannelsSettings[4 * i]     = mixer->getEffectsChannel(i)->getGain();
+      effectsChannelsSettings[4 * i + 1] = mixer->getEffectsChannel(i)->getMute();
+      effectsChannelsSettings[4 * i + 2] = mixer->getEffectsChannel(i)->getSolo();
+      effectsChannelsSettings[4 * i + 3] = mixer->getEffectsChannel(i)->getPan();
+    }
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::setupAudioData",
+      "Populated initial effectsSettings into buffer"
+    );
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::setupAudioData",
+      "Setting up AudioData effects processing..."
+    );
+
+    for (const auto effectsChannel : mixer->getEffectsChannels()) {
+      const auto effectsChannelIdx = effectsChannel->getIndex();
+      audioCore.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
+      audioCore.effectsChannelsSettings[2 * effectsChannelIdx] = effectsChannel->getGain();
+      audioCore.effectsChannelsSettings[2 * effectsChannelIdx + 1] = effectsChannel->getPan();
+
+      for (int pluginIdx = 0; pluginIdx < effectsChannel->effectCount(); pluginIdx++) {
+        const auto plugin = effectsChannel->getPluginAtIdx(pluginIdx);
+        audioCore.effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
+          [ObjectPtr = plugin->audioHost->audioClient](auto && PH1, auto && PH2) { return ObjectPtr->process(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2)); };
+
+        if (effectsChannelIdx == 0) { // main channel
+          audioCore.effectsChannelsProcessData[0].buffers[pluginIdx] = {
+            audioCore.processBuffers,
+            2,
+            audioCore.processBuffers,
+            2,
+            static_cast<int32_t>(gAppState->getAudioFramesPerBuffer())
+          };
+        } else {
+          audioCore.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioCore);
+        }
+      }
+    }
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::setupAudioData",
+      "Setup AudioData Effects processing."
+    );
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::setupAudioData",
+      "Successfully setup AudioData."
+    );
+
+    return 0;
+  }
+
+  Result setupInputBuffers() {
+    return OK;
+  }
+
+  Result allocateEffectsChannelsWriteOutBuffers() {
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::allocateEffectsChannelsWriteOutBuffers",
+      "Allocating process buffers."
+    );
+
+    effectsChannelsWriteOutBuffer = new float[2 * MAX_AUDIO_FRAMES_PER_BUFFER * MAX_EFFECTS_CHANNELS];
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::allocateEffectsChannelsWriteOutBuffers",
+      "Allocated process buffers."
+    );
+
+    return OK;
+  }
+
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore& audioData) {
+    const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
+
+    // NOTE: input buffers will be updated to audioData->playbackBuffers when pluginIdx = 0 in JackClient::processCallback
+    if (const int effectsCount = effectsChannel->effectCount(); pluginIdx == effectsCount - 1) {
+      const auto writeOut = const_cast<float**>(audioData.effectsChannelsWriteOut[channelIdx]);
+      return {
+        audioData.processBuffers,
+        2,
+        writeOut,
+        2,
+        audioFramesPerBuffer
+      };
+    }
+
+    return {
+      audioData.processBuffers,
+      2,
+      audioData.processBuffers,
+      2,
+      audioFramesPerBuffer
+    };
+  }
 
   Result updateAudioDataFromMixer(
     jack_ringbuffer_t* effectsChannelsSettingsRB,
@@ -48,149 +286,149 @@ struct AudioPlayer {
     int channelCount
   ) {
 
-  // read vu_ring_buffer
-  if (jack_ringbuffer_read_space(vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
-    jack_ringbuffer_read(
-      vu_ring_buffer,
-      reinterpret_cast<char*>(vu_buffer),
-      VU_RING_BUFFER_SIZE
-    );
-  }
+    // read vu_ring_buffer
+    if (jack_ringbuffer_read_space(vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
+      jack_ringbuffer_read(
+        vu_ring_buffer,
+        reinterpret_cast<char*>(vu_buffer),
+        VU_RING_BUFFER_SIZE
+      );
+    }
 
-  if (jack_ringbuffer_write_space(vu_ring_buffer_out) > VU_RING_BUFFER_SIZE - 2) {
-    jack_ringbuffer_write(
-      vu_ring_buffer_out,
-      reinterpret_cast<char*>(vu_buffer),
-      VU_RING_BUFFER_SIZE
-    );
-  }
+    if (jack_ringbuffer_write_space(vu_ring_buffer_out) > VU_RING_BUFFER_SIZE - 2) {
+      jack_ringbuffer_write(
+        vu_ring_buffer_out,
+        reinterpret_cast<char*>(vu_buffer),
+        VU_RING_BUFFER_SIZE
+      );
+    }
 
-  // read fft_eq_ring_buffer
-  if (jack_ringbuffer_read_space(fft_eq_ring_buffer) > FFT_EQ_RING_BUFFER_SIZE - 2) {
-    jack_ringbuffer_read(
-      fft_eq_ring_buffer,
-      reinterpret_cast<char*>(fft_eq_buffer),
-      FFT_EQ_RING_BUFFER_SIZE
-    );
-  }
+    // read fft_eq_ring_buffer
+    if (jack_ringbuffer_read_space(fft_eq_ring_buffer) > FFT_EQ_RING_BUFFER_SIZE - 2) {
+      jack_ringbuffer_read(
+        fft_eq_ring_buffer,
+        reinterpret_cast<char*>(fft_eq_buffer),
+        FFT_EQ_RING_BUFFER_SIZE
+      );
+    }
 
-  if (jack_ringbuffer_write_space(fft_eq_ring_buffer_out) > FFT_EQ_RING_BUFFER_SIZE - 2) {
-    jack_ringbuffer_write(
-      fft_eq_ring_buffer_out,
-      reinterpret_cast<char*>(fft_eq_buffer),
-      FFT_EQ_RING_BUFFER_SIZE
-    );
-  }
+    if (jack_ringbuffer_write_space(fft_eq_ring_buffer_out) > FFT_EQ_RING_BUFFER_SIZE - 2) {
+      jack_ringbuffer_write(
+        fft_eq_ring_buffer_out,
+        reinterpret_cast<char*>(fft_eq_buffer),
+        FFT_EQ_RING_BUFFER_SIZE
+      );
+    }
 
-  // read playbackSettingsFromAudioThread ring buffer
-  if (jack_ringbuffer_read_space(playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
-    jack_ringbuffer_read(
-      playbackSettingsFromAudioThreadRB,
-      reinterpret_cast<char*>(playbackSettingsFromAudioThread),
-      PlaybackSettingsFromAudioThread_RB_SIZE
-    );
-  }
+    // read playbackSettingsFromAudioThread ring buffer
+    if (jack_ringbuffer_read_space(playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
+      jack_ringbuffer_read(
+        playbackSettingsFromAudioThreadRB,
+        reinterpret_cast<char*>(playbackSettingsFromAudioThread),
+        PlaybackSettingsFromAudioThread_RB_SIZE
+      );
+    }
 
-  const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
-  mixer->getUpdateProgressBarFunc()(audioCore.frames, currentFrameId);
+    const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
+    mixer->getUpdateProgressBarFunc()(audioCore.frames, currentFrameId);
 
-  playbackSettingsToAudioThread[0] = 0;
-  playbackSettingsToAudioThread[1] = 0;
-  playbackSettingsToAudioThread[2] = ThreadStatics::getPlaybackSpeed();
+    playbackSettingsToAudioThread[0] = 0;
+    playbackSettingsToAudioThread[1] = 0;
+    playbackSettingsToAudioThread[2] = ThreadStatics::getPlaybackSpeed();
 
-  if (ThreadStatics::getUserSettingFrameId()) {
-    const sf_count_t newFrameId = ThreadStatics::getFrameId();
-    playbackSettingsToAudioThread[0] = 1;
-    playbackSettingsToAudioThread[1] = newFrameId;
+    if (ThreadStatics::getUserSettingFrameId()) {
+      const sf_count_t newFrameId = ThreadStatics::getFrameId();
+      playbackSettingsToAudioThread[0] = 1;
+      playbackSettingsToAudioThread[1] = newFrameId;
 
-    ThreadStatics::setUserSettingFrameId(false);
-  }
+      ThreadStatics::setUserSettingFrameId(false);
+    }
 
-  // write to playbackSettingsToAudioThread ring buffer
-  if (jack_ringbuffer_write_space(playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE - 2) {
-    jack_ringbuffer_write(
-      playbackSettingsToAudioThreadRB,
-      reinterpret_cast<char*>(playbackSettingsToAudioThread),
-      PlaybackSettingsToAudioThread_RB_SIZE
-    );
-  }
+    // write to playbackSettingsToAudioThread ring buffer
+    if (jack_ringbuffer_write_space(playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE - 2) {
+      jack_ringbuffer_write(
+        playbackSettingsToAudioThreadRB,
+        reinterpret_cast<char*>(playbackSettingsToAudioThread),
+        PlaybackSettingsToAudioThread_RB_SIZE
+      );
+    }
 
-  const float channelCountF = static_cast<float>(channelCount);
+    const float channelCountF = static_cast<float>(channelCount);
 
-  Effects::EffectsChannel* effectsChannels[MAX_EFFECTS_CHANNELS] {nullptr};
-  float soloVals[MAX_EFFECTS_CHANNELS] {0.0f};
-  float soloLVals[MAX_EFFECTS_CHANNELS] {0.0f};
-  float soloRVals[MAX_EFFECTS_CHANNELS] {0.0f};
-  bool soloEngaged = false;
+    Effects::EffectsChannel* effectsChannels[MAX_EFFECTS_CHANNELS] {nullptr};
+    float soloVals[MAX_EFFECTS_CHANNELS] {0.0f};
+    float soloLVals[MAX_EFFECTS_CHANNELS] {0.0f};
+    float soloRVals[MAX_EFFECTS_CHANNELS] {0.0f};
+    bool soloEngaged = false;
 
-  // no solos on main
-  effectsChannels[0] = mixer->getEffectsChannel(0);
-  for (int i = 1; i < channelCount; i++) {
-    effectsChannels[i] = mixer->getEffectsChannel(i);
-    soloVals[i]  = effectsChannels[i]->getSolo();
-    soloLVals[i] = effectsChannels[i]->getSoloL();
-    soloRVals[i] = effectsChannels[i]->getSoloR();
-    if (!soloEngaged && (soloVals[i] == 1.0f || soloLVals[i] == 1.0f || soloRVals[i] == 1.0f))
-      soloEngaged = true;
-  }
+    // no solos on main
+    effectsChannels[0] = mixer->getEffectsChannel(0);
+    for (int i = 1; i < channelCount; i++) {
+      effectsChannels[i] = mixer->getEffectsChannel(i);
+      soloVals[i]  = effectsChannels[i]->getSolo();
+      soloLVals[i] = effectsChannels[i]->getSoloL();
+      soloRVals[i] = effectsChannels[i]->getSoloR();
+      if (!soloEngaged && (soloVals[i] == 1.0f || soloLVals[i] == 1.0f || soloRVals[i] == 1.0f))
+        soloEngaged = true;
+    }
 
-  // update buffer
-  for (int i = 0; i < channelCount; i++) {
-    const auto effectsChannel = effectsChannels[i];
-    const bool isMain = i == 0;
-    const float gain = effectsChannel->getGain();
-    const float gainL = effectsChannel->getGainL();
-    const float gainR = effectsChannel->getGainR();
-    const float mute = effectsChannel->getMute();
-    const float muteL = effectsChannel->getMuteL();
-    const float muteR = effectsChannel->getMuteR();
-    const float solo = isMain // no solo on main
-                        ? 1.0f
-                        : soloEngaged ? soloVals[i] : 1.0f;
-    const float soloL = isMain
+    // update buffer
+    for (int i = 0; i < channelCount; i++) {
+      const auto effectsChannel = effectsChannels[i];
+      const bool isMain = i == 0;
+      const float gain = effectsChannel->getGain();
+      const float gainL = effectsChannel->getGainL();
+      const float gainR = effectsChannel->getGainR();
+      const float mute = effectsChannel->getMute();
+      const float muteL = effectsChannel->getMuteL();
+      const float muteR = effectsChannel->getMuteR();
+      const float solo = isMain // no solo on main
                           ? 1.0f
-                          : soloEngaged ? soloLVals[i] : 1.0f;
-    const float soloR = isMain
-                          ? 1.0f
-                          : soloEngaged ? soloRVals[i] : 1.0f;
-    const float pan  = effectsChannel->getPan();
-    const float panL = effectsChannel->getPanL();
-    const float panR = effectsChannel->getPanR();
+                          : soloEngaged ? soloVals[i] : 1.0f;
+      const float soloL = isMain
+                            ? 1.0f
+                            : soloEngaged ? soloLVals[i] : 1.0f;
+      const float soloR = isMain
+                            ? 1.0f
+                            : soloEngaged ? soloRVals[i] : 1.0f;
+      const float pan  = effectsChannel->getPan();
+      const float panL = effectsChannel->getPanL();
+      const float panR = effectsChannel->getPanR();
 
-    effectsChannelsSettings[4 * i] = AudioCore::factorLL(
-      gain, gainL, gainR,
-      mute, muteL, muteR,
-      solo, soloL, soloR,
-      pan, panL, panR,
-      channelCountF
-    );
-    effectsChannelsSettings[4 * i + 1] = AudioCore::factorLR(
-      gain, gainL, gainR,
-      mute, muteL, muteR,
-      solo, soloL, soloR,
-      pan, panL, panR,
-      channelCountF
-    );
-    effectsChannelsSettings[4 * i + 2] = AudioCore::factorRL(
-      gain, gainL, gainR,
-      mute, muteL, muteR,
-      solo, soloL, soloR,
-      pan, panL, panR,
-      channelCountF
-    );
-    effectsChannelsSettings[4 * i + 3] = AudioCore::factorRR(
-      gain, gainL, gainR,
-      mute, muteL, muteR,
-      solo, soloL, soloR,
-      pan, panL, panR,
-      channelCountF
-    );
-  }
+      effectsChannelsSettings[4 * i] = AudioCore::factorLL(
+        gain, gainL, gainR,
+        mute, muteL, muteR,
+        solo, soloL, soloR,
+        pan, panL, panR,
+        channelCountF
+      );
+      effectsChannelsSettings[4 * i + 1] = AudioCore::factorLR(
+        gain, gainL, gainR,
+        mute, muteL, muteR,
+        solo, soloL, soloR,
+        pan, panL, panR,
+        channelCountF
+      );
+      effectsChannelsSettings[4 * i + 2] = AudioCore::factorRL(
+        gain, gainL, gainR,
+        mute, muteL, muteR,
+        solo, soloL, soloR,
+        pan, panL, panR,
+        channelCountF
+      );
+      effectsChannelsSettings[4 * i + 3] = AudioCore::factorRR(
+        gain, gainL, gainR,
+        mute, muteL, muteR,
+        solo, soloL, soloR,
+        pan, panL, panR,
+        channelCountF
+      );
+    }
 
-  // write to effectsSettings ring buffer
-  if (jack_ringbuffer_write_space(effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE) {
-    jack_ringbuffer_write(effectsChannelsSettingsRB, reinterpret_cast<char*>(effectsChannelsSettings), EffectsSettings_RB_SIZE);
-  }
+    // write to effectsSettings ring buffer
+    if (jack_ringbuffer_write_space(effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE) {
+      jack_ringbuffer_write(effectsChannelsSettingsRB, reinterpret_cast<char*>(effectsChannelsSettings), EffectsSettings_RB_SIZE);
+    }
 
     return OK;
   }
@@ -230,22 +468,22 @@ struct AudioPlayer {
 
       // here is our chance to pull data out of the application
       // and
-      // make it accessible to our running audio callback through the audioData obj
+      // make it accessible to our running audio callback through the audioCore obj
 
       // TODO: pass readComplete thru ring buffer
       if (audioCore.readComplete) { // reached end of input file
           ThreadStatics::setPlayState(STOP);
           Logging::write(
             Info,
-            "Audio::Cassette::play",
+            "Audio::AudioPlayer::play",
             "Read complete"
           );
           break;
       }
 
-      // if (audioData.fadeIn > 0.01) {
-      //     audioData.fadeIn -= 0.01;
-      //     audioData.volume += 0.01;
+      // if (audioCore.fadeIn > 0.01) {
+      //     audioCore.fadeIn -= 0.01;
+      //     audioCore.volume += 0.01;
       // }
 
       updateAudioDataFromMixer(
@@ -260,11 +498,11 @@ struct AudioPlayer {
       );
 
       if ( audioCore.threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
-        // if (audioData.fadeOut < 0.01) { // break + cleanup
+        // if (audioCore.fadeOut < 0.01) { // break + cleanup
         //     break;
         // } else { // continue fading out
-        //     audioData.volume -= 0.001;
-        //     audioData.fadeOut -= 0.001;
+        //     audioCore.volume -= 0.001;
+        //     audioCore.fadeOut -= 0.001;
         // }
       } else {
         audioCore.playbackSpeed = ThreadStatics::getPlaybackSpeed();
@@ -283,17 +521,17 @@ struct AudioPlayer {
       ThreadStatics::setReadComplete(true);
     }
 
-    // if (jackClientIsActive) {
-    //   if (jackClient->deactivate() != OK) {
-    //     Logging::write(
-    //       Error,
-    //       "Audio::Cassette::play",
-    //       "An error occurred deactivating the JackClient"
-    //     );
-    //   }
-    // }
+    if (jackClientIsActive) {
+      if (jackClient->deactivate() != OK) {
+        Logging::write(
+          Error,
+          "Audio::AudioPlayer::play",
+          "An error occurred deactivating the JackClient"
+        );
+      }
+    }
 
-    // jackClientIsActive = false;
+    jackClientIsActive = false;
 
     if (ThreadStatics::getPlayState() == STOP) {
       mixer->getUpdateProgressBarFunc()(audioCore.frames, 0);

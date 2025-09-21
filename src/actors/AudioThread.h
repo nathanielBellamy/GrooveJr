@@ -82,7 +82,7 @@ struct AudioThreadState {
                    "Act::AudioThread::audio_thread_init_a",
                    "Unable to add Cassette to audioCore"
                   );
-               Audio::AudioPlayer audioPlayer (audioCore, mixer);
+               Audio::AudioPlayer audioPlayer (audioCore, mixer, gAppState);
                if (audioPlayer.play() == ERROR)
                  Logging::write(
                    Error,
