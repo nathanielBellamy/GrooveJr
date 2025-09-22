@@ -52,7 +52,7 @@ struct AudioPlayer {
       );
     }
 
-    if (const int audioCoreRes = setupAudioData(); audioCoreRes > 0) {
+    if (const int audioCoreRes = setupAudioCore(); audioCoreRes > 0) {
       Logging::write(
         Error,
         "Audio::AudioPlayer::Cassette",
@@ -63,12 +63,6 @@ struct AudioPlayer {
       );
     }
 
-    Logging::write(
-      Info,
-      "Audio::AudioPlayer::Cassette",
-      "Initialized AudioData with frameId: " + std::to_string(audioCore.frameId)
-    );
-
     if (jackClient->activate(&audioCore) != OK) {
       Logging::write(
         Error,
@@ -76,7 +70,7 @@ struct AudioPlayer {
         "Unable to activate Jack"
       );
       throw std::runtime_error(
-        "Unable to instantiate Cassette"
+        "Unable to instantiate AudioPlayer"
       );
     }
 
@@ -105,7 +99,7 @@ struct AudioPlayer {
     jackClientIsActive = false;
   }
 
-  int setupAudioData() {
+  int setupAudioCore() {
     Logging::write(
       Info,
       "Audio::AudioPlayer::setupAudioData",
@@ -456,16 +450,20 @@ struct AudioPlayer {
     jack_ringbuffer_t* vu_ring_buffer_out = jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS);
     mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
 
+    audioCore.playState = PLAY;
     ThreadStatics::setReadComplete(false);
 
-    while(
-            audioCore.playState != STOP
-              && audioCore.playState != PAUSE
-              && audioCore.frameId > -1
+    std::cout << "audio player - will play <<"
+              << std::endl << " playState " << audioCore.playState << std::endl
+              << std::endl << " frameId " << audioCore.frameId << std::endl;
+
+    while( true
+            // audioCore.playState != STOP
+            //   && audioCore.playState != PAUSE
+            //   && audioCore.frameId > -1
               // && frameId < sfInfo.frames
     ) {
-      // hold thread open until stopped
-
+      std::cout << "audio player - playing " << audioCore.frameId << std::endl;
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj
@@ -478,7 +476,7 @@ struct AudioPlayer {
             "Audio::AudioPlayer::play",
             "Read complete"
           );
-          break;
+          // break;
       }
 
       // if (audioCore.fadeIn > 0.01) {
@@ -513,6 +511,8 @@ struct AudioPlayer {
       std::this_thread::sleep_for( std::chrono::milliseconds(10) );
     } // end of while loop
 
+    std::cout << "exit while loop" << std::endl;
+
     if ( audioCore.threadId == ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
       if (audioCore.playState == PLAY)
           ThreadStatics::setPlayState(STOP);
@@ -528,6 +528,7 @@ struct AudioPlayer {
           "Audio::AudioPlayer::play",
           "An error occurred deactivating the JackClient"
         );
+        return ERROR;
       }
     }
 

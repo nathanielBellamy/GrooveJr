@@ -21,7 +21,6 @@ class Cassette
   long initialFrameId;
   AppState* gAppState;
   float* buffer{};
-  SF_INFO sfInfo;
   SNDFILE* file{};
   float* inputBuffer{};
 
@@ -35,6 +34,7 @@ class Cassette
   bool deleteBuffers() const;
 
   public:
+    SF_INFO sfInfo;
     float* inputBuffers[2]{}; // full song audio data
 
     Cassette(AppState* gAppState);

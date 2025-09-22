@@ -85,7 +85,6 @@ struct AudioThreadState {
                    "Act::AudioThread::audio_thread_init_a",
                    "An error occurred during playback."
                  );
-               // cassette.play();
              } catch (std::runtime_error& e) {
                Logging::write(
                  Error,

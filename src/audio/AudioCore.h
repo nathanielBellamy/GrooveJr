@@ -29,7 +29,7 @@ struct AudioCore {
   sf_count_t                       frameAdvance;
   PlayState                        playState;
   float                            playbackSpeed;
-  bool                             readComplete;
+  bool                             readComplete = false;
   float                            volume;
   float                            fadeIn;
   float                            fadeOut;
@@ -241,12 +241,14 @@ struct AudioCore {
   }
 
   Result addCassette(Cassette* cassette) {
-    const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    // const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    constexpr int nextDeckIndex = 0;
     deckIndex = nextDeckIndex;
     decks[deckIndex].setCassette(cassette);
     if (decks[deckIndex].cassette == nullptr)
       return ERROR;
 
+    frames = cassette->sfInfo.frames;
     inputBuffers[2 * deckIndex] = cassette->inputBuffers[0];
     inputBuffers[2 * deckIndex + 1] = cassette->inputBuffers[1];
 
