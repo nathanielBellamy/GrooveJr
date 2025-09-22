@@ -24,7 +24,7 @@ class Cassette
   SNDFILE* file{};
   float* inputBuffer{};
 
-  int setupAudioData();
+  int init();
 
   bool allocateInputBuffers();
   bool populateInputBuffers() const;

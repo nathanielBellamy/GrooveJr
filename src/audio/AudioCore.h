@@ -106,8 +106,8 @@ struct AudioCore {
   ~AudioCore() {
     Logging::write(
       Info,
-      "Audio::AudioData::~AudioData",
-      "Destroying AudioData"
+      "Audio::AudioCore::~AudioCore",
+      "Destroying AudioCore"
     );
 
     fftwf_destroy_plan(fft_eq_0_plan_r2c);
@@ -117,8 +117,8 @@ struct AudioCore {
 
     Logging::write(
       Info,
-      "Audio::AudioData::~AudioData",
-      "Destroyed AudioData"
+      "Audio::AudioCore::~AudioCore",
+      "Destroyed AudioCore"
     );
   }
 
@@ -137,8 +137,8 @@ struct AudioCore {
 
     Logging::write(
       Info,
-      "Audio::AudioData::AudioData",
-      "Instantiated AudioData"
+      "Audio::AudioCore::AudioCore",
+      "Instantiated AudioCore"
     );
 
     return OK;
@@ -241,6 +241,11 @@ struct AudioCore {
   }
 
   Result addCassette(Cassette* cassette) {
+    Logging::write(
+      Info,
+      "Audio::AudioCore::addCassette",
+      "Adding cassette to deckIndex " + std::to_string(deckIndex)
+    );
     // const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
     constexpr int nextDeckIndex = 0;
     deckIndex = nextDeckIndex;
@@ -251,6 +256,12 @@ struct AudioCore {
     frames = cassette->sfInfo.frames;
     inputBuffers[2 * deckIndex] = cassette->inputBuffers[0];
     inputBuffers[2 * deckIndex + 1] = cassette->inputBuffers[1];
+
+    Logging::write(
+      Info,
+      "Audio::AudioCore::addCassette",
+      "Set input buffers to cassette input buffers"
+    );
 
     return OK;
   }

@@ -55,18 +55,18 @@ struct AudioPlayer {
     if (const int audioCoreRes = setupAudioCore(); audioCoreRes > 0) {
       Logging::write(
         Error,
-        "Audio::AudioPlayer::Cassette",
+        "Audio::AudioPlayer::AudioPlayer",
         "Unable to setup AudioData - status: " + std::to_string(audioCoreRes)
       );
       throw std::runtime_error(
-        "Unable to instantiate Cassette - AudioData status: " + std::to_string(audioCoreRes)
+        "Unable to instantiate AudioPlayer - AudioCore status: " + std::to_string(audioCoreRes)
       );
     }
 
     if (jackClient->activate(&audioCore) != OK) {
       Logging::write(
         Error,
-        "Audio::AudioPlayer::Cassette",
+        "Audio::AudioPlayer::AudioPlayer",
         "Unable to activate Jack"
       );
       throw std::runtime_error(
@@ -74,12 +74,12 @@ struct AudioPlayer {
       );
     }
 
-    // jackClientIsActive = true;
+    jackClientIsActive = true;
 
     Logging::write(
       Info,
-      "Audio::AudioPlayer::Cassette",
-      "Cassette initialized"
+      "Audio::AudioPlayer::AudioPlayer",
+      "AudioPlayer initialized"
     );
 
   }
@@ -91,7 +91,7 @@ struct AudioPlayer {
       if (jackClient->deactivate() != OK) {
         Logging::write(
           Error,
-          "Audio::Cassette::cleanup",
+          "Audio::AudioPlayer::cleanup",
           "Unable to deactivate jackClient"
         );
       }
@@ -102,8 +102,8 @@ struct AudioPlayer {
   int setupAudioCore() {
     Logging::write(
       Info,
-      "Audio::AudioPlayer::setupAudioData",
-      "Setting up Cassette AudioData"
+      "Audio::AudioPlayer::setupAudioCore",
+      "Setting up AudioCore"
     );
 
     // update plugin effects with info about audio to be processed
@@ -115,7 +115,7 @@ struct AudioPlayer {
     //   );
     // }
 
-    // ThreadStatics::setFrames(audioCore.frames);
+    ThreadStatics::setFrames(audioCore.frames);
 
     if (setupInputBuffers() != OK) {
       Logging::write(
@@ -245,14 +245,14 @@ struct AudioPlayer {
     return OK;
   }
 
-  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore& audioData) {
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore& audioCore) {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
 
-    // NOTE: input buffers will be updated to audioData->playbackBuffers when pluginIdx = 0 in JackClient::processCallback
+    // NOTE: input buffers will be updated to audioCore->playbackBuffers when pluginIdx = 0 in JackClient::processCallback
     if (const int effectsCount = effectsChannel->effectCount(); pluginIdx == effectsCount - 1) {
-      const auto writeOut = const_cast<float**>(audioData.effectsChannelsWriteOut[channelIdx]);
+      const auto writeOut = const_cast<float**>(audioCore.effectsChannelsWriteOut[channelIdx]);
       return {
-        audioData.processBuffers,
+        audioCore.processBuffers,
         2,
         writeOut,
         2,
@@ -261,9 +261,9 @@ struct AudioPlayer {
     }
 
     return {
-      audioData.processBuffers,
+      audioCore.processBuffers,
       2,
-      audioData.processBuffers,
+      audioCore.processBuffers,
       2,
       audioFramesPerBuffer
     };

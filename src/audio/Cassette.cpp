@@ -10,14 +10,14 @@ Cassette::Cassette(AppState* gAppState)
   , sfInfo()
   {
 
-  if (int audioDataRes = setupAudioData(); audioDataRes > 0) {
+  if (const int initRes = init(); initRes > 0) {
     Logging::write(
       Error,
       "Audio::Cassette::Cassette",
-      "Unable to setup AudioData - status: " + std::to_string(audioDataRes)
+      "Unable to setup AudioData - status: " + std::to_string(initRes)
     );
     throw std::runtime_error(
-      "Unable to instantiate Cassette - AudioData status: " + std::to_string(audioDataRes)
+      "Unable to instantiate Cassette - AudioData status: " + std::to_string(initRes)
     );
   }
 
@@ -72,11 +72,11 @@ void Cassette::cleanup() {
   );
 };
 
-int Cassette::setupAudioData() {
+int Cassette::init() {
   Logging::write(
     Info,
-    "Audio::Cassette::setupAudioData",
-    "Setting up Cassette"
+    "Audio::Cassette::init",
+    "Init Cassette"
   );
 
   // https://svn.ict.usc.edu/svn_vh_public/trunk/lib/vhcl/libsndfile/doc/api.html
@@ -87,7 +87,7 @@ int Cassette::setupAudioData() {
   if (file == nullptr) {
     Logging::write(
       Error,
-      "Audio::Cassette::setupAudioData",
+      "Audio::Cassette::init",
       "Unable to open input file : sf : " + std::string(sf_strerror(nullptr))
     );
     return 1;
@@ -107,7 +107,7 @@ int Cassette::setupAudioData() {
   if (!buffer) {
       Logging::write(
         Error,
-        "Audio::Cassette::setupAudioData",
+        "Audio::Cassette::init",
         "Cannot allocate memory for raw audio buffer"
       );
     return 2;
@@ -135,7 +135,7 @@ int Cassette::setupAudioData() {
   Logging::write(
     Info,
     "Audio::Cassette::setupAudioData",
-    "Successfully setup AudioData."
+    "Successfully init Cassette."
   );
 
   return 0;
