@@ -344,7 +344,7 @@ float JackClient::princArg(const float phaseIn) {
 
 // plabackSpeed in [-2.0, 2.0]
 int JackClient::fillPlaybackBuffer(AudioCore* audioData, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
-  if constexpr (false) { // TODO: fix phase-tracking  in phase vocoder
+  if constexpr (false) { // TODO: fix phase-tracking in phase vocoder
     const int hopAnalysis = FFT_PV_HOP_ANALYSIS;
     const float hopAnalysisF = FFT_PV_HOP_ANALYSISF;
     const int fftSize = FFT_PV_TIME_SIZE;

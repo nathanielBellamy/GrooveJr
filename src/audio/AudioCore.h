@@ -12,15 +12,13 @@
 
 #include <jack/ringbuffer.h>
 
+#include "Cassette.h"
 #include "../Logging.h"
 #include "../enums/Result.h"
 
 namespace Gj {
 namespace Audio {
   constexpr int AUDIO_CORE_DECK_COUNT = 2;
-
-  // forward decl
-  class Cassette;
 
 struct AudioCore {
   long                             threadId;
@@ -35,7 +33,7 @@ struct AudioCore {
   float                            volume;
   float                            fadeIn;
   float                            fadeOut;
-  float*                           inputBuffers[2]{nullptr, nullptr};
+  float*                           inputBuffers[2 * AUDIO_CORE_DECK_COUNT]{};
   float                            fft_eq_time[2][FFT_EQ_TIME_SIZE]{ 0.0 };
   fftwf_complex                    fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
   float                            fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{};
@@ -248,6 +246,9 @@ struct AudioCore {
     decks[deckIndex].setCassette(cassette);
     if (decks[deckIndex].cassette == nullptr)
       return ERROR;
+
+    inputBuffers[2 * deckIndex] = cassette->inputBuffers[0];
+    inputBuffers[2 * deckIndex + 1] = cassette->inputBuffers[1];
 
     return OK;
   }

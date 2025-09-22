@@ -71,11 +71,7 @@ struct AudioThreadState {
                "Instantiating Cassette"
              );
              try {
-               Audio::Cassette cassette (
-                  self->system(),
-                  gAppState,
-                  mixer
-               );
+               Audio::Cassette cassette (gAppState);
                if (audioCore.addCassette(&cassette) == ERROR)
                  Logging::write(
                    Error,

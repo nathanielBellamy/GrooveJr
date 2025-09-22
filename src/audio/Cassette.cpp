@@ -1,18 +1,12 @@
 #include "./Cassette.h"
 
-typedef float SAMPLE;
-
-using namespace caf;
-
 namespace Gj {
 namespace Audio {
 
-Cassette::Cassette(actor_system& actorSystem, AppState* gAppState, Mixer* mixer)
-  : actorSystem(actorSystem)
-  , threadId(ThreadStatics::incrThreadId())
+Cassette::Cassette(AppState* gAppState)
+  : threadId(ThreadStatics::incrThreadId())
   , fileName(ThreadStatics::getFilePath())
   , gAppState(gAppState)
-  , mixer(mixer)
   , sfInfo()
   {
 
@@ -100,13 +94,13 @@ int Cassette::setupAudioData() {
   };
 
   // update plugin effects with info about audio to be processed
-  if (mixer->setSampleRate(sfInfo.samplerate) != OK) {
-    Logging::write(
-      Warning,
-      "Audio::Cassette::setupAudioData",
-      "Unable to set sample rate: " + std::to_string(sfInfo.samplerate)
-    );
-  }
+  // if (mixer->setSampleRate(sfInfo.samplerate) != OK) {
+  //   Logging::write(
+  //     Warning,
+  //     "Audio::Cassette::setupAudioData",
+  //     "Unable to set sample rate: " + std::to_string(sfInfo.samplerate)
+  //   );
+  // }
 
   // Allocate memory for data
   buffer = new float[sfInfo.frames * sfInfo.channels];
