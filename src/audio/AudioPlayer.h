@@ -117,45 +117,10 @@ struct AudioPlayer {
 
     ThreadStatics::setFrames(audioCore->frames);
 
-    if (setupInputBuffers() != OK) {
-      Logging::write(
-        Error,
-        "Audio::AudioPlayer::setupAudioData",
-        "Unable to setup inputBuffers"
-      );
-      return 4;
-    };
-
-    if (allocateEffectsChannelsWriteOutBuffers() != OK) {
-      Logging::write(
-        Error,
-        "Audio::AudioPlayer::setupAudioData",
-        "Unable to allocate processBuffers"
-      );
-      return 4;
-    }
-
-    Logging::write(
-      Info,
-      "Audio::AudioPlayer::setupAudioData",
-      "Allocated process buffers"
-    );
-
-    Logging::write(
-      Info,
-      "Audio::AudioPlayer::setupAudioData",
-      "Setting up AudioData buffers"
-    );
-
     audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
 
     audioCore->inputBuffers[0] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
     audioCore->inputBuffers[1] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[1];
-
-    for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-      audioCore->effectsChannelsWriteOut[i][0] = effectsChannelsWriteOutBuffer + (2 * i * MAX_AUDIO_FRAMES_PER_BUFFER);
-      audioCore->effectsChannelsWriteOut[i][1] = effectsChannelsWriteOutBuffer + ((2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER);
-    }
 
     Logging::write(
       Info,
@@ -173,14 +138,14 @@ struct AudioPlayer {
 
     Logging::write(
       Info,
-      "Audio::AudioPlayer::setupAudioData",
+      "Audio::AudioPlayer::setupAudioCore",
       "Populated initial effectsSettings into buffer"
     );
 
     Logging::write(
       Info,
-      "Audio::AudioPlayer::setupAudioData",
-      "Setting up AudioData effects processing..."
+      "Audio::AudioPlayer::setupAudioCore",
+      "Setting up AudioCore effects processing..."
     );
 
     for (const auto effectsChannel : mixer->getEffectsChannels()) {
@@ -210,39 +175,17 @@ struct AudioPlayer {
 
     Logging::write(
       Info,
-      "Audio::AudioPlayer::setupAudioData",
-      "Setup AudioData Effects processing."
+      "Audio::AudioPlayer::setupAudioCore",
+      "Setup AudioCore Effects processing."
     );
 
     Logging::write(
       Info,
-      "Audio::AudioPlayer::setupAudioData",
-      "Successfully setup AudioData."
+      "Audio::AudioPlayer::setupAudioCore",
+      "Successfully setup AudioCore."
     );
 
     return 0;
-  }
-
-  Result setupInputBuffers() {
-    return OK;
-  }
-
-  Result allocateEffectsChannelsWriteOutBuffers() {
-    Logging::write(
-      Info,
-      "Audio::AudioPlayer::allocateEffectsChannelsWriteOutBuffers",
-      "Allocating process buffers."
-    );
-
-    effectsChannelsWriteOutBuffer = new float[2 * MAX_AUDIO_FRAMES_PER_BUFFER * MAX_EFFECTS_CHANNELS];
-
-    Logging::write(
-      Info,
-      "Audio::AudioPlayer::allocateEffectsChannelsWriteOutBuffers",
-      "Allocated process buffers."
-    );
-
-    return OK;
   }
 
   IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore* audioCore) {
@@ -463,7 +406,8 @@ struct AudioPlayer {
             //   && audioCore.frameId > -1
               // && frameId < sfInfo.frames
     ) {
-      std::cout << "audio player - playing " << audioCore->playbackBuffers[0][0] << std::endl;
+      std::cout << "audio player - playing - processBuf " << audioCore->processBuffers[0][0] << std::endl;
+      std::cout << "audio player - playing - inputBuf " << audioCore->inputBuffers[0] + audioCore->frameId << std::endl;
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj

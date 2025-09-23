@@ -24,15 +24,15 @@ struct AudioCore {
   long                             threadId;
   AudioDeck                        decks[AUDIO_CORE_DECK_COUNT] { AudioDeck(0), AudioDeck(1), AudioDeck(2) };
   int                              deckIndex = 0;
-  sf_count_t                       frameId;
+  sf_count_t                       frameId = 0;
   sf_count_t                       frames { 0 }; // total # of frames
   sf_count_t                       frameAdvance;
-  PlayState                        playState;
+  PlayState                        playState = STOP;
   float                            playbackSpeed;
   bool                             readComplete = false;
-  float                            volume;
-  float                            fadeIn;
-  float                            fadeOut;
+  float                            volume = 1.0f;
+  float                            fadeIn = 1.0f;
+  float                            fadeOut = 1.0f;
   float*                           inputBuffers[2 * AUDIO_CORE_DECK_COUNT]{};
   float                            fft_eq_time[2][FFT_EQ_TIME_SIZE]{ 0.0 };
   fftwf_complex                    fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
@@ -60,6 +60,7 @@ struct AudioCore {
   float                            fftFreqBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
   float                            channelCount;
   int                              effectsChannelCount;
+  float                            effectsChannelsWriteOutBuffer[2 * MAX_AUDIO_FRAMES_PER_BUFFER * MAX_EFFECTS_CHANNELS];
   std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
                                    // eCS[4k]   = {factorLL channel k}
                                    // eCS[4k+1] = {factorLR channel k}
@@ -80,32 +81,11 @@ struct AudioCore {
   std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
   AudioCore() {
-    std::cout << "fooooooooo " << std::endl;
     Logging::write(
       Info,
       "Audio::AudioCore::AudioCore()",
       "AudioCore no args ctor"
     );
-    init();
-  }
-
-  AudioCore(
-    const sf_count_t frameId,
-    const PlayState playState,
-    const float playbackSpeed,
-    const float channelCount,
-    const int effectsChannelCount)
-      : frameId(frameId)
-      , playState(playState)
-      , playbackSpeed(playbackSpeed)
-      , readComplete(false)
-      , volume(1.0)
-      , fadeIn(1.0)
-      , fadeOut(1.0)
-      , channelCount(channelCount)
-      , effectsChannelCount(effectsChannelCount)
-      {
-
     init();
   }
 
@@ -146,6 +126,11 @@ struct AudioCore {
 
     fft_pv_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_PV_TIME_SIZE, fft_pv_time, fft_pv_freq, FFTW_ESTIMATE);
     fft_pv_plan_c2r = fftwf_plan_dft_c2r_1d(FFT_PV_FREQ_SIZE, fft_pv_freq_shift, fft_pv_time, FFTW_ESTIMATE);
+
+    for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
+      effectsChannelsWriteOut[i][0] = effectsChannelsWriteOutBuffer + 2 * i * MAX_AUDIO_FRAMES_PER_BUFFER;
+      effectsChannelsWriteOut[i][1] = effectsChannelsWriteOutBuffer + (2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER;
+    }
 
     Logging::write(
       Info,
@@ -266,6 +251,8 @@ struct AudioCore {
       return ERROR;
 
     frames = cassette->sfInfo.frames;
+    std::cout << "cassette->inputBuffers[0] " << cassette->inputBuffers[0] + 5000 << std::endl;
+    std::cout << "cassette->inputBuffers[1] " << cassette->inputBuffers[1] + 5000 << std::endl;
     inputBuffers[2 * deckIndex] = cassette->inputBuffers[0];
     inputBuffers[2 * deckIndex + 1] = cassette->inputBuffers[1];
 
