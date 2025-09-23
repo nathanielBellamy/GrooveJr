@@ -18,11 +18,11 @@
 
 namespace Gj {
 namespace Audio {
-  constexpr int AUDIO_CORE_DECK_COUNT = 2;
+  constexpr int AUDIO_CORE_DECK_COUNT = 3;
 
 struct AudioCore {
   long                             threadId;
-  AudioDeck                        decks[AUDIO_CORE_DECK_COUNT] { AudioDeck(0), AudioDeck(1) };
+  AudioDeck                        decks[AUDIO_CORE_DECK_COUNT] { AudioDeck(0), AudioDeck(1), AudioDeck(2) };
   int                              deckIndex = 0;
   sf_count_t                       frameId;
   sf_count_t                       frames { 0 }; // total # of frames
@@ -80,6 +80,12 @@ struct AudioCore {
   std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
   AudioCore() {
+    std::cout << "fooooooooo " << std::endl;
+    Logging::write(
+      Info,
+      "Audio::AudioCore::AudioCore()",
+      "AudioCore no args ctor"
+    );
     init();
   }
 
@@ -93,7 +99,7 @@ struct AudioCore {
       , playState(playState)
       , playbackSpeed(playbackSpeed)
       , readComplete(false)
-      , volume(0.0)
+      , volume(1.0)
       , fadeIn(1.0)
       , fadeOut(1.0)
       , channelCount(channelCount)
@@ -123,7 +129,13 @@ struct AudioCore {
   }
 
   Result init() {
-    processBuffers[0] = &playbackBuffersBuffer[0];
+    Logging::write(
+      Info,
+      "Audio::AudioCore::init",
+      "Initializing AudioCore"
+    );
+
+    processBuffers[0] = &processBuffersBuffer[0];
     processBuffers[1] = &processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
 
     playbackBuffers[0] = &playbackBuffersBuffer[0];
@@ -137,8 +149,8 @@ struct AudioCore {
 
     Logging::write(
       Info,
-      "Audio::AudioCore::AudioCore",
-      "Instantiated AudioCore"
+      "Audio::AudioCore::init",
+      "Initialized AudioCore"
     );
 
     return OK;

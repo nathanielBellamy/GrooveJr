@@ -22,7 +22,7 @@ namespace Audio {
 
 struct AudioPlayer {
 
-  AudioCore& audioCore;
+  AudioCore* audioCore;
   Mixer* mixer;
   AppState* gAppState;
   std::shared_ptr<JackClient> jackClient;
@@ -35,7 +35,7 @@ struct AudioPlayer {
   float fft_eq_buffer[FFT_EQ_RING_BUFFER_SIZE]{};
   float vu_buffer[VU_RING_BUFFER_SIZE]{};
 
-  AudioPlayer(AudioCore& audioCore, Mixer* mixer, AppState* gAppState)
+  AudioPlayer(AudioCore* audioCore, Mixer* mixer, AppState* gAppState)
     : audioCore(audioCore)
     , mixer(mixer)
     , gAppState(gAppState)
@@ -63,7 +63,7 @@ struct AudioPlayer {
       );
     }
 
-    if (jackClient->activate(&audioCore) != OK) {
+    if (jackClient->activate(audioCore) != OK) {
       Logging::write(
         Error,
         "Audio::AudioPlayer::AudioPlayer",
@@ -115,7 +115,7 @@ struct AudioPlayer {
     //   );
     // }
 
-    ThreadStatics::setFrames(audioCore.frames);
+    ThreadStatics::setFrames(audioCore->frames);
 
     if (setupInputBuffers() != OK) {
       Logging::write(
@@ -147,14 +147,14 @@ struct AudioPlayer {
       "Setting up AudioData buffers"
     );
 
-    audioCore.fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
+    audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
 
-    // audioCore.inputBuffers[0] = inputBuffers[0];
-    // audioCore.inputBuffers[1] = inputBuffers[1];
+    audioCore->inputBuffers[0] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
+    audioCore->inputBuffers[1] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[1];
 
     for (int i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-      audioCore.effectsChannelsWriteOut[i][0] = effectsChannelsWriteOutBuffer + (2 * i * MAX_AUDIO_FRAMES_PER_BUFFER);
-      audioCore.effectsChannelsWriteOut[i][1] = effectsChannelsWriteOutBuffer + ((2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER);
+      audioCore->effectsChannelsWriteOut[i][0] = effectsChannelsWriteOutBuffer + (2 * i * MAX_AUDIO_FRAMES_PER_BUFFER);
+      audioCore->effectsChannelsWriteOut[i][1] = effectsChannelsWriteOutBuffer + ((2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER);
     }
 
     Logging::write(
@@ -185,25 +185,25 @@ struct AudioPlayer {
 
     for (const auto effectsChannel : mixer->getEffectsChannels()) {
       const auto effectsChannelIdx = effectsChannel->getIndex();
-      audioCore.effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
-      audioCore.effectsChannelsSettings[2 * effectsChannelIdx] = effectsChannel->getGain();
-      audioCore.effectsChannelsSettings[2 * effectsChannelIdx + 1] = effectsChannel->getPan();
+      audioCore->effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
+      audioCore->effectsChannelsSettings[2 * effectsChannelIdx] = effectsChannel->getGain();
+      audioCore->effectsChannelsSettings[2 * effectsChannelIdx + 1] = effectsChannel->getPan();
 
       for (int pluginIdx = 0; pluginIdx < effectsChannel->effectCount(); pluginIdx++) {
         const auto plugin = effectsChannel->getPluginAtIdx(pluginIdx);
-        audioCore.effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
+        audioCore->effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
           [ObjectPtr = plugin->audioHost->audioClient](auto && PH1, auto && PH2) { return ObjectPtr->process(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2)); };
 
         if (effectsChannelIdx == 0) { // main channel
-          audioCore.effectsChannelsProcessData[0].buffers[pluginIdx] = {
-            audioCore.processBuffers,
+          audioCore->effectsChannelsProcessData[0].buffers[pluginIdx] = {
+            audioCore->processBuffers,
             2,
-            audioCore.processBuffers,
+            audioCore->processBuffers,
             2,
             static_cast<int32_t>(gAppState->getAudioFramesPerBuffer())
           };
         } else {
-          audioCore.effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioCore);
+          audioCore->effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioCore);
         }
       }
     }
@@ -245,14 +245,14 @@ struct AudioPlayer {
     return OK;
   }
 
-  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore& audioCore) {
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore* audioCore) {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
 
     // NOTE: input buffers will be updated to audioCore->playbackBuffers when pluginIdx = 0 in JackClient::processCallback
     if (const int effectsCount = effectsChannel->effectCount(); pluginIdx == effectsCount - 1) {
-      const auto writeOut = const_cast<float**>(audioCore.effectsChannelsWriteOut[channelIdx]);
+      const auto writeOut = const_cast<float**>(audioCore->effectsChannelsWriteOut[channelIdx]);
       return {
-        audioCore.processBuffers,
+        audioCore->processBuffers,
         2,
         writeOut,
         2,
@@ -261,9 +261,9 @@ struct AudioPlayer {
     }
 
     return {
-      audioCore.processBuffers,
+      audioCore->processBuffers,
       2,
-      audioCore.processBuffers,
+      audioCore->processBuffers,
       2,
       audioFramesPerBuffer
     };
@@ -324,7 +324,7 @@ struct AudioPlayer {
     }
 
     const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
-    mixer->getUpdateProgressBarFunc()(audioCore.frames, currentFrameId);
+    mixer->getUpdateProgressBarFunc()(audioCore->frames, currentFrameId);
 
     playbackSettingsToAudioThread[0] = 0;
     playbackSettingsToAudioThread[1] = 0;
@@ -436,26 +436,26 @@ struct AudioPlayer {
 
     const int channelCount = mixer->getEffectsChannelsCount() + 1;
 
-    audioCore.effectsChannelsSettingsRB = jack_ringbuffer_create(EffectsSettings_RB_SIZE);
-    audioCore.playbackSettingsToAudioThreadRB = jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE);
-    audioCore.playbackSettingsFromAudioThreadRB = jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE);
+    audioCore->effectsChannelsSettingsRB = jack_ringbuffer_create(EffectsSettings_RB_SIZE);
+    audioCore->playbackSettingsToAudioThreadRB = jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE);
+    audioCore->playbackSettingsFromAudioThreadRB = jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE);
 
-    audioCore.fft_eq_ring_buffer = jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE);
+    audioCore->fft_eq_ring_buffer = jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE);
 
     jack_ringbuffer_t* fft_eq_ring_buffer_out = jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE);
     mixer->getSetEqRingBufferFunc()(fft_eq_ring_buffer_out);
 
-    audioCore.vu_ring_buffer = jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS);
+    audioCore->vu_ring_buffer = jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS);
 
     jack_ringbuffer_t* vu_ring_buffer_out = jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS);
     mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
 
-    audioCore.playState = PLAY;
+    audioCore->playState = PLAY;
     ThreadStatics::setReadComplete(false);
 
     std::cout << "audio player - will play <<"
-              << std::endl << " playState " << audioCore.playState << std::endl
-              << std::endl << " frameId " << audioCore.frameId << std::endl;
+              << std::endl << " playState " << audioCore->playState << std::endl
+              << std::endl << " frameId " << audioCore->frameId << std::endl;
 
     while( true
             // audioCore.playState != STOP
@@ -463,13 +463,13 @@ struct AudioPlayer {
             //   && audioCore.frameId > -1
               // && frameId < sfInfo.frames
     ) {
-      std::cout << "audio player - playing " << audioCore.frameId << std::endl;
+      std::cout << "audio player - playing " << audioCore->playbackBuffers[0][0] << std::endl;
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj
 
       // TODO: pass readComplete thru ring buffer
-      if (audioCore.readComplete) { // reached end of input file
+      if (audioCore->readComplete) { // reached end of input file
           ThreadStatics::setPlayState(STOP);
           Logging::write(
             Info,
@@ -485,17 +485,17 @@ struct AudioPlayer {
       // }
 
       updateAudioDataFromMixer(
-        audioCore.effectsChannelsSettingsRB,
-        audioCore.playbackSettingsToAudioThreadRB,
-        audioCore.playbackSettingsFromAudioThreadRB,
-        audioCore.fft_eq_ring_buffer,
+        audioCore->effectsChannelsSettingsRB,
+        audioCore->playbackSettingsToAudioThreadRB,
+        audioCore->playbackSettingsFromAudioThreadRB,
+        audioCore->fft_eq_ring_buffer,
         fft_eq_ring_buffer_out,
-        audioCore.vu_ring_buffer,
+        audioCore->vu_ring_buffer,
         vu_ring_buffer_out,
         channelCount
       );
 
-      if ( audioCore.threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
+      if ( audioCore->threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
         // if (audioCore.fadeOut < 0.01) { // break + cleanup
         //     break;
         // } else { // continue fading out
@@ -503,9 +503,9 @@ struct AudioPlayer {
         //     audioCore.fadeOut -= 0.001;
         // }
       } else {
-        audioCore.playbackSpeed = ThreadStatics::getPlaybackSpeed();
-        audioCore.playState = ThreadStatics::getPlayState();
-        ThreadStatics::setFrameId( audioCore.frameId );
+        audioCore->playbackSpeed = ThreadStatics::getPlaybackSpeed();
+        audioCore->playState = ThreadStatics::getPlayState();
+        ThreadStatics::setFrameId( audioCore->frameId );
       }
 
       std::this_thread::sleep_for( std::chrono::milliseconds(10) );
@@ -513,11 +513,11 @@ struct AudioPlayer {
 
     std::cout << "exit while loop" << std::endl;
 
-    if ( audioCore.threadId == ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
-      if (audioCore.playState == PLAY)
+    if ( audioCore->threadId == ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
+      if (audioCore->playState == PLAY)
           ThreadStatics::setPlayState(STOP);
       else
-          ThreadStatics::setPlayState(audioCore.playState);
+          ThreadStatics::setPlayState(audioCore->playState);
       ThreadStatics::setReadComplete(true);
     }
 
@@ -535,7 +535,7 @@ struct AudioPlayer {
     jackClientIsActive = false;
 
     if (ThreadStatics::getPlayState() == STOP) {
-      mixer->getUpdateProgressBarFunc()(audioCore.frames, 0);
+      mixer->getUpdateProgressBarFunc()(audioCore->frames, 0);
       mixer->getSetEqRingBufferFunc()(nullptr);
       mixer->getSetVuRingBufferFunc()(nullptr);
     }

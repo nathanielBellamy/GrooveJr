@@ -457,7 +457,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     jack_port_get_buffer(outPortR, nframes)
   );
 
-  // retrieve AudioData
+  // retrieve AudioCore
   const auto audioCore = static_cast<AudioCore*>(arg);
 
   // read playbackSettingsToAudioThreadRingBuffer

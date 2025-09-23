@@ -49,7 +49,7 @@ struct SupervisorState {
        AppState* gAppState,
        Gui::MainWindow* mainWindowPtr,
        Audio::Mixer* mixer,
-       Audio::AudioCore& audioCore)
+       Audio::AudioCore* audioCore)
        : self(self)
        , mainWindowPtr(mainWindowPtr)
        , running(false)

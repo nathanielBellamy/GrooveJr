@@ -48,14 +48,14 @@ struct PlaybackState {
 
      AppState* gAppState;
      Audio::Mixer* mixer;
-     Audio::AudioCore& audioCore;
+     Audio::AudioCore* audioCore;
 
      PlaybackState(
        Playback::pointer self,
        strong_actor_ptr supervisor,
        AppState* gAppState,
        Audio::Mixer* mixer,
-       Audio::AudioCore& audioCore) :
+       Audio::AudioCore* audioCore) :
           self(self)
         , gAppState(gAppState)
         , mixer(mixer)

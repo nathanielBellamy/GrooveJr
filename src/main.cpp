@@ -15,7 +15,7 @@ Audio::Effects::Vst3::Host::App* PluginContext;
 AppState* gAppState;
 Audio::Mixer* Mixer;
 Db::Dao* Dao;
-auto audioCore = Audio::AudioCore();
+Audio::AudioCore* audioCore;
 
 void shutdown_handler(const int sig) {
   Logging::write(
@@ -74,7 +74,7 @@ void caf_main(
   actor_system& sys,
   AppState* gAppState,
   Audio::Mixer* mixer,
-  Audio::AudioCore& audioCore) {
+  Audio::AudioCore* audioCore) {
   Logging::write(Info, "caf_main", "Starting caf_main");
 
   // init Qt App
@@ -149,6 +149,7 @@ extern "C" {
         // setup Audio
         initVst3PluginContext();
         Mixer = new Audio::Mixer(gAppState, Dao);
+        audioCore = new Audio::AudioCore();
 
         Logging::write(
           Info,

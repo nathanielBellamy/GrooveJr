@@ -45,14 +45,14 @@ struct AudioThreadState {
      AudioThread::pointer self;
      AppState* gAppState;
      Audio::Mixer* mixer;
-     Audio::AudioCore& audioCore;
+     Audio::AudioCore* audioCore;
 
      AudioThreadState(
        AudioThread::pointer self,
        strong_actor_ptr supervisor,
        AppState* gAppState,
        Audio::Mixer* mixer,
-       Audio::AudioCore& audioCore
+       Audio::AudioCore* audioCore
     ) :
          self(self)
        , gAppState(gAppState)
@@ -72,14 +72,13 @@ struct AudioThreadState {
              );
              try {
                Audio::Cassette cassette (gAppState);
-               if (audioCore.addCassette(&cassette) == ERROR)
+               if (audioCore->addCassette(&cassette) == ERROR)
                  Logging::write(
                    Error,
                    "Act::AudioThread::audio_thread_init_a",
                    "Unable to add Cassette to audioCore"
                   );
-               Audio::AudioPlayer audioPlayer (audioCore, mixer, gAppState);
-               if (audioPlayer.play() == ERROR)
+               if (Audio::AudioPlayer audioPlayer (audioCore, mixer, gAppState); audioPlayer.play() == ERROR)
                  Logging::write(
                    Error,
                    "Act::AudioThread::audio_thread_init_a",
