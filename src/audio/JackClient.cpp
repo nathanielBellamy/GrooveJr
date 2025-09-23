@@ -541,12 +541,12 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
         accumR = valR;
       } else {
         if (audioCore->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          valL += factorLL * audioCore->playbackBuffers[0][i] + factorRL * audioCore->playbackBuffers[1][i];
-          valR += factorLR * audioCore->playbackBuffers[0][i] + factorRR * audioCore->playbackBuffers[1][i];
+          valL = factorLL * audioCore->playbackBuffers[0][i] + factorRL * audioCore->playbackBuffers[1][i];
+          valR = factorLR * audioCore->playbackBuffers[0][i] + factorRR * audioCore->playbackBuffers[1][i];
         } else {
-          valL += factorLL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+          valL = factorLL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                             factorRL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          valR += factorLR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+          valR = factorLR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
                                             factorRR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
         }
 
@@ -594,6 +594,11 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   }
 
   for (int i = 0; i < nframes; i++) {
+    // TODO: debug playbackBuffers -> final processBuffers
+    // - outputing playbackBuffers directly works great
+    // const float valL = audioCore->playbackBuffers[0][i];
+    // const float valR = audioCore->playbackBuffers[1][i];
+
     const float valL = factorLL * audioCore->processBuffers[0][i] + factorRL * audioCore->processBuffers[1][i];
     const float valR = factorLR * audioCore->processBuffers[0][i] + factorRR * audioCore->processBuffers[1][i];
 

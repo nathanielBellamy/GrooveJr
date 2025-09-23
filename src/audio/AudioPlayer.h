@@ -122,6 +122,9 @@ struct AudioPlayer {
     audioCore->inputBuffers[0] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
     audioCore->inputBuffers[1] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[1];
 
+    std::cout << " acIB0 " << audioCore->inputBuffers[0][10000]; // = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
+    std::cout << " acIB1 " << audioCore->inputBuffers[1][10000] << std::endl; // = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
+
     Logging::write(
       Info,
       "Audio::AudioPlayer::setupAudioData",
@@ -406,7 +409,9 @@ struct AudioPlayer {
             //   && audioCore.frameId > -1
               // && frameId < sfInfo.frames
     ) {
-      std::cout << "audio player - playing - processBuf " << audioCore->processBuffers[0][0] << std::endl;
+      std::cout << "audio player - playing - processBuf " << audioCore->processBuffers[1][0] << std::endl;
+      std::cout << "audio player - playing - eowBuf " << audioCore->effectsChannelsWriteOut[0][0] << std::endl;
+      std::cout << "audio player - playing - playbackBuf " << audioCore->playbackBuffers[0][0] << std::endl;
       std::cout << "audio player - playing - inputBuf " << audioCore->inputBuffers[0] + audioCore->frameId << std::endl;
       // here is our chance to pull data out of the application
       // and
