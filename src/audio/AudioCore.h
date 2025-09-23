@@ -33,7 +33,7 @@ struct AudioCore {
   float                            volume = 1.0f;
   float                            fadeIn = 1.0f;
   float                            fadeOut = 1.0f;
-  float*                           inputBuffers[2 * AUDIO_CORE_DECK_COUNT]{};
+  float*                           inputBuffers[2 * AUDIO_CORE_DECK_COUNT]{nullptr};
   float                            fft_eq_time[2][FFT_EQ_TIME_SIZE]{ 0.0 };
   fftwf_complex                    fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
   float                            fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{};
@@ -53,27 +53,27 @@ struct AudioCore {
   float                            vu_buffer[VU_RING_BUFFER_SIZE]{ 0.0f };
   jack_ringbuffer_t*               vu_ring_buffer{nullptr};
   float*                           processBuffers[2]{nullptr, nullptr};
-  float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
+  float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{0.0f};
   float                            playbackBuffersPre[2][MAX_AUDIO_FRAMES_PER_BUFFER]{};
   float*                           playbackBuffers[2]{nullptr, nullptr};
-  float                            playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
-  float                            fftFreqBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{};
+  float                            playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{0.0f};
+  float                            fftFreqBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{0.0f};
   float                            channelCount;
   int                              effectsChannelCount;
-  float                            effectsChannelsWriteOutBuffer[2 * MAX_AUDIO_FRAMES_PER_BUFFER * MAX_EFFECTS_CHANNELS];
+  float                            effectsChannelsWriteOutBuffer[2 * MAX_AUDIO_FRAMES_PER_BUFFER * MAX_EFFECTS_CHANNELS]{0.0f};
   std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
                                    // eCS[4k]   = {factorLL channel k}
                                    // eCS[4k+1] = {factorLR channel k}
                                    // eCS[4k+2] = {factorRL channel k}
                                    // eCS[4k+3] = {factorRR channel k}
-  float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{};
+  float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{0.0f};
   jack_ringbuffer_t*               effectsChannelsSettingsRB{nullptr};
-  sf_count_t                       playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
+  sf_count_t                       playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{0};
   jack_ringbuffer_t*               playbackSettingsToAudioThreadRB{nullptr};
                                    // pSTATRB[0] = userSettingFrameId bool
                                    // pSTATRB[1] = newFrameId         sf_count_t
                                    // pSTATRB[2] = newPlaybackSpeed   sf_count_t
-  sf_count_t                       playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
+  sf_count_t                       playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{0};
   jack_ringbuffer_t*               playbackSettingsFromAudioThreadRB{nullptr};
                                    // pSFATRB[0] = unused (debug)
                                    // pSFATRB[1] = frameId sf_count_t
@@ -262,6 +262,12 @@ struct AudioCore {
       "Set input buffers to cassette input buffers"
     );
 
+    return OK;
+  }
+
+  Result setChannelCount(float val) {
+    effectsChannelCount = static_cast<int>(val);
+    channelCount = val;
     return OK;
   }
 };

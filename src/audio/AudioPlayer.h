@@ -151,6 +151,9 @@ struct AudioPlayer {
       "Setting up AudioCore effects processing..."
     );
 
+    audioCore->setChannelCount(
+      static_cast<float>(mixer->getEffectsChannelsCount())
+    );
     for (const auto effectsChannel : mixer->getEffectsChannels()) {
       const auto effectsChannelIdx = effectsChannel->getIndex();
       audioCore->effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
@@ -191,8 +194,9 @@ struct AudioPlayer {
     return 0;
   }
 
-  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore* audioCore) {
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore* audioCore) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
+    std::cout << "audioFramesPerBuffer "<< audioFramesPerBuffer << std::endl;
 
     // NOTE: input buffers will be updated to audioCore->playbackBuffers when pluginIdx = 0 in JackClient::processCallback
     if (const int effectsCount = effectsChannel->effectCount(); pluginIdx == effectsCount - 1) {
@@ -411,8 +415,12 @@ struct AudioPlayer {
     ) {
       std::cout << "audio player - playing - processBuf " << audioCore->processBuffers[1][0] << std::endl;
       std::cout << "audio player - playing - eowBuf " << audioCore->effectsChannelsWriteOut[0][0] << std::endl;
+      std::cout << "audio player - playing - fxchans 0 " << audioCore->effectsChannelsSettings[0] << std::endl;
+      std::cout << "audio player - playing - fxchans 1 " << audioCore->effectsChannelsSettings[1] << std::endl;
+      std::cout << "audio player - playing - fxchans 2 " << audioCore->effectsChannelsSettings[2] << std::endl;
+      std::cout << "audio player - playing - fxchans 3 " << audioCore->effectsChannelsSettings[3] << std::endl;
       std::cout << "audio player - playing - playbackBuf " << audioCore->playbackBuffers[0][0] << std::endl;
-      std::cout << "audio player - playing - inputBuf " << audioCore->inputBuffers[0] + audioCore->frameId << std::endl;
+      std::cout << "audio player - playing - inputBuf " << *(audioCore->inputBuffers[0] + audioCore->frameId) << std::endl;
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj

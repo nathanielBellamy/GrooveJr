@@ -492,13 +492,12 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
   // process effects channels
   // main channel is effectsChannelIdx 0
+  const int32_t nframes32t = static_cast<int32_t>(nframes);
   for (int effectsChannelIdx = 1; effectsChannelIdx < audioCore->effectsChannelCount + 1; effectsChannelIdx++) {
     auto [effectCount, processFuncs, buffers] = audioCore->effectsChannelsProcessData[effectsChannelIdx];
+    buffers[0].inputs = static_cast<float**>(audioCore->playbackBuffers);
     for (int pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
-      if (pluginIdx == 0) {
-        buffers[pluginIdx].inputs = static_cast<float**>(audioCore->playbackBuffers);
-      }
-      buffers[pluginIdx].numSamples = static_cast<int32_t>(nframes);
+      buffers[pluginIdx].numSamples = nframes32t;
 
       processFuncs[pluginIdx](
         buffers[pluginIdx],
@@ -527,32 +526,18 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
       float valL = 0.0f;
       float valR = 0.0f;
-      if (effectsChannelIdx == 1) {
-        if (audioCore->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          valL = factorLL * audioCore->playbackBuffers[0][i] + factorRL * audioCore->playbackBuffers[1][i];
-          valR = factorLR * audioCore->playbackBuffers[0][i] + factorRR * audioCore->playbackBuffers[1][i];
-        } else {
-          valL = factorLL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
-                                           factorRL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          valR = factorLR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
-                                           factorRR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-        }
-        accumL = valL;
-        accumR = valR;
+      if (audioCore->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
+        valL = factorLL * audioCore->playbackBuffers[0][i] + factorRL * audioCore->playbackBuffers[1][i];
+        valR = factorLR * audioCore->playbackBuffers[0][i] + factorRR * audioCore->playbackBuffers[1][i];
       } else {
-        if (audioCore->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
-          valL = factorLL * audioCore->playbackBuffers[0][i] + factorRL * audioCore->playbackBuffers[1][i];
-          valR = factorLR * audioCore->playbackBuffers[0][i] + factorRR * audioCore->playbackBuffers[1][i];
-        } else {
-          valL = factorLL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
-                                            factorRL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-          valR = factorLR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
-                                            factorRR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-        }
-
-        accumL += valL;
-        accumR += valR;
+        valL = factorLL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+                                          factorRL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+        valR = factorLR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
+                                          factorRR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
       }
+
+      accumL += valL;
+      accumR += valR;
 
       rmsL[effectsChannelIdx] += valL * valL;
       rmsR[effectsChannelIdx] += valR * valR;
