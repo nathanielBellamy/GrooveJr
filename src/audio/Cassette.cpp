@@ -3,9 +3,9 @@
 namespace Gj {
 namespace Audio {
 
-Cassette::Cassette(AppState* gAppState)
+Cassette::Cassette(AppState* gAppState, const char* filePath)
   : threadId(ThreadStatics::incrThreadId())
-  , fileName(ThreadStatics::getFilePath())
+  , filePath(filePath)
   , gAppState(gAppState)
   , sfInfo()
   {
@@ -48,7 +48,7 @@ void Cassette::cleanup() {
   Logging::write(
     Info,
     "Audio::Cassette::cleanup",
-    "Freeing resources for file " + std::string(fileName)
+    "Freeing resources for file " + std::string(filePath)
   );
 
   if (!deleteBuffers()) {
@@ -68,7 +68,7 @@ void Cassette::cleanup() {
   Logging::write(
     Info,
     "Audio::Cassette::cleanup",
-    "Done freeing resources for file" + std::string(fileName)
+    "Done freeing resources for file" + std::string(filePath)
   );
 };
 
@@ -82,7 +82,7 @@ int Cassette::init() {
   // https://svn.ict.usc.edu/svn_vh_public/trunk/lib/vhcl/libsndfile/doc/api.html
   // > When opening a file for read, the format field should be set to zero before calling sf_open().
   sfInfo.format = 0;
-  file = sf_open(fileName, SFM_READ, &sfInfo);
+  file = sf_open(filePath, SFM_READ, &sfInfo);
 
   if (file == nullptr) {
     Logging::write(
@@ -118,7 +118,7 @@ int Cassette::init() {
     Logging::write(
       Error,
       "Audio::Cassette::setupAudioData",
-      "Unable to read file: " + std::string(fileName)
+      "Unable to read file: " + std::string(filePath)
     );
     return 3;
   }

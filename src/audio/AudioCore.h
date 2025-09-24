@@ -243,16 +243,14 @@ struct AudioCore {
       "Audio::AudioCore::addCassette",
       "Adding cassette to deckIndex " + std::to_string(deckIndex)
     );
-    // const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
-    constexpr int nextDeckIndex = 0;
+    const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    // constexpr int nextDeckIndex = 0;
     deckIndex = nextDeckIndex;
     decks[deckIndex].setCassette(cassette);
     if (decks[deckIndex].cassette == nullptr)
       return ERROR;
 
     frames = cassette->sfInfo.frames;
-    std::cout << "cassette->inputBuffers[0] " << cassette->inputBuffers[0] + 5000 << std::endl;
-    std::cout << "cassette->inputBuffers[1] " << cassette->inputBuffers[1] + 5000 << std::endl;
     inputBuffers[2 * deckIndex] = cassette->inputBuffers[0];
     inputBuffers[2 * deckIndex + 1] = cassette->inputBuffers[1];
 
@@ -268,6 +266,11 @@ struct AudioCore {
   Result setChannelCount(float val) {
     effectsChannelCount = static_cast<int>(val);
     channelCount = val;
+    return OK;
+  }
+
+  Result setDeckIndex(int val) {
+    deckIndex = val;
     return OK;
   }
 };

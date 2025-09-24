@@ -72,7 +72,6 @@ void EffectsChannelsContainer::addEffectsChannel() {
     return;
 
   const int channelIndex = channels.size() + 1;
-  std::cout << "Adding effects channel " << channelIndex << std::endl;
   const auto effectsChannel = new EffectsChannel(
     this, actorSystem, mixer, channelIndex, &removeEffectsChannelAction,
     muteChannelAction, muteLChannelAction, muteRChannelAction,

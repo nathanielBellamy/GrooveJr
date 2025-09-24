@@ -71,13 +71,25 @@ struct AudioThreadState {
                "Instantiating Cassette"
              );
              try {
-               Audio::Cassette cassette (gAppState);
-               if (audioCore->addCassette(&cassette) == ERROR)
+               // WIP
+               // - loading cassettes on decks
+               const char* filePath1 = "/Users/ns/Music/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac";
+               const char* filePath2 = "/Users/ns/Music/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/07 Tears Dry On Their Own.flac";
+               Audio::Cassette cassette1 (gAppState, filePath1);
+               Audio::Cassette cassette2 (gAppState, filePath2);
+               if (audioCore->addCassette(&cassette1) == ERROR)
                  Logging::write(
                    Error,
                    "Act::AudioThread::audio_thread_init_a",
-                   "Unable to add Cassette to audioCore"
+                   "Unable to add Cassette1 to audioCore"
                   );
+               if (audioCore->addCassette(&cassette2) == ERROR)
+                 Logging::write(
+                   Error,
+                   "Act::AudioThread::audio_thread_init_a",
+                   "Unable to add Cassette2 to audioCore"
+                  );
+               audioCore->setDeckIndex(2);
                if (Audio::AudioPlayer audioPlayer (audioCore, mixer, gAppState); audioPlayer.play() == ERROR)
                  Logging::write(
                    Error,
