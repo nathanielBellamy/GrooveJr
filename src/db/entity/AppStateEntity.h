@@ -6,6 +6,7 @@
 #define APPSTATEENTITY_H
 
 #include <sqlite3.h>
+#include <sndfile.h>
 #include <jack/jack.h>
 
 namespace Gj {
@@ -17,8 +18,9 @@ struct AppStateEntity {
   jack_nframes_t audioFramesPerBuffer;
   int sceneId;
   int sceneIndex;
+  sf_count_t crossfade;
 
-  AppStateEntity(int id, jack_nframes_t audioFramesPerBuffer, int sceneId, int sceneIndex);
+  AppStateEntity(int id, jack_nframes_t audioFramesPerBuffer, int sceneId, int sceneIndex, sf_count_t crossfade);
 
   static AppStateEntity deser(sqlite3_stmt* stmt);
 

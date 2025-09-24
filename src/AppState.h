@@ -6,6 +6,7 @@
 #define APPSTATE_H
 
 #include <atomic>
+#include <sndfile.h>
 #include <string>
 
 #include <jack/jack.h>
@@ -35,6 +36,7 @@ struct AppState {
   std::atomic<PlayState> playState{};
   std::atomic<int> sceneId{};
   std::atomic<int> sceneIndex{};
+  std::atomic<sf_count_t> crossfade{ 0 };
 
   AppState();
   AppState(int id, jack_nframes_t audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
@@ -48,6 +50,7 @@ struct AppState {
     playState.store( STOP);
     sceneId.store(appStateEntity.sceneId);
     sceneIndex.store(appStateEntity.sceneIndex);
+    crossfade.store(appStateEntity.crossfade);
   };
 
   jack_nframes_t getAudioFramesPerBuffer() const {
@@ -76,6 +79,13 @@ struct AppState {
   };
   void setSceneIndex(const int val) {
     sceneIndex.store(val);
+  }
+
+  sf_count_t getCrossfade() const {
+    return crossfade.load();
+  }
+  void setCrossfade(const sf_count_t val) {
+    crossfade.store(val);
   }
 
   std::string toString() const {

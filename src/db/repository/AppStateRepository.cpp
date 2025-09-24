@@ -49,8 +49,8 @@ AppStateEntity AppStateRepository::get() const {
 
 int AppStateRepository::save() const {
   const std::string query = R"sql(
-    insert into appState (audioFramesPerBuffer, sceneId, sceneIndex)
-    values (?, ?, ?)
+    insert into appState (audioFramesPerBuffer, sceneId, sceneIndex, crossfade)
+    values (?, ?, ?, ?)
   )sql";
 
   sqlite3_stmt* stmt;
@@ -66,6 +66,7 @@ int AppStateRepository::save() const {
   sqlite3_bind_int(stmt, 1, gAppState->getAudioFramesPerBuffer());
   sqlite3_bind_int(stmt, 2, gAppState->getSceneId());
   sqlite3_bind_int(stmt, 3, gAppState->getSceneIndex());
+  sqlite3_bind_int(stmt, 4, gAppState->getCrossfade());
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     Logging::write(

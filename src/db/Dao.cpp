@@ -67,6 +67,7 @@ int Dao::initSchema() const {
       audioFramesPerBuffer integer,
       sceneId integer,
       sceneIndex integer,
+      crossfade integer,
       createdAt datetime default current_timestamp
     );
 
