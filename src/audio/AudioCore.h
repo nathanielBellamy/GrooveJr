@@ -13,6 +13,7 @@
 #include <jack/ringbuffer.h>
 
 #include "Cassette.h"
+#include "../AppState.h"
 #include "../Logging.h"
 #include "../enums/Result.h"
 
@@ -22,7 +23,8 @@ namespace Audio {
 
 struct AudioCore {
   long                             threadId;
-  AudioDeck                        decks[AUDIO_CORE_DECK_COUNT] { AudioDeck(0), AudioDeck(1), AudioDeck(2) };
+  AppState*                        gAppState;
+  AudioDeck                        decks[AUDIO_CORE_DECK_COUNT]{ AudioDeck(0, gAppState), AudioDeck(1, gAppState), AudioDeck(2, gAppState) };
   int                              deckIndex = 0;
   sf_count_t                       frameId = 0;
   sf_count_t                       frames { 0 }; // total # of frames
@@ -33,7 +35,7 @@ struct AudioCore {
   float                            volume = 1.0f;
   float                            fadeIn = 1.0f;
   float                            fadeOut = 1.0f;
-  float*                           inputBuffers[2 * AUDIO_CORE_DECK_COUNT]{nullptr};
+  // float*                           inputBuffers[2 * AUDIO_CORE_DECK_COUNT]{nullptr};
   float                            fft_eq_time[2][FFT_EQ_TIME_SIZE]{ 0.0 };
   fftwf_complex                    fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
   float                            fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{};
@@ -80,12 +82,15 @@ struct AudioCore {
   float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{};
   std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
-  AudioCore() {
+  AudioCore(AppState* gAppState)
+    : gAppState(gAppState)
+    {
     Logging::write(
       Info,
       "Audio::AudioCore::AudioCore()",
-      "AudioCore no args ctor"
+      "AudioCore ctor"
     );
+
     init();
   }
 
@@ -237,22 +242,20 @@ struct AudioCore {
     return soloVal * (1.0f - mute) * (1.0f - muteR) * panRVal * gain * gainR / channelCount;
   }
 
-  Result addCassette(Cassette* cassette) {
+  Result addCassetteFromFilePath(const char* filePath) {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassette",
-      "Adding cassette to deckIndex " + std::to_string(deckIndex)
+      "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + filePath
     );
     const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
     // constexpr int nextDeckIndex = 0;
     deckIndex = nextDeckIndex;
-    decks[deckIndex].setCassette(cassette);
-    if (decks[deckIndex].cassette == nullptr)
-      return ERROR;
+    decks[deckIndex].setCassetteFromFilePath(filePath);
 
-    frames = cassette->sfInfo.frames;
-    inputBuffers[2 * deckIndex] = cassette->inputBuffers[0];
-    inputBuffers[2 * deckIndex + 1] = cassette->inputBuffers[1];
+    frames = decks[deckIndex].cassette.sfInfo.frames;
+    // inputBuffers[2 * deckIndex] = decks[deckIndex].cassette.inputBuffers[0];
+    // inputBuffers[2 * deckIndex + 1] = decks[deckIndex].cassette.inputBuffers[1];
 
     Logging::write(
       Info,

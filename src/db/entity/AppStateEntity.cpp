@@ -38,7 +38,7 @@ AppStateEntity AppStateEntity::deser(sqlite3_stmt* stmt) {
 
 AppStateEntity AppStateEntity::base() {
   return {
-    0, 256, 0, 0, 0
+    0, 256, 0, 0, 10000
   };
 }
 

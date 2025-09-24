@@ -362,7 +362,8 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
       std::fill_n(audioCore->fft_pv_ola_buffer[chan], 2 * FFT_PV_TIME_SIZE, 0.0f);
 
       for (int hop = 0; hop < FFT_PV_HOP_COUNT; hop++) {
-        const float* processHead = audioCore->inputBuffers[chan] + audioCore->frameId + hop * hopAnalysis;
+        // TODO: update to decks
+        const float* processHead = nullptr; // audioCore->inputBuffers[chan] + audioCore->frameId + hop * hopAnalysis;
 
         for (int i = 0; i < fftSize; i++) {
           const float hannFactor = 0.5f * (1.0f - std::cosf(TWO_PI * static_cast<float>(i) / fftSizeF));
@@ -420,25 +421,43 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
     }
   }
 
-  // playbackSpeed
-  const float* processHeadL = audioCore->inputBuffers[0] + audioCore->frameId; //  &audioCore->playbackBuffersPre[0][0];
-  const float* processHeadR = audioCore->inputBuffers[1] + audioCore->frameId; // &audioCore->playbackBuffersPre[1][0];
+  std::fill_n(audioCore->playbackBuffers[0], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
+  std::fill_n(audioCore->playbackBuffers[1], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
 
-  const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
-  float playbackPos = 0.0f;
-  float playbackPosTrunc = 0.0f;
-  int idx = 0;
-  for (jack_nframes_t i = 0; i < nframes; i++) {
-    playbackPosTrunc = std::trunc(playbackPos);
-    idx = static_cast<int>(playbackPosTrunc);
-    const float frac = playbackPos - playbackPosTrunc;
-    audioCore->playbackBuffers[0][i] = (1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1];
-    audioCore->playbackBuffers[1][i] = (1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1];
-    playbackPos += playbackSpeedF;
+  for (int j = 0; j < AUDIO_CORE_DECK_COUNT; j++) {
+    if (j != audioCore->deckIndex) {
+      if (
+        audioCore->decks[audioCore->deckIndex].frameId < audioCore->decks[audioCore->deckIndex].frames - 10000
+         && audioCore->decks[audioCore->deckIndex].frameId > 10000
+      )
+        continue;
+      if (j == (audioCore->deckIndex + 1) % AUDIO_CORE_DECK_COUNT && audioCore->decks[audioCore->deckIndex].frameId < 10000)
+        continue;
+      if (j == (audioCore->deckIndex - 1) % AUDIO_CORE_DECK_COUNT && audioCore->decks[audioCore->deckIndex].frameId > audioCore->decks[audioCore->deckIndex].frames - 10000)
+        continue;
+    }
+    // playbackSpeed
+    const float* processHeadL = audioCore->decks[j].cassette.inputBuffers[0] + audioCore->decks[j].frameId; //  &audioCore->playbackBuffersPre[0][0];
+    const float* processHeadR = audioCore->decks[j].cassette.inputBuffers[1] + audioCore->decks[j].frameId; // &audioCore->playbackBuffersPre[1][0];
+
+    const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
+    float playbackPos = 0.0f;
+    float playbackPosTrunc = 0.0f;
+    int idx = 0;
+    for (jack_nframes_t i = 0; i < nframes; i++) {
+      playbackPosTrunc = std::trunc(playbackPos);
+      idx = static_cast<int>(playbackPosTrunc);
+      const float frac = playbackPos - playbackPosTrunc;
+      audioCore->playbackBuffers[0][i] += (1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1];
+      audioCore->playbackBuffers[1][i] += (1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1];
+      playbackPos += playbackSpeedF;
+    }
+
+    audioCore->frameAdvance = idx;
+    audioCore->frameId += idx;
+    audioCore->decks[j].frameId += idx;
   }
 
-  audioCore->frameAdvance = idx;
-  audioCore->frameId += idx;
   return 0;
 
   // audioCore->frameId += hopSynthesis;

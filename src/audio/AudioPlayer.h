@@ -119,8 +119,8 @@ struct AudioPlayer {
 
     audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
 
-    audioCore->inputBuffers[0] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
-    audioCore->inputBuffers[1] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[1];
+    // audioCore->inputBuffers[0] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
+    // audioCore->inputBuffers[1] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[1];
 
     Logging::write(
       Info,

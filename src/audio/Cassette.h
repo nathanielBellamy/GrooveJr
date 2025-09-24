@@ -32,6 +32,7 @@ class Cassette
 
   [[nodiscard]]
   bool deleteBuffers() const;
+  Cassette() {};
 
   public:
     SF_INFO sfInfo;
@@ -41,6 +42,10 @@ class Cassette
     ~Cassette();
 
     void cleanup();
+
+    static Cassette blank() {
+      return Cassette();
+    }
 };
 
 } // Audio
