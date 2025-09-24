@@ -122,9 +122,6 @@ struct AudioPlayer {
     audioCore->inputBuffers[0] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
     audioCore->inputBuffers[1] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[1];
 
-    std::cout << " acIB0 " << audioCore->inputBuffers[0][10000]; // = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
-    std::cout << " acIB1 " << audioCore->inputBuffers[1][10000] << std::endl; // = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
-
     Logging::write(
       Info,
       "Audio::AudioPlayer::setupAudioData",
@@ -196,7 +193,6 @@ struct AudioPlayer {
 
   IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore* audioCore) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
-    std::cout << "audioFramesPerBuffer "<< audioFramesPerBuffer << std::endl;
 
     // NOTE: input buffers will be updated to audioCore->playbackBuffers when pluginIdx = 0 in JackClient::processCallback
     if (const int effectsCount = effectsChannel->effectCount(); pluginIdx == effectsCount - 1) {
@@ -403,24 +399,12 @@ struct AudioPlayer {
     audioCore->playState = PLAY;
     ThreadStatics::setReadComplete(false);
 
-    std::cout << "audio player - will play <<"
-              << std::endl << " playState " << audioCore->playState << std::endl
-              << std::endl << " frameId " << audioCore->frameId << std::endl;
-
     while( true
             // audioCore.playState != STOP
             //   && audioCore.playState != PAUSE
             //   && audioCore.frameId > -1
               // && frameId < sfInfo.frames
     ) {
-      std::cout << "audio player - playing - processBuf " << audioCore->processBuffers[1][0] << std::endl;
-      std::cout << "audio player - playing - eowBuf " << audioCore->effectsChannelsWriteOut[0][0] << std::endl;
-      std::cout << "audio player - playing - fxchans 0 " << audioCore->effectsChannelsSettings[0] << std::endl;
-      std::cout << "audio player - playing - fxchans 1 " << audioCore->effectsChannelsSettings[1] << std::endl;
-      std::cout << "audio player - playing - fxchans 2 " << audioCore->effectsChannelsSettings[2] << std::endl;
-      std::cout << "audio player - playing - fxchans 3 " << audioCore->effectsChannelsSettings[3] << std::endl;
-      std::cout << "audio player - playing - playbackBuf " << audioCore->playbackBuffers[0][0] << std::endl;
-      std::cout << "audio player - playing - inputBuf " << *(audioCore->inputBuffers[0] + audioCore->frameId) << std::endl;
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj
@@ -467,8 +451,6 @@ struct AudioPlayer {
 
       std::this_thread::sleep_for( std::chrono::milliseconds(10) );
     } // end of while loop
-
-    std::cout << "exit while loop" << std::endl;
 
     if ( audioCore->threadId == ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
       if (audioCore->playState == PLAY)
