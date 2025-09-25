@@ -6,6 +6,7 @@
 - vst3sdk
 - CAF (C++ Actor Framework)
 - Qt
+- Boost
 
 ---
 
