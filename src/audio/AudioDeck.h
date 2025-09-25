@@ -37,6 +37,22 @@ namespace Audio {
     , cassette(new Cassette(gAppState))
     {}
 
+  ~AudioDeck() {
+    Logging::write(
+      Info,
+      "AudioDeck::~AudioDeck()",
+      "Destroying AudioDeck - deckIndex : " + std::to_string(deckIndex)
+    );
+
+    delete cassette;
+
+    Logging::write(
+      Info,
+      "AudioDeck::~AudioDeck()",
+      "Destroyed AudioDeck - deckIndex : " + std::to_string(deckIndex)
+    );
+  }
+
   Result setCassetteFromFilePath(const char* filePath) {
     delete cassette;
     cassette = new Cassette(gAppState, filePath);

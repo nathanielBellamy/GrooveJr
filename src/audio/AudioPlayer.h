@@ -375,7 +375,7 @@ struct AudioPlayer {
     return OK;
   }
 
-  bool continuePlay() {
+  bool continueRun() {
     const PlayState playState = ThreadStatics::getPlayState();
     return  playState != STOP
             && playState != PAUSE;
@@ -383,10 +383,10 @@ struct AudioPlayer {
               // && frameId < sfInfo.frames
   }
 
-  Result play() {
+  Result run() {
     Logging::write(
       Info,
-      "Audio::AudioPlayer::play",
+      "Audio::AudioPlayer::run",
       "Playing"
     );
 
@@ -409,7 +409,7 @@ struct AudioPlayer {
     audioCore->playState = PLAY;
     ThreadStatics::setReadComplete(false);
 
-    while( continuePlay() ) {
+    while( continueRun() ) {
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj
@@ -419,7 +419,7 @@ struct AudioPlayer {
           ThreadStatics::setPlayState(STOP);
           Logging::write(
             Info,
-            "Audio::AudioPlayer::play",
+            "Audio::AudioPlayer::run",
             "Read complete"
           );
           // break;
@@ -450,7 +450,7 @@ struct AudioPlayer {
         // }
       } else {
         audioCore->playbackSpeed = ThreadStatics::getPlaybackSpeed();
-        audioCore->playState = gAppState->playState.load(); //::getPlayState();
+        audioCore->playState = ThreadStatics::getPlayState();
         ThreadStatics::setFrameId( audioCore->frameId );
       }
 
@@ -459,7 +459,7 @@ struct AudioPlayer {
 
     Logging::write(
       Info,
-      "Audio::AudioPlayer::play",
+      "Audio::AudioPlayer::run",
       "Exited while loop."
     );
 
@@ -475,7 +475,7 @@ struct AudioPlayer {
       if (jackClient->deactivate() != OK) {
         Logging::write(
           Error,
-          "Audio::AudioPlayer::play",
+          "Audio::AudioPlayer::run",
           "An error occurred deactivating the JackClient"
         );
         return ERROR;
