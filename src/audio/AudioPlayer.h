@@ -414,8 +414,17 @@ struct AudioPlayer {
       // and
       // make it accessible to our running audio callback through the audioCore obj
 
+      AudioDeck& currentDeck = audioCore->currentDeck();
+
+      const int nextDeckIndex = (currentDeck.deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+
+      // todo: finesse crossfade
+      // todo: pass thru ring buffer, perhaps with readComplete
+      if (currentDeck.frameId > currentDeck.frames - 500000)
+        audioCore->decks[nextDeckIndex].active = true;
+
       // TODO: pass readComplete thru ring buffer
-      if (audioCore->currentDeck().readComplete) { // reached end of input file
+      if (currentDeck.readComplete) { // reached end of input file
           ThreadStatics::setPlayState(STOP);
           Logging::write(
             Info,

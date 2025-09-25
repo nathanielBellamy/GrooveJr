@@ -58,6 +58,7 @@ struct AudioDeck {
   Result setCassetteFromFilePath(const char* filePath) {
     delete cassette;
     cassette = new Cassette(gAppState, filePath);
+    frames = cassette->sfInfo.frames;
     inputBuffers[0] = cassette->inputBuffers[0];
     inputBuffers[1] = cassette->inputBuffers[1];
     return OK;

@@ -446,6 +446,7 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
     }
 
     audioCore->frameAdvance = idx;
+    audioCore->decks[j].frameAdvance = idx;
     audioCore->decks[j].frameId += idx;
   }
 
