@@ -9,6 +9,7 @@
 - Boost
 - sqlite
 - CMake
+- C++ 17
 
 ---
 
