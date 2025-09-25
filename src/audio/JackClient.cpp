@@ -437,8 +437,8 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
         continue;
     }
     // playbackSpeed
-    const float* processHeadL = audioCore->decks[j].cassette.inputBuffers[0] + audioCore->decks[j].frameId; //  &audioCore->playbackBuffersPre[0][0];
-    const float* processHeadR = audioCore->decks[j].cassette.inputBuffers[1] + audioCore->decks[j].frameId; // &audioCore->playbackBuffersPre[1][0];
+    const float* processHeadL = audioCore->decks[j].inputBuffers[0] + audioCore->decks[j].frameId; //  &audioCore->playbackBuffersPre[0][0];
+    const float* processHeadR = audioCore->decks[j].inputBuffers[1] + audioCore->decks[j].frameId; // &audioCore->playbackBuffersPre[1][0];
 
     const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
     float playbackPos = 0.0f;

@@ -4,8 +4,7 @@ namespace Gj {
 namespace Audio {
 
 Cassette::Cassette(AppState* gAppState, const char* filePath)
-  : threadId(ThreadStatics::incrThreadId())
-  , filePath(filePath)
+  : filePath(filePath)
   , gAppState(gAppState)
   , sfInfo()
   {
@@ -25,6 +24,19 @@ Cassette::Cassette(AppState* gAppState, const char* filePath)
     Info,
     "Audio::Cassette::Cassette",
     "Cassette initialized"
+  );
+}
+
+Cassette::Cassette(AppState* gAppState)
+  : filePath("")
+  , gAppState(gAppState)
+  , sfInfo()
+  {
+
+  Logging::write(
+    Info,
+    "Audio::Cassette::Cassette(gAppState)",
+    "Blank Cassette initialized"
   );
 }
 

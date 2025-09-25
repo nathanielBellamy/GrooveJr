@@ -29,16 +29,19 @@ namespace Audio {
   float                            fadeIn;
   float                            fadeOut;
   float*                           inputBuffers[2]{nullptr, nullptr};
-  Cassette                         cassette;
+  Cassette*                        cassette;
 
   AudioDeck(int deckIndex, AppState* gAppState)
     : deckIndex(deckIndex)
     , gAppState(gAppState)
-    , cassette(Cassette::blank())
+    , cassette(new Cassette(gAppState))
     {}
 
   Result setCassetteFromFilePath(const char* filePath) {
-    cassette = Cassette(gAppState, filePath);
+    delete cassette;
+    cassette = new Cassette(gAppState, filePath);
+    inputBuffers[0] = cassette->inputBuffers[0];
+    inputBuffers[1] = cassette->inputBuffers[1];
     return OK;
   }
 };

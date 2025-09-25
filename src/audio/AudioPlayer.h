@@ -22,6 +22,7 @@ namespace Audio {
 
 struct AudioPlayer {
 
+  long threadId;
   AudioCore* audioCore;
   Mixer* mixer;
   AppState* gAppState;
@@ -36,7 +37,8 @@ struct AudioPlayer {
   float vu_buffer[VU_RING_BUFFER_SIZE]{};
 
   AudioPlayer(AudioCore* audioCore, Mixer* mixer, AppState* gAppState)
-    : audioCore(audioCore)
+    : threadId(ThreadStatics::incrThreadId())
+    , audioCore(audioCore)
     , mixer(mixer)
     , gAppState(gAppState)
     , jackClient(mixer->getGjJackClient())
@@ -56,7 +58,7 @@ struct AudioPlayer {
       Logging::write(
         Error,
         "Audio::AudioPlayer::AudioPlayer",
-        "Unable to setup AudioData - status: " + std::to_string(audioCoreRes)
+        "Unable to setup AudioCore - status: " + std::to_string(audioCoreRes)
       );
       throw std::runtime_error(
         "Unable to instantiate AudioPlayer - AudioCore status: " + std::to_string(audioCoreRes)
@@ -110,7 +112,7 @@ struct AudioPlayer {
     // if (mixer->setSampleRate(sfInfo.samplerate) != OK) {
     //   Logging::write(
     //     Warning,
-    //     "Audio::AudioPlayer::setupAudioData",
+    //     "Audio::AudioPlayer::setupAudioCore",
     //     "Unable to set sample rate: " + std::to_string(sfInfo.samplerate)
     //   );
     // }
@@ -124,7 +126,7 @@ struct AudioPlayer {
 
     Logging::write(
       Info,
-      "Audio::AudioPlayer::setupAudioData",
+      "Audio::AudioPlayer::setupAudioCore",
       "Successfully setup AudioData buffers."
     );
 
@@ -215,7 +217,7 @@ struct AudioPlayer {
     };
   }
 
-  Result updateAudioDataFromMixer(
+  Result updateRingBuffers(
     jack_ringbuffer_t* effectsChannelsSettingsRB,
     jack_ringbuffer_t* playbackSettingsToAudioThreadRB,
     jack_ringbuffer_t* playbackSettingsFromAudioThreadRB,
@@ -373,6 +375,14 @@ struct AudioPlayer {
     return OK;
   }
 
+  bool continuePlay() {
+    const PlayState playState = ThreadStatics::getPlayState();
+    return  playState != STOP
+            && playState != PAUSE;
+            //   && audioCore.frameId > -1
+              // && frameId < sfInfo.frames
+  }
+
   Result play() {
     Logging::write(
       Info,
@@ -399,12 +409,7 @@ struct AudioPlayer {
     audioCore->playState = PLAY;
     ThreadStatics::setReadComplete(false);
 
-    while( true
-            // audioCore.playState != STOP
-            //   && audioCore.playState != PAUSE
-            //   && audioCore.frameId > -1
-              // && frameId < sfInfo.frames
-    ) {
+    while( continuePlay() ) {
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj
@@ -425,7 +430,7 @@ struct AudioPlayer {
       //     audioCore.volume += 0.01;
       // }
 
-      updateAudioDataFromMixer(
+      updateRingBuffers(
         audioCore->effectsChannelsSettingsRB,
         audioCore->playbackSettingsToAudioThreadRB,
         audioCore->playbackSettingsFromAudioThreadRB,
@@ -445,12 +450,18 @@ struct AudioPlayer {
         // }
       } else {
         audioCore->playbackSpeed = ThreadStatics::getPlaybackSpeed();
-        audioCore->playState = ThreadStatics::getPlayState();
+        audioCore->playState = gAppState->playState.load(); //::getPlayState();
         ThreadStatics::setFrameId( audioCore->frameId );
       }
 
       std::this_thread::sleep_for( std::chrono::milliseconds(10) );
     } // end of while loop
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::play",
+      "Exited while loop."
+    );
 
     if ( audioCore->threadId == ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
       if (audioCore->playState == PLAY)

@@ -1,6 +1,8 @@
 #ifndef GJAUDIOAUDIODATA_H
 #define GJAUDIOAUDIODATA_H
 
+#include <atomic>
+
 #include <fftw3.h>
 
 #include <sndfile.hh>
@@ -29,7 +31,7 @@ struct AudioCore {
   sf_count_t                       frameId = 0;
   sf_count_t                       frames { 0 }; // total # of frames
   sf_count_t                       frameAdvance;
-  PlayState                        playState = STOP;
+  std::atomic<PlayState>           playState = STOP;
   float                            playbackSpeed;
   bool                             readComplete = false;
   float                            volume = 1.0f;
@@ -253,7 +255,7 @@ struct AudioCore {
     deckIndex = nextDeckIndex;
     decks[deckIndex].setCassetteFromFilePath(filePath);
 
-    frames = decks[deckIndex].cassette.sfInfo.frames;
+    frames = decks[deckIndex].cassette->sfInfo.frames;
     // inputBuffers[2 * deckIndex] = decks[deckIndex].cassette.inputBuffers[0];
     // inputBuffers[2 * deckIndex + 1] = decks[deckIndex].cassette.inputBuffers[1];
 
