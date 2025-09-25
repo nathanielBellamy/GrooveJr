@@ -7,6 +7,8 @@
 - CAF (C++ Actor Framework)
 - Qt
 - Boost
+- sqlite
+- CMake
 
 ---
 
