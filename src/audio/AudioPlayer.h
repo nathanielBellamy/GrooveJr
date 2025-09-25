@@ -117,7 +117,7 @@ struct AudioPlayer {
     //   );
     // }
 
-    ThreadStatics::setFrames(audioCore->frames);
+    ThreadStatics::setFrames(audioCore->currentDeck().frames);
 
     audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
 
@@ -272,7 +272,7 @@ struct AudioPlayer {
     }
 
     const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
-    mixer->getUpdateProgressBarFunc()(audioCore->frames, currentFrameId);
+    mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, currentFrameId);
 
     playbackSettingsToAudioThread[0] = 0;
     playbackSettingsToAudioThread[1] = 0;
@@ -415,7 +415,7 @@ struct AudioPlayer {
       // make it accessible to our running audio callback through the audioCore obj
 
       // TODO: pass readComplete thru ring buffer
-      if (audioCore->readComplete) { // reached end of input file
+      if (audioCore->currentDeck().readComplete) { // reached end of input file
           ThreadStatics::setPlayState(STOP);
           Logging::write(
             Info,
@@ -451,7 +451,7 @@ struct AudioPlayer {
       } else {
         audioCore->playbackSpeed = ThreadStatics::getPlaybackSpeed();
         audioCore->playState = ThreadStatics::getPlayState();
-        ThreadStatics::setFrameId( audioCore->frameId );
+        ThreadStatics::setFrameId( audioCore->currentDeck().frameId );
       }
 
       std::this_thread::sleep_for( std::chrono::milliseconds(10) );
@@ -485,7 +485,7 @@ struct AudioPlayer {
     jackClientIsActive = false;
 
     if (ThreadStatics::getPlayState() == STOP) {
-      mixer->getUpdateProgressBarFunc()(audioCore->frames, 0);
+      mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, 0);
       mixer->getSetEqRingBufferFunc()(nullptr);
       mixer->getSetVuRingBufferFunc()(nullptr);
     }

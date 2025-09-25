@@ -28,16 +28,9 @@ struct AudioCore {
   AppState*                        gAppState;
   AudioDeck                        decks[AUDIO_CORE_DECK_COUNT]{ AudioDeck(0, gAppState), AudioDeck(1, gAppState), AudioDeck(2, gAppState) };
   int                              deckIndex = 0;
-  sf_count_t                       frameId = 0;
-  sf_count_t                       frames { 0 }; // total # of frames
   sf_count_t                       frameAdvance;
   std::atomic<PlayState>           playState = STOP;
   float                            playbackSpeed;
-  bool                             readComplete = false;
-  float                            volume = 1.0f;
-  float                            fadeIn = 1.0f;
-  float                            fadeOut = 1.0f;
-  // float*                           inputBuffers[2 * AUDIO_CORE_DECK_COUNT]{nullptr};
   float                            fft_eq_time[2][FFT_EQ_TIME_SIZE]{ 0.0 };
   fftwf_complex                    fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
   float                            fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{};
@@ -251,13 +244,8 @@ struct AudioCore {
       "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + filePath
     );
     const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
-    // constexpr int nextDeckIndex = 0;
     deckIndex = nextDeckIndex;
     decks[deckIndex].setCassetteFromFilePath(filePath);
-
-    frames = decks[deckIndex].cassette->sfInfo.frames;
-    // inputBuffers[2 * deckIndex] = decks[deckIndex].cassette.inputBuffers[0];
-    // inputBuffers[2 * deckIndex + 1] = decks[deckIndex].cassette.inputBuffers[1];
 
     Logging::write(
       Info,
@@ -276,7 +264,12 @@ struct AudioCore {
 
   Result setDeckIndex(int val) {
     deckIndex = val;
+    decks[deckIndex].active = true;
     return OK;
+  }
+
+  AudioDeck& currentDeck() {
+    return decks[deckIndex];
   }
 };
 

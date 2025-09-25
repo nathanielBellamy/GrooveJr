@@ -18,7 +18,9 @@
 namespace Gj {
 namespace Audio {
 
-  struct AudioDeck {
+struct AudioDeck {
+
+  bool                             active = false;
   int                              deckIndex;
   AppState*                        gAppState;
   sf_count_t                       frameId;

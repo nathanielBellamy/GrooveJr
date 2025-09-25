@@ -425,17 +425,9 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
   std::fill_n(audioCore->playbackBuffers[1], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
 
   for (int j = 0; j < AUDIO_CORE_DECK_COUNT; j++) {
-    if (j != audioCore->deckIndex) {
-      if (
-        audioCore->decks[audioCore->deckIndex].frameId < audioCore->decks[audioCore->deckIndex].frames - 10000
-         && audioCore->decks[audioCore->deckIndex].frameId > 10000
-      )
-        continue;
-      if (j == (audioCore->deckIndex + 1) % AUDIO_CORE_DECK_COUNT && audioCore->decks[audioCore->deckIndex].frameId < 10000)
-        continue;
-      if (j == (audioCore->deckIndex - 1) % AUDIO_CORE_DECK_COUNT && audioCore->decks[audioCore->deckIndex].frameId > audioCore->decks[audioCore->deckIndex].frames - 10000)
-        continue;
-    }
+    if (!audioCore->decks[j].active)
+      continue;
+
     // playbackSpeed
     const float* processHeadL = audioCore->decks[j].inputBuffers[0] + audioCore->decks[j].frameId; //  &audioCore->playbackBuffersPre[0][0];
     const float* processHeadR = audioCore->decks[j].inputBuffers[1] + audioCore->decks[j].frameId; // &audioCore->playbackBuffersPre[1][0];
@@ -454,7 +446,6 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
     }
 
     audioCore->frameAdvance = idx;
-    audioCore->frameId += idx;
     audioCore->decks[j].frameId += idx;
   }
 
@@ -489,10 +480,10 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   }
 
   if (audioCore->playbackSettingsToAudioThread[0] == 1) // user set frame Id
-    audioCore->frameId = audioCore->playbackSettingsToAudioThread[1];
+    audioCore->currentDeck().frameId = audioCore->playbackSettingsToAudioThread[1];
 
   audioCore->playbackSettingsFromAudioThread[0] = 0; // debug value
-  audioCore->playbackSettingsFromAudioThread[1] = audioCore->frameId;
+  audioCore->playbackSettingsFromAudioThread[1] = audioCore->currentDeck().frameId;
 
   // write to playbackSettingsFromAudioThread ring buffer
   if (jack_ringbuffer_write_space(audioCore->playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
@@ -654,8 +645,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   }
 
 
-  if (audioCore->frameId >= audioCore->frames - nframes)
-    audioCore->readComplete = true;
+  // if (audioCore->frameId >= audioCore->frames - nframes)
+  //   audioCore->readComplete = true;
 
   return kJackSuccess;
 }
