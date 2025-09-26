@@ -9,6 +9,7 @@
 #include "./Constants.h"
 #include "./ThreadStatics.h"
 #include "../AppState.h"
+#include "../enums/Result.h"
 #include "Logging.h"
 
 namespace Gj {
@@ -30,7 +31,7 @@ class Cassette
   bool setupInputBuffers();
 
   [[nodiscard]]
-  bool deleteBuffers() const;
+  Result deleteBuffers() const;
   Cassette() {};
 
   public:

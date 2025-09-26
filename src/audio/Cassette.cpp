@@ -220,7 +220,7 @@ bool Cassette::setupInputBuffers() {
   return true;
 }
 
-bool Cassette::deleteBuffers() const {
+Result Cassette::deleteBuffers() const {
   Logging::write(
     Info,
     "Audio::Cassette::deleteBuffers",
@@ -236,7 +236,7 @@ bool Cassette::deleteBuffers() const {
         "Audio::Cassette::freeBuffers",
         "Unable to delete Cassette buffers"
     );
-    return false;
+    return ERROR;
   }
 
   Logging::write(
@@ -245,7 +245,7 @@ bool Cassette::deleteBuffers() const {
     "Done delete Cassette buffers."
   );
 
-  return true;
+  return OK;
 }
 
 } // Audio

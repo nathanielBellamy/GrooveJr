@@ -440,8 +440,8 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
       playbackPosTrunc = std::trunc(playbackPos);
       idx = static_cast<int>(playbackPosTrunc);
       const float frac = playbackPos - playbackPosTrunc;
-      audioCore->playbackBuffers[0][i] += (1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1];
-      audioCore->playbackBuffers[1][i] += (1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1];
+      audioCore->playbackBuffers[0][i] += (1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1];// * audioCore->decks[j].fadeIn * audioCore->decks[j].fadeOut;
+      audioCore->playbackBuffers[1][i] += (1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1];// * audioCore->decks[j].fadeIn * audioCore->decks[j].fadeOut;
       playbackPos += playbackSpeedF;
     }
 
@@ -645,9 +645,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     );
   }
 
-
-  // if (audioCore->frameId >= audioCore->frames - nframes)
-  //   audioCore->readComplete = true;
+  audioCore->updateCurrentDeckReadComplete(nframes);
 
   return kJackSuccess;
 }

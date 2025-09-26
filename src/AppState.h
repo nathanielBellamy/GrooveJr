@@ -23,6 +23,7 @@ struct AppStatePacket {
     int playState;
     int sceneId;
     int sceneIndex;
+    sf_count_t crossfade;
 };
 
 template <class Inspector>
@@ -39,7 +40,14 @@ struct AppState {
   std::atomic<sf_count_t> crossfade{ 0 };
 
   AppState();
-  AppState(int id, jack_nframes_t audioFramesPerBuffer, PlayState playState, int sceneId, int sceneIndex);
+  AppState(
+    int id,
+    jack_nframes_t audioFramesPerBuffer,
+    PlayState playState,
+    int sceneId,
+    int sceneIndex,
+    sf_count_t crossfade
+  );
   AppStatePacket toPacket() const;
   static AppState fromAppStateEntity(Db::AppStateEntity appStateEntity);
 

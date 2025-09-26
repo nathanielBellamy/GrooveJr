@@ -23,13 +23,13 @@ struct AudioDeck {
   bool                             active = false;
   int                              deckIndex;
   AppState*                        gAppState;
-  sf_count_t                       frameId;
-  sf_count_t                       frames { 0 }; // total # of frames
+  sf_count_t                       frameId = 0;
+  sf_count_t                       frames = 0; // total # of frames
   sf_count_t                       frameAdvance;
-  bool                             readComplete;
+  bool                             readComplete = false;
   float                            volume;
-  float                            fadeIn;
-  float                            fadeOut;
+  float                            fadeIn = 0.0f;
+  float                            fadeOut = 1.0f;
   float*                           inputBuffers[2]{nullptr, nullptr};
   Cassette*                        cassette;
 
@@ -61,6 +61,19 @@ struct AudioDeck {
     frames = cassette->sfInfo.frames;
     inputBuffers[0] = cassette->inputBuffers[0];
     inputBuffers[1] = cassette->inputBuffers[1];
+    return OK;
+  }
+
+  bool isCrossfadeStart() const {
+      return frameId < gAppState->getCrossfade();
+  }
+
+  bool isCrossfadeEnd() const {
+    return frameId > frames - gAppState->getCrossfade();
+  }
+
+  Result setReadComplete(bool val) {
+    readComplete = val;
     return OK;
   }
 };

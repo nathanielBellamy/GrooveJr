@@ -268,8 +268,20 @@ struct AudioCore {
     return OK;
   }
 
+  Result incrDeckIndex() {
+    deckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    decks[deckIndex].active = true;
+    return OK;
+  }
+
   AudioDeck& currentDeck() {
     return decks[deckIndex];
+  }
+
+  Result updateCurrentDeckReadComplete(jack_nframes_t nframes) {
+    if (decks[deckIndex].frameId >= decks[deckIndex].frames - nframes)
+      decks[deckIndex].setReadComplete(true);
+    return OK;
   }
 };
 

@@ -6,12 +6,19 @@
 
 namespace Gj {
 
-AppState::AppState(const int id, const jack_nframes_t audioFramesPerBuffer, const PlayState playState, const int sceneId, const int sceneIndex)
+AppState::AppState(
+  const int id,
+  const jack_nframes_t audioFramesPerBuffer,
+  const PlayState playState,
+  const int sceneId,
+  const int sceneIndex,
+  const sf_count_t crossfade)
   : id(id)
   , audioFramesPerBuffer(audioFramesPerBuffer)
   , playState(playState)
   , sceneId(sceneId)
   , sceneIndex(sceneIndex)
+  , crossfade(crossfade)
   {}
 
 AppState::AppState() {
@@ -21,6 +28,7 @@ AppState::AppState() {
   playState.store( appState.playState);
   sceneId.store( appState.sceneId);
   sceneIndex.store(appState.sceneIndex);
+  crossfade.store( appState.crossfade);
 }
 
 AppStatePacket AppState::toPacket() const {
@@ -29,7 +37,8 @@ AppStatePacket AppState::toPacket() const {
       audioFramesPerBuffer.load(),
       psToInt(playState.load()),
       sceneId.load(),
-      sceneIndex.load()
+      sceneIndex.load(),
+      crossfade.load()
     };
     return packet;
 }
@@ -40,7 +49,8 @@ AppState AppState::fromAppStateEntity(const Db::AppStateEntity appStateEntity) {
     appStateEntity.audioFramesPerBuffer,
     STOP,
     appStateEntity.sceneId,
-    appStateEntity.sceneIndex
+    appStateEntity.sceneIndex,
+    appStateEntity.crossfade
   };
 }
 
