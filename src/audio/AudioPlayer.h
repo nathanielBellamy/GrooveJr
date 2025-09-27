@@ -415,11 +415,10 @@ struct AudioPlayer {
       // make it accessible to our running audio callback through the audioCore obj
 
       AudioDeck& currentDeck = audioCore->currentDeck();
-
-      std::cout << "currentDeck index " << currentDeck.deckIndex << std::endl;
-
       const int nextDeckIndex = (currentDeck.deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
       const int prevDeckIndex = (currentDeck.deckIndex - 1) % AUDIO_CORE_DECK_COUNT;
+
+      std::cout << "currentDeck index: " << currentDeck.deckIndex << std::endl;
 
       if (currentDeck.isCrossfadeStart()) {
         audioCore->decks[prevDeckIndex].fadeOut -= 0.01f;
@@ -429,26 +428,24 @@ struct AudioPlayer {
       // todo: finesse crossfade
       // todo: pass thru ring buffer, perhaps with readComplete
       if (currentDeck.isCrossfadeEnd()) {
-        audioCore->decks[nextDeckIndex].active = true;
+        std::cout << "crossfade end" << std::endl;
+        if (!audioCore->decks[nextDeckIndex].active)
+          audioCore->decks[nextDeckIndex].active = true;
         audioCore->decks[nextDeckIndex].fadeIn += 0.01f;
         currentDeck.fadeOut -= 0.01f;
       }
 
-      if (currentDeck.readComplete) {
-        currentDeck.readComplete = false;
-        audioCore->decks[nextDeckIndex].readComplete = false;
-        audioCore->incrDeckIndex();
-      }
-
       // TODO: pass readComplete thru ring buffer
       if (currentDeck.readComplete) { // reached end of input file
-          ThreadStatics::setPlayState(STOP);
+          std::cout << "read complete" << std::endl;
+          currentDeck.readComplete = false;
+          audioCore->decks[nextDeckIndex].readComplete = false;
+          audioCore->incrDeckIndex();
           Logging::write(
             Info,
             "Audio::AudioPlayer::run",
             "Read complete"
           );
-          // break;
       }
 
       // if (audioCore.fadeIn > 0.01) {
