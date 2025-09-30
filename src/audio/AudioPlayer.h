@@ -120,6 +120,7 @@ struct AudioPlayer {
     ThreadStatics::setFrames(audioCore->currentDeck().frames);
 
     audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
+    audioCore->crossfade = gAppState->getCrossfade();
 
     // audioCore->inputBuffers[0] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
     // audioCore->inputBuffers[1] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[1];
@@ -438,8 +439,8 @@ struct AudioPlayer {
       // TODO: pass readComplete thru ring buffer
       if (currentDeck.readComplete) { // reached end of input file
           std::cout << "read complete" << std::endl;
-          currentDeck.readComplete = false;
-          audioCore->decks[nextDeckIndex].readComplete = false;
+          // currentDeck.setReadComplete(false);
+          // audioCore->decks[nextDeckIndex].setReadComplete(false);
           audioCore->incrDeckIndex();
           Logging::write(
             Info,

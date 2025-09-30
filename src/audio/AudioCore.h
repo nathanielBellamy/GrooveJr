@@ -26,6 +26,7 @@ namespace Audio {
 struct AudioCore {
   long                             threadId;
   AppState*                        gAppState;
+  sf_count_t                       crossfade = 0;
   AudioDeck                        decks[AUDIO_CORE_DECK_COUNT]{ AudioDeck(0, gAppState), AudioDeck(1, gAppState), AudioDeck(2, gAppState) };
   int                              deckIndex = 0;
   sf_count_t                       frameAdvance;
