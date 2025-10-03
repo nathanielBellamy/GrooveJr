@@ -17,7 +17,6 @@ namespace Audio {
 
 class Cassette
 {
-  char const* filePath;
   long initialFrameId;
   AppState* gAppState;
   float* buffer { nullptr };
@@ -35,6 +34,7 @@ class Cassette
   Cassette() {};
 
   public:
+    char const* filePath;
     SF_INFO sfInfo;
     float* inputBuffers[2]{nullptr, nullptr}; // full song audio data
 

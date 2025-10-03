@@ -32,7 +32,7 @@ struct AudioCore {
   int                              deckIndexNext = 0;
   sf_count_t                       frameAdvance;
   std::atomic<PlayState>           playState = STOP;
-  float                            playbackSpeed;
+  float                            playbackSpeed = 1.0f;
   float                            fft_eq_time[2][FFT_EQ_TIME_SIZE]{ 0.0 };
   fftwf_complex                    fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
   float                            fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{};
@@ -265,7 +265,6 @@ struct AudioCore {
 
   Result setDeckIndex(const int val) {
     deckIndex = val;
-    decks[deckIndex].active = true;
 
     return OK;
   }
@@ -281,18 +280,32 @@ struct AudioCore {
       "Updating deckIndex " + std::to_string(deckIndex) + " to next deckIndexNext " + std::to_string(deckIndexNext)
     );
     deckIndex = deckIndexNext;
-    decks[deckIndex].active = true;
     return OK;
   }
 
   Result incrDeckIndex() {
     deckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
-    decks[deckIndex].active = true;
     return OK;
   }
 
   AudioDeck& currentDeck() {
     return decks[deckIndex];
+  }
+
+  float getDeckGain(const int di) {
+    if (deckIndex == di) {
+      if (playbackSpeed > 0.0f) {
+
+      } else {
+
+      }
+    }
+
+    // TODO:
+    // - if next index
+    // - if previous index and playbackSpeed
+
+    return 0.0f;
   }
 };
 

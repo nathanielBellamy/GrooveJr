@@ -28,7 +28,7 @@ Cassette::Cassette(AppState* gAppState, const char* filePath)
 }
 
 Cassette::Cassette(AppState* gAppState)
-  : filePath("Blank CASSETTE")
+  : filePath("BLANK")
   , gAppState(gAppState)
   , sfInfo()
   {

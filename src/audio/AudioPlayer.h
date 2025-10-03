@@ -436,8 +436,6 @@ struct AudioPlayer {
       // todo: pass thru ring buffer, perhaps with readComplete
       if (currentDeck.isCrossfadeEnd()) {
         std::cout << "crossfade end" << std::endl;
-        if (!audioCore->decks[nextDeckIndex].active)
-          audioCore->decks[nextDeckIndex].active = true;
         audioCore->decks[nextDeckIndex].fadeIn += 0.01f;
         currentDeck.fadeOut -= 0.01f;
       }

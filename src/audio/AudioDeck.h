@@ -22,16 +22,12 @@ constexpr sf_count_t MIN_FADE_IN = 500;
 constexpr sf_count_t MIN_FADE_OUT = 500;
 
 struct AudioDeck {
-
-  bool                             active = false;
   int                              deckIndex;
   AppState*                        gAppState;
   mutable sf_count_t               frameId = 0;
   sf_count_t                       frames = 0; // total # of frames
   sf_count_t                       frameAdvance;
-  float                            volume;
-  float                            fadeIn = 0.0f;
-  float                            fadeOut = 1.0f;
+  float                            gain = 1.0f;
   float*                           inputBuffers[2]{nullptr, nullptr};
   Cassette*                        cassette;
 
@@ -64,10 +60,6 @@ struct AudioDeck {
     inputBuffers[0] = cassette->inputBuffers[0];
     inputBuffers[1] = cassette->inputBuffers[1];
 
-    if (cassette == nullptr) {
-      std::cout << "OH NO - NULL CASSETTE" << std::endl;
-    }
-
     Logging::write(
       Info,
       "Audio::AudioDeck::setCassetteFromFilePath",
@@ -90,6 +82,21 @@ struct AudioDeck {
 
   bool isFadeOut() const {
     return frameId > std::min(frames - gAppState->getCrossfade(), frames - MIN_FADE_OUT);
+  }
+
+  bool validCassetteLoaded() const {
+    if (cassette == nullptr)
+      return false;
+
+    const bool nonZeroFrames = frames > 0 && frames == cassette->sfInfo.frames;
+    const bool nonBlankCassette = cassette->filePath != "BLANK";
+    const bool nonNullInputBuffers =
+         inputBuffers[0] != nullptr
+      && inputBuffers[1] != nullptr
+      && inputBuffers[0] == cassette->inputBuffers[0]
+      && inputBuffers[1] == cassette->inputBuffers[1];
+
+    return nonZeroFrames && nonBlankCassette && nonNullInputBuffers;
   }
 };
 
