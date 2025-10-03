@@ -20,9 +20,9 @@ class Cassette
   char const* filePath;
   long initialFrameId;
   AppState* gAppState;
-  float* buffer{};
+  float* buffer { nullptr };
   SNDFILE* file{};
-  float* inputBuffer{};
+  float* inputBuffer { nullptr };
 
   int init();
 

@@ -408,7 +408,6 @@ struct AudioPlayer {
     mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
 
     audioCore->playState = PLAY;
-    ThreadStatics::setReadComplete(false);
 
     while( continueRun() ) {
       // here is our chance to pull data out of the application
@@ -419,9 +418,16 @@ struct AudioPlayer {
       const int nextDeckIndex = (currentDeck.deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
       const int prevDeckIndex = (currentDeck.deckIndex - 1) % AUDIO_CORE_DECK_COUNT;
 
+      std::cout << "audioCore deckIndex" << audioCore->deckIndex << std::endl;
       std::cout << "currentDeck index: " << currentDeck.deckIndex << std::endl;
 
+      if (audioCore->shouldUpdateDeckIndex()) {
+        std::cout << "should update deck index()" << std::endl;
+        audioCore->updateDeckIndexToNext();
+      }
+
       if (currentDeck.isCrossfadeStart()) {
+        std::cout << "is crossfade start" << std::endl;
         audioCore->decks[prevDeckIndex].fadeOut -= 0.01f;
         currentDeck.fadeIn += 0.01f;
       }
@@ -434,19 +440,6 @@ struct AudioPlayer {
           audioCore->decks[nextDeckIndex].active = true;
         audioCore->decks[nextDeckIndex].fadeIn += 0.01f;
         currentDeck.fadeOut -= 0.01f;
-      }
-
-      // TODO: pass readComplete thru ring buffer
-      if (currentDeck.readComplete) { // reached end of input file
-          std::cout << "read complete" << std::endl;
-          // currentDeck.setReadComplete(false);
-          // audioCore->decks[nextDeckIndex].setReadComplete(false);
-          audioCore->incrDeckIndex();
-          Logging::write(
-            Info,
-            "Audio::AudioPlayer::run",
-            "Read complete"
-          );
       }
 
       // if (audioCore.fadeIn > 0.01) {
@@ -478,6 +471,8 @@ struct AudioPlayer {
         ThreadStatics::setFrameId( audioCore->currentDeck().frameId );
       }
 
+      std::cout << "while loop will sleep" << std::endl;
+
       std::this_thread::sleep_for( std::chrono::milliseconds(10) );
     } // end of while loop
 
@@ -492,7 +487,6 @@ struct AudioPlayer {
           ThreadStatics::setPlayState(STOP);
       else
           ThreadStatics::setPlayState(audioCore->playState);
-      ThreadStatics::setReadComplete(true);
     }
 
     if (jackClientIsActive) {

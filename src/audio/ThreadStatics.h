@@ -23,7 +23,6 @@ class ThreadStatics {
   static std::atomic<sf_count_t> frames;
   static PlayState playState;
   static sf_count_t playbackSpeed;
-  static bool readComplete;
   static long threadId;
 
 public:
@@ -42,10 +41,6 @@ public:
   static std::mutex playStateMutex;
   static PlayState getPlayState();
   static void setPlayState(PlayState playState);
-
-  static std::mutex readCompleteMutex;
-  static bool getReadComplete();
-  static void setReadComplete(bool readComplete);
 
   static std::mutex threadIdMutex;
   static long incrThreadId();

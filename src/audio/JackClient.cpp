@@ -425,12 +425,13 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
   std::fill_n(audioCore->playbackBuffers[1], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
 
   for (int j = 0; j < AUDIO_CORE_DECK_COUNT; j++) {
-    if (!audioCore->decks[j].active)
+    auto& deck = audioCore->decks[j];
+    if (!deck.active)
       continue;
 
     // playbackSpeed
-    const float* processHeadL = audioCore->decks[j].inputBuffers[0] + audioCore->decks[j].frameId; //  &audioCore->playbackBuffersPre[0][0];
-    const float* processHeadR = audioCore->decks[j].inputBuffers[1] + audioCore->decks[j].frameId; // &audioCore->playbackBuffersPre[1][0];
+    const float* processHeadL = deck.inputBuffers[0] + deck.frameId; //  &audioCore->playbackBuffersPre[0][0];
+    const float* processHeadR = deck.inputBuffers[1] + deck.frameId; // &audioCore->playbackBuffersPre[1][0];
 
     const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
     float playbackPos = 0.0f;
@@ -446,14 +447,21 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
     }
 
     audioCore->frameAdvance = idx;
-    audioCore->decks[j].frameAdvance = idx;
-    audioCore->decks[j].frameId += idx;
+    // deck.frameAdvance = idx;
+    deck.frameId += idx;
 
-    if (audioCore->decks[j].frameId >= audioCore->decks[j].frames - (audioCore->crossfade / 2))
-      audioCore->decks[j].setReadComplete(true);
-
-    if (audioCore->decks[j].frameId >= audioCore->decks[j].frames - 2 * nframes)
-      audioCore->decks[j].active = false;
+    // TODO: debug deckIndexNext
+    if (audioCore->playbackSpeed > 0.0f) {
+      if (deck.frameId >= deck.frames - 4 * nframes) {
+        // deck.active = false;
+        audioCore->deckIndexNext = 1; // (audioCore->deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+      }
+    } else {
+      if (deck.frameId < 4 * nframes) {
+        // deck.active = false;
+        audioCore->deckIndexNext = 2; // (audioCore->deckIndex - 1) % AUDIO_CORE_DECK_COUNT;
+      }
+    }
   }
 
   return 0;
@@ -650,8 +658,6 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
       FFT_EQ_RING_BUFFER_SIZE
     );
   }
-
-  audioCore->updateCurrentDeckReadComplete(nframes);
 
   return kJackSuccess;
 }

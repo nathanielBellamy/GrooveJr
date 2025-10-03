@@ -28,7 +28,7 @@ Cassette::Cassette(AppState* gAppState, const char* filePath)
 }
 
 Cassette::Cassette(AppState* gAppState)
-  : filePath("")
+  : filePath("Blank CASSETTE")
   , gAppState(gAppState)
   , sfInfo()
   {
@@ -44,7 +44,7 @@ Cassette::~Cassette() {
   Logging::write(
     Info,
     "Audio::Cassette::~Cassette",
-    "Destroying Cassette"
+    "Destroying Cassette with filePath: " + std::string(filePath)
   );
 
   cleanup();
@@ -52,7 +52,7 @@ Cassette::~Cassette() {
   Logging::write(
     Info,
     "Audio::Cassette::~Cassette",
-    "Destroyed Cassette"
+    "Destroyed Cassette with filePath: " + std::string(filePath)
   );
 }
 

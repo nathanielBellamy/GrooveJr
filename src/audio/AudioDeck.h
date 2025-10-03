@@ -18,15 +18,17 @@
 namespace Gj {
 namespace Audio {
 
+constexpr sf_count_t MIN_FADE_IN = 500;
+constexpr sf_count_t MIN_FADE_OUT = 500;
+
 struct AudioDeck {
 
   bool                             active = false;
   int                              deckIndex;
   AppState*                        gAppState;
-  sf_count_t                       frameId = 0;
+  mutable sf_count_t               frameId = 0;
   sf_count_t                       frames = 0; // total # of frames
   sf_count_t                       frameAdvance;
-  bool                             readComplete = false;
   float                            volume;
   float                            fadeIn = 0.0f;
   float                            fadeOut = 1.0f;
@@ -61,6 +63,16 @@ struct AudioDeck {
     frames = cassette->sfInfo.frames;
     inputBuffers[0] = cassette->inputBuffers[0];
     inputBuffers[1] = cassette->inputBuffers[1];
+
+    if (cassette == nullptr) {
+      std::cout << "OH NO - NULL CASSETTE" << std::endl;
+    }
+
+    Logging::write(
+      Info,
+      "Audio::AudioDeck::setCassetteFromFilePath",
+      "Added Cassette to deck : " + std::to_string(deckIndex) + ". Identified deck and cassette inputBuffers."
+    );
     return OK;
   }
 
@@ -72,9 +84,12 @@ struct AudioDeck {
     return frameId > frames - gAppState->getCrossfade();
   }
 
-  Result setReadComplete(bool val) {
-    readComplete = val;
-    return OK;
+  bool isFadeIn() const {
+    return frameId < std::max(gAppState->getCrossfade(), MIN_FADE_IN);
+  }
+
+  bool isFadeOut() const {
+    return frameId > std::min(frames - gAppState->getCrossfade(), frames - MIN_FADE_OUT);
   }
 };
 

@@ -22,9 +22,6 @@ std::mutex ThreadStatics::playStateMutex;
 sf_count_t ThreadStatics::playbackSpeed = 100LL;
 std::mutex ThreadStatics::playbackSpeedMutex;
 
-bool ThreadStatics::readComplete = false;
-std::mutex ThreadStatics::readCompleteMutex;
-
 long ThreadStatics::threadId = 0;
 std::mutex ThreadStatics::threadIdMutex;
 
@@ -73,19 +70,7 @@ void ThreadStatics::setPlayState(PlayState newState) {
 
   if (playState == STOP)
     setFrameId(0);
-  if (playState == PLAY)
-    setReadComplete(false);
   playState = newState;
-}
-
-bool ThreadStatics::getReadComplete() {
-  std::lock_guard guard(readCompleteMutex);
-  return readComplete;
-}
-
-void ThreadStatics::setReadComplete(bool val) {
-  std::lock_guard guard(readCompleteMutex);
-  readComplete = val;
 }
 
 long ThreadStatics::incrThreadId() {

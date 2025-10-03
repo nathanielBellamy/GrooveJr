@@ -29,6 +29,7 @@ struct AudioCore {
   sf_count_t                       crossfade = 0;
   AudioDeck                        decks[AUDIO_CORE_DECK_COUNT]{ AudioDeck(0, gAppState), AudioDeck(1, gAppState), AudioDeck(2, gAppState) };
   int                              deckIndex = 0;
+  int                              deckIndexNext = 0;
   sf_count_t                       frameAdvance;
   std::atomic<PlayState>           playState = STOP;
   float                            playbackSpeed;
@@ -241,7 +242,7 @@ struct AudioCore {
   Result addCassetteFromFilePath(const char* filePath) {
     Logging::write(
       Info,
-      "Audio::AudioCore::addCassette",
+      "Audio::AudioCore::addCassetteFromFilePath",
       "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + filePath
     );
     const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
@@ -250,10 +251,9 @@ struct AudioCore {
 
     Logging::write(
       Info,
-      "Audio::AudioCore::addCassette",
-      "Set input buffers to cassette input buffers"
+      "Audio::AudioCore::addCassetteFromFilePath",
+      "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + filePath
     );
-
     return OK;
   }
 
@@ -263,8 +263,24 @@ struct AudioCore {
     return OK;
   }
 
-  Result setDeckIndex(int val) {
+  Result setDeckIndex(const int val) {
     deckIndex = val;
+    decks[deckIndex].active = true;
+
+    return OK;
+  }
+
+  bool shouldUpdateDeckIndex() {
+    return deckIndex != deckIndexNext;
+  }
+
+  Result updateDeckIndexToNext() {
+    Logging::write(
+      Info,
+      "Audio::AudioCore::updateDeckIndexToNext",
+      "Updating deckIndex " + std::to_string(deckIndex) + " to next deckIndexNext " + std::to_string(deckIndexNext)
+    );
+    deckIndex = deckIndexNext;
     decks[deckIndex].active = true;
     return OK;
   }
@@ -277,12 +293,6 @@ struct AudioCore {
 
   AudioDeck& currentDeck() {
     return decks[deckIndex];
-  }
-
-  Result updateCurrentDeckReadComplete(jack_nframes_t nframes) {
-    if (decks[deckIndex].frameId >= decks[deckIndex].frames - nframes)
-      decks[deckIndex].setReadComplete(true);
-    return OK;
   }
 };
 
