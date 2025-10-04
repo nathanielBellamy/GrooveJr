@@ -443,31 +443,36 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
       playbackPosTrunc = std::trunc(playbackPos);
       idx = static_cast<int>(playbackPosTrunc);
       const float frac = playbackPos - playbackPosTrunc;
-      audioCore->playbackBuffers[0][i] += (1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1];// * audioCore->decks[j].fadeIn * audioCore->decks[j].fadeOut;
-      audioCore->playbackBuffers[1][i] += (1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1];// * audioCore->decks[j].fadeIn * audioCore->decks[j].fadeOut;
+      audioCore->playbackBuffers[0][i] += ((1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1]) * deck.gain;
+      audioCore->playbackBuffers[1][i] += ((1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1]) * deck.gain;
       playbackPos += playbackSpeedF;
     }
 
     audioCore->frameAdvance = idx;
     // deck.frameAdvance = idx;
     deck.frameId += idx;
+  }
 
-    // TODO: debug deckIndexNext
-    if (audioCore->playbackSpeed > 0.0f) {
-      if (deck.frameId >= deck.frames - audioCore->crossfade) {
-        audioCore->deckIndexNext = 1; // (audioCore->deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
-      }
-    } else {
-      if (deck.frameId < audioCore->crossfade) {
-        audioCore->deckIndexNext = 2; // (audioCore->deckIndex - 1) % AUDIO_CORE_DECK_COUNT;
-      }
+  const auto& currentDeck = audioCore->decks[audioCore->deckIndex];
+  const int nextDeckIndex = (audioCore->deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+  const int prevDeckIndex = (audioCore->deckIndex - 1) % AUDIO_CORE_DECK_COUNT;
+  if (audioCore->playbackSpeed > 0.0f) {
+    if (currentDeck.frameId >= currentDeck.frames - audioCore->crossfade)
+      audioCore->decks[nextDeckIndex].playState = PLAY;
+    if (currentDeck.frameId >= currentDeck.frames - 4 * nframes) {
+      audioCore->deckIndexNext = nextDeckIndex;
+    }
+  } else {
+    if (currentDeck.frameId < audioCore->crossfade) {
+      audioCore->decks[prevDeckIndex].frameId = audioCore->decks[prevDeckIndex].frames;
+      audioCore->decks[prevDeckIndex].playState = PLAY;
+    }
+    if (currentDeck.frameId < 4 * nframes) {
+      audioCore->deckIndexNext = prevDeckIndex;
     }
   }
 
   return 0;
-
-  // audioCore->frameId += hopSynthesis;
-  // return 0;
 }
 
 // jack process callback
