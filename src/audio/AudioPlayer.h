@@ -378,6 +378,12 @@ struct AudioPlayer {
 
   bool continueRun() {
     const PlayState playState = ThreadStatics::getPlayState();
+    if (playState == STOP || playState == PAUSE)
+      audioCore->setPlayStateAllDecks(playState);
+
+    if (playState == STOP)
+      audioCore->setFrameIdAllDecks(0);
+
     return  playState != STOP
             && playState != PAUSE;
             //   && audioCore.frameId > -1
@@ -415,32 +421,8 @@ struct AudioPlayer {
       // and
       // make it accessible to our running audio callback through the audioCore obj
 
-      AudioDeck& currentDeck = audioCore->currentDeck();
-      const int nextDeckIndex = (currentDeck.deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
-      const int prevDeckIndex = (currentDeck.deckIndex - 1) % AUDIO_CORE_DECK_COUNT;
-
-      std::cout << "audioCore deckIndex" << audioCore->deckIndex << std::endl;
-      std::cout << "currentDeck index: " << currentDeck.deckIndex << std::endl;
-
-      if (audioCore->shouldUpdateDeckIndex()) {
-        std::cout << "should update deck index()" << std::endl;
+      if (audioCore->shouldUpdateDeckIndex())
         audioCore->updateDeckIndexToNext();
-      }
-
-      if (currentDeck.isCrossfadeStart()) {
-        std::cout << "is crossfade start" << std::endl;
-      }
-
-      // todo: finesse crossfade
-      // todo: pass thru ring buffer, perhaps with readComplete
-      if (currentDeck.isCrossfadeEnd()) {
-        std::cout << "crossfade end" << std::endl;
-      }
-
-      // if (audioCore.fadeIn > 0.01) {
-      //     audioCore.fadeIn -= 0.01;
-      //     audioCore.volume += 0.01;
-      // }
 
       updateRingBuffers(
         audioCore->effectsChannelsSettingsRB,
@@ -454,19 +436,12 @@ struct AudioPlayer {
       );
 
       if ( audioCore->threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
-        // if (audioCore.fadeOut < 0.01) { // break + cleanup
-        //     break;
-        // } else { // continue fading out
-        //     audioCore.volume -= 0.001;
-        //     audioCore.fadeOut -= 0.001;
-        // }
+        // TODO
       } else {
         audioCore->playbackSpeed = ThreadStatics::getPlaybackSpeed();
         audioCore->playState = ThreadStatics::getPlayState();
         ThreadStatics::setFrameId( audioCore->currentDeck().frameId );
       }
-
-      std::cout << "while loop will sleep" << std::endl;
 
       std::this_thread::sleep_for( std::chrono::milliseconds(10) );
     } // end of while loop

@@ -327,6 +327,20 @@ struct AudioCore {
 
     return 0.0f;
   }
+
+  Result setPlayStateAllDecks(PlayState playState) {
+    for (int i = 0; i < AUDIO_CORE_DECK_COUNT; i++)
+        decks[i].playState = playState;
+
+    return OK;
+  }
+
+  Result setFrameIdAllDecks(sf_count_t frameId) {
+    for (int i = 0; i < AUDIO_CORE_DECK_COUNT; i++)
+        decks[i].frameId = frameId;
+
+    return OK;
+  }
 };
 
 } // Audio
