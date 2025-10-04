@@ -279,6 +279,9 @@ struct AudioCore {
       "Audio::AudioCore::updateDeckIndexToNext",
       "Updating deckIndex " + std::to_string(deckIndex) + " to next deckIndexNext " + std::to_string(deckIndexNext)
     );
+
+    decks[deckIndex].playState = STOP;
+    decks[deckIndexNext].playState = PLAY;
     deckIndex = deckIndexNext;
     return OK;
   }
@@ -293,17 +296,34 @@ struct AudioCore {
   }
 
   float getDeckGain(const int di) {
+    const auto& deck = decks[di];
+    const float frameIdF = static_cast<float>(deck.frameId);
+    const float framesF = static_cast<float>(deck.frames);
+    const float crossfadeF = static_cast<float>(gAppState->getCrossfade());
+    // TODO: log, exp transition funcs
     if (deckIndex == di) {
-      if (playbackSpeed > 0.0f) {
+      if (deck.frameId >= deck.frames - gAppState->getCrossfade())
+        return (framesF - frameIdF) / crossfadeF;
 
-      } else {
+      if (deck.frameId <= gAppState->getCrossfade())
+        return frameIdF / crossfadeF;
 
-      }
+      return 1.0f;
     }
 
-    // TODO:
-    // - if next index
-    // - if previous index and playbackSpeed
+    if (di == (deckIndex + 1) % AUDIO_CORE_DECK_COUNT) {
+      if (deck.frameId <= gAppState->getCrossfade())
+        return frameIdF / crossfadeF;
+
+      return 0.0f;
+    }
+
+    if (di == (deckIndex - 1) % AUDIO_CORE_DECK_COUNT) {
+      if (deck.frameId >= deck.frames - gAppState->getCrossfade())
+        return (framesF - frameIdF) / crossfadeF;
+
+      return 0.0f;
+    }
 
     return 0.0f;
   }

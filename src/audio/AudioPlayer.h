@@ -408,6 +408,7 @@ struct AudioPlayer {
     mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
 
     audioCore->playState = PLAY;
+    audioCore->decks[audioCore->deckIndex].playState = PLAY;
 
     while( continueRun() ) {
       // here is our chance to pull data out of the application
@@ -428,16 +429,12 @@ struct AudioPlayer {
 
       if (currentDeck.isCrossfadeStart()) {
         std::cout << "is crossfade start" << std::endl;
-        audioCore->decks[prevDeckIndex].fadeOut -= 0.01f;
-        currentDeck.fadeIn += 0.01f;
       }
 
       // todo: finesse crossfade
       // todo: pass thru ring buffer, perhaps with readComplete
       if (currentDeck.isCrossfadeEnd()) {
         std::cout << "crossfade end" << std::endl;
-        audioCore->decks[nextDeckIndex].fadeIn += 0.01f;
-        currentDeck.fadeOut -= 0.01f;
       }
 
       // if (audioCore.fadeIn > 0.01) {

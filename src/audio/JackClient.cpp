@@ -426,9 +426,10 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
 
   for (int j = 0; j < AUDIO_CORE_DECK_COUNT; j++) {
     auto& deck = audioCore->decks[j];
-    const float deckGain = deck.gain;
-    if (deckGain == 0.0f)
+    if (!deck.isPlaying())
       continue;
+
+    deck.gain = audioCore->getDeckGain(j);
 
     // playbackSpeed
     const float* processHeadL = deck.inputBuffers[0] + deck.frameId; //  &audioCore->playbackBuffersPre[0][0];
@@ -453,11 +454,11 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
 
     // TODO: debug deckIndexNext
     if (audioCore->playbackSpeed > 0.0f) {
-      if (deck.frameId >= deck.frames - 4 * nframes) {
+      if (deck.frameId >= deck.frames - audioCore->crossfade) {
         audioCore->deckIndexNext = 1; // (audioCore->deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
       }
     } else {
-      if (deck.frameId < 4 * nframes) {
+      if (deck.frameId < audioCore->crossfade) {
         audioCore->deckIndexNext = 2; // (audioCore->deckIndex - 1) % AUDIO_CORE_DECK_COUNT;
       }
     }

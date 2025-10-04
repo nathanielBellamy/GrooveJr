@@ -14,6 +14,7 @@
 #include "../AppState.h"
 #include "../Logging.h"
 #include "../enums/Result.h"
+#include "../enums/PlayState.h"
 
 namespace Gj {
 namespace Audio {
@@ -23,6 +24,7 @@ constexpr sf_count_t MIN_FADE_OUT = 500;
 
 struct AudioDeck {
   int                              deckIndex;
+  PlayState                        playState = STOP;
   AppState*                        gAppState;
   mutable sf_count_t               frameId = 0;
   sf_count_t                       frames = 0; // total # of frames
@@ -89,14 +91,20 @@ struct AudioDeck {
       return false;
 
     const bool nonZeroFrames = frames > 0 && frames == cassette->sfInfo.frames;
-    const bool nonBlankCassette = cassette->filePath != "BLANK";
+    // const bool nonBlankCassette = cassette->filePath != "BLANK";
     const bool nonNullInputBuffers =
          inputBuffers[0] != nullptr
       && inputBuffers[1] != nullptr
       && inputBuffers[0] == cassette->inputBuffers[0]
       && inputBuffers[1] == cassette->inputBuffers[1];
 
-    return nonZeroFrames && nonBlankCassette && nonNullInputBuffers;
+    return nonZeroFrames
+      // && nonBlankCassette
+      && nonNullInputBuffers;
+  }
+
+  bool isPlaying() const {
+    return playState == PLAY;
   }
 };
 
