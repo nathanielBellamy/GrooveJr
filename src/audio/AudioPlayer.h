@@ -420,7 +420,6 @@ struct AudioPlayer {
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj
-
       if (audioCore->shouldUpdateDeckIndex())
         audioCore->updateDeckIndexToNext();
 
