@@ -35,6 +35,8 @@
 
 #include "./db/Dao.h"
 
+#include "./scanner/Scanner.h"
+
 namespace Gj {
 
 extern "C" {

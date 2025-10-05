@@ -7,6 +7,7 @@
 - CAF (C++ Actor Framework)
 - Qt
 - Boost
+- taglib
 - sqlite
 - CMake
 - C++ 17
@@ -16,7 +17,7 @@
 ### MacOs Build (Dev Build)
 
 - ```bash
-  brew install boost cmake jack fftw blackhole-2ch libsndfile sqlite
+  brew install boost cmake jack fftw taglib blackhole-2ch libsndfile sqlite
   git clone git@github.com:nathanielBellamy/GrooveJr.git 
   cd GrooveJr/src
   vim CMakeLists.txt

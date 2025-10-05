@@ -62,6 +62,9 @@ add_subdirectory(
 add_subdirectory(
      ${GJ_BASE_DIR}/GrooveJr/src/db
 )
+add_subdirectory(
+        ${GJ_BASE_DIR}/GrooveJr/src/scanner
+)
 add_definitions(-DQT_NO_VERSION_TAGGING)
 
 add_executable(GrooveJr
@@ -92,6 +95,7 @@ target_link_libraries(GrooveJr
         GjAudio
         GjDb
         GjGui
+        GjScanner
         Qt6::Core
         Qt6::Widgets
         Qt6::Gui

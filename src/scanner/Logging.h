@@ -1,9 +1,9 @@
 //
-// Created by ns on 3/13/25.
+// Created by ns on 5/31/25.
 //
 
-#ifndef LOGGING_H
-#define LOGGING_H
+#ifndef SCLOGGING_H
+#define SCLOGGING_H
 
 #include <string>
 
@@ -19,11 +19,8 @@
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/sources/global_logger_storage.hpp>
 
-#include "audio/Logging.h"
-#include "db/Logging.h"
-#include "scanner/Logging.h"
-
 namespace Gj {
+namespace Scanner {
 
 enum LogSeverityLevel {
   Info,
@@ -33,15 +30,14 @@ enum LogSeverityLevel {
   Critical
 };
 
-class Logging {
+class Logging final {
 
   public:
-   static void init();
    static void write(LogSeverityLevel severity, const std::string& caller, const std::string& message);
 
 };
 
+} // Scn
 } // Gj
 
-
-#endif //LOGGING_H
+#endif //SCLOGGING_H

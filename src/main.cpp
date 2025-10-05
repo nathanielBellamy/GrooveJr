@@ -146,15 +146,28 @@ extern "C" {
           "Loaded gAppState: id = " + std::to_string(gAppState->id) + " audioFramesPerBuffer = " + std::to_string(gAppState->getAudioFramesPerBuffer()) + ", sceneId: " + std::to_string(gAppState->getSceneId()) + ", sceneIndex: " + std::to_string(gAppState->getSceneIndex()) + "."
         );
 
+        // setup music library scanner
+        Scanner::Scanner scanner(Dao);
+        scanner.runScan();
+
         // setup Audio
         initVst3PluginContext();
+        Logging::write(
+          Info,
+          "main",
+          "Instantiated vst3PluginContext"
+        );
         Mixer = new Audio::Mixer(gAppState, Dao);
-        audioCore = new Audio::AudioCore(gAppState);
-
         Logging::write(
           Info,
           "main",
           "Instantiated Mixer"
+        );
+        audioCore = new Audio::AudioCore(gAppState);
+        Logging::write(
+          Info,
+          "main",
+          "Instantiated audioCore"
         );
 
         // while (Mixer->getEffectsChannelsCount() < 1) // at least main and channel 1
