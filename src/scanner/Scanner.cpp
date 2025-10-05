@@ -54,6 +54,14 @@ Result Scanner::runScan() {
     std::cout << "Year        : " << tag->year() << std::endl;
     std::cout << "Track Number: " << tag->track() << std::endl;
     std::cout << "Genre       : " << tag->genre() << std::endl;
+
+    Db::Track track(
+        filePaths[i],
+        tag->title().to8Bit(),
+        tag->artist().to8Bit(),
+        tag->album().to8Bit(),
+        static_cast<uint16_t>(tag->track())
+    );
   }
 
   Logging::write(

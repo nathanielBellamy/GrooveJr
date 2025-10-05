@@ -24,4 +24,5 @@ target_link_libraries(GjScanner
         Boost::log
         ${Boost_LIBRARIES}
         TagLib::TagLib
+        GjDb
 )
