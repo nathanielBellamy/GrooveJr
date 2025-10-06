@@ -5,6 +5,8 @@
 #ifndef SCANNER_H
 #define SCANNER_H
 
+#include <vector>
+
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 

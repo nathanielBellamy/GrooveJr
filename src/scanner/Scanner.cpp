@@ -20,6 +20,7 @@ Scanner::Scanner(Db::Dao* dao)
 }
 
 Result Scanner::runScan() {
+  std::vector<Db::Track> tracks;
 
   Logging::write(
       Info,
@@ -38,7 +39,7 @@ Result Scanner::runScan() {
     TagLib::FileRef file(
         filePaths[i],
         true,
-        TagLib::AudioProperties::Average
+        TagLib::AudioProperties::Accurate
     );
 
     if (file.isNull() || !file.tag()) {
@@ -62,6 +63,33 @@ Result Scanner::runScan() {
         tag->album().to8Bit(),
         static_cast<uint16_t>(tag->track())
     );
+
+    // TODO
+//    Db::Track track(...);
+    // - many Tracks to one Album
+    // - many Tracks to many Genres
+    // - many Tracks to many Artists
+//    Db::AudioFile file(...);
+    // - one Track to many AudioFiles
+//    Db::Album album(...);
+    // - one Album to many Tracks
+    // - many Albums to many Artists (Now, That's What I Call Music)
+    // - many Albums to many Genres
+//    Db::Artist artist(...);
+    // - many Artists to many Tracks
+    // - many Artists to many Albums
+    // - many Artists to many Genres
+//    Db::Genre genre(tag->genre());
+    // - many Genres to many Tracks
+    // - many Genres to many Albums
+    // - many Genres to many Artists
+
+    tracks.push_back(track);
+  }
+
+  for (const auto track : tracks) {
+    // TODO
+//    dao->trackRepository.createIfNotExists(track);
   }
 
   Logging::write(
