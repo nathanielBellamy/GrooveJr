@@ -13,24 +13,6 @@ Track::Track(const int id, const std::string& filePath, const std::string& title
   , title(title)
   {}
 
-Track::Track(
-    const std::string& filePath,
-    const std::string& title,
-    const std::string& artist,
-    const std::string& album,
-    const uint16_t trackNumber)
-      : id(0)
-      , filePath(filePath)
-      , title(title)
-      , trackNumber(trackNumber) {
-
-  std::cout << "Instantiated track " << filePath << std::endl
-    << "Title: " << title << std::endl
-    << "Artist: " << artist << std::endl
-    << "Album: " << album << std::endl
-    << "Track number: " << trackNumber << std::endl;
-}
-
 Track Track::deser(sqlite3_stmt* stmt) {
   const int id = sqlite3_column_int(stmt, 0);
   const unsigned char* filePath = sqlite3_column_text(stmt, 1);

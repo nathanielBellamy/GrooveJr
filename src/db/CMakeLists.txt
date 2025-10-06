@@ -34,8 +34,12 @@ add_library(GjDb SHARED
     repository/mixer/SceneRepository.cpp
     entity/musicLibrary/Track.h
     entity/musicLibrary/Track.cpp
+    entity/musicLibrary/AudioFile.h
+    entity/musicLibrary/AudioFile.cpp
     repository/musicLibrary/TrackRepository.h
     repository/musicLibrary/TrackRepository.cpp
+    decorate/musicLibrary/TrackDecorate.h
+    decorate/musicLibrary/TrackDecorate.cpp
 )
 
 target_link_libraries(GjDb

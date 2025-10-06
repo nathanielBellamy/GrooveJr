@@ -36,13 +36,6 @@ struct Track {
   AudioCodec audioCodec;
 
   Track(int id, const std::string& filePath, const std::string& title);
-  Track(
-    const std::string& filePath,
-    const std::string& title,
-    const std::string& artist,
-    const std::string& album,
-    uint16_t trackNumber
-  );
   static Track deser(sqlite3_stmt* stmt);
 };
 

@@ -11,7 +11,7 @@
 #include <taglib/tag.h>
 
 #include "../db/Dao.h"
-#include "../db/entity/musicLibrary/Track.h"
+#include "../db/decorate/musicLibrary/TrackDecorate.h"
 #include "../db/repository/musicLibrary/TrackRepository.h"
 
 #include "./Logging.h"

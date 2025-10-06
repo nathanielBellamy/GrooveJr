@@ -20,7 +20,7 @@ Scanner::Scanner(Db::Dao* dao)
 }
 
 Result Scanner::runScan() {
-  std::vector<Db::Track> tracks;
+  std::vector<Db::TrackDecorate> trackDecorates;
 
   Logging::write(
       Info,
@@ -56,7 +56,7 @@ Result Scanner::runScan() {
     std::cout << "Track Number: " << tag->track() << std::endl;
     std::cout << "Genre       : " << tag->genre() << std::endl;
 
-    Db::Track track(
+    Db::TrackDecorate trackDecorate(
         filePaths[i],
         tag->title().to8Bit(),
         tag->artist().to8Bit(),
@@ -84,12 +84,15 @@ Result Scanner::runScan() {
     // - many Genres to many Albums
     // - many Genres to many Artists
 
-    tracks.push_back(track);
+    trackDecorates.push_back(trackDecorate);
   }
 
-  for (const auto track : tracks) {
+  for (const auto trackDeco : trackDecorates) {
     // TODO
-//    dao->trackRepository.createIfNotExists(track);
+//    dao->trackRepository.createIfNotExists(trackDeco);
+//    dao->albumRepository.createIfNotExists(track);
+//    dao->artistRepository.createIfNotExists(track);
+//    dao->genreRepository.createIfNotExists(track);
   }
 
   Logging::write(
