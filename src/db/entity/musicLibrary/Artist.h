@@ -15,6 +15,16 @@ namespace Db {
 struct Artist {
   ID id;
   std::string name;
+
+  Artist(std::string name)
+      : id(0)
+      , name(name)
+      {}
+
+  Artist(ID id, std::string name)
+      : id(id)
+      , name(name)
+      {}
 };
 
 } // Db

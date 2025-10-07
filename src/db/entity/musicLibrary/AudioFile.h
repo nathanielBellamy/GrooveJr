@@ -14,8 +14,6 @@
 #include "../../../enums/AudioCodec.h"
 #include "../../../enums/Result.h"
 
-
-
 namespace Gj {
 namespace Db {
 

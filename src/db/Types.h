@@ -6,12 +6,13 @@
 #define GJDBTYPES_H
 
 #include <stdint.h>
+#include <string>
 
 namespace Gj {
 namespace Db {
 
-typedef uint64_t ID;
-typedef uint16_t TrackNumber;
+typedef uint64_t         ID;
+typedef uint16_t         TrackNumber;
 typedef unsigned int     Year;
 
 } // Db
