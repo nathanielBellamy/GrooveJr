@@ -1,0 +1,20 @@
+//
+// Created by ns on 10/7/25.
+//
+
+#ifndef GJDBTYPES_H
+#define GJDBTYPES_H
+
+#include <stdint.h>
+
+namespace Gj {
+namespace Db {
+
+typedef uint64_t ID;
+typedef uint16_t TrackNumber;
+typedef uint     Year;
+
+} // Db
+} // Gj
+
+#endif //TYPES_H

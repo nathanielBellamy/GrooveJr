@@ -5,11 +5,16 @@
 #ifndef ARTIST_H
 #define ARTIST_H
 
+#include <string>
+
+#include "../../Types.h"
+
 namespace Gj {
 namespace Db {
 
 struct Artist {
-
+  ID id;
+  std::string name;
 };
 
 } // Db

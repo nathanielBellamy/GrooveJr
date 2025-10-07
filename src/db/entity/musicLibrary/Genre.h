@@ -5,11 +5,16 @@
 #ifndef GENRE_H
 #define GENRE_H
 
+#include <string>
+
+#include "../../Types.h"
+
 namespace Gj {
 namespace Db {
 
-class Genre {
-
+struct Genre {
+  ID id;
+  std::string name;
 };
 
 } // Db

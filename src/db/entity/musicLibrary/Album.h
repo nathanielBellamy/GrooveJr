@@ -5,10 +5,17 @@
 #ifndef ALBUM_H
 #define ALBUM_H
 
+#include <string>
+
+#include "../../Types.h"
+
 namespace Gj {
 namespace Db {
 
 struct Album {
+  ID id;
+  std::string name;
+  Year year;
 
 };
 
