@@ -31,7 +31,7 @@ std::vector<Track> TrackRepository::getAll() const {
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     const auto track = Track::deser(stmt);
-    std::cout << "Row: ID = " << track.id << ", filePath = " << track.filePath << ", title = " << track.title << std::endl;
+    std::cout << "Row: ID = " << track.id << ", title = " << track.title << std::endl;
     tracks.push_back(track);
   }
 

@@ -18,7 +18,7 @@ TrackDecorate::TrackDecorate(
   , artist(artist)
   , album(album)
   , trackNumber(trackNumber)
-  , track(0, filePath, title)
+  , track(0, title)
   , audioFile(filePath)
   {
 

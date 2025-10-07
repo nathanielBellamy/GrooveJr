@@ -12,7 +12,7 @@ namespace Db {
 
 typedef uint64_t ID;
 typedef uint16_t TrackNumber;
-typedef uint     Year;
+typedef unsigned int     Year;
 
 } // Db
 } // Gj

@@ -11,7 +11,9 @@
 
 #include "../../Types.h"
 #include "../../Logging.h"
+#include "../../../enums/AudioCodec.h"
 #include "../../../enums/Result.h"
+
 
 
 namespace Gj {
