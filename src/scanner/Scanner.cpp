@@ -21,6 +21,7 @@ Scanner::Scanner(Db::Dao* dao)
 
 Result Scanner::runScan() {
   std::vector<Db::TrackDecorate> trackDecorates;
+  std::vector<Db::Artist> artists;
 
   Logging::write(
       Info,
@@ -56,6 +57,9 @@ Result Scanner::runScan() {
     std::cout << "Track Number: " << tag->track() << std::endl;
     std::cout << "Genre       : " << tag->genre() << std::endl;
 
+    Db::Artist artist (tag->artist().to8Bit());
+    artists.push_back(artist);
+
     Db::TrackDecorate trackDecorate(
         filePaths[i],
         tag->title().to8Bit(),
@@ -79,6 +83,11 @@ Result Scanner::runScan() {
     // - many Genres to many Tracks
 
     trackDecorates.push_back(trackDecorate);
+  }
+
+  // todo: SaveAll
+  for (const auto artist : artists) {
+    dao->artistRepository.save(artist);
   }
 
   for (const auto trackDeco : trackDecorates) {

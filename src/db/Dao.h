@@ -16,6 +16,9 @@
 #include "repository/mixer/ChannelRepository.h"
 #include "repository/mixer/EffectRepository.h"
 #include "repository/mixer/SceneRepository.h"
+#include "repository/musicLibrary/ArtistRepository.h"
+#include "repository/musicLibrary/AlbumRepository.h"
+#include "repository/musicLibrary/GenreRepository.h"
 #include "repository/musicLibrary/TrackRepository.h"
 #include "repository/AppStateRepository.h"
 
@@ -31,6 +34,7 @@ class Dao {
     ChannelRepository channelRepository;
     EffectRepository effectRepository;
     SceneRepository sceneRepository;
+    ArtistRepository artistRepository;
     TrackRepository trackRepository;
 
     Dao(AppState* gAppState);

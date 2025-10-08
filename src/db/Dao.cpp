@@ -14,6 +14,7 @@ Dao::Dao(AppState* gAppState)
   , channelRepository(&db, gAppState)
   , effectRepository(&db, gAppState)
   , sceneRepository(&db, gAppState)
+  , artistRepository(&db, gAppState)
   , trackRepository(&db, gAppState)
   {
 
@@ -147,7 +148,7 @@ int Dao::initSchema() const {
 
     create table if not exists artists (
       id integer primary key autoincrement,
-      name text not null,
+      name text not null unique,
       createdAt datetime default current_timestamp
     );
 

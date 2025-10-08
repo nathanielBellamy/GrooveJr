@@ -18,13 +18,13 @@ struct Artist {
   ID id;
   std::string name;
 
-  Artist(std::string name)
-      : id(0)
+  Artist(const ID id, const std::string& name)
+      : id(id)
       , name(name)
       {}
 
-  Artist(ID id, std::string name)
-      : id(id)
+  Artist(const std::string& name)
+      : id(0)
       , name(name)
       {}
 

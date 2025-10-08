@@ -12,7 +12,7 @@
 
 #include "../db/Dao.h"
 #include "../db/decorate/musicLibrary/TrackDecorate.h"
-#include "../db/repository/musicLibrary/TrackRepository.h"
+#include "../db/entity/musicLibrary/Artist.h"
 
 #include "./Logging.h"
 #include "../enums/Result.h"
