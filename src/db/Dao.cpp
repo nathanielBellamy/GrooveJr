@@ -138,10 +138,31 @@ int Dao::initSchema() const {
     );
 
     -- music library
+    create table if not exists albums (
+      id integer primary key autoincrement,
+      title text not null,
+      year integer not null,
+      createdAt datetime default current_timestamp
+    );
+
+    create table if not exists artists (
+      id integer primary key autoincrement,
+      name text not null,
+      createdAt datetime default current_timestamp
+    );
+
     create table if not exists tracks (
       id integer primary key autoincrement,
+      albumId integer not null,
+      title text not null,
+      createdAt datetime default current_timestamp,
+      foreign key (albumId) references albums(id) on delete cascade
+    );
+
+    create table if not exists audioFiles (
+      id integer primary key autoincrement,
+      trackId integer not null,
       filePath text not null,
-      title text,
       bitRate integer not null,
 
       sf_frames integer not null,
@@ -150,8 +171,32 @@ int Dao::initSchema() const {
       sf_format integer not null,
       sf_sections integer not null,
       sf_seekable integer not null,
+      createdAt datetime default current_timestamp,
+      foreign key (trackId) references tracks(id) on delete cascade
+    );
+
+    create table if not exists genres (
+      id integer primary key autoincrement,
+      name text not null,
       createdAt datetime default current_timestamp
     );
+
+    create table if not exists track_to_artists (
+      trackId integer not null,
+      artistId integer not null,
+      primary key (trackId, artistId),
+      foreign key (trackId) references tracks(id) on delete cascade,
+      foreign key (artistId) references artists(id) on delete cascade
+    );
+
+    create table if not exists track_to_genres (
+      trackId integer not null,
+      genreId integer not null,
+      primary key (trackId, genreId),
+      foreign key (trackId) references tracks(id) on delete cascade,
+      foreign key (genreId) references genres(id) on delete cascade
+    );
+
   )sql";
 
   if (sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr) != SQLITE_OK) {

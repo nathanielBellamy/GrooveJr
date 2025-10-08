@@ -14,23 +14,23 @@ namespace Db {
 
 struct Album {
   ID id;
-  std::string name;
+  std::string title;
   Year year = 0;
 
-  Album(std::string name)
+  Album(std::string title)
       : id(0)
-      , name(name)
+      , title(title)
       {}
 
-  Album(std::string name, Year year)
+  Album(std::string title, Year year)
       : id(0)
-      , name(name)
+      , title(title)
       , year(year)
       {}
 
-  Album(ID id, std::string name, Year year)
+  Album(ID id, std::string title, Year year)
       : id(id)
-      , name(name)
+      , title(title)
       , year(year)
       {}
 };

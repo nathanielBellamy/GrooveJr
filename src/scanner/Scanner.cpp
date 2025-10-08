@@ -73,16 +73,10 @@ Result Scanner::runScan() {
     // - one Track to many AudioFiles
 //    Db::Album album(...);
     // - one Album to many Tracks
-    // - many Albums to many Artists (Now, That's What I Call Music)
-    // - many Albums to many Genres
 //    Db::Artist artist(...);
     // - many Artists to many Tracks
-    // - many Artists to many Albums
-    // - many Artists to many Genres
 //    Db::Genre genre(tag->genre());
     // - many Genres to many Tracks
-    // - many Genres to many Albums
-    // - many Genres to many Artists
 
     trackDecorates.push_back(trackDecorate);
   }
