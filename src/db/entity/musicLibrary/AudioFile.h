@@ -8,6 +8,7 @@
 #include <string>
 
 #include <sndfile.h>
+#include <sqlite3.h>
 
 #include "../../Types.h"
 #include "../../Logging.h"
@@ -19,14 +20,16 @@ namespace Db {
 
 struct AudioFile {
   ID id;
+  ID trackId;
   std::string filePath;
   SF_INFO sfInfo;
-  bool isLossless;
-  bool isVariableBitRate;
-  AudioCodec audioCodec;
+  // bool isLossless;
+  // bool isVariableBitRate;
+  // AudioCodec audioCodec;
 
   AudioFile(const std::string& filePath)
     : id(0)
+    , trackId(0)
     , filePath(filePath)
     {
     if (getSfInfo() != OK)
@@ -39,6 +42,7 @@ struct AudioFile {
 
   AudioFile(const ID id, const std::string& filePath)
     : id(id)
+    , trackId(0)
     , filePath(filePath)
     {
     if (getSfInfo() != OK)
@@ -49,8 +53,9 @@ struct AudioFile {
       );
   }
 
-  AudioFile(const ID id, const std::string& filePath, const SF_INFO& sfInfo)
+  AudioFile(const ID id, const ID trackId, const std::string& filePath, const SF_INFO& sfInfo)
     : id(id)
+    , trackId(trackId)
     , filePath(filePath)
     , sfInfo(sfInfo)
     {}
@@ -60,6 +65,8 @@ struct AudioFile {
 
     return OK;
   }
+
+  static AudioFile deser(sqlite3_stmt* stmt);
 };
 
 } // Db

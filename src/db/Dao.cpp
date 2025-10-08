@@ -155,6 +155,7 @@ int Dao::initSchema() const {
       id integer primary key autoincrement,
       albumId integer not null,
       title text not null,
+      trackNumber integer not null,
       createdAt datetime default current_timestamp,
       foreign key (albumId) references albums(id) on delete cascade
     );
@@ -163,8 +164,6 @@ int Dao::initSchema() const {
       id integer primary key autoincrement,
       trackId integer not null,
       filePath text not null,
-      bitRate integer not null,
-
       sf_frames integer not null,
       sf_sampleRate integer not null,
       sf_channels integer not null,

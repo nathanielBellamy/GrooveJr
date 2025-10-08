@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include <sqlite3.h>
+
 #include "../../Types.h"
 
 namespace Gj {
@@ -33,6 +35,8 @@ struct Album {
       , title(title)
       , year(year)
       {}
+
+  static Album deser(sqlite3_stmt* stmt);
 };
 
 } // Db

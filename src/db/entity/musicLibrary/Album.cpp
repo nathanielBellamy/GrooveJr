@@ -7,6 +7,17 @@
 namespace Gj {
 namespace Db {
 
+Album Album::deser(sqlite3_stmt* stmt) {
+  const ID id = sqlite3_column_int(stmt, 0);
+  const unsigned char* title = sqlite3_column_text(stmt, 1);
+  const Year year = sqlite3_column_int(stmt, 2);
+
+  return Album(
+      id,
+      std::string(reinterpret_cast<const char*>(title)),
+      year
+  );
+}
 
 } // Db
 } // Gj

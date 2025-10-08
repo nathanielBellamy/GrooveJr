@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include <sqlite3.h>
+
 #include "../../Types.h"
 
 namespace Gj {
@@ -25,6 +27,8 @@ struct Genre {
       : id(id)
       , name(name)
       {};
+
+  static Genre deser(sqlite3_stmt* stmt);
 };
 
 } // Db
