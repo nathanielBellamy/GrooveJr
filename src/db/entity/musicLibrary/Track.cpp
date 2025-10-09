@@ -7,15 +7,15 @@
 namespace Gj {
 namespace Db {
 
-Track::Track(const ID id, const std::string& title)
-  : id(id)
-  , albumId(0)
-  , title(title)
-  , trackNumber(0)
-  {}
-
 Track::Track(const ID id, const ID albumId, const std::string& title, const TrackNumber trackNumber)
   : id(id)
+  , albumId(albumId)
+  , title(title)
+  , trackNumber(trackNumber)
+  {}
+
+Track::Track(const ID albumId, const std::string& title, const TrackNumber trackNumber)
+  : id(0)
   , albumId(albumId)
   , title(title)
   , trackNumber(trackNumber)

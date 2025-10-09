@@ -29,10 +29,11 @@ Result Scanner::runScan() {
   const char* filePath1 = "/Users/ns/Music/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/05 Back To Black.flac";
   const char* filePath2 = "/Users/ns/Music/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac";
   const char* filePath3 = "/Users/ns/Music/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/07 Tears Dry On Their Own.flac";
+  const char* filePath4 = "/Users/ns/Music/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/07 Tears Dry On Their Own.flac";
 
-  const char* filePaths [3] = { filePath1, filePath2, filePath3 };
+  const char* filePaths [4] = { filePath1, filePath2, filePath3, filePath4 };
 
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 4; ++i) {
     TagLib::FileRef file(
         filePaths[i],
         true,
@@ -65,7 +66,10 @@ Result Scanner::runScan() {
       album,
       artist
     };
-    dao->albumRepository.save(albumWithArtist);
+    album.id = dao->albumRepository.save(albumWithArtist);
+
+    Db::Track track (album.id, tag->title().to8Bit(), tag->track());
+    track.id = dao->trackRepository.save(track);
   }
 
 

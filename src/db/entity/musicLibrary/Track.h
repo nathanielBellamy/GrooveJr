@@ -24,8 +24,13 @@ struct Track {
   std::string title;
   TrackNumber trackNumber;
 
-  Track(ID id, const std::string& title);
   Track(ID id, ID albumId, const std::string& title, TrackNumber trackNumber);
+  Track(ID albumId, const std::string& title, TrackNumber trackNumber);
+
+  static Track empty() {
+    return Track(0, 0, "- Empty Track -", 0);
+  }
+
   static Track deser(sqlite3_stmt* stmt);
 };
 

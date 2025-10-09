@@ -159,7 +159,8 @@ int Dao::initSchema() const {
       title text not null,
       trackNumber integer not null,
       createdAt datetime default current_timestamp,
-      foreign key (albumId) references albums(id) on delete cascade
+      foreign key (albumId) references albums(id) on delete cascade,
+      unique (albumId, trackNumber)
     );
 
     create table if not exists audioFiles (

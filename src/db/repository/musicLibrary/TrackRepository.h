@@ -22,6 +22,8 @@ class TrackRepository {
   public:
     TrackRepository(sqlite3** db, AppState* gAppState);
     std::vector<Track> getAll() const;
+    ID save(const Track& track) const;
+    Track findByAlbumIdAndTrackNumber(ID albumId, TrackNumber trackNumber) const;
 
 };
 
