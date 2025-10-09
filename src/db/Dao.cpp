@@ -17,6 +17,7 @@ Dao::Dao(AppState* gAppState)
   , albumRepository(&db, gAppState)
   , artistRepository(&db, gAppState)
   , audioFileRepository(&db, gAppState)
+  , genreRepository(&db, gAppState)
   , trackRepository(&db, gAppState)
   {
 
@@ -181,7 +182,7 @@ int Dao::initSchema() const {
 
     create table if not exists genres (
       id integer primary key autoincrement,
-      name text not null,
+      name text not null unique,
       createdAt datetime default current_timestamp
     );
 

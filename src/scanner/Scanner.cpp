@@ -73,6 +73,10 @@ Result Scanner::runScan() {
 
     Db::AudioFile audioFile (track.id, path);
     audioFile.id = dao->audioFileRepository.save(audioFile);
+
+    Db::Genre genre (tag->genre().to8Bit());
+    Db::GenreWithTrackId genreWithTrackId { genre, track.id };
+    dao->genreRepository.save(genreWithTrackId);
   }
 
 

@@ -5,12 +5,34 @@
 #ifndef GENREREPOSITORY_H
 #define GENREREPOSITORY_H
 
+#include <optional>
+
+#include <sqlite3.h>
+
+#include "../../Logging.h"
+#include "../../../AppState.h"
+#include "../../../enums/Result.h"
+
+#include "../../entity/musicLibrary/Genre.h"
+#include "../../dto/musicLibrary/GenreWithTrackId.h"
 
 namespace Gj {
 namespace Db {
 
-class GenreRepository {
+class GenreRepository final {
+  sqlite3** db;
+  AppState* gAppState;
 
+  public:
+    GenreRepository(sqlite3** db, AppState* gAppState)
+      : db(db)
+      , gAppState(gAppState)
+      {};
+    std::vector<Genre> getAll() const;
+    ID save(const Genre& genre) const;
+    ID save(const GenreWithTrackId& genreWithTrackId) const;
+    std::optional<Genre> findByName(const std::string& name) const;
+    Result join(const ID genreId, const ID trackId) const;
 };
 
 

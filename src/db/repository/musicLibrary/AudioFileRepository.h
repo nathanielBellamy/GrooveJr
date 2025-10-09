@@ -17,7 +17,7 @@
 namespace Gj {
 namespace Db {
 
-class AudioFileRepository {
+class AudioFileRepository final {
   sqlite3** db;
   AppState* gAppState;
 

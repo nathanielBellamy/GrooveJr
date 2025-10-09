@@ -15,7 +15,7 @@
 namespace Gj {
 namespace Db {
 
-class TrackRepository {
+class TrackRepository final {
   sqlite3** db;
   AppState* gAppState;
 

@@ -38,6 +38,7 @@ class Dao {
     AlbumRepository albumRepository;
     ArtistRepository artistRepository;
     AudioFileRepository audioFileRepository;
+    GenreRepository genreRepository;
     TrackRepository trackRepository;
 
     Dao(AppState* gAppState);
