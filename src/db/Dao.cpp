@@ -16,6 +16,7 @@ Dao::Dao(AppState* gAppState)
   , sceneRepository(&db, gAppState)
   , albumRepository(&db, gAppState)
   , artistRepository(&db, gAppState)
+  , audioFileRepository(&db, gAppState)
   , trackRepository(&db, gAppState)
   {
 
@@ -166,7 +167,8 @@ int Dao::initSchema() const {
     create table if not exists audioFiles (
       id integer primary key autoincrement,
       trackId integer not null,
-      filePath text not null,
+      filePath text not null unique,
+      valid int default 0,
       sf_frames integer not null,
       sf_sampleRate integer not null,
       sf_channels integer not null,

@@ -62,4 +62,6 @@ target_link_libraries(GjDb
   Boost::log
   ${Boost_LIBRARIES}
   SQLite::SQLite3
+  -L${C_LIBS_HOME}/libsndfile/1.2.2/lib
+  -lsndfile
 )

@@ -23,6 +23,7 @@ struct AudioFile {
   ID trackId;
   std::string filePath;
   SF_INFO sfInfo;
+  bool valid = false;
   // bool isLossless;
   // bool isVariableBitRate;
   // AudioCodec audioCodec;
@@ -40,9 +41,9 @@ struct AudioFile {
       );
   }
 
-  AudioFile(const ID id, const std::string& filePath)
-    : id(id)
-    , trackId(0)
+  AudioFile(const ID trackId, const std::string& filePath)
+    : id(0)
+    , trackId(trackId)
     , filePath(filePath)
     {
     if (getSfInfo() != OK)
@@ -53,19 +54,15 @@ struct AudioFile {
       );
   }
 
-  AudioFile(const ID id, const ID trackId, const std::string& filePath, const SF_INFO& sfInfo)
+  AudioFile(const ID id, const ID trackId, const std::string& filePath, const bool valid, const SF_INFO& sfInfo)
     : id(id)
     , trackId(trackId)
     , filePath(filePath)
+    , valid(valid)
     , sfInfo(sfInfo)
     {}
 
-  Result getSfInfo() {
-    // TODO
-
-    return OK;
-  }
-
+  Result getSfInfo();
   static AudioFile deser(sqlite3_stmt* stmt);
 };
 

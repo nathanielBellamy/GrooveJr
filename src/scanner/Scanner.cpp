@@ -33,9 +33,9 @@ Result Scanner::runScan() {
 
   const char* filePaths [4] = { filePath1, filePath2, filePath3, filePath4 };
 
-  for (int i = 0; i < 4; ++i) {
+  for (const auto path : filePaths) {
     TagLib::FileRef file(
-        filePaths[i],
+        path,
         true,
         TagLib::AudioProperties::Accurate
     );
@@ -70,6 +70,9 @@ Result Scanner::runScan() {
 
     Db::Track track (album.id, tag->title().to8Bit(), tag->track());
     track.id = dao->trackRepository.save(track);
+
+    Db::AudioFile audioFile (track.id, path);
+    audioFile.id = dao->audioFileRepository.save(audioFile);
   }
 
 

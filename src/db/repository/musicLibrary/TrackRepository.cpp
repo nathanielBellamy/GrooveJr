@@ -66,7 +66,7 @@ ID TrackRepository::save(const Track& track) const {
       Logging::write(
           Info,
           "Db::ArtistRepository::save",
-          "Not Saving Track " + track.title + " as TrackNumber " + std::to_string(found.trackNumber) + " already exists for AlbumId " + std::to_string(found.albumId) + " with title " + found.title + " - SQLite UNIQUE constraint failed: artists.name"
+          "Not Saving Track " + track.title + " as TrackNumber " + std::to_string(found.trackNumber) + " already exists for AlbumId " + std::to_string(found.albumId) + " with title " + found.title + " - SQLite UNIQUE constraint failed: tracks.albumId, tracks.trackNumber"
       );
       return found.id;
     }
