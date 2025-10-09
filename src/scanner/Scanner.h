@@ -5,14 +5,21 @@
 #ifndef SCANNER_H
 #define SCANNER_H
 
+#include <map>
 #include <vector>
 
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 
 #include "../db/Dao.h"
-#include "../db/decorate/musicLibrary/TrackDecorate.h"
+#include "../db/Types.h"
+#include "../db/dto/musicLibrary/AlbumWithArtist.h"
+#include "../db/dto/musicLibrary/TrackDecoratedDto.h"
+#include "../db/entity/musicLibrary/Album.h"
 #include "../db/entity/musicLibrary/Artist.h"
+#include "../db/entity/musicLibrary/AudioFile.h"
+#include "../db/entity/musicLibrary/Genre.h"
+#include "../db/entity/musicLibrary/Track.h"
 
 #include "./Logging.h"
 #include "../enums/Result.h"

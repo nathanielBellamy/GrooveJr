@@ -20,9 +20,6 @@ Scanner::Scanner(Db::Dao* dao)
 }
 
 Result Scanner::runScan() {
-  std::vector<Db::TrackDecorate> trackDecorates;
-  std::vector<Db::Artist> artists;
-
   Logging::write(
       Info,
       "Scanner::Scanner::runScan()",
@@ -36,7 +33,6 @@ Result Scanner::runScan() {
   const char* filePaths [3] = { filePath1, filePath2, filePath3 };
 
   for (int i = 0; i < 3; ++i) {
-    // (FileName fileName, bool readAudioProperties=true, AudioProperties::ReadStyle audioPropertiesStyle=AudioProperties::Average)
     TagLib::FileRef file(
         filePaths[i],
         true,
@@ -44,7 +40,11 @@ Result Scanner::runScan() {
     );
 
     if (file.isNull() || !file.tag()) {
-      std::cerr << "Failed to read file: " << filePaths[i] << std::endl;
+      Logging::write(
+          Error,
+          "Scanner::Scanner::runScan()",
+          "Failed to read file."
+      );
       return ERROR;
     }
 
@@ -58,45 +58,16 @@ Result Scanner::runScan() {
     std::cout << "Genre       : " << tag->genre() << std::endl;
 
     Db::Artist artist (tag->artist().to8Bit());
-    artists.push_back(artist);
+    artist.id = dao->artistRepository.save(artist);
 
-    Db::TrackDecorate trackDecorate(
-        filePaths[i],
-        tag->title().to8Bit(),
-        tag->artist().to8Bit(),
-        tag->album().to8Bit(),
-        static_cast<uint16_t>(tag->track())
-    );
-
-    // TODO
-//    Db::Track track(...);
-    // - many Tracks to one Album
-    // - many Tracks to many Genres
-    // - many Tracks to many Artists
-//    Db::AudioFile file(...);
-    // - one Track to many AudioFiles
-//    Db::Album album(...);
-    // - one Album to many Tracks
-//    Db::Artist artist(...);
-    // - many Artists to many Tracks
-//    Db::Genre genre(tag->genre());
-    // - many Genres to many Tracks
-
-    trackDecorates.push_back(trackDecorate);
+    Db::Album album (tag->album().to8Bit(), tag->year());
+    Db::AlbumWithArtist albumWithArtist {
+      album,
+      artist
+    };
+    dao->albumRepository.save(albumWithArtist);
   }
 
-  // todo: SaveAll
-  for (const auto artist : artists) {
-    dao->artistRepository.save(artist);
-  }
-
-  for (const auto trackDeco : trackDecorates) {
-    // TODO
-//    dao->trackRepository.createIfNotExists(trackDeco);
-//    dao->albumRepository.createIfNotExists(track);
-//    dao->artistRepository.createIfNotExists(track);
-//    dao->genreRepository.createIfNotExists(track);
-  }
 
   Logging::write(
       Info,

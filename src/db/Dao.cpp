@@ -14,6 +14,7 @@ Dao::Dao(AppState* gAppState)
   , channelRepository(&db, gAppState)
   , effectRepository(&db, gAppState)
   , sceneRepository(&db, gAppState)
+  , albumRepository(&db, gAppState)
   , artistRepository(&db, gAppState)
   , trackRepository(&db, gAppState)
   {
@@ -195,6 +196,14 @@ int Dao::initSchema() const {
       primary key (trackId, genreId),
       foreign key (trackId) references tracks(id) on delete cascade,
       foreign key (genreId) references genres(id) on delete cascade
+    );
+
+    create table if not exists artist_to_albums (
+      artistId integer not null,
+      albumId integer not null,
+      primary key (artistId, albumId),
+      foreign key (artistId) references artists(id) on delete cascade,
+      foreign key (albumId) references albums(id) on delete cascade
     );
 
   )sql";

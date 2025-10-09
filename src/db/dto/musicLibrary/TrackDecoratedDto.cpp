@@ -2,12 +2,12 @@
 // Created by ns on 10/6/25.
 //
 
-#include "TrackDecorate.h"
+#include "TrackDecoratedDto.h"
 
 namespace Gj {
 namespace Db {
 
-TrackDecorate::TrackDecorate(
+TrackDecoratedDto::TrackDecoratedDto(
   const std::string& filePath,
   const std::string& title,
   const std::string& artist,
@@ -22,7 +22,7 @@ TrackDecorate::TrackDecorate(
   , audioFile(filePath)
   {
 
-  std::cout << "Instantiated TrackDecorate " << filePath << std::endl
+  std::cout << "Instantiated TrackDecoratedDto " << filePath << std::endl
     << "Title: " << title << std::endl
     << "Artist: " << artist << std::endl
     << "Album: " << album << std::endl
@@ -30,7 +30,7 @@ TrackDecorate::TrackDecorate(
 
   Logging::write(
       Info,
-      "Db::TrackDecorate::TrackDecorate",
+      "Db::TrackDecorate::TrackDecoratedDto",
       "Created TrackDecorate for track title: " + title
   );
 }

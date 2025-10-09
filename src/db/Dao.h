@@ -34,6 +34,7 @@ class Dao {
     ChannelRepository channelRepository;
     EffectRepository effectRepository;
     SceneRepository sceneRepository;
+    AlbumRepository albumRepository;
     ArtistRepository artistRepository;
     TrackRepository trackRepository;
 

@@ -12,10 +12,10 @@
 namespace Gj {
 namespace Db {
 
-class TrackDecorate final {
+class TrackDecoratedDto final {
 
   public:
-    TrackDecorate(
+    TrackDecoratedDto(
       const std::string& filePath,
       const std::string& title,
       const std::string& artist,
