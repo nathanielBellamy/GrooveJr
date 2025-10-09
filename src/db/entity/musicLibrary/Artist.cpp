@@ -17,5 +17,9 @@ Artist Artist::deser(sqlite3_stmt* stmt) {
   );
 }
 
+Artist Artist::unknown() {
+  return Artist(" - Unknown Artist - ");
+}
+
 } // Db
 } // Gj

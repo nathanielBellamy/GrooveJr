@@ -31,10 +31,22 @@ ID ArtistRepository::save(const Artist& artist) const {
   sqlite3_bind_text(stmt, 1, artist.name.c_str(), -1, SQLITE_STATIC);
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
+    const char* errmsg = sqlite3_errmsg(*db);
+
+    if (std::strstr(errmsg, "UNIQUE constraint failed: artists.name") != nullptr) {
+      const Artist found = findByName(artist.name);
+      Logging::write(
+          Info,
+          "Db::ArtistRepository::save",
+          "Not Saving Artist " + artist.name + " ArtistId " + std::to_string(found.id) + ". Already Exists - SQLite UNIQUE constraint failed: artists.name"
+      );
+      return found.id;
+    }
+
     Logging::write(
       Error,
       "Db::ArtistRepository::save",
-      "Failed to save Artist " + artist.name + " Message: " + std::string(sqlite3_errmsg(*db))
+      "Failed to save Artist " + artist.name + " Message: " + std::string(errmsg)
     );
   } else {
     Logging::write(
@@ -45,6 +57,30 @@ ID ArtistRepository::save(const Artist& artist) const {
   }
 
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
+}
+
+Artist ArtistRepository::findByName(const std::string& name) const {
+  const std::string query = R"sql(
+    select * from artists a
+    where a.name = ?;
+  )sql";
+
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::SceneRepository::getEffects",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return Artist::unknown();
+  }
+
+  sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
+
+  if (sqlite3_step(stmt) == SQLITE_ROW)
+    return Artist::deser(stmt);
+
+  return Artist::unknown();
 }
 
 

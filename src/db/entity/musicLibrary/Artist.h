@@ -29,6 +29,8 @@ struct Artist {
       {}
 
   static Artist deser(sqlite3_stmt* stmt);
+
+  static Artist unknown();
 };
 
 } // Db

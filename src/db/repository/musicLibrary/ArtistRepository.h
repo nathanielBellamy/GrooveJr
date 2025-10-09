@@ -5,6 +5,7 @@
 #ifndef ARTISTREPOSITORY_H
 #define ARTISTREPOSITORY_H
 
+#include <cstring>
 #include <vector>
 
 #include <sqlite3.h>
@@ -28,6 +29,7 @@ class ArtistRepository final {
     std::vector<Artist> getAll() const;
     ID save(const Artist& artist) const;
     ID saveAll(const std::vector<Artist>& artist) const;
+    Artist findByName(const std::string& name) const;
 
 };
 
