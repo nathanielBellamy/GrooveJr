@@ -37,7 +37,12 @@ namespace Gui {
 
 class MainWindow final : public QMainWindow {
   public:
-    explicit MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState* gAppState, void (*shutdown_handler) (int));
+    explicit MainWindow(
+      actor_system& actorSystem,
+      Audio::Mixer* mixer,
+      AppState* gAppState,
+      void (*shutdown_handler) (int)
+    );
     int hydrateState(const AppStatePacket& appStatePacket);
     void closeEvent(QCloseEvent* event) override;
     void setChannels();

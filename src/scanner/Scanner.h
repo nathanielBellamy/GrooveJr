@@ -36,7 +36,7 @@ class Scanner final {
   public:
     Scanner(Db::Dao* dao);
 
-    Result scanDirectoryRecursive(const std::string& dirPath);
+    Result scanDirectoryRecursive(const std::string& dirPath) const;
 };
 
 } // Sc

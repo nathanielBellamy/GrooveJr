@@ -18,6 +18,7 @@
 #include "./Display.h"
 #include "./EffectsManager.h"
 #include "./Playback.h"
+#include "./MusicLibraryManager.h"
 
 #include "../gui/MainWindow.h"
 #include "../audio/Mixer.h"
@@ -38,6 +39,7 @@ struct SupervisorState {
      strong_actor_ptr playbackActorPtr;
      strong_actor_ptr effectsManagerPtr;
      strong_actor_ptr appStateManagerPtr;
+     strong_actor_ptr musicLibraryManagerPtr;
      strong_actor_ptr displayPtr;
 
      Supervisor::pointer self;
@@ -68,6 +70,8 @@ struct SupervisorState {
            auto effectsManager = self->system().spawn(actor_from_state<EffectsManagerState>, actor_cast<strong_actor_ptr>(self), mixer);
            effectsManagerPtr = actor_cast<strong_actor_ptr>(effectsManager);
 
+
+
            auto appStateManager = self->system().spawn(
                actor_from_state<AppStateManagerState>,
                actor_cast<strong_actor_ptr>(self),
@@ -82,6 +86,14 @@ struct SupervisorState {
                mainWindowPtr
            );
            displayPtr = actor_cast<strong_actor_ptr>(display);
+
+           auto musicLibraryManager = self->system().spawn(
+             actor_from_state<MusicLibraryManagerState>,
+             actor_cast<strong_actor_ptr>(self),
+             mixer,
+             gAppState
+           );
+           musicLibraryManagerPtr = actor_cast<strong_actor_ptr>(musicLibraryManager);
 
            running = true;
          }

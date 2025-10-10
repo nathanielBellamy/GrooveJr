@@ -10,10 +10,8 @@
 //
 #include <string>
 
-#include "caf/actor_ostream.hpp"
 #include "caf/actor_registry.hpp"
 #include "caf/actor_system.hpp"
-#include "caf/caf_main.hpp"
 #include "caf/event_based_actor.hpp"
 
 #include "../Logging.h"

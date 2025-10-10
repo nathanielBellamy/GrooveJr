@@ -37,7 +37,6 @@ class JackClient;
 
 class Mixer {
   AppState* gAppState;
-  Db::Dao* dao;
   std::shared_ptr<JackClient> jackClient;
   float channelCount;
   std::vector<Effects::EffectsChannel*> effectsChannels;
@@ -50,6 +49,7 @@ class Mixer {
   void incorporateLatencySamples(int latencySamples) const;
 
 public:
+  Db::Dao* dao;
   explicit Mixer(AppState*, Db::Dao*);
   ~Mixer();
 

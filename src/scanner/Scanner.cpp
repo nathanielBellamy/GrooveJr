@@ -21,7 +21,7 @@ Scanner::Scanner(Db::Dao* dao)
   );
 }
 
-Result Scanner::scanDirectoryRecursive(const std::string& dirPath) {
+Result Scanner::scanDirectoryRecursive(const std::string& dirPath) const {
   Logging::write(
       Info,
       "Scanner::Scanner::runScan()",
@@ -46,9 +46,8 @@ Result Scanner::scanDirectoryRecursive(const std::string& dirPath) {
 
       // TODO: m4a support
       const bool isAudioFile = ext == ".wav"
-                               || ext == ".mp3"
-                               || ext == ".aif"
                                || ext == ".flac"
+                               || ext == ".mp3"
                                || ext == ".mp4"
                                || ext == ".aif"
                                || ext == ".ogg"

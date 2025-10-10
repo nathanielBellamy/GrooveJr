@@ -15,6 +15,7 @@ namespace Act {
       EFFECTS_MANAGER,
       PLAYBACK,
       SUPERVISOR,
+      MUSIC_LIBRARY_MANAGER
     };
 
 }
