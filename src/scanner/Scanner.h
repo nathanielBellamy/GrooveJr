@@ -5,6 +5,7 @@
 #ifndef SCANNER_H
 #define SCANNER_H
 
+#include <filesystem>
 #include <map>
 #include <vector>
 
@@ -35,7 +36,7 @@ class Scanner final {
   public:
     Scanner(Db::Dao* dao);
 
-    Result runScan();
+    Result scanDirectoryRecursive(const std::string& dirPath);
 };
 
 } // Sc

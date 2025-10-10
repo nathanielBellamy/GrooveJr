@@ -31,7 +31,6 @@ std::vector<Track> TrackRepository::getAll() const {
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     const auto track = Track::deser(stmt);
-    std::cout << "Row: ID = " << track.id << ", title = " << track.title << std::endl;
     tracks.push_back(track);
   }
 
@@ -64,7 +63,7 @@ ID TrackRepository::save(const Track& track) const {
     if (std::strstr(errmsg, "UNIQUE constraint failed: tracks.albumId, tracks.trackNumber") != nullptr) {
       const Track found = findByAlbumIdAndTrackNumber(track.albumId, track.trackNumber);
       Logging::write(
-          Info,
+          Warning,
           "Db::ArtistRepository::save",
           "Not Saving Track " + track.title + " as TrackNumber " + std::to_string(found.trackNumber) + " already exists for AlbumId " + std::to_string(found.albumId) + " with title " + found.title + " - SQLite UNIQUE constraint failed: tracks.albumId, tracks.trackNumber"
       );

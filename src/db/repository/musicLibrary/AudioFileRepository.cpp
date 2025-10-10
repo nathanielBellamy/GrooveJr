@@ -42,7 +42,7 @@ ID AudioFileRepository::save(const AudioFile& audioFile) const {
         // TODO: update validity of existing file
         const AudioFile& foundAudioFile = found.value();
         Logging::write(
-            Info,
+            Warning,
             "Db::AudioFileRepository::save",
             "Not Saving AudioFile " + audioFile.filePath + ". Already Exists - SQLite UNIQUE constraint failed: audioFiles.filePath"
         );

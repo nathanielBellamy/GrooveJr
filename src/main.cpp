@@ -148,7 +148,7 @@ extern "C" {
 
         // setup music library scanner
         Scanner::Scanner scanner(Dao);
-        scanner.runScan();
+        scanner.scanDirectoryRecursive("/Users/ns/GrooveSprings_MusicLibrary");
 
         // setup Audio
         initVst3PluginContext();

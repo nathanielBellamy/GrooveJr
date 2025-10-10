@@ -47,12 +47,16 @@ Result AudioFile::getSfInfo() {
     Logging::write(
       Error,
       "Db::AudioFile::getSfInfo",
-      "Unable to open input file: " + std::string(sf_strerror(nullptr))
+      "Unable to open input filePath: " + filePath + "Error: " + std::string(sf_strerror(nullptr))
     );
+
+    sf_close(file);
     valid = false;
     return ERROR;
   };
 
+
+  sf_close(file);
   valid = true;
   return OK;
 }

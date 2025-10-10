@@ -32,14 +32,14 @@ ID GenreRepository::save(const Genre& genre) const {
       const std::optional<Genre> found = findByName(genre.name);
       if (!found.has_value()) {
         Logging::write(
-            Info,
+            Error,
             "Db::ArtistRepository::save",
             "Failed to find genre with name: " + genre.name + ". This Error Should Not Happen."
         );
         return 0;
       } else {
         Logging::write(
-            Info,
+            Warning,
             "Db::ArtistRepository::save",
             "Not Saving Genre " + genre.name + ". Already exists with Id " + std::to_string(found.value().id) + " - SQLite UNIQUE constraint failed: genres.name"
         );

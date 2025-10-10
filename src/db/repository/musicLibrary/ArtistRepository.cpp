@@ -36,7 +36,7 @@ ID ArtistRepository::save(const Artist& artist) const {
     if (std::strstr(errmsg, "UNIQUE constraint failed: artists.name") != nullptr) {
       const Artist found = findByName(artist.name);
       Logging::write(
-          Info,
+          Warning,
           "Db::ArtistRepository::save",
           "Not Saving Artist " + artist.name + " ArtistId " + std::to_string(found.id) + ". Already Exists - SQLite UNIQUE constraint failed: artists.name"
       );
