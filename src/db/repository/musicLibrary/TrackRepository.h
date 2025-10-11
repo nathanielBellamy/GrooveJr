@@ -9,6 +9,7 @@
 
 #include "../../Logging.h"
 #include "../../../AppState.h"
+#include "../../../enums/Result.h"
 
 #include "../../entity/musicLibrary/Track.h"
 
@@ -24,6 +25,7 @@ class TrackRepository final {
     std::vector<Track> getAll() const;
     ID save(const Track& track) const;
     Track findByAlbumIdAndTrackNumber(ID albumId, TrackNumber trackNumber) const;
+    Result loadAll(const std::map<ID, Track>& tracks) const;
 
 };
 

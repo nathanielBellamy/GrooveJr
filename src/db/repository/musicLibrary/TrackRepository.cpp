@@ -111,5 +111,12 @@ Track TrackRepository::findByAlbumIdAndTrackNumber(const ID albumId, const Track
   return Track::empty();
 }
 
+Result TrackRepository::loadAll(const std::map<ID, Track>& tracks) const {
+  // TODO
+  // - fetch all tracks
+  // - populate into map
+  return OK;
+}
+
 } // Db
 } // Gj

@@ -6,6 +6,7 @@
 #define MUSICLIBRARYMANAGER_H
 
 #include <string>
+#include <map>
 
 #include "caf/actor_registry.hpp"
 #include "caf/actor_system.hpp"
@@ -18,6 +19,9 @@
 #include "./Playback.h"
 #include "../AppState.h"
 
+#include "../db/Dao.h"
+#include "../db/Cache.h"
+
 #include "../scanner/Scanner.h"
 
 using namespace caf;
@@ -27,7 +31,8 @@ namespace Act {
 
 struct MusicLibraryManagerTrait {
     using signatures = type_list<
-                                  result<void>(std::string /*dirPath*/, ml_scan_dir_a)
+                                  result<void>(std::string /*dirPath*/, ml_scan_dir_a),
+                                  result<void>(ml_load_tracks_all_a)
                                 >;
 };
 
@@ -36,6 +41,8 @@ using MusicLibraryManager = typed_actor<MusicLibraryManagerTrait>;
 struct MusicLibraryManagerState {
    MusicLibraryManager::pointer self;
    Audio::Mixer* mixer;
+   Db::Dao* dao;
+   Db::Cache cache;
    AppState* gAppState;
 
    MusicLibraryManagerState(
@@ -46,12 +53,13 @@ struct MusicLibraryManagerState {
      )
      : self(self)
      , mixer(mixer)
+     , dao(mixer->dao)
+     , cache(dao)
      , gAppState(gAppState)
      {
          self->link_to(supervisor);
          self->system().registry().put(MUSIC_LIBRARY_MANAGER, actor_cast<strong_actor_ptr>(self));
      }
-
 
    MusicLibraryManager::behavior_type make_behavior() {
      return {
@@ -63,13 +71,30 @@ struct MusicLibraryManagerState {
          );
 
          try {
-           const Scanner::Scanner scanner (mixer->dao);
+           const Scanner::Scanner scanner (dao);
            scanner.scanDirectoryRecursive(dirPath);
          } catch (...) {
            Logging::write(
              Error,
              "Act::MusicLibraryManager::ml_scan_dir_a",
              "An error occurred while scanning dirPath " + dirPath
+           );
+         }
+       },
+       [this](ml_load_tracks_all_a) {
+         Logging::write(
+           Info,
+           "Act::MusicLibraryManager::ml_load_tracks_all_a",
+           "Loading All Tracks Into Cache"
+         );
+
+         try {
+           cache.loadTracksAll();
+         } catch (...) {
+           Logging::write(
+             Error,
+             "Act::MusicLibraryManager::ml_load_tracks_all_a",
+             "An error occurred while loading all Tracks."
            );
          }
        }

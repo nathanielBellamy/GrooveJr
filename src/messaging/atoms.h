@@ -46,6 +46,7 @@ CAF_BEGIN_TYPE_ID_BLOCK(groovejr, first_custom_type_id)
 
   // Music Library
   CAF_ADD_ATOM(groovejr, ml_scan_dir_a)
+  CAF_ADD_ATOM(groovejr, ml_load_tracks_all_a)
 
 CAF_END_TYPE_ID_BLOCK(groovejr)
 
