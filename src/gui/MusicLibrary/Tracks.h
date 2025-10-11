@@ -9,6 +9,8 @@
 //#include <QSqlDatabase>
 //#include <QSqlQuery>
 //#include <QSqlError>
+#include <QVariant>
+#include <QColor>
 
 namespace Gj {
 namespace Gui {
@@ -19,6 +21,8 @@ public:
   Tracks(QObject* parent = nullptr)
     : QSqlQueryModel(parent)
     {}
+
+  QVariant data(const QModelIndex &item, int role) const override;
 };
 
 } // Gui

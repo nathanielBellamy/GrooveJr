@@ -12,8 +12,11 @@
 #include <QWidget>
 
 #include "../Color.h"
+#include "../../enums/Result.h"
+#include "../../Logging.h"
 
 #include "Tracks.h"
+
 
 using namespace caf;
 
@@ -29,6 +32,7 @@ class MusicLibraryWindow final : public QWidget {
     QGridLayout grid;
     QLabel title;
     Tracks tracks;
+    Result connectToDb();
     void setStyle();
     void setupGrid();
 };

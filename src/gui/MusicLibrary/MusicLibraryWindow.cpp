@@ -14,6 +14,8 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , title(this)
   , tracks(this)
   {
+  connectToDb();
+
   title.setText("Music Library");
   title.setFont({title.font().family(), 18});
 
@@ -37,6 +39,29 @@ void MusicLibraryWindow::setupGrid() {
 
   setLayout(&grid);
 }
+
+Result MusicLibraryWindow::connectToDb() {
+  QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+  db.setDatabaseName("/Users/ns/groove_jr.db");
+
+  if (!db.open()) {
+    Logging::write(
+      Error,
+      "Gui::MusicLibraryWindow::connectToDb",
+      "Failed to connect to the database"
+    );
+    return ERROR;
+  }
+
+  Logging::write(
+    Info,
+      "Gui::MusicLibraryWindow::connectToDb",
+    "MusicLibraryWindow Successfully Connected to Db"
+  );
+
+  return OK;
+}
+
 
 } // Gui
 } // Gj
