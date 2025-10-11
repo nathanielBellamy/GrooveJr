@@ -12,6 +12,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , actorSystem(actorSystem)
   , grid(this)
   , title(this)
+  , tracks(this)
   {
   title.setText("Music Library");
   title.setFont({title.font().family(), 18});

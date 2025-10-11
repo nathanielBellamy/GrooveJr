@@ -13,6 +13,8 @@
 
 #include "../Color.h"
 
+#include "Tracks.h"
+
 using namespace caf;
 
 namespace Gj {
@@ -26,6 +28,7 @@ class MusicLibraryWindow final : public QWidget {
     actor_system& actorSystem;
     QGridLayout grid;
     QLabel title;
+    Tracks tracks;
     void setStyle();
     void setupGrid();
 };

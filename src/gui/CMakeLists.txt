@@ -18,7 +18,7 @@ endif()
 # logging
 find_package(Boost REQUIRED COMPONENTS log_setup log)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Sql)
 qt_standard_project_setup()
 
 set (CAF_ROOT
@@ -81,6 +81,8 @@ qt_add_library(GjGui STATIC
         Mixer/Channel/EffectsChannel/Effects/VstWindowSelectButton.cpp
         MusicLibrary/MusicLibraryWindow.h
         MusicLibrary/MusicLibraryWindow.cpp
+        MusicLibrary/Tracks.h
+        MusicLibrary/Tracks.cpp
         MainToolBar/CurrentlyPlaying.h
         MainToolBar/CurrentlyPlaying.cpp
         MainToolBar/MainToolBar.h
@@ -119,6 +121,7 @@ target_link_libraries(GjGui
         Qt6::Core
         Qt6::Widgets
         Qt6::Gui
+        Qt6::Sql
         CAF::core
         -L${VST3SDK_HOME}/build/lib/Release
         -lsdk
