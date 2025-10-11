@@ -146,10 +146,6 @@ extern "C" {
           "Loaded gAppState: id = " + std::to_string(gAppState->id) + " audioFramesPerBuffer = " + std::to_string(gAppState->getAudioFramesPerBuffer()) + ", sceneId: " + std::to_string(gAppState->getSceneId()) + ", sceneIndex: " + std::to_string(gAppState->getSceneIndex()) + "."
         );
 
-        // setup music library scanner
-        Scanner::Scanner scanner(Dao);
-        scanner.scanDirectoryRecursive("/Users/ns/GrooveSprings_MusicLibrary");
-
         // setup Audio
         initVst3PluginContext();
         Logging::write(

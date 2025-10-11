@@ -20,6 +20,10 @@
 #include <QUrl>
 #include <QString>
 
+#include "../../../../actors/ActorIds.h"
+#include "../../../../messaging/atoms.h"
+#include "../../../../enums/Result.h"
+
 #include "../../../../Logging.h"
 
 #include "./FolderSelect.h"
@@ -30,11 +34,11 @@ namespace Gui {
 using namespace caf;
 
 class MusicMenu final : public QMenu {
-  private:
-    actor_system& actorSystem;
-    QAction addFolderToLibraryAction;
-    FolderSelect folderSelect;
-    QUrl folderUrl;
+
+  actor_system& actorSystem;
+  QAction addFolderToLibraryAction;
+  FolderSelect folderSelect;
+  QUrl folderUrl;
 
   public:
     MusicMenu(actor_system& actorSystem, QWidget* parent);

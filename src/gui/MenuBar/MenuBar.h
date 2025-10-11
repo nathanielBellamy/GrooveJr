@@ -20,7 +20,6 @@
 
 #include "./Menus/FileMenu.h"
 #include "./Menus/Music/MusicMenu.h"
-#include "./Menus/Effects/EffectsMenu.h"
 
 namespace Gj {
 namespace Gui {
@@ -29,14 +28,12 @@ using namespace caf;
 
 class MenuBar final : QMenuBar {
 
-private:
   actor_system& actorSystem;
   FileMenu fileMenu;
   MusicMenu musicMenu;
-  EffectsMenu effectsMenu;
 
-public:
-  explicit MenuBar(actor_system&, QWidget* parent = nullptr);
+  public:
+    explicit MenuBar(actor_system&, QWidget* parent = nullptr);
 };
 
 } // Gui

@@ -24,9 +24,8 @@ using namespace caf;
 
 class FileMenu final : public QMenu {
 
-  private:
-    actor_system& actorSystem;
-    QAction renderAction;
+  actor_system& actorSystem;
+  QAction renderAction;
 
   public:
     FileMenu(actor_system& actorSystem, QWidget* parent);

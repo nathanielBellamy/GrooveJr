@@ -14,7 +14,7 @@ MusicMenu::MusicMenu(actor_system& actorSystem, QWidget* parent)
     , folderSelect(this)
     {
 
-  addFolderToLibraryAction.setStatusTip(tr("Add folder to Music Library"));
+  addFolderToLibraryAction.setStatusTip(tr("Add Folder To Library"));
   addAction(&addFolderToLibraryAction);
 
   connect(&folderSelect, &QFileDialog::directoryUrlEntered, [&](const QUrl& dir) {
@@ -26,7 +26,16 @@ MusicMenu::MusicMenu(actor_system& actorSystem, QWidget* parent)
       Logging::write(
         Info,
         "Gui::MusicMenu::addFolderToLibraryAction",
-        "Selected : " + folderUrl.toDisplayString().toStdString()
+        "Selected : " + folderUrl.toDisplayString().toStdString().substr(7)
+      );
+
+      strong_actor_ptr musicLibraryManager = actorSystem.registry().get(Act::ActorIds::MUSIC_LIBRARY_MANAGER);
+
+      scoped_actor self{actorSystem};
+      self->anon_send(
+          actor_cast<actor>(musicLibraryManager),
+          folderUrl.toDisplayString().toStdString().substr(7),
+          ml_scan_dir_a_v
       );
     }
   });

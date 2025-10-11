@@ -12,12 +12,10 @@ MenuBar::MenuBar(actor_system& actorSystem, QWidget* parent)
     , actorSystem(actorSystem)
     , fileMenu(actorSystem, this)
     , musicMenu(actorSystem, this)
-    , effectsMenu(actorSystem, this)
     {
 
     addMenu(&fileMenu);
     addMenu(&musicMenu);
-    addMenu(&effectsMenu);
 }
 
 } // Gui
