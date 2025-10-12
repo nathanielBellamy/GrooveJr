@@ -21,7 +21,7 @@ namespace Gj {
 namespace Gui {
 
 class TrackQueryModel final : public QSqlQueryModel {
-  QString query = QString("select * from tracks");
+  QString query = QString("select title, trackNumber from tracks");
 
 public:
   explicit TrackQueryModel(QObject* parent = nullptr)
@@ -29,10 +29,8 @@ public:
     {
 
     setQuery(query);
-    setHeaderData(0, Qt::Horizontal, QObject::tr("ID"));
-    setHeaderData(1, Qt::Horizontal, QObject::tr("Album ID"));
-    setHeaderData(2, Qt::Horizontal, QObject::tr("Title"));
-    setHeaderData(3, Qt::Horizontal, QObject::tr("Track Number"));
+    setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
+    setHeaderData(1, Qt::Horizontal, QObject::tr("TrackNumber"));
   }
   Result hydrateState(const AppStatePacket& appStatePacket);
 
