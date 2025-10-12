@@ -84,6 +84,9 @@ qt_add_library(GjGui STATIC
         MusicLibrary/albums/AlbumTableView.h
         MusicLibrary/albums/AlbumQueryModel.h
         MusicLibrary/albums/AlbumQueryModel.cpp
+        MusicLibrary/artists/ArtistTableView.h
+        MusicLibrary/artists/ArtistQueryModel.h
+        MusicLibrary/artists/ArtistQueryModel.cpp
         MusicLibrary/tracks/TrackTableView.h
         MusicLibrary/tracks/TrackQueryModel.h
         MusicLibrary/tracks/TrackQueryModel.cpp

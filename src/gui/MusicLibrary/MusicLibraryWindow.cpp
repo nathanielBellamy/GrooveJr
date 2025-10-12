@@ -13,9 +13,17 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , grid(this)
   , title(this)
   {
-  connectToDb();
-  albumTableView = new AlbumTableView(this);
-  trackTableView = new TrackTableView(this);
+  if (connectToDb() == OK) {
+    albumTableView = new AlbumTableView(this);
+    artistTableView = new ArtistTableView(this);
+    trackTableView = new TrackTableView(this);
+  } else {
+    Logging::write(
+      Warning,
+      "Gui::MusicLibraryWindow::MusicLibraryWindow()",
+      "Something went wrong while connecting to the db."
+    );
+  }
 
   title.setText("Music Library");
   title.setFont({title.font().family(), 18});
@@ -31,6 +39,10 @@ MusicLibraryWindow::~MusicLibraryWindow() {
     "Gui::MusicLibraryWindow::~MusicLibraryWindow()",
     "Deleting MusicLibraryWindow"
   );
+
+  delete albumTableView;
+  delete artistTableView;
+  delete trackTableView;
 
   Logging::write(
     Info,
@@ -49,11 +61,12 @@ void MusicLibraryWindow::setupGrid() {
   grid.setVerticalSpacing(1);
 
   grid.addWidget(&title, 0, 0, 1, 1);
-  grid.addWidget(albumTableView, 1, 0, 5, -1);
-  grid.addWidget(trackTableView, 1, 1, 5, -1);
+  grid.addWidget(artistTableView, 1, 0, 5, 2);
+  grid.addWidget(albumTableView, 1, 2, 5, 2);
+  grid.addWidget(trackTableView, 1, 4, 5, 2);
   grid.setRowStretch(0, 1);
   grid.setRowMinimumHeight(0, 20);
-  grid.setColumnStretch(0, 1);
+  // grid.setColumnStretch(0, 1);
   grid.setColumnMinimumWidth(0, 20);
 
   setLayout(&grid);
