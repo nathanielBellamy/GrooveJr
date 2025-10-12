@@ -2,8 +2,8 @@
 // Created by ns on 10/11/25.
 //
 
-#ifndef TRACKQUERYMODEL_H
-#define TRACKQUERYMODEL_H
+#ifndef ALBUMQUERYMODEL_H
+#define ALBUMQUERYMODEL_H
 
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
@@ -17,17 +17,17 @@
 namespace Gj {
 namespace Gui {
 
-class TrackQueryModel final : public QSqlQueryModel {
-  QString query = QString("select title, trackNumber from tracks");
+class AlbumQueryModel final : public QSqlQueryModel {
+  QString query = QString("select title, year from albums");
 
 public:
-  explicit TrackQueryModel(QObject* parent = nullptr)
+  explicit AlbumQueryModel(QObject* parent = nullptr)
     : QSqlQueryModel(parent)
     {
 
     setQuery(query);
     setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
-    setHeaderData(1, Qt::Horizontal, QObject::tr("TrackNumber"));
+    setHeaderData(1, Qt::Horizontal, QObject::tr("Year"));
   }
   Result hydrateState(const AppStatePacket& appStatePacket);
 
@@ -37,4 +37,4 @@ public:
 } // Gui
 } // Gj
 
-#endif //TRACKQUERYMODEL_H
+#endif //ALBUMQUERYMODEL_H

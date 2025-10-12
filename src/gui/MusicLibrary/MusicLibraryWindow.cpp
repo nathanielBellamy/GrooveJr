@@ -14,6 +14,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , title(this)
   {
   connectToDb();
+  albumTableView = new AlbumTableView(this);
   trackTableView = new TrackTableView(this);
 
   title.setText("Music Library");
@@ -48,9 +49,12 @@ void MusicLibraryWindow::setupGrid() {
   grid.setVerticalSpacing(1);
 
   grid.addWidget(&title, 0, 0, 1, 1);
-  grid.addWidget(trackTableView, 1, 0, 5, -1);
+  grid.addWidget(albumTableView, 1, 0, 5, -1);
+  grid.addWidget(trackTableView, 1, 1, 5, -1);
   grid.setRowStretch(0, 1);
   grid.setRowMinimumHeight(0, 20);
+  grid.setColumnStretch(0, 1);
+  grid.setColumnMinimumWidth(0, 20);
 
   setLayout(&grid);
 }

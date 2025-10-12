@@ -19,6 +19,7 @@
 #include "../../enums/Result.h"
 
 #include "tracks/TrackTableView.h"
+#include "albums/AlbumTableView.h"
 
 using namespace caf;
 
@@ -30,6 +31,7 @@ class MusicLibraryWindow final : public QWidget {
     explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem);
     ~MusicLibraryWindow();
     Result hydrateState(const AppStatePacket& appStatePacket) {
+      albumTableView->hydrateState(appStatePacket);
       trackTableView->hydrateState(appStatePacket);
       return OK;
     };
@@ -38,6 +40,7 @@ class MusicLibraryWindow final : public QWidget {
     actor_system& actorSystem;
     QGridLayout grid;
     QLabel title;
+    AlbumTableView* albumTableView;
     TrackTableView* trackTableView;
     Result connectToDb();
     void setStyle();
