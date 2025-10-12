@@ -10,12 +10,13 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QWidget>
+#include <QTableView>
 
 #include "../Color.h"
 #include "../../enums/Result.h"
 #include "../../Logging.h"
 
-#include "Tracks.h"
+#include "tracks/TrackTableView.h"
 
 
 using namespace caf;
@@ -26,12 +27,13 @@ namespace Gui {
 class MusicLibraryWindow final : public QWidget {
   public:
     explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem);
+    ~MusicLibraryWindow();
 
   private:
     actor_system& actorSystem;
     QGridLayout grid;
     QLabel title;
-    Tracks tracks;
+    TrackTableView* trackTableView;
     Result connectToDb();
     void setStyle();
     void setupGrid();

@@ -12,9 +12,9 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , actorSystem(actorSystem)
   , grid(this)
   , title(this)
-  , tracks(this)
   {
   connectToDb();
+  trackTableView = new TrackTableView(this);
 
   title.setText("Music Library");
   title.setFont({title.font().family(), 18});
@@ -22,6 +22,20 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyle();
   setupGrid();
+}
+
+MusicLibraryWindow::~MusicLibraryWindow() {
+  Logging::write(
+    Info,
+    "Gui::MusicLibraryWindow::~MusicLibraryWindow()",
+    "Deleting MusicLibraryWindow"
+  );
+
+  Logging::write(
+    Info,
+    "Gui::MusicLibraryWindow::~MusicLibraryWindow()",
+    "Deleted MusicLibraryWindow"
+  );
 }
 
 void MusicLibraryWindow::setStyle() {
@@ -33,7 +47,8 @@ void MusicLibraryWindow::setStyle() {
 void MusicLibraryWindow::setupGrid() {
   grid.setVerticalSpacing(1);
 
-  grid.addWidget(&title, 0, 0, 1, -1);
+  grid.addWidget(&title, 0, 0, 1, 1);
+  grid.addWidget(trackTableView, 1, 0, 5, -1);
   grid.setRowStretch(0, 1);
   grid.setRowMinimumHeight(0, 20);
 
@@ -42,7 +57,7 @@ void MusicLibraryWindow::setupGrid() {
 
 Result MusicLibraryWindow::connectToDb() {
   QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-  db.setDatabaseName("/Users/ns/groove_jr.db");
+  db.setDatabaseName("/Users/ns/groovejr.db");
 
   if (!db.open()) {
     Logging::write(

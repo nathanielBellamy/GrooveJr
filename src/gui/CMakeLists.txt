@@ -81,8 +81,9 @@ qt_add_library(GjGui STATIC
         Mixer/Channel/EffectsChannel/Effects/VstWindowSelectButton.cpp
         MusicLibrary/MusicLibraryWindow.h
         MusicLibrary/MusicLibraryWindow.cpp
-        MusicLibrary/Tracks.h
-        MusicLibrary/Tracks.cpp
+        MusicLibrary/tracks/TrackTableView.h
+        MusicLibrary/tracks/TrackQueryModel.h
+        MusicLibrary/tracks/TrackQueryModel.cpp
         MainToolBar/CurrentlyPlaying.h
         MainToolBar/CurrentlyPlaying.cpp
         MainToolBar/MainToolBar.h
