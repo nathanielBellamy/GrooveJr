@@ -46,6 +46,7 @@ int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
 
     mainToolBar.hydrateState(appStatePacket);
     mixerWindow.hydrateState(appStatePacket);
+    musicLibraryWindow.hydrateState(appStatePacket);
 
     Logging::write(
       Info,

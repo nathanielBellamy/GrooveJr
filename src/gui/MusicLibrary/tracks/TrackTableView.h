@@ -7,7 +7,9 @@
 
 #include <QTableView>
 
+#include "../../../enums/Result.h"
 #include "TrackQueryModel.h"
+#include "../../../AppState.h"
 
 namespace Gj {
 namespace Gui {
@@ -20,6 +22,15 @@ class TrackTableView final : public QTableView {
         : QTableView(parent)
         , trackQueryModel(new TrackQueryModel(this)) {
       setModel(trackQueryModel);
+    };
+
+    ~TrackTableView() {
+      delete trackQueryModel;
+    }
+
+    Result hydrateState(const AppStatePacket& appStatePacket) {
+      trackQueryModel->hydrateState(appStatePacket);
+      return OK;
     };
 };
 

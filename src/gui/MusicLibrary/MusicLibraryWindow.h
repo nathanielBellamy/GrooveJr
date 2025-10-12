@@ -15,9 +15,10 @@
 #include "../Color.h"
 #include "../../enums/Result.h"
 #include "../../Logging.h"
+#include "../../AppState.h"
+#include "../../enums/Result.h"
 
 #include "tracks/TrackTableView.h"
-
 
 using namespace caf;
 
@@ -28,6 +29,10 @@ class MusicLibraryWindow final : public QWidget {
   public:
     explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem);
     ~MusicLibraryWindow();
+    Result hydrateState(const AppStatePacket& appStatePacket) {
+      trackTableView->hydrateState(appStatePacket);
+      return OK;
+    };
 
   private:
     actor_system& actorSystem;

@@ -7,6 +7,22 @@
 namespace Gj {
 namespace Gui {
 
+Result TrackQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
+  // TODO
+  // - if newQuery == query and refresh == false
+  //   - no update
+  // - else
+  //   - setQuery(newQuery)
+  //   - update()
+
+  Logging::write(
+      Info,
+      "Gui::TrackQueryModel::hydrateState",
+      "Setting Track Query: ===== newQuery ====="
+  );
+  return OK;
+}
+
 QVariant TrackQueryModel::data(const QModelIndex &index, int role) const {
   QVariant value = QSqlQueryModel::data(index, role);
 //  if (value.isValid() && role == Qt::DisplayRole) {
