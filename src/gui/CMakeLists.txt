@@ -90,6 +90,9 @@ qt_add_library(GjGui STATIC
         MusicLibrary/audioFiles/AudioFileTableView.h
         MusicLibrary/audioFiles/AudioFileQueryModel.h
         MusicLibrary/audioFiles/AudioFileQueryModel.cpp
+        MusicLibrary/genres/GenreTableView.h
+        MusicLibrary/genres/GenreQueryModel.h
+        MusicLibrary/genres/GenreQueryModel.cpp
         MusicLibrary/tracks/TrackTableView.h
         MusicLibrary/tracks/TrackQueryModel.h
         MusicLibrary/tracks/TrackQueryModel.cpp

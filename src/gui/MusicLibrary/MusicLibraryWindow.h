@@ -21,6 +21,7 @@
 #include "albums/AlbumTableView.h"
 #include "artists/ArtistTableView.h"
 #include "audioFiles/AudioFileTableView.h"
+#include "genres/GenreTableView.h"
 #include "tracks/TrackTableView.h"
 
 using namespace caf;
@@ -35,6 +36,8 @@ class MusicLibraryWindow final : public QWidget {
     Result hydrateState(const AppStatePacket& appStatePacket) {
       albumTableView->hydrateState(appStatePacket);
       artistTableView->hydrateState(appStatePacket);
+      audioFileTableView->hydrateState(appStatePacket);
+      genreTableView->hydrateState(appStatePacket);
       trackTableView->hydrateState(appStatePacket);
       return OK;
     };
@@ -47,6 +50,8 @@ class MusicLibraryWindow final : public QWidget {
     AlbumTableView* albumTableView;
     QLabel artistHeader;
     ArtistTableView* artistTableView;
+    QLabel genreHeader;
+    GenreTableView* genreTableView;
     QLabel trackHeader;
     TrackTableView* trackTableView;
     QLabel audioFileHeader;
