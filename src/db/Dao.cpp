@@ -158,7 +158,7 @@ int Dao::initSchema() const {
     create table if not exists playlists (
       id integer primary key autoincrement,
       name text not null unique,
-      createdAt datetime default current_timestamp,
+      createdAt datetime default current_timestamp
     );
 
     create table if not exists tracks (
@@ -208,12 +208,14 @@ int Dao::initSchema() const {
       foreign key (genreId) references genres(id) on delete cascade
     );
 
-    create table if not exists audioFiles_to_playlists (
+    create table if not exists audioFile_to_playlists (
       audioFileId integer not null,
       playlistId integer not null,
+      trackNumber integer not null,
       primary key (audioFileId, playlistId),
       foreign key (audioFileId) references audioFiles(id) on delete cascade,
-      foreign key (playlistId) references playlists(id) on delete cascade
+      foreign key (playlistId) references playlists(id) on delete cascade,
+      unique (playlistId, trackNumber)
     );
 
     create table if not exists artist_to_albums (

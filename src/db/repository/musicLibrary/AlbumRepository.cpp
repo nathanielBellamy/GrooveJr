@@ -40,7 +40,7 @@ ID AlbumRepository::save(const Album& album) const {
   } else {
     Logging::write(
       Info,
-      "Db::AlbumRepository::save",
+      "Db::AlbumRepository::save(album)",
       "Saved Album: " + album.title
     );
   }
@@ -49,18 +49,17 @@ ID AlbumRepository::save(const Album& album) const {
 }
 
 ID AlbumRepository::save(const AlbumWithArtist& albumWithArtist) const {
-  ID albumMatch = getAlbumIdWithArtist(albumWithArtist.album, albumWithArtist.artist);
-  if (albumMatch != 0) {
+  if (const ID albumMatchId = getAlbumIdWithArtist(albumWithArtist.album, albumWithArtist.artist); albumMatchId != 0) {
     Logging::write(
-        Info,
-        "Db::AlbumRepository::save",
+        Warning,
+        "Db::AlbumRepository::save(albumWithArtist)",
         "Album " + albumWithArtist.album.title + " by Artist " + albumWithArtist.artist.name + " Already Exists"
     );
-    return albumMatch;
+    return albumMatchId;
   }
 
   const ID albumId = save(albumWithArtist.album);
-  Album albumWithId (albumId, albumWithArtist.album.title, albumWithArtist.album.year);
+  const Album albumWithId (albumId, albumWithArtist.album.title, albumWithArtist.album.year);
 
   join(albumWithId, albumWithArtist.artist);
 

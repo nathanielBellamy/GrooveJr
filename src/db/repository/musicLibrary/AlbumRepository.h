@@ -29,7 +29,7 @@ class AlbumRepository final {
     AlbumRepository(sqlite3** db, AppState* gAppState);
     std::vector<Album> getAll() const;
     ID save(const Album& artist) const;
-    ID save(const AlbumWithArtist& albumWithArtists) const;
+    ID save(const AlbumWithArtist& albumWithArtist) const;
     ID saveAll(const std::vector<Album>& artist) const;
     Result join(const Album& album, const Artist& artist) const;
 
