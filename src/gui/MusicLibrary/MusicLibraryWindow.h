@@ -18,9 +18,10 @@
 #include "../../AppState.h"
 #include "../../enums/Result.h"
 
-#include "tracks/TrackTableView.h"
 #include "albums/AlbumTableView.h"
 #include "artists/ArtistTableView.h"
+#include "audioFiles/AudioFileTableView.h"
+#include "tracks/TrackTableView.h"
 
 using namespace caf;
 
@@ -42,9 +43,14 @@ class MusicLibraryWindow final : public QWidget {
     actor_system& actorSystem;
     QGridLayout grid;
     QLabel title;
+    QLabel albumHeader;
     AlbumTableView* albumTableView;
+    QLabel artistHeader;
     ArtistTableView* artistTableView;
+    QLabel trackHeader;
     TrackTableView* trackTableView;
+    QLabel audioFileHeader;
+    AudioFileTableView* audioFileTableView;
     Result connectToDb();
     void setStyle();
     void setupGrid();

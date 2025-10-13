@@ -12,10 +12,15 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , actorSystem(actorSystem)
   , grid(this)
   , title(this)
+  , albumHeader(this)
+  , artistHeader(this)
+  , trackHeader(this)
+  , audioFileHeader(this)
   {
   if (connectToDb() == OK) {
     albumTableView = new AlbumTableView(this);
     artistTableView = new ArtistTableView(this);
+    audioFileTableView = new AudioFileTableView(this);
     trackTableView = new TrackTableView(this);
   } else {
     Logging::write(
@@ -27,6 +32,18 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
 
   title.setText("Music Library");
   title.setFont({title.font().family(), 18});
+
+  albumHeader.setText("Albums");
+  albumHeader.setFont({title.font().family(), 14});
+
+  artistHeader.setText("Artists");
+  artistHeader.setFont({title.font().family(), 14});
+
+  audioFileHeader.setText("Audio Files");
+  audioFileHeader.setFont({title.font().family(), 14});
+
+  trackHeader.setText("Tracks");
+  trackHeader.setFont({title.font().family(), 14});
 
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyle();
@@ -42,6 +59,7 @@ MusicLibraryWindow::~MusicLibraryWindow() {
 
   delete albumTableView;
   delete artistTableView;
+  delete audioFileTableView;
   delete trackTableView;
 
   Logging::write(
@@ -61,13 +79,22 @@ void MusicLibraryWindow::setupGrid() {
   grid.setVerticalSpacing(1);
 
   grid.addWidget(&title, 0, 0, 1, 1);
-  grid.addWidget(artistTableView, 1, 0, 5, 2);
-  grid.addWidget(albumTableView, 1, 2, 5, 2);
-  grid.addWidget(trackTableView, 1, 4, 5, 2);
-  grid.setRowStretch(0, 1);
-  grid.setRowMinimumHeight(0, 20);
+  // headers
+  grid.addWidget(&artistHeader, 1, 0, 1, 2);
+  grid.addWidget(&albumHeader, 1, 2, 1, 2);
+  grid.addWidget(&trackHeader, 1, 4, 1, 2);
+  grid.addWidget(&audioFileHeader, 1, 6, 1, 2);
+
+  // tables
+  grid.addWidget(artistTableView, 2, 0, 5, 2);
+  grid.addWidget(albumTableView, 2, 2, 5, 2);
+  grid.addWidget(trackTableView, 2, 4, 5, 2);
+  grid.addWidget(audioFileTableView, 2, 6, 5, 2);
+
+  // grid.setRowStretch(0, 1);
+  // grid.setRowMinimumHeight(0, 20);
   // grid.setColumnStretch(0, 1);
-  grid.setColumnMinimumWidth(0, 20);
+  // grid.setColumnMinimumWidth(0, 20);
 
   setLayout(&grid);
 }
