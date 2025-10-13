@@ -15,6 +15,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , albumHeader(this)
   , artistHeader(this)
   , genreHeader(this)
+  , playlistHeader(this)
   , trackHeader(this)
   , audioFileHeader(this)
   {
@@ -23,6 +24,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
     artistTableView = new ArtistTableView(this);
     audioFileTableView = new AudioFileTableView(this);
     genreTableView = new GenreTableView(this);
+    playlistTableView = new PlaylistTableView(this);
     trackTableView = new TrackTableView(this);
   } else {
     Logging::write(
@@ -47,6 +49,9 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   genreHeader.setText("Genre");
   genreHeader.setFont({title.font().family(), 14});
 
+  playlistHeader.setText("Playlist");
+  playlistHeader.setFont({title.font().family(), 14});
+
   trackHeader.setText("Tracks");
   trackHeader.setFont({title.font().family(), 14});
 
@@ -66,6 +71,7 @@ MusicLibraryWindow::~MusicLibraryWindow() {
   delete artistTableView;
   delete audioFileTableView;
   delete genreTableView;
+  delete playlistTableView;
   delete trackTableView;
 
   Logging::write(
@@ -87,16 +93,18 @@ void MusicLibraryWindow::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, 1);
 
   grid.addWidget(&genreHeader, 1, 0, 1, 1);
-  grid.addWidget(&artistHeader, 1, 1, 1, 1);
-  grid.addWidget(&albumHeader, 1, 2, 1, 2);
-  grid.addWidget(&trackHeader, 1, 4, 1, 2);
-  grid.addWidget(&audioFileHeader, 1, 6, 1, 2);
+  grid.addWidget(&playlistHeader, 1, 1, 1, 1);
+  grid.addWidget(&artistHeader, 1, 2, 1, 1);
+  grid.addWidget(&albumHeader, 1, 3, 1, 2);
+  grid.addWidget(&trackHeader, 1, 5, 1, 2);
+  grid.addWidget(&audioFileHeader, 1, 7, 1, 2);
 
   grid.addWidget(genreTableView, 2, 0, 5, 1);
-  grid.addWidget(artistTableView, 2, 1, 5, 1);
-  grid.addWidget(albumTableView, 2, 2, 5, 2);
-  grid.addWidget(trackTableView, 2, 4, 5, 2);
-  grid.addWidget(audioFileTableView, 2, 6, 5, 2);
+  grid.addWidget(playlistTableView, 2, 1, 5, 1);
+  grid.addWidget(artistTableView, 2, 2, 5, 1);
+  grid.addWidget(albumTableView, 2, 3, 5, 2);
+  grid.addWidget(trackTableView, 2, 5, 5, 2);
+  grid.addWidget(audioFileTableView, 2, 7, 5, 2);
 
   setLayout(&grid);
 }
