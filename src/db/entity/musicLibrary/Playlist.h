@@ -20,6 +20,15 @@ namespace Db {
 struct Playlist {
   ID id;
   std::string name;
+
+  Playlist(ID id, const std::string& name);
+  Playlist(const std::string& name);
+
+  static Playlist empty() {
+    return Playlist("- Empty Playlist -");
+  }
+
+  static Playlist deser(sqlite3_stmt* stmt);
 };
 
 } // Db

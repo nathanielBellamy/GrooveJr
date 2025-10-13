@@ -18,6 +18,7 @@ Dao::Dao(AppState* gAppState)
   , artistRepository(&db, gAppState)
   , audioFileRepository(&db, gAppState)
   , genreRepository(&db, gAppState)
+  , playlistRepository(&db, gAppState)
   , trackRepository(&db, gAppState)
   {
 

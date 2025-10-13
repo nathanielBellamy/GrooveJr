@@ -37,6 +37,10 @@ Result Scanner::scanDirectoryRecursive(const std::string& dirPath) const {
     return ERROR;
   }
 
+  Db::Playlist playlist ("Grooves With Moves");
+  dao->playlistRepository.save(playlist);
+  dao->playlistRepository.save(playlist);
+
   for (const auto& entry : fs::directory_iterator(dirPath)) {
     if (fs::is_directory(entry.status())) {
       // recurse into subdirectory

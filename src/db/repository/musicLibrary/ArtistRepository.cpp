@@ -69,7 +69,7 @@ Artist ArtistRepository::findByName(const std::string& name) const {
   if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     Logging::write(
       Error,
-      "Db::SceneRepository::getEffects",
+      "Db::SceneRepository::findByName",
       "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
     );
     return Artist::unknown();

@@ -96,7 +96,7 @@ Track TrackRepository::findByAlbumIdAndTrackNumber(const ID albumId, const Track
   if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     Logging::write(
       Error,
-      "Db::TrackRepository::getEffects",
+      "Db::TrackRepository::findByAlbumIdAndTrackNumber",
       "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
     );
     return Track::empty();

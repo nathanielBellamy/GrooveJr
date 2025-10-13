@@ -29,16 +29,18 @@ add_library(GjDb SHARED
         entity/mixer/Effect.cpp
         entity/mixer/Scene.h
         entity/mixer/Scene.cpp
-        entity/musicLibrary/Track.h
-        entity/musicLibrary/Track.cpp
-        entity/musicLibrary/AudioFile.h
-        entity/musicLibrary/AudioFile.cpp
-        entity/musicLibrary/Artist.h
-        entity/musicLibrary/Artist.cpp
         entity/musicLibrary/Album.h
         entity/musicLibrary/Album.cpp
+        entity/musicLibrary/Artist.h
+        entity/musicLibrary/Artist.cpp
+        entity/musicLibrary/AudioFile.h
+        entity/musicLibrary/AudioFile.cpp
         entity/musicLibrary/Genre.h
         entity/musicLibrary/Genre.cpp
+        entity/musicLibrary/Playlist.h
+        entity/musicLibrary/Playlist.cpp
+        entity/musicLibrary/Track.h
+        entity/musicLibrary/Track.cpp
         repository/AppStateRepository.h
         repository/AppStateRepository.cpp
         repository/mixer/ChannelRepository.h
@@ -55,6 +57,8 @@ add_library(GjDb SHARED
         repository/musicLibrary/AudioFileRepository.cpp
         repository/musicLibrary/GenreRepository.h
         repository/musicLibrary/GenreRepository.cpp
+        repository/musicLibrary/PlaylistRepository.h
+        repository/musicLibrary/PlaylistRepository.cpp
         repository/musicLibrary/TrackRepository.h
         repository/musicLibrary/TrackRepository.cpp
 )

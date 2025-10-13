@@ -22,6 +22,7 @@
 #include "../db/entity/musicLibrary/AudioFile.h"
 #include "../db/entity/musicLibrary/Genre.h"
 #include "../db/entity/musicLibrary/Track.h"
+#include "../db/entity/musicLibrary/Playlist.h"
 
 #include "./Logging.h"
 #include "../enums/Result.h"
