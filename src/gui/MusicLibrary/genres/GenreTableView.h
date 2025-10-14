@@ -16,12 +16,19 @@ namespace Gui {
 
 class GenreTableView final : public QTableView {
   GenreQueryModel* genreQueryModel;
+  Result setStyle() {
+    setStyleSheet(
+      "font-weight: 500; font-size: 12px;"
+    );
+    return OK;
+  }
 
   public:
     GenreTableView(QWidget* parent = nullptr)
         : QTableView(parent)
         , genreQueryModel(new GenreQueryModel(this)) {
       setModel(genreQueryModel);
+      setStyle();
     };
 
     ~GenreTableView() {

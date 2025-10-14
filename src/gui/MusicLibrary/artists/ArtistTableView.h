@@ -16,12 +16,19 @@ namespace Gui {
 
 class ArtistTableView final : public QTableView {
   ArtistQueryModel* artistQueryModel;
+  Result setStyle() {
+    setStyleSheet(
+      "font-weight: 500; font-size: 12px;"
+    );
+    return OK;
+  }
 
   public:
     ArtistTableView(QWidget* parent = nullptr)
         : QTableView(parent)
         , artistQueryModel(new ArtistQueryModel(this)) {
       setModel(artistQueryModel);
+      setStyle();
     };
 
     ~ArtistTableView() {

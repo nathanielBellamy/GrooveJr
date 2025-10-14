@@ -31,7 +31,7 @@ public:
   }
   Result hydrateState(const AppStatePacket& appStatePacket);
 
-  QVariant data(const QModelIndex &item, int role) const override;
+  QVariant data(const QModelIndex& index, int role) const override;
 };
 
 } // Gui

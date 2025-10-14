@@ -16,12 +16,19 @@ namespace Gui {
 
 class TrackTableView final : public QTableView {
   TrackQueryModel* trackQueryModel;
+  Result setStyle() {
+    setStyleSheet(
+      "font-weight: 500; font-size: 12px;"
+    );
+    return OK;
+  }
 
   public:
     TrackTableView(QWidget* parent = nullptr)
         : QTableView(parent)
         , trackQueryModel(new TrackQueryModel(this)) {
       setModel(trackQueryModel);
+      setStyle();
     };
 
     ~TrackTableView() {

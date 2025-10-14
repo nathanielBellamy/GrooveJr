@@ -16,12 +16,19 @@ namespace Gui {
 
 class AlbumTableView final : public QTableView {
   AlbumQueryModel* albumQueryModel;
+  Result setStyle() {
+    setStyleSheet(
+      "font-weight: 500; font-size: 12px;"
+    );
+    return OK;
+  }
 
   public:
     AlbumTableView(QWidget* parent = nullptr)
         : QTableView(parent)
         , albumQueryModel(new AlbumQueryModel(this)) {
       setModel(albumQueryModel);
+      setStyle();
     };
 
     ~AlbumTableView() {

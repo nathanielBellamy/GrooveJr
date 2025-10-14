@@ -92,19 +92,26 @@ void MusicLibraryWindow::setupGrid() {
 
   grid.addWidget(&title, 0, 0, 1, 1);
 
+  grid.setColumnStretch(0, 1);
+  grid.setColumnStretch(1, 2);
+  grid.setColumnStretch(2, 2);
+  grid.setColumnStretch(3,3);
+  grid.setColumnStretch(4, 4);
+  grid.setColumnStretch(5, 2);
+
   grid.addWidget(&genreHeader, 1, 0, 1, 1);
   grid.addWidget(&playlistHeader, 1, 1, 1, 1);
   grid.addWidget(&artistHeader, 1, 2, 1, 1);
-  grid.addWidget(&albumHeader, 1, 3, 1, 2);
-  grid.addWidget(&trackHeader, 1, 5, 1, 2);
-  grid.addWidget(&audioFileHeader, 1, 7, 1, 2);
+  grid.addWidget(&albumHeader, 1, 3, 1, 1);
+  grid.addWidget(&trackHeader, 1, 4, 1, 1);
+  grid.addWidget(&audioFileHeader, 1, 5, 1, 1);
 
   grid.addWidget(genreTableView, 2, 0, 5, 1);
   grid.addWidget(playlistTableView, 2, 1, 5, 1);
   grid.addWidget(artistTableView, 2, 2, 5, 1);
-  grid.addWidget(albumTableView, 2, 3, 5, 2);
-  grid.addWidget(trackTableView, 2, 5, 5, 2);
-  grid.addWidget(audioFileTableView, 2, 7, 5, 2);
+  grid.addWidget(albumTableView, 2, 3, 5, 1);
+  grid.addWidget(trackTableView, 2, 4, 5, 1);
+  grid.addWidget(audioFileTableView, 2, 5, 5, 1);
 
   setLayout(&grid);
 }

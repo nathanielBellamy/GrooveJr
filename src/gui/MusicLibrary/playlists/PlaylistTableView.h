@@ -16,12 +16,19 @@ namespace Gui {
 
 class PlaylistTableView final : public QTableView {
   PlaylistQueryModel* playlistQueryModel;
+  Result setStyle() {
+    setStyleSheet(
+      "font-weight: 500; font-size: 12px;"
+    );
+    return OK;
+  }
 
   public:
     PlaylistTableView(QWidget* parent = nullptr)
         : QTableView(parent)
         , playlistQueryModel(new PlaylistQueryModel(this)) {
       setModel(playlistQueryModel);
+      setStyle();
     };
 
     ~PlaylistTableView() {

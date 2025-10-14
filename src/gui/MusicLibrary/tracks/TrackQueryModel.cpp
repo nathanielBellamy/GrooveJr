@@ -23,8 +23,11 @@ Result TrackQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
-QVariant TrackQueryModel::data(const QModelIndex& index, int role) const {
+QVariant TrackQueryModel::data(const QModelIndex& index, const int role) const {
   // TODO: format
+  // if (role == Qt::ForegroundRole)
+  //   return QVariant::fromValue(QColor(Qt::green));
+
   return QSqlQueryModel::data(index, role);
 }
 

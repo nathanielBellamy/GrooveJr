@@ -16,12 +16,19 @@ namespace Gui {
 
 class AudioFileTableView final : public QTableView {
   AudioFileQueryModel* audioFileQueryModel;
+  Result setStyle() {
+    setStyleSheet(
+      "font-weight: 500; font-size: 12px;"
+    );
+    return OK;
+  }
 
   public:
     AudioFileTableView(QWidget* parent = nullptr)
         : QTableView(parent)
         , audioFileQueryModel(new AudioFileQueryModel(this)) {
       setModel(audioFileQueryModel);
+      setStyle();
     };
 
     ~AudioFileTableView() {
