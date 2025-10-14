@@ -18,14 +18,15 @@ namespace Gj {
 namespace Gui {
 
 class AlbumQueryModel final : public QSqlQueryModel {
-  QString query = QString("select title, year from albums");
+  QString query = QString("select id, title, year from albums");
 
   Qt::ItemFlags flags(const QModelIndex &index) const override;
 
   Result refresh() {
     setQuery(query);
-    setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
-    setHeaderData(1, Qt::Horizontal, QObject::tr("Year"));
+    setHeaderData(0, Qt::Horizontal, QObject::tr("Id"));
+    setHeaderData(1, Qt::Horizontal, QObject::tr("Title"));
+    setHeaderData(2, Qt::Horizontal, QObject::tr("Year"));
 
     return OK;
   }

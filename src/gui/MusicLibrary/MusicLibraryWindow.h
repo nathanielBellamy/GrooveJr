@@ -46,13 +46,6 @@ class MusicLibraryWindow final : public QWidget {
       return OK;
     };
 
-    Result updateFilters() {
-      filters.albumIds.clear();
-      filters.albumIds.push_back(1);
-
-      return refresh();
-    }
-
     Result refresh() {
       trackTableView->refresh();
       return OK;
@@ -78,10 +71,6 @@ class MusicLibraryWindow final : public QWidget {
     void setStyle();
     void setupGrid();
     Result connectActions();
-
-    static void onAlbumDoubleClick(const QModelIndex &index) {
-      std::cout << "fooooo  fff " << index.row() << " " << index.column() << " fooo "  << index.data().toString().toStdString() << std::endl;
-    }
 };
 
 } // Gui

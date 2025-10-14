@@ -118,7 +118,13 @@ void MusicLibraryWindow::setupGrid() {
 }
 
 Result MusicLibraryWindow::connectActions() {
-  connect(albumTableView, &QTableView::doubleClicked, this, &MusicLibraryWindow::onAlbumDoubleClick);
+  connect(albumTableView, &QTableView::doubleClicked, this, [&] (const QModelIndex& index) {
+      const QVariant albumId = albumTableView->model()->index(index.row(), 0).data();
+      filters.albumIds.clear();
+      filters.albumIds.push_back(static_cast<uint64_t>(albumId.toInt()));
+
+      refresh();
+  });
 
   return OK;
 }
