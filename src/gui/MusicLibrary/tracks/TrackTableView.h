@@ -8,8 +8,10 @@
 #include <QTableView>
 
 #include "../../../enums/Result.h"
-#include "TrackQueryModel.h"
 #include "../../../AppState.h"
+
+#include "../MusicLibraryFilters.h"
+#include "TrackQueryModel.h"
 
 namespace Gj {
 namespace Gui {
@@ -24,15 +26,20 @@ class TrackTableView final : public QTableView {
   }
 
   public:
-    TrackTableView(QWidget* parent = nullptr)
+    TrackTableView(QWidget* parent, MusicLibraryFilters* filters)
         : QTableView(parent)
-        , trackQueryModel(new TrackQueryModel(this)) {
+        , trackQueryModel(new TrackQueryModel(this, filters)) {
       setModel(trackQueryModel);
       setStyle();
     };
 
     ~TrackTableView() {
       delete trackQueryModel;
+    }
+
+    Result refresh() {
+      trackQueryModel->refresh();
+      return OK;
     }
 
     Result hydrateState(const AppStatePacket& appStatePacket) {

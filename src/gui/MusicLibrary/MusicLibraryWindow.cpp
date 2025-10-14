@@ -25,7 +25,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
     audioFileTableView = new AudioFileTableView(this);
     genreTableView = new GenreTableView(this);
     playlistTableView = new PlaylistTableView(this);
-    trackTableView = new TrackTableView(this);
+    trackTableView = new TrackTableView(this, &filters);
   } else {
     Logging::write(
       Warning,
@@ -56,6 +56,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   trackHeader.setFont({title.font().family(), 14});
 
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  connectActions();
   setStyle();
   setupGrid();
 }
@@ -114,6 +115,12 @@ void MusicLibraryWindow::setupGrid() {
   grid.addWidget(audioFileTableView, 2, 5, 5, 1);
 
   setLayout(&grid);
+}
+
+Result MusicLibraryWindow::connectActions() {
+  connect(albumTableView, &QTableView::doubleClicked, this, &MusicLibraryWindow::onAlbumDoubleClick);
+
+  return OK;
 }
 
 Result MusicLibraryWindow::connectToDb() {

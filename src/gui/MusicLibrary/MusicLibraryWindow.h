@@ -18,6 +18,7 @@
 #include "../../AppState.h"
 #include "../../enums/Result.h"
 
+#include "MusicLibraryFilters.h"
 #include "albums/AlbumTableView.h"
 #include "artists/ArtistTableView.h"
 #include "audioFiles/AudioFileTableView.h"
@@ -32,6 +33,7 @@ namespace Gui {
 
 class MusicLibraryWindow final : public QWidget {
   public:
+    MusicLibraryFilters filters;
     explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem);
     ~MusicLibraryWindow();
     Result hydrateState(const AppStatePacket& appStatePacket) {
@@ -43,6 +45,18 @@ class MusicLibraryWindow final : public QWidget {
       trackTableView->hydrateState(appStatePacket);
       return OK;
     };
+
+    Result updateFilters() {
+      filters.albumIds.clear();
+      filters.albumIds.push_back(1);
+
+      return refresh();
+    }
+
+    Result refresh() {
+      trackTableView->refresh();
+      return OK;
+    }
 
   private:
     actor_system& actorSystem;
@@ -63,6 +77,11 @@ class MusicLibraryWindow final : public QWidget {
     Result connectToDb();
     void setStyle();
     void setupGrid();
+    Result connectActions();
+
+    static void onAlbumDoubleClick(const QModelIndex &index) {
+      std::cout << "fooooo  fff " << index.row() << " " << index.column() << " fooo "  << index.data().toString().toStdString() << std::endl;
+    }
 };
 
 } // Gui
