@@ -14,6 +14,7 @@ Result AlbumQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   // - else
   //   - setQuery(newQuery)
   //   - update()
+  // refresh();
 
   Logging::write(
       Info,
@@ -26,6 +27,12 @@ Result AlbumQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
 QVariant AlbumQueryModel::data(const QModelIndex& index, int role) const {
   // TODO: format
   return QSqlQueryModel::data(index, role);
+}
+
+Qt::ItemFlags AlbumQueryModel::flags(const QModelIndex &index) const {
+  Qt::ItemFlags flags = QSqlQueryModel::flags(index);
+  flags |= Qt::ItemIsEditable;
+  return flags;
 }
 
 } // Gui
