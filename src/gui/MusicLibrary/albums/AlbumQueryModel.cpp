@@ -33,6 +33,12 @@ Result AlbumQueryModel::refresh() {
                  " on alb.id = ata.albumId"
                  " where ata.artistId in " + filters->idSqlArray();
       break;
+    case TRACK:
+      queryStr = " select alb.title, alb.year, alb.id from albums alb"
+                 " join tracks trk"
+                 " on alb.id = trk.albumId"
+                 " where trk.id in " + filters->idSqlArray();
+      break;
     default:
       queryStr = "select title, year, id from albums";
   }
