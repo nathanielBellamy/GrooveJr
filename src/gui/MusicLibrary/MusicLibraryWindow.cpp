@@ -22,7 +22,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   if (connectToDb() == OK) {
     albumTableView = new AlbumTableView(this, &filters);
     artistTableView = new ArtistTableView(this, &filters);
-    audioFileTableView = new AudioFileTableView(this);
+    audioFileTableView = new AudioFileTableView(this, &filters);
     genreTableView = new GenreTableView(this);
     playlistTableView = new PlaylistTableView(this);
     trackTableView = new TrackTableView(this, &filters);
@@ -120,18 +120,21 @@ void MusicLibraryWindow::setupGrid() {
 Result MusicLibraryWindow::connectActions() {
   const auto albumClickedConnection = connect(albumTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant albumId = albumTableView->model()->index(index.row(), 2).data();
-      filters.filterBy = ALBUM;
-      filters.ids.clear();
-      filters.ids.push_back(static_cast<uint64_t>(albumId.toInt()));
+      filters.set(ALBUM, albumId.toInt());
 
       refresh();
   });
 
   const auto artistClickedConnection = connect(artistTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant artistId = artistTableView->model()->index(index.row(), 1).data();
-      filters.filterBy = ARTIST;
-      filters.ids.clear();
-      filters.ids.push_back(static_cast<uint64_t>(artistId.toInt()));
+      filters.set(ARTIST, artistId.toLongLong());
+
+      refresh();
+  });
+
+  const auto trackClickedConnection = connect(trackTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
+      const QVariant trackId = trackTableView->model()->index(index.row(), 2).data();
+      filters.set(TRACK, trackId.toLongLong());
 
       refresh();
   });

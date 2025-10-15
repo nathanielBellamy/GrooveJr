@@ -10,12 +10,16 @@
 #include "../../../enums/Result.h"
 #include "AudioFileQueryModel.h"
 #include "../../../AppState.h"
+#include "../MusicLibraryFilters.h"
 
 namespace Gj {
 namespace Gui {
 
 class AudioFileTableView final : public QTableView {
+
+  MusicLibraryFilters* filters;
   AudioFileQueryModel* audioFileQueryModel;
+
   Result setStyle() {
     setStyleSheet(
       "font-weight: 500; font-size: 12px;"
@@ -24,9 +28,10 @@ class AudioFileTableView final : public QTableView {
   }
 
   public:
-    AudioFileTableView(QWidget* parent = nullptr)
+    AudioFileTableView(QWidget* parent, MusicLibraryFilters* filters)
         : QTableView(parent)
-        , audioFileQueryModel(new AudioFileQueryModel(this)) {
+        , filters(filters)
+        , audioFileQueryModel(new AudioFileQueryModel(this, filters)) {
       setModel(audioFileQueryModel);
       setStyle();
     };
@@ -39,6 +44,11 @@ class AudioFileTableView final : public QTableView {
       audioFileQueryModel->hydrateState(appStatePacket);
       return OK;
     };
+
+    Result refresh() {
+      audioFileQueryModel->refresh();
+      return OK;
+    }
 };
 
 } // Gui

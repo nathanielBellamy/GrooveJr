@@ -28,5 +28,24 @@ QVariant AudioFileQueryModel::data(const QModelIndex& index, int role) const {
   return QSqlQueryModel::data(index, role);
 }
 
+Result AudioFileQueryModel::refresh() {
+  std::string queryStr;
+  switch (filters->filterBy) {
+    case TRACK:
+      queryStr = " select filePath from audioFiles"
+                 " where audioFiles.trackId in " + filters->idSqlArray();
+      break;
+    default:
+      queryStr = "select filePath from audioFiles";
+  }
+
+  query = QString(queryStr.c_str());
+  setQuery(query);
+  setHeaderData(0, Qt::Horizontal, QObject::tr("Path"));
+
+  return OK;
+}
+
+
 } // Gui
 } // Gj

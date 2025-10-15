@@ -49,6 +49,7 @@ class MusicLibraryWindow final : public QWidget {
     Result refresh() {
       albumTableView->refresh();
       artistTableView->refresh();
+      audioFileTableView->refresh();
       trackTableView->refresh();
       return OK;
     }

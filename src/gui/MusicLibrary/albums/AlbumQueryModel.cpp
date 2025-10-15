@@ -37,7 +37,8 @@ Result AlbumQueryModel::refresh() {
       queryStr = "select title, year, id from albums";
   }
 
-  setQuery(QString(queryStr.c_str()));
+  query = QString(queryStr.c_str());
+  setQuery(query);
   setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
   setHeaderData(1, Qt::Horizontal, QObject::tr("Year"));
   setHeaderData(2, Qt::Horizontal, QObject::tr("Id"));

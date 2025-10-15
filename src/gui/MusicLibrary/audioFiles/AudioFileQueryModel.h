@@ -10,6 +10,7 @@
 #include <QColor>
 #include <QString>
 
+#include "../MusicLibraryFilters.h"
 #include "../../../AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
@@ -18,19 +19,21 @@ namespace Gj {
 namespace Gui {
 
 class AudioFileQueryModel final : public QSqlQueryModel {
-  QString query = QString("select filePath from audioFiles");
+  MusicLibraryFilters* filters;
+  QString query;
 
 public:
-  explicit AudioFileQueryModel(QObject* parent = nullptr)
+  explicit AudioFileQueryModel(QObject* parent, MusicLibraryFilters* filters)
     : QSqlQueryModel(parent)
+    , filters(filters)
     {
-
-    setQuery(query);
-    setHeaderData(0, Qt::Horizontal, QObject::tr("Path"));
+    refresh();
   }
   Result hydrateState(const AppStatePacket& appStatePacket);
 
   QVariant data(const QModelIndex &item, int role) const override;
+
+  Result refresh();
 };
 
 } // Gui
