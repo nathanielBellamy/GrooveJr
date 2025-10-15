@@ -33,14 +33,14 @@ ID GenreRepository::save(const Genre& genre) const {
       if (!found.has_value()) {
         Logging::write(
             Error,
-            "Db::ArtistRepository::save",
+            "Db::GenreRepository::save",
             "Failed to find genre with name: " + genre.name + ". This Error Should Not Happen."
         );
         return 0;
       } else {
         Logging::write(
             Warning,
-            "Db::ArtistRepository::save",
+            "Db::GenreRepository::save",
             "Not Saving Genre " + genre.name + ". Already exists with Id " + std::to_string(found.value().id) + " - SQLite UNIQUE constraint failed: genres.name"
         );
         return found.value().id;
@@ -124,7 +124,7 @@ Result GenreRepository::join(const ID genreId, const ID trackId) const {
 
   Logging::write(
     Info,
-    "Db::EffectRepository::save",
+    "Db::GenreRepository::join(genreId, trackId)",
     "Joined GenreId " + std::to_string(genreId) + " to TrackId " + std::to_string(trackId) + ". Message: " + std::string(sqlite3_errmsg(*db))
   );
 

@@ -13,29 +13,22 @@
 #include "../../../AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
+#include "../MusicLibraryFilters.h"
 
 namespace Gj {
 namespace Gui {
 
 class AlbumQueryModel final : public QSqlQueryModel {
-  QString query = QString("select title, year, id from albums");
+  MusicLibraryFilters* filters;
+  QString query = QString();
 
-  Qt::ItemFlags flags(const QModelIndex &index) const override;
-
-  Result refresh() {
-    setQuery(query);
-    setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
-    setHeaderData(1, Qt::Horizontal, QObject::tr("Year"));
-    setHeaderData(2, Qt::Horizontal, QObject::tr("Id"));
-
-    return OK;
-  }
 
 public:
-  explicit AlbumQueryModel(QObject* parent = nullptr)
+  Result refresh();
+  explicit AlbumQueryModel(QObject* parent, MusicLibraryFilters* filters)
     : QSqlQueryModel(parent)
+    , filters(filters)
     {
-
     refresh();
   }
   Result hydrateState(const AppStatePacket& appStatePacket);

@@ -96,7 +96,7 @@ Result AlbumRepository::join(const Album& album, const Artist& artist) const {
 
   Logging::write(
     Info,
-    "Db::EffectRepository::save",
+    "Db::AlbumRepository::save",
     "Joined Album " + album.title + " to Artist " + artist.name + ". Message: " + std::string(sqlite3_errmsg(*db))
   );
 

@@ -118,5 +118,42 @@ Result TrackRepository::loadAll(const std::map<ID, Track>& tracks) const {
   return OK;
 }
 
+Result TrackRepository::join(const Track& track, const Artist& artist) const {
+  const std::string joinQuery = R"sql(
+    insert into track_to_artists (trackId, artistId)
+    values (?, ?);
+  )sql";
+
+  sqlite3_stmt* joinStmt;
+  if (sqlite3_prepare_v2(*db, joinQuery.c_str(), -1, &joinStmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::TrackRepository::join(track, artist)",
+      "Failed to prepare join statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return ERROR;
+  }
+
+  sqlite3_bind_int(joinStmt, 1, track.id);
+  sqlite3_bind_int(joinStmt, 2, artist.id);
+
+  if (sqlite3_step(joinStmt) != SQLITE_DONE) {
+    Logging::write(
+      Error,
+      "Db::TrackRepository::join(album, artist)",
+      "Failed to join Track " + track.title + " to Artist " + artist.name + ". Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return ERROR;
+  }
+
+  Logging::write(
+    Info,
+    "Db::TrackRepository::save",
+    "Joined Track " + track.title + " to Artist " + artist.name + ". Message: " + std::string(sqlite3_errmsg(*db))
+  );
+
+  return OK;
+}
+
 } // Db
 } // Gj

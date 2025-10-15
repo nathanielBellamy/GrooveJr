@@ -24,15 +24,30 @@ Result AlbumQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
+Result AlbumQueryModel::refresh() {
+  std::string queryStr;
+  switch (filters->filterBy) {
+    case ARTIST:
+      queryStr = " select title, year, id from albums alb"
+                 " join artist_to_albums ata"
+                 " on alb.id = ata.albumId"
+                 " where ata.artistId in " + filters->idSqlArray();
+      break;
+    default:
+      queryStr = "select title, year, id from albums";
+  }
+
+  setQuery(QString(queryStr.c_str()));
+  setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
+  setHeaderData(1, Qt::Horizontal, QObject::tr("Year"));
+  setHeaderData(2, Qt::Horizontal, QObject::tr("Id"));
+
+  return OK;
+}
+
 QVariant AlbumQueryModel::data(const QModelIndex& index, int role) const {
   // TODO: format
   return QSqlQueryModel::data(index, role);
-}
-
-Qt::ItemFlags AlbumQueryModel::flags(const QModelIndex &index) const {
-  Qt::ItemFlags flags = QSqlQueryModel::flags(index);
-  flags |= Qt::ItemIsEditable;
-  return flags;
 }
 
 } // Gui

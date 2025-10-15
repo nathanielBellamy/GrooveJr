@@ -36,9 +36,16 @@ Result TrackQueryModel::refresh() {
   std::string queryStr;
   switch(filters->filterBy) {
     case ALBUM:
-      queryStr = " select title, trackNumber, id from tracks where albumId in "
+      queryStr = " select title, trackNumber, id from tracks"
+                 " where albumId in "
                  + filters->idSqlArray()
                  + " order by trackNumber asc";
+      break;
+    case ARTIST:
+      queryStr = " select title, trackNumber, id from tracks t"
+                 " join track_to_artists tta"
+                 " on t.id = tta.trackId"
+                 " where tta.artistId in " + filters->idSqlArray();
       break;
     default:
       queryStr = "select title, trackNumber, id from tracks";

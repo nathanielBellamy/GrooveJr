@@ -11,6 +11,8 @@
 #include "AlbumQueryModel.h"
 #include "../../../AppState.h"
 
+#include "../MusicLibraryFilters.h"
+
 namespace Gj {
 namespace Gui {
 
@@ -24,9 +26,9 @@ class AlbumTableView final : public QTableView {
   }
 
   public:
-    AlbumTableView(QWidget* parent = nullptr)
+    AlbumTableView(QWidget* parent, MusicLibraryFilters* filters)
         : QTableView(parent)
-        , albumQueryModel(new AlbumQueryModel(this)) {
+        , albumQueryModel(new AlbumQueryModel(this, filters)) {
       setModel(albumQueryModel);
       setStyle();
     };
@@ -39,6 +41,11 @@ class AlbumTableView final : public QTableView {
       albumQueryModel->hydrateState(appStatePacket);
       return OK;
     };
+
+    Result refresh() {
+      albumQueryModel->refresh();
+      return OK;
+    }
 };
 
 } // Gui

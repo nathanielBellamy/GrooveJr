@@ -89,6 +89,7 @@ Result Scanner::scanDirectoryRecursive(const std::string& dirPath) const {
 
       Db::Track track (album.id, tag->title().to8Bit(), tag->track());
       track.id = dao->trackRepository.save(track);
+      dao->trackRepository.join(track, artist);
 
       Db::AudioFile audioFile (track.id, entry.path().string().c_str());
       audioFile.id = dao->audioFileRepository.save(audioFile);

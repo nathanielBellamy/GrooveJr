@@ -20,7 +20,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , audioFileHeader(this)
   {
   if (connectToDb() == OK) {
-    albumTableView = new AlbumTableView(this);
+    albumTableView = new AlbumTableView(this, &filters);
     artistTableView = new ArtistTableView(this, &filters);
     audioFileTableView = new AudioFileTableView(this);
     genreTableView = new GenreTableView(this);
@@ -118,11 +118,20 @@ void MusicLibraryWindow::setupGrid() {
 }
 
 Result MusicLibraryWindow::connectActions() {
-  connect(albumTableView, &QTableView::doubleClicked, this, [&] (const QModelIndex& index) {
+  const auto albumClickedConnection = connect(albumTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant albumId = albumTableView->model()->index(index.row(), 2).data();
       filters.filterBy = ALBUM;
       filters.ids.clear();
       filters.ids.push_back(static_cast<uint64_t>(albumId.toInt()));
+
+      refresh();
+  });
+
+  const auto artistClickedConnection = connect(artistTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
+      const QVariant artistId = artistTableView->model()->index(index.row(), 1).data();
+      filters.filterBy = ARTIST;
+      filters.ids.clear();
+      filters.ids.push_back(static_cast<uint64_t>(artistId.toInt()));
 
       refresh();
   });

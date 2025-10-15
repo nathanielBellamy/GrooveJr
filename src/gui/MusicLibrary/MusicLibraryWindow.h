@@ -47,6 +47,7 @@ class MusicLibraryWindow final : public QWidget {
     };
 
     Result refresh() {
+      albumTableView->refresh();
       artistTableView->refresh();
       trackTableView->refresh();
       return OK;

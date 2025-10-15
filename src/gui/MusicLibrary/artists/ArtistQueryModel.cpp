@@ -25,17 +25,18 @@ Result ArtistQueryModel::refresh() {
   std::string queryStr;
   switch (filters->filterBy) {
     case ALBUM:
-      queryStr = " select name from artists art"
+      queryStr = " select name, id from artists art"
                  " join artist_to_albums ata"
                  " on art.id = ata.artistId"
                  " where ata.albumId in " + filters->idSqlArray();
       break;
     default:
-      queryStr = "select name from artists";
+      queryStr = "select name, id from artists";
   }
 
   setQuery(QString(queryStr.c_str()));
   setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
+  setHeaderData(1, Qt::Horizontal, QObject::tr("Id"));
   return OK;
 }
 
