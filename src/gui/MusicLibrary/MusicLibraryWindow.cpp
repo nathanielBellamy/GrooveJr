@@ -120,8 +120,9 @@ void MusicLibraryWindow::setupGrid() {
 Result MusicLibraryWindow::connectActions() {
   connect(albumTableView, &QTableView::doubleClicked, this, [&] (const QModelIndex& index) {
       const QVariant albumId = albumTableView->model()->index(index.row(), 2).data();
-      filters.albumIds.clear();
-      filters.albumIds.push_back(static_cast<uint64_t>(albumId.toInt()));
+      filters.filterBy = ALBUM;
+      filters.ids.clear();
+      filters.ids.push_back(static_cast<uint64_t>(albumId.toInt()));
 
       refresh();
   });

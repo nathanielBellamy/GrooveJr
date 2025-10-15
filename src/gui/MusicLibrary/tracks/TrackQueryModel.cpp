@@ -31,5 +31,26 @@ QVariant TrackQueryModel::data(const QModelIndex& index, const int role) const {
   return QSqlQueryModel::data(index, role);
 }
 
+
+Result TrackQueryModel::refresh() {
+  std::string queryStr;
+  switch(filters->filterBy) {
+    case ALBUM:
+      queryStr = " select title, trackNumber, id from tracks where albumId in "
+                 + filters->idSqlArray()
+                 + " order by trackNumber asc";
+      break;
+    default:
+      queryStr = "select title, trackNumber, id from tracks";
+  }
+
+  setQuery(QString(queryStr.c_str()));
+  setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
+  setHeaderData(1, Qt::Horizontal, QObject::tr("TrackNumber"));
+  setHeaderData(2, Qt::Horizontal, QObject::tr("Id"));
+
+  return OK;
+}
+
 } // Gui
 } // Gj

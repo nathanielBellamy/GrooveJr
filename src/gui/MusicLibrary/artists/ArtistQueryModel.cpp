@@ -22,19 +22,20 @@ QVariant ArtistQueryModel::data(const QModelIndex& index, int role) const {
 }
 
 Result ArtistQueryModel::refresh() {
-  if (!filters->albumIds.empty()) {
-    const std::string queryStr = " select name from artists art"
-                                 " join artist_to_albums ata"
-                                 " on art.id = ata.artistId"
-                                 " where ata.albumId = " + std::to_string(filters->albumIds.front());
-    query = QString(queryStr.c_str());
-  } else {
-    query = QString("select name from artists");
+  std::string queryStr;
+  switch (filters->filterBy) {
+    case ALBUM:
+      queryStr = " select name from artists art"
+                 " join artist_to_albums ata"
+                 " on art.id = ata.artistId"
+                 " where ata.albumId in " + filters->idSqlArray();
+      break;
+    default:
+      queryStr = "select name from artists";
   }
 
-  setQuery(query);
+  setQuery(QString(queryStr.c_str()));
   setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
-
   return OK;
 }
 

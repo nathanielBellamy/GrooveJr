@@ -10,8 +10,30 @@
 namespace Gj {
 namespace Gui {
 
+enum FilterBy {
+  ALBUM,
+  ARTIST,
+  GENRE,
+  PLAYLIST,
+  TRACK
+};
+
 struct MusicLibraryFilters {
-  std::vector<uint64_t> albumIds {};
+  FilterBy filterBy;
+  std::vector<uint64_t> ids {};
+
+  std::string idSqlArray() const {
+    std::ostringstream oss;
+    oss << "(";
+    for (size_t i = 0; i < ids.size(); ++i) {
+      oss << ids[i];
+      if (i != ids.size() - 1) {
+        oss << ", ";
+      }
+    }
+    oss << ")";
+    return oss.str();
+  }
 };
 
 } // Gui
