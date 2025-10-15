@@ -20,7 +20,7 @@ namespace Gui {
 
 class ArtistQueryModel final : public QSqlQueryModel {
   MusicLibraryFilters* filters;
-  QString query = QString("select name from artists");
+  QString query;
 
 public:
   explicit ArtistQueryModel(QObject* parent, MusicLibraryFilters* filters)
@@ -28,14 +28,13 @@ public:
     , filters(filters)
     {
 
-    setQuery(query);
-    setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
+    refresh();
   }
   Result hydrateState(const AppStatePacket& appStatePacket);
 
   Result refresh();
 
-  QVariant data(const QModelIndex &item, int role) const override;
+  QVariant data(const QModelIndex& index, int role) const override;
 };
 
 } // Gui

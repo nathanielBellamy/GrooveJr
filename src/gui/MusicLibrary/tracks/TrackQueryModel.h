@@ -20,7 +20,7 @@ namespace Gj {
 namespace Gui {
 
 class TrackQueryModel final : public QSqlQueryModel {
-  QString query = QString("select id, title, trackNumber from tracks");
+  QString query = QString("select title, trackNumber, id from tracks");
   MusicLibraryFilters* filters;
 
 public:
@@ -35,16 +35,16 @@ public:
 
   Result refresh() {
     if (!filters->albumIds.empty()) {
-      const std::string str = "select id, title, trackNumber from tracks where albumId = "
+      const std::string str = "select title, trackNumber, id from tracks where albumId = "
         + std::to_string(filters->albumIds.front())
         + " order by trackNumber asc";
       query = QString(str.c_str());
     }
 
     setQuery(query);
-    setHeaderData(0, Qt::Horizontal, QObject::tr("Id"));
-    setHeaderData(1, Qt::Horizontal, QObject::tr("Title"));
-    setHeaderData(2, Qt::Horizontal, QObject::tr("TrackNumber"));
+    setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
+    setHeaderData(1, Qt::Horizontal, QObject::tr("TrackNumber"));
+    setHeaderData(2, Qt::Horizontal, QObject::tr("Id"));
 
     return OK;
   }

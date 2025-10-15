@@ -8,17 +8,10 @@ namespace Gj {
 namespace Gui {
 
 Result ArtistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
-  // TODO
-  // - if newQuery == query and refresh == false
-  //   - no update
-  // - else
-  //   - setQuery(newQuery)
-  //   - update()
-
   Logging::write(
       Info,
       "Gui::ArtistQueryModel::hydrateState",
-      "Setting Artist Query: ===== newQuery ====="
+      "Hydrating state to AQM"
   );
   return OK;
 }
@@ -30,17 +23,17 @@ QVariant ArtistQueryModel::data(const QModelIndex& index, int role) const {
 
 Result ArtistQueryModel::refresh() {
   if (!filters->albumIds.empty()) {
-    const std::string queryStr = " select id, name from artists art"
+    const std::string queryStr = " select name from artists art"
                                  " join artist_to_albums ata"
                                  " on art.id = ata.artistId"
                                  " where ata.albumId = " + std::to_string(filters->albumIds.front());
     query = QString(queryStr.c_str());
+  } else {
+    query = QString("select name from artists");
   }
 
   setQuery(query);
-  setHeaderData(0, Qt::Horizontal, QObject::tr("Id"));
-  setHeaderData(1, Qt::Horizontal, QObject::tr("Title"));
-  setHeaderData(2, Qt::Horizontal, QObject::tr("TrackNumber"));
+  setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
 
   return OK;
 }
