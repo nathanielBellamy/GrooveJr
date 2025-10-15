@@ -28,5 +28,22 @@ QVariant ArtistQueryModel::data(const QModelIndex& index, int role) const {
   return QSqlQueryModel::data(index, role);
 }
 
+Result ArtistQueryModel::refresh() {
+  if (!filters->albumIds.empty()) {
+    const std::string queryStr = " select id, name from artists art"
+                                 " join artist_to_albums ata"
+                                 " on art.id = ata.artistId"
+                                 " where ata.albumId = " + std::to_string(filters->albumIds.front());
+    query = QString(queryStr.c_str());
+  }
+
+  setQuery(query);
+  setHeaderData(0, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(1, Qt::Horizontal, QObject::tr("Title"));
+  setHeaderData(2, Qt::Horizontal, QObject::tr("TrackNumber"));
+
+  return OK;
+}
+
 } // Gui
 } // Gj

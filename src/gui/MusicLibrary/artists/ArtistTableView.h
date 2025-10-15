@@ -11,6 +11,8 @@
 #include "ArtistQueryModel.h"
 #include "../../../AppState.h"
 
+#include "../MusicLibraryFilters.h"
+
 namespace Gj {
 namespace Gui {
 
@@ -24,15 +26,20 @@ class ArtistTableView final : public QTableView {
   }
 
   public:
-    ArtistTableView(QWidget* parent = nullptr)
+    ArtistTableView(QWidget* parent, MusicLibraryFilters* filters)
         : QTableView(parent)
-        , artistQueryModel(new ArtistQueryModel(this)) {
+        , artistQueryModel(new ArtistQueryModel(this, filters)) {
       setModel(artistQueryModel);
       setStyle();
     };
 
     ~ArtistTableView() {
       delete artistQueryModel;
+    }
+
+    Result refresh() {
+      artistQueryModel->refresh();
+      return OK;
     }
 
     Result hydrateState(const AppStatePacket& appStatePacket) {

@@ -21,7 +21,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   {
   if (connectToDb() == OK) {
     albumTableView = new AlbumTableView(this);
-    artistTableView = new ArtistTableView(this);
+    artistTableView = new ArtistTableView(this, &filters);
     audioFileTableView = new AudioFileTableView(this);
     genreTableView = new GenreTableView(this);
     playlistTableView = new PlaylistTableView(this);
