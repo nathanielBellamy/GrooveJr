@@ -32,12 +32,13 @@ Result GenreQueryModel::refresh() {
   std::string queryStr;
   switch (filters->filterBy) {
     case ALBUM:
-      queryStr = " select name from genres g"
+      queryStr = " select g.name from genres g"
                  " join track_to_genres ttg"
                  " on g.id = ttg.genreId"
                  " join tracks trk"
                  " on ttg.trackId = trk.id"
-                 " where trk.albumId in " + filters->idSqlArray();
+                 " where trk.albumId in " + filters->idSqlArray() +
+                 " group by g.name";
       break;
     case PLAYLIST:
       queryStr = " select name from genres g"
@@ -62,6 +63,8 @@ Result GenreQueryModel::refresh() {
   query = QString(queryStr.c_str());
   setQuery(query);
   setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
+
+  return OK;
 }
 
 } // Gui
