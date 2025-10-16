@@ -25,10 +25,28 @@ Result ArtistQueryModel::refresh() {
   std::string queryStr;
   switch (filters->filterBy) {
     case ALBUM:
-      queryStr = " select name, id from artists art"
+      queryStr = " select art.name, art.id from artists art"
                  " join artist_to_albums ata"
                  " on art.id = ata.artistId"
                  " where ata.albumId in " + filters->idSqlArray();
+      break;
+    case AUDIO_FILE:
+      queryStr = " select art.name, art.id from artists art"
+                 " join track_to_artists tta"
+                 " on art.id = tta.artistId"
+                 " join audioFiles af"
+                 " on af.trackId = tta.trackId"
+                 " where af.id in " + filters->idSqlArray() +
+                 " group by art.id";
+      break;
+    case GENRE:
+      queryStr = " select art.name, art.id from artists art"
+                 " join track_to_artists tta"
+                 " on art.id = tta.artistId"
+                 " join track_to_genres ttg"
+                 " on tta.trackId = ttg.trackId"
+                 " where ttg.genreId in " + filters->idSqlArray() +
+                 " group by art.id";
       break;
     case PLAYLIST:
       queryStr = " select art.name, art.id from artists art"
