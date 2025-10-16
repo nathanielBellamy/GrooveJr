@@ -32,7 +32,7 @@ Result GenreQueryModel::refresh() {
   std::string queryStr;
   switch (filters->filterBy) {
     case ALBUM:
-      queryStr = " select g.name from genres g"
+      queryStr = " select g.name, g.id from genres g"
                  " join track_to_genres ttg"
                  " on g.id = ttg.genreId"
                  " join tracks trk"
@@ -41,7 +41,7 @@ Result GenreQueryModel::refresh() {
                  " group by g.name";
       break;
     case PLAYLIST:
-      queryStr = " select name from genres g"
+      queryStr = " select g.name, g.id from genres g"
                  " join track_to_genres ttg"
                  " on g.id = ttg.genreId"
                  " join audioFiles af"
@@ -51,18 +51,19 @@ Result GenreQueryModel::refresh() {
                  " where atp.playlistId in " + filters->idSqlArray();
       break;
     case TRACK:
-      queryStr = " select name from genres g"
+      queryStr = " select g.name, g.id from genres g"
                  " join track_to_genres ttg"
                  " on g.id = ttg.genreId"
                  " where trk.id in " + filters->idSqlArray();
       break;
     default:
-      queryStr = "select name from genres";
+      queryStr = "select name, id from genres";
   }
 
   query = QString(queryStr.c_str());
   setQuery(query);
   setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
+  setHeaderData(0, Qt::Horizontal, QObject::tr("Id"));
 
   return OK;
 }

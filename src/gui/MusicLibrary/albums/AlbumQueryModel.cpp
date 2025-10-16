@@ -33,13 +33,23 @@ Result AlbumQueryModel::refresh() {
                  " on alb.id = ata.albumId"
                  " where ata.artistId in " + filters->idSqlArray();
       break;
+    case AUDIO_FILE:
+      queryStr = " select alb.title, alb.year, alb.id from albums alb"
+                 " join tracks trk"
+                 " on trk.albumId = alb.id"
+                 " join audioFiles af"
+                 " on af.trackId = trk.id"
+                 " where af.id in " + filters->idSqlArray() +
+                 " group by alb.id";
+      break;
     case GENRE:
       queryStr = " select alb.title, alb.year, alb.id from albums alb"
                  " join tracks trk"
                  " on alb.id = trk.albumId"
                  " join track_to_genres ttg"
                  " on trk.id = ttg.trackId"
-                 " where ttg.genreId in " + filters->idSqlArray();
+                 " where ttg.genreId in " + filters->idSqlArray() +
+                 " group by alb.id";
       break;
     case PLAYLIST:
       queryStr = " select alb.title, alb.year, alb.id from albums alb"

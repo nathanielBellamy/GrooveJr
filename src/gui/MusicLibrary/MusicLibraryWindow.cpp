@@ -132,6 +132,27 @@ Result MusicLibraryWindow::connectActions() {
       refresh();
   });
 
+  const auto audioFileClickedConnection = connect(audioFileTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
+      const QVariant audioFileId = audioFileTableView->model()->index(index.row(), 1).data();
+      filters.set(AUDIO_FILE, audioFileId.toLongLong());
+
+      refresh();
+  });
+
+  const auto genreClickedConnection = connect(genreTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
+      const QVariant genreId = genreTableView->model()->index(index.row(), 1).data();
+      filters.set(GENRE, genreId.toLongLong());
+
+      refresh();
+  });
+
+  const auto playlistClickedConnection = connect(playlistTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
+      const QVariant playlistId = playlistTableView->model()->index(index.row(), 1).data();
+      filters.set(PLAYLIST, playlistId.toLongLong());
+
+      refresh();
+  });
+
   const auto trackClickedConnection = connect(trackTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant trackId = trackTableView->model()->index(index.row(), 2).data();
       filters.set(TRACK, trackId.toLongLong());

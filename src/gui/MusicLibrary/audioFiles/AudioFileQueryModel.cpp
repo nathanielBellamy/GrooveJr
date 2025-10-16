@@ -32,7 +32,7 @@ Result AudioFileQueryModel::refresh() {
   std::string queryStr;
   switch (filters->filterBy) {
     case ARTIST:
-      queryStr = " select af.filePath audioFiles af"
+      queryStr = " select af.filePath, af.id audioFiles af"
                  " join tracks trk"
                  " on af.trackId = trk.id"
                  " join track_to_artists tta"
@@ -40,7 +40,7 @@ Result AudioFileQueryModel::refresh() {
                  " where tta.artistId in " + filters->idSqlArray();
       break;
     case GENRE:
-      queryStr = " select af.filePath audioFiles af"
+      queryStr = " select af.filePath, af.id audioFiles af"
                  " join tracks trk"
                  " on af.trackId = trk.id"
                  " join track_to_genres ttg"
@@ -48,16 +48,17 @@ Result AudioFileQueryModel::refresh() {
                  " where ttg.genreId in " + filters->idSqlArray();
       break;
     case TRACK:
-      queryStr = " select filePath from audioFiles"
+      queryStr = " select filePath, id from audioFiles"
                  " where audioFiles.trackId in " + filters->idSqlArray();
       break;
     default:
-      queryStr = "select filePath from audioFiles";
+      queryStr = "select filePath, id from audioFiles";
   }
 
   query = QString(queryStr.c_str());
   setQuery(query);
   setHeaderData(0, Qt::Horizontal, QObject::tr("Path"));
+  setHeaderData(1, Qt::Horizontal, QObject::tr("Id"));
 
   return OK;
 }

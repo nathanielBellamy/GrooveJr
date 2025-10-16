@@ -27,9 +27,7 @@ public:
     : QSqlQueryModel(parent)
     , filters(filters)
     {
-
-    setQuery(query);
-    setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
+    refresh();
   }
   Result hydrateState(const AppStatePacket& appStatePacket);
   Result refresh();

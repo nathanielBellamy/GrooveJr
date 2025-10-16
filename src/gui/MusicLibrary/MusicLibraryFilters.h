@@ -16,6 +16,7 @@ namespace Gui {
 enum FilterBy {
   ALBUM,
   ARTIST,
+  AUDIO_FILE,
   GENRE,
   NONE,
   PLAYLIST,
