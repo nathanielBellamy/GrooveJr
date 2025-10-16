@@ -23,8 +23,8 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
     albumTableView = new AlbumTableView(this, &filters);
     artistTableView = new ArtistTableView(this, &filters);
     audioFileTableView = new AudioFileTableView(this, &filters);
-    genreTableView = new GenreTableView(this);
-    playlistTableView = new PlaylistTableView(this);
+    genreTableView = new GenreTableView(this, &filters);
+    playlistTableView = new PlaylistTableView(this, &filters);
     trackTableView = new TrackTableView(this, &filters);
   } else {
     Logging::write(

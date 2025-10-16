@@ -30,6 +30,24 @@ Result ArtistQueryModel::refresh() {
                  " on art.id = ata.artistId"
                  " where ata.albumId in " + filters->idSqlArray();
       break;
+    case PLAYLIST:
+      queryStr = " select art.name, art.id from artists art"
+                 " join track_to_artists tta"
+                 " on tta.artistId = art.id"
+                 " join audioFiles af"
+                 " on tta.trackId = af.trackId"
+                 " join audioFile_to_playlists atp"
+                 " on af.id = atp.audioFileId"
+                 " where atp.playlistId in " + filters->idSqlArray();
+      break;
+    case TRACK:
+      queryStr = " select art.name, art.id from artists art"
+                 " join artist_to_albums ata"
+                 " on art.id = ata.artistId"
+                 " join track trk"
+                 " on trk.albumId = ata.albumId"
+                 " where trk.id in " + filters->idSqlArray();
+      break;
     default:
       queryStr = "select name, id from artists";
   }

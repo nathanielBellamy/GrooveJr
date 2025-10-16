@@ -10,6 +10,7 @@
 #include "../../../enums/Result.h"
 #include "GenreQueryModel.h"
 #include "../../../AppState.h"
+#include "../MusicLibraryFilters.h"
 
 namespace Gj {
 namespace Gui {
@@ -24,19 +25,24 @@ class GenreTableView final : public QTableView {
   }
 
   public:
-    GenreTableView(QWidget* parent = nullptr)
+    GenreTableView(QWidget* parent, MusicLibraryFilters* filters)
         : QTableView(parent)
-        , genreQueryModel(new GenreQueryModel(this)) {
+        , genreQueryModel(new GenreQueryModel(this, filters)) {
       setModel(genreQueryModel);
       setStyle();
     };
 
     ~GenreTableView() {
       delete genreQueryModel;
-    }
+    };
 
     Result hydrateState(const AppStatePacket& appStatePacket) {
       genreQueryModel->hydrateState(appStatePacket);
+      return OK;
+    };
+
+    Result refresh() {
+      genreQueryModel->refresh();
       return OK;
     };
 };

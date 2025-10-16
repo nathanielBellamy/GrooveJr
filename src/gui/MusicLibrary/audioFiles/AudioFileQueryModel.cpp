@@ -31,6 +31,22 @@ QVariant AudioFileQueryModel::data(const QModelIndex& index, int role) const {
 Result AudioFileQueryModel::refresh() {
   std::string queryStr;
   switch (filters->filterBy) {
+    case ARTIST:
+      queryStr = " select af.filePath audioFiles af"
+                 " join tracks trk"
+                 " on af.trackId = trk.id"
+                 " join track_to_artists tta"
+                 " on trk.id = tta.trackId"
+                 " where tta.artistId in " + filters->idSqlArray();
+      break;
+    case GENRE:
+      queryStr = " select af.filePath audioFiles af"
+                 " join tracks trk"
+                 " on af.trackId = trk.id"
+                 " join track_to_genres ttg"
+                 " on trk.id = ttg.trackId"
+                 " where ttg.genreId in " + filters->idSqlArray();
+      break;
     case TRACK:
       queryStr = " select filePath from audioFiles"
                  " where audioFiles.trackId in " + filters->idSqlArray();

@@ -10,6 +10,7 @@
 #include "../../../enums/Result.h"
 #include "PlaylistQueryModel.h"
 #include "../../../AppState.h"
+#include "../MusicLibraryFilters.h"
 
 namespace Gj {
 namespace Gui {
@@ -24,9 +25,9 @@ class PlaylistTableView final : public QTableView {
   }
 
   public:
-    PlaylistTableView(QWidget* parent = nullptr)
+    PlaylistTableView(QWidget* parent, MusicLibraryFilters* filters)
         : QTableView(parent)
-        , playlistQueryModel(new PlaylistQueryModel(this)) {
+        , playlistQueryModel(new PlaylistQueryModel(this, filters)) {
       setModel(playlistQueryModel);
       setStyle();
     };
@@ -37,6 +38,11 @@ class PlaylistTableView final : public QTableView {
 
     Result hydrateState(const AppStatePacket& appStatePacket) {
       playlistQueryModel->hydrateState(appStatePacket);
+      return OK;
+    };
+
+    Result refresh() {
+      playlistQueryModel->refresh();
       return OK;
     };
 };

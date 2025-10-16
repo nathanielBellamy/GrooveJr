@@ -13,22 +13,25 @@
 #include "../../../AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
+#include "../MusicLibraryFilters.h"
 
 namespace Gj {
 namespace Gui {
 
 class PlaylistQueryModel final : public QSqlQueryModel {
-  QString query = QString("select name from playlists");
+  MusicLibraryFilters* filters;
+  QString query;
 
 public:
-  explicit PlaylistQueryModel(QObject* parent = nullptr)
+  explicit PlaylistQueryModel(QObject* parent, MusicLibraryFilters* filters)
     : QSqlQueryModel(parent)
+    , filters(filters)
     {
 
-    setQuery(query);
-    setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
+    refresh();
   }
   Result hydrateState(const AppStatePacket& appStatePacket);
+  Result refresh();
 
   QVariant data(const QModelIndex &item, int role) const override;
 };

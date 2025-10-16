@@ -28,5 +28,41 @@ QVariant GenreQueryModel::data(const QModelIndex& index, int role) const {
   return QSqlQueryModel::data(index, role);
 }
 
+Result GenreQueryModel::refresh() {
+  std::string queryStr;
+  switch (filters->filterBy) {
+    case ALBUM:
+      queryStr = " select name from genres g"
+                 " join track_to_genres ttg"
+                 " on g.id = ttg.genreId"
+                 " join tracks trk"
+                 " on ttg.trackId = trk.id"
+                 " where trk.albumId in " + filters->idSqlArray();
+      break;
+    case PLAYLIST:
+      queryStr = " select name from genres g"
+                 " join track_to_genres ttg"
+                 " on g.id = ttg.genreId"
+                 " join audioFiles af"
+                 " on ttg.trackId = af.trackId"
+                 " join audioFile_to_playlists atp"
+                 " on af.id = atp.audioFileId"
+                 " where atp.playlistId in " + filters->idSqlArray();
+      break;
+    case TRACK:
+      queryStr = " select name from genres g"
+                 " join track_to_genres ttg"
+                 " on g.id = ttg.genreId"
+                 " where trk.id in " + filters->idSqlArray();
+      break;
+    default:
+      queryStr = "select name from genres";
+  }
+
+  query = QString(queryStr.c_str());
+  setQuery(query);
+  setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
+}
+
 } // Gui
 } // Gj
