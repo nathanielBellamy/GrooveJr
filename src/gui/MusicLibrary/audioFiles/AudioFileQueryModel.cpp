@@ -8,17 +8,10 @@ namespace Gj {
 namespace Gui {
 
 Result AudioFileQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
-  // TODO
-  // - if newQuery == query and refresh == false
-  //   - no update
-  // - else
-  //   - setQuery(newQuery)
-  //   - update()
-
   Logging::write(
       Info,
       "Gui::AudioFileQueryModel::hydrateState",
-      "Setting AudioFile Query: ===== newQuery ====="
+      "AudioFileQueryModel::hydrateState"
   );
   return OK;
 }

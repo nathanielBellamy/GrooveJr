@@ -8,17 +8,10 @@ namespace Gj {
 namespace Gui {
 
 Result GenreQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
-  // TODO
-  // - if newQuery == query and refresh == false
-  //   - no update
-  // - else
-  //   - setQuery(newQuery)
-  //   - update()
-
   Logging::write(
       Info,
       "Gui::GenreQueryModel::hydrateState",
-      "Setting Genre Query: ===== newQuery ====="
+      "GenreQueryModel::hydrateState"
   );
   return OK;
 }

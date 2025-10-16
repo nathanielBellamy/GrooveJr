@@ -8,17 +8,10 @@ namespace Gj {
 namespace Gui {
 
 Result TrackQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
-  // TODO
-  // - if newQuery == query and refresh == false
-  //   - no update
-  // - else
-  //   - setQuery(newQuery)
-  //   - update()
-
   Logging::write(
       Info,
       "Gui::TrackQueryModel::hydrateState",
-      "Setting Track Query: ===== newQuery ====="
+      "TrackQueryModel::hydrateState"
   );
   return OK;
 }

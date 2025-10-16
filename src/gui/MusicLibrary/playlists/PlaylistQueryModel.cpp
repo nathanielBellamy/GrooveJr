@@ -8,17 +8,10 @@ namespace Gj {
 namespace Gui {
 
 Result PlaylistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
-  // TODO
-  // - if newQuery == query and refresh == false
-  //   - no update
-  // - else
-  //   - setQuery(newQuery)
-  //   - update()
-
   Logging::write(
       Info,
       "Gui::PlaylistQueryModel::hydrateState",
-      "Setting Playlist Query: ===== newQuery ====="
+      "PlaylistQueryModel::hydrateState"
   );
   return OK;
 }

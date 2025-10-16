@@ -11,7 +11,7 @@ Result ArtistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   Logging::write(
       Info,
       "Gui::ArtistQueryModel::hydrateState",
-      "Hydrating state to AQM"
+      "ArtistQueryModel::hydrateState"
   );
   return OK;
 }
