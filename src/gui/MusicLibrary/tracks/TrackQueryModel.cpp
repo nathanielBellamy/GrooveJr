@@ -17,12 +17,7 @@ Result TrackQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
 }
 
 QVariant TrackQueryModel::data(const QModelIndex& item, const int role) const {
-  if (role == Qt::ForegroundRole
-        && std::find(
-          filters->ids.begin(),
-          filters->ids.end(),
-          index(item.row(), TRACK_COL_ID).data()
-          ) != filters->ids.end())
+  if (role == Qt::BackgroundRole && isSelected(item, TRACK_COL_ID))
     return QVariant::fromValue(QColor(Qt::blue));
   return QSqlQueryModel::data(item, role);
 }
@@ -68,7 +63,9 @@ Result TrackQueryModel::refresh() {
       queryStr = "select title, trackNumber, id from tracks";
   }
 
-  setQuery(QString(queryStr.c_str()));
+  setQueryString(queryStr);
+
+  // TODO: TRACK_COL_XXX
   setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
   setHeaderData(1, Qt::Horizontal, QObject::tr("TrackNumber"));
   setHeaderData(2, Qt::Horizontal, QObject::tr("Id"));

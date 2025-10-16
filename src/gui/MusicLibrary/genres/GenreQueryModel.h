@@ -15,12 +15,17 @@
 #include "../../../enums/Result.h"
 #include "../MusicLibraryFilters.h"
 
+
 namespace Gj {
 namespace Gui {
+
+constexpr size_t GENRE_COL_NAME = 0;
+constexpr size_t GENRE_COL_ID = 1;
 
 class GenreQueryModel final : public QSqlQueryModel {
   MusicLibraryFilters* filters;
   QString query;
+  bool isSelected(const QModelIndex& item) const;
 
 public:
   explicit GenreQueryModel(QObject* parent, MusicLibraryFilters* filters)

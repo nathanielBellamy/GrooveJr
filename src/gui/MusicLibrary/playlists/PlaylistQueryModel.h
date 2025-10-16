@@ -18,9 +18,13 @@
 namespace Gj {
 namespace Gui {
 
+constexpr size_t PLAYLIST_COL_NAME = 0;
+constexpr size_t PLAYLIST_COL_ID = 1;
+
 class PlaylistQueryModel final : public QSqlQueryModel {
   MusicLibraryFilters* filters;
   QString query;
+  bool isSelected(const QModelIndex& item) const;
 
 public:
   explicit PlaylistQueryModel(QObject* parent, MusicLibraryFilters* filters)

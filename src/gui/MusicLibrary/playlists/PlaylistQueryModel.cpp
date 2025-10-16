@@ -16,6 +16,14 @@ Result PlaylistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
+bool PlaylistQueryModel::isSelected(const QModelIndex& item) const {
+  return std::find(
+    filters->ids.begin(),
+    filters->ids.end(),
+    index(item.row(), PLAYLIST_COL_ID).data()
+  ) != filters->ids.end();
+}
+
 QVariant PlaylistQueryModel::data(const QModelIndex& index, int role) const {
   // TODO: format
   return QSqlQueryModel::data(index, role);
@@ -76,7 +84,8 @@ Result PlaylistQueryModel::refresh() {
 
   query = QString(queryStr.c_str());
   setQuery(query);
-  setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
+  setHeaderData(PLAYLIST_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
+  setHeaderData(PLAYLIST_COL_ID, Qt::Horizontal, QObject::tr("Id"));
 
   return OK;
 }

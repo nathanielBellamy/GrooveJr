@@ -21,6 +21,7 @@ namespace Gui {
 class ArtistQueryModel final : public QSqlQueryModel {
   MusicLibraryFilters* filters;
   QString query;
+  bool isSelected(const QModelIndex& item) const;
 
 public:
   explicit ArtistQueryModel(QObject* parent, MusicLibraryFilters* filters)

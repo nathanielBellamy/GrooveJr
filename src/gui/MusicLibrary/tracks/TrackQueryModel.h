@@ -14,22 +14,18 @@
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
 
-#include "../MusicLibraryFilters.h"
+#include "../GjQueryModel.h"
 
 namespace Gj {
 namespace Gui {
 
 constexpr size_t TRACK_COL_ID = 2;
 
-class TrackQueryModel final : public QSqlQueryModel {
-  QString query;
-  MusicLibraryFilters* filters;
-
+class TrackQueryModel final : public GjQueryModel {
 
 public:
   explicit TrackQueryModel(QObject* parent, MusicLibraryFilters* filters)
-    : QSqlQueryModel(parent)
-    , filters(filters)
+    : GjQueryModel(parent, filters)
     {
     refresh();
   }

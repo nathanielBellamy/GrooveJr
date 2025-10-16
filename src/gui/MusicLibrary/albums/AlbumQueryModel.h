@@ -21,7 +21,7 @@ namespace Gui {
 class AlbumQueryModel final : public QSqlQueryModel {
   MusicLibraryFilters* filters;
   QString query = QString();
-
+  bool isSelected(const QModelIndex& item) const;
 
 public:
   Result refresh();
