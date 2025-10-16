@@ -53,6 +53,14 @@ Result TrackQueryModel::refresh() {
                  " where ttg.genreId in " + filters->idSqlArray() +
                  " group by t.id";
       break;
+    case PLAYLIST:
+      queryStr = " select trk.title, trk.trackNumber, trk.id from tracks trk"
+                 " join audioFiles af"
+                 " on trk.id = af.trackId"
+                 " join audioFile_to_playlists atp"
+                 " on af.id = atp.audioFileId"
+                 " where atp.playlistId in " + filters->idSqlArray();
+      break;
     default:
       queryStr = "select title, trackNumber, id from tracks";
   }

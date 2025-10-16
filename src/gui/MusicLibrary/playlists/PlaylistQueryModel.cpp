@@ -24,6 +24,16 @@ QVariant PlaylistQueryModel::data(const QModelIndex& index, int role) const {
 Result PlaylistQueryModel::refresh() {
   std::string queryStr;
   switch (filters->filterBy) {
+    case ALBUM:
+      queryStr = " select name from playlists p"
+                 " join audioFile_to_playlists atp"
+                 " on p.id = atp.playlistId"
+                 " join audioFiles af"
+                 " on af.id = atp.audioFileId"
+                 " join track_to_albums tta"
+                 " on af.trackId = tta.trackId"
+                 " where tta.albumId in " + filters->idSqlArray();
+      break;
     case ARTIST:
       queryStr = " select name from playlists p"
                  " join audioFile_to_playlists atp"
@@ -33,6 +43,14 @@ Result PlaylistQueryModel::refresh() {
                  " join track_to_artists tta"
                  " on af.trackId = tta.trackId"
                  " where tta.artistId in " + filters->idSqlArray();
+      break;
+    case AUDIO_FILE:
+      queryStr = " select name from playlists p"
+                 " join audioFile_to_playlists atp"
+                 " on p.id = atp.playlistId"
+                 " join audioFiles af"
+                 " on af.id = atp.audioFileId"
+                 " where af.id in " + filters->idSqlArray();
       break;
     case GENRE:
       queryStr = " select name from playlists p"

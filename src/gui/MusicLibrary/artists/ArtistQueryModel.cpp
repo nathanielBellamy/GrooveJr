@@ -60,11 +60,10 @@ Result ArtistQueryModel::refresh() {
       break;
     case TRACK:
       queryStr = " select art.name, art.id from artists art"
-                 " join artist_to_albums ata"
-                 " on art.id = ata.artistId"
-                 " join track trk"
-                 " on trk.albumId = ata.albumId"
-                 " where trk.id in " + filters->idSqlArray();
+                 " join track_to_artists tta"
+                 " on art.id = tta.artistId"
+                 " where tta.trackId in " + filters->idSqlArray() +
+                 " group by art.id";
       break;
     default:
       queryStr = "select name, id from artists";

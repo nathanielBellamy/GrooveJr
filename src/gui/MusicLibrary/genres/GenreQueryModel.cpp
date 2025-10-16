@@ -33,6 +33,15 @@ Result GenreQueryModel::refresh() {
                  " where trk.albumId in " + filters->idSqlArray() +
                  " group by g.name";
       break;
+    case ARTIST:
+      queryStr = " select g.name, g.id from genres g"
+                 " join track_to_genres ttg"
+                 " on g.id = ttg.genreId"
+                 " join track_to_artists tta"
+                 " on ttg.trackId = tta.trackId"
+                 " where tta.artistId in " + filters->idSqlArray() +
+                 " group by g.name";
+      break;
     case PLAYLIST:
       queryStr = " select g.name, g.id from genres g"
                  " join track_to_genres ttg"
@@ -47,7 +56,8 @@ Result GenreQueryModel::refresh() {
       queryStr = " select g.name, g.id from genres g"
                  " join track_to_genres ttg"
                  " on g.id = ttg.genreId"
-                 " where trk.id in " + filters->idSqlArray();
+                 " where ttg.trackId in " + filters->idSqlArray() +
+                 " group by g.id";
       break;
     default:
       queryStr = "select name, id from genres";
