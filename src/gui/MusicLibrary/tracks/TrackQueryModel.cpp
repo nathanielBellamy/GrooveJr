@@ -16,12 +16,15 @@ Result TrackQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
-QVariant TrackQueryModel::data(const QModelIndex& index, const int role) const {
-  // TODO: format
-  // if (role == Qt::ForegroundRole)
-  //   return QVariant::fromValue(QColor(Qt::green));
-
-  return QSqlQueryModel::data(index, role);
+QVariant TrackQueryModel::data(const QModelIndex& item, const int role) const {
+  if (role == Qt::ForegroundRole
+        && std::find(
+          filters->ids.begin(),
+          filters->ids.end(),
+          index(item.row(), TRACK_COL_ID).data()
+          ) != filters->ids.end())
+    return QVariant::fromValue(QColor(Qt::blue));
+  return QSqlQueryModel::data(item, role);
 }
 
 

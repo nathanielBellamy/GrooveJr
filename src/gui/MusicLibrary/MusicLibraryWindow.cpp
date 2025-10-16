@@ -38,22 +38,22 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   title.setFont({title.font().family(), 18});
 
   albumHeader.setText("Albums");
-  albumHeader.setFont({title.font().family(), 14});
+  albumHeader.setFont({title.font().family(), 12});
 
   artistHeader.setText("Artists");
-  artistHeader.setFont({title.font().family(), 14});
+  artistHeader.setFont({title.font().family(), 12});
 
-  audioFileHeader.setText("Audio Files");
-  audioFileHeader.setFont({title.font().family(), 14});
+  audioFileHeader.setText("Files");
+  audioFileHeader.setFont({title.font().family(), 12});
 
-  genreHeader.setText("Genre");
-  genreHeader.setFont({title.font().family(), 14});
+  genreHeader.setText("Genres");
+  genreHeader.setFont({title.font().family(), 12});
 
-  playlistHeader.setText("Playlist");
-  playlistHeader.setFont({title.font().family(), 14});
+  playlistHeader.setText("Playlists");
+  playlistHeader.setFont({title.font().family(), 12});
 
   trackHeader.setText("Tracks");
-  trackHeader.setFont({title.font().family(), 14});
+  trackHeader.setFont({title.font().family(), 12});
 
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   connectActions();
@@ -91,28 +91,35 @@ void MusicLibraryWindow::setStyle() {
 void MusicLibraryWindow::setupGrid() {
   grid.setVerticalSpacing(1);
 
-  grid.addWidget(&title, 0, 0, 1, 1);
+
+  grid.setRowStretch(0, 2);
+  grid.setRowStretch(1, 1);
+  grid.setRowStretch(2, 4);
+  grid.setRowStretch(3, 1);
+  grid.setRowStretch(4, 4);
 
   grid.setColumnStretch(0, 1);
-  grid.setColumnStretch(1, 2);
+  grid.setColumnStretch(1, 1);
   grid.setColumnStretch(2, 2);
-  grid.setColumnStretch(3,3);
-  grid.setColumnStretch(4, 4);
-  grid.setColumnStretch(5, 2);
+  grid.setColumnStretch(3,2);
+  grid.setColumnStretch(4, 2);
+
+  grid.addWidget(&title, 0, 0, 1, 1);
 
   grid.addWidget(&genreHeader, 1, 0, 1, 1);
   grid.addWidget(&playlistHeader, 1, 1, 1, 1);
   grid.addWidget(&artistHeader, 1, 2, 1, 1);
   grid.addWidget(&albumHeader, 1, 3, 1, 1);
   grid.addWidget(&trackHeader, 1, 4, 1, 1);
-  grid.addWidget(&audioFileHeader, 1, 5, 1, 1);
 
-  grid.addWidget(genreTableView, 2, 0, 5, 1);
-  grid.addWidget(playlistTableView, 2, 1, 5, 1);
-  grid.addWidget(artistTableView, 2, 2, 5, 1);
-  grid.addWidget(albumTableView, 2, 3, 5, 1);
-  grid.addWidget(trackTableView, 2, 4, 5, 1);
-  grid.addWidget(audioFileTableView, 2, 5, 5, 1);
+  grid.addWidget(genreTableView, 2, 0, 1, 1);
+  grid.addWidget(playlistTableView, 2, 1, 1, 1);
+  grid.addWidget(artistTableView, 2, 2, 1, 1);
+  grid.addWidget(albumTableView, 2, 3, 1, 1);
+  grid.addWidget(trackTableView, 2, 4, 1, 3);
+
+  grid.addWidget(&audioFileHeader, 3, 0, 1, -1);
+  grid.addWidget(audioFileTableView, 4, 0, 1, -1);
 
   setLayout(&grid);
 }

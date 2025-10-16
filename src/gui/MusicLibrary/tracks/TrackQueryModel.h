@@ -19,9 +19,12 @@
 namespace Gj {
 namespace Gui {
 
+constexpr size_t TRACK_COL_ID = 2;
+
 class TrackQueryModel final : public QSqlQueryModel {
   QString query;
   MusicLibraryFilters* filters;
+
 
 public:
   explicit TrackQueryModel(QObject* parent, MusicLibraryFilters* filters)
@@ -35,7 +38,7 @@ public:
 
   Result refresh();
 
-  QVariant data(const QModelIndex& index, int role) const override;
+  QVariant data(const QModelIndex& item, int role) const override;
 };
 
 } // Gui
