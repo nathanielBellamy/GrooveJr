@@ -22,7 +22,6 @@ QVariant TrackQueryModel::data(const QModelIndex& item, const int role) const {
   return QSqlQueryModel::data(item, role);
 }
 
-
 Result TrackQueryModel::refresh() {
   std::string queryStr;
   switch(filters->filterBy) {
@@ -65,10 +64,9 @@ Result TrackQueryModel::refresh() {
 
   setQueryString(queryStr);
 
-  // TODO: TRACK_COL_XXX
-  setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
-  setHeaderData(1, Qt::Horizontal, QObject::tr("TrackNumber"));
-  setHeaderData(2, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(TRACK_COL_TITLE, Qt::Horizontal, QObject::tr("Title"));
+  setHeaderData(TRACK_COL_TRACK_NUMBER, Qt::Horizontal, QObject::tr("TrackNumber"));
+  setHeaderData(TRACK_COL_ID, Qt::Horizontal, QObject::tr("Id"));
 
   return OK;
 }

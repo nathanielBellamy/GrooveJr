@@ -5,6 +5,8 @@
 #ifndef TRACKQUERYMODEL_H
 #define TRACKQUERYMODEL_H
 
+#include <string>
+
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
 #include <QColor>
@@ -19,13 +21,15 @@
 namespace Gj {
 namespace Gui {
 
+constexpr size_t TRACK_COL_TITLE = 0;
+constexpr size_t TRACK_COL_TRACK_NUMBER = 1;
 constexpr size_t TRACK_COL_ID = 2;
 
 class TrackQueryModel final : public GjQueryModel {
 
 public:
   explicit TrackQueryModel(QObject* parent, MusicLibraryFilters* filters)
-    : GjQueryModel(parent, filters)
+    : GjQueryModel(parent, filters, TRACK)
     {
     refresh();
   }
