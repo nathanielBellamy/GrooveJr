@@ -31,7 +31,7 @@ QVariant PlaylistQueryModel::data(const QModelIndex& index, int role) const {
 
 Result PlaylistQueryModel::refresh() {
   std::string queryStr;
-  switch (filters->filterBy) {
+  switch (filters->type) {
     case ALBUM:
       queryStr = " select name from playlists p"
                  " join audioFile_to_playlists atp"

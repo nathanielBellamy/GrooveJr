@@ -13,7 +13,7 @@
 namespace Gj {
 namespace Gui {
 
-enum FilterBy {
+enum MusicLibraryType {
   ALBUM,
   ARTIST,
   AUDIO_FILE,
@@ -24,7 +24,7 @@ enum FilterBy {
 };
 
 struct MusicLibraryFilters {
-  FilterBy filterBy = NONE;
+  MusicLibraryType type = NONE;
   std::vector<uint64_t> ids {};
 
   std::string idSqlArray() const {
@@ -38,8 +38,8 @@ struct MusicLibraryFilters {
     return oss;
   }
 
-  Result set(FilterBy newFilterBy, uint64_t id) {
-    filterBy = newFilterBy;
+  Result set(MusicLibraryType newFilterBy, uint64_t id) {
+    type = newFilterBy;
     ids.clear();
     ids.push_back(id);
 

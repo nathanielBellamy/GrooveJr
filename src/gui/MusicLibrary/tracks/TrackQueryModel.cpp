@@ -24,7 +24,7 @@ QVariant TrackQueryModel::data(const QModelIndex& item, const int role) const {
 
 Result TrackQueryModel::refresh() {
   std::string queryStr;
-  switch(filters->filterBy) {
+  switch(filters->type) {
     case ALBUM:
       queryStr = " select t.title, t.trackNumber, t.id from tracks t"
                  " where t.albumId in " + filters->idSqlArray() +

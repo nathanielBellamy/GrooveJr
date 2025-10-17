@@ -21,7 +21,7 @@ namespace Gui {
 
 class GjQueryModel : public QSqlQueryModel {
   protected:
-    FilterBy type;
+    MusicLibraryType type;
     MusicLibraryFilters* filters;
     QString queryString;
     Result setQueryString(const std::string& newQueryString) {
@@ -31,7 +31,7 @@ class GjQueryModel : public QSqlQueryModel {
     };
 
     bool isSelected(const QModelIndex& item, const size_t idCol) const {
-      return type == filters->filterBy
+      return type == filters->type
         && std::find(
           filters->ids.begin(),
           filters->ids.end(),
@@ -40,7 +40,7 @@ class GjQueryModel : public QSqlQueryModel {
     };
 
   public:
-    GjQueryModel(QObject* parent, MusicLibraryFilters* filters, const FilterBy type)
+    GjQueryModel(QObject* parent, MusicLibraryFilters* filters, const MusicLibraryType type)
       : QSqlQueryModel(parent)
       , type(type)
       , filters(filters)

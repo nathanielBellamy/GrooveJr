@@ -23,7 +23,7 @@ QVariant GenreQueryModel::data(const QModelIndex& index, int role) const {
 
 Result GenreQueryModel::refresh() {
   std::string queryStr;
-  switch (filters->filterBy) {
+  switch (filters->type) {
     case ALBUM:
       queryStr = " select g.name, g.id from genres g"
                  " join track_to_genres ttg"

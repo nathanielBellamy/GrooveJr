@@ -18,7 +18,7 @@ Result AlbumQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
 
 Result AlbumQueryModel::refresh() {
   std::string queryStr;
-  switch (filters->filterBy) {
+  switch (filters->type) {
     case ARTIST:
       queryStr = " select title, year, id from albums alb"
                  " join artist_to_albums ata"

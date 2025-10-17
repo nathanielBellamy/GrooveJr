@@ -23,7 +23,7 @@ QVariant ArtistQueryModel::data(const QModelIndex& index, int role) const {
 
 Result ArtistQueryModel::refresh() {
   std::string queryStr;
-  switch (filters->filterBy) {
+  switch (filters->type) {
     case ALBUM:
       queryStr = " select art.name, art.id from artists art"
                  " join artist_to_albums ata"
