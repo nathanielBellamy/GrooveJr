@@ -44,7 +44,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   genreHeader.setFont({genreHeader.font().family(), 12});
 
   playlistHeader.setText("Playlists");
-  playlistHeader.setFont({playlistHeader.font().family(), 10});
+  playlistHeader.setFont({playlistHeader.font().family(), 12});
 
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   connectActions();

@@ -35,8 +35,7 @@ Result AudioFileQueryModel::refresh() {
                  " join artists art"
                  " on tta.artistId = art.id"
                  " where alb.id in " + filters->idSqlArray() +
-                 " group by af.id"
-                 " order by trk.trackNumber asc";
+                 " order by trk.trackNumber asc, af.filePath asc";
       break;
     case ARTIST:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
@@ -49,7 +48,7 @@ Result AudioFileQueryModel::refresh() {
                  " join artists art"
                  " on tta.artistId = art.id"
                  " where art.id in " + filters->idSqlArray() +
-                 " order by alb.id asc, trk.trackNumber asc";
+                 " order by alb.year asc, alb.title asc, alb.id asc, trk.trackNumber asc";
       break;
     case GENRE:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
@@ -63,7 +62,8 @@ Result AudioFileQueryModel::refresh() {
                  " on tta.artistId = art.id"
                  " join track_to_genres ttg"
                  " on trk.id = ttg.trackId"
-                 " where ttg.genreId in " + filters->idSqlArray();
+                 " where ttg.genreId in " + filters->idSqlArray() +
+                 " order by art.name asc, alb.year asc, alb.title asc, trk.trackNumber asc";
       break;
     case PLAYLIST:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
@@ -77,7 +77,8 @@ Result AudioFileQueryModel::refresh() {
                  " on tta.artistId = art.id"
                  " join audioFile_to_playlists atp"
                  " on af.id = atp.audioFileId"
-                 " where atp.playlistId in " + filters->idSqlArray();
+                 " where atp.playlistId in " + filters->idSqlArray() +
+                 " order by atp.trackNumber asc";
       break;
     case TRACK:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
@@ -89,7 +90,8 @@ Result AudioFileQueryModel::refresh() {
                  " on tta.trackId = trk.id"
                  " join artists art"
                  " on tta.artistId = art.id"
-                 " where trk.id in " + filters->idSqlArray();
+                 " where trk.id in " + filters->idSqlArray() +
+                 " order by af.filePath asc";
       break;
     default:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
@@ -101,8 +103,7 @@ Result AudioFileQueryModel::refresh() {
                  " on tta.trackId = trk.id"
                  " join artists art"
                  " on tta.artistId = art.id"
-                 " group by alb.id"
-                 " order by trk.trackNumber asc";
+                 " order by art.name asc, alb.year asc, alb.title asc, trk.trackNumber asc";
   }
 
   query = QString(queryStr.c_str());
