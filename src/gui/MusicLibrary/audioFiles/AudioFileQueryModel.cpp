@@ -25,46 +25,96 @@ Result AudioFileQueryModel::refresh() {
   std::string queryStr;
   switch (filters->type) {
     case ALBUM:
-      queryStr = " select af.filePath, af.id from audioFiles af"
+      queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
                  " join tracks trk"
                  " on af.trackId = trk.id"
-                 " where trk.albumId in " + filters->idSqlArray() +
-                 " group by af.id";
+                 " join albums alb"
+                 " on trk.albumId = alb.id"
+                 " join track_to_artists tta"
+                 " on tta.trackId = trk.id"
+                 " join artists art"
+                 " on tta.artistId = art.id"
+                 " where alb.id in " + filters->idSqlArray() +
+                 " group by af.id"
+                 " order by trk.trackNumber asc";
       break;
     case ARTIST:
-      queryStr = " select af.filePath, af.id from audioFiles af"
+      queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
                  " join tracks trk"
                  " on af.trackId = trk.id"
+                 " join albums alb"
+                 " on trk.albumId = alb.id"
                  " join track_to_artists tta"
-                 " on trk.id = tta.trackId"
-                 " where tta.artistId in " + filters->idSqlArray();
+                 " on tta.trackId = trk.id"
+                 " join artists art"
+                 " on tta.artistId = art.id"
+                 " where tta.artistId in " + filters->idSqlArray() +
+                 " group by alb.id"
+                 " order by trk.trackNumber asc";
       break;
     case GENRE:
-      queryStr = " select af.filePath, af.id from audioFiles af"
+      queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
                  " join tracks trk"
                  " on af.trackId = trk.id"
+                 " join albums alb"
+                 " on trk.albumId = alb.id"
+                 " join track_to_artists tta"
+                 " on tta.trackId = trk.id"
+                 " join artists art"
+                 " on tta.artistId = art.id"
                  " join track_to_genres ttg"
                  " on trk.id = ttg.trackId"
                  " where ttg.genreId in " + filters->idSqlArray();
       break;
     case PLAYLIST:
-      queryStr = " select af.filePath, af.id from audioFiles af"
+      queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
+                 " join tracks trk"
+                 " on af.trackId = trk.id"
+                 " join albums alb"
+                 " on trk.albumId = alb.id"
+                 " join track_to_artists tta"
+                 " on tta.trackId = trk.id"
+                 " join artists art"
+                 " on tta.artistId = art.id"
                  " join audioFile_to_playlists atp"
                  " on af.id = atp.audioFileId"
                  " where atp.playlistId in " + filters->idSqlArray();
       break;
     case TRACK:
-      queryStr = " select filePath, id from audioFiles"
-                 " where audioFiles.trackId in " + filters->idSqlArray();
+      queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
+                 " join tracks trk"
+                 " on af.trackId = trk.id"
+                 " join albums alb"
+                 " on trk.albumId = alb.id"
+                 " join track_to_artists tta"
+                 " on tta.trackId = trk.id"
+                 " join artists art"
+                 " on tta.artistId = art.id"
+                 " where trk.id in " + filters->idSqlArray();
       break;
     default:
-      queryStr = "select filePath, id from audioFiles";
+      queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"
+                 " join tracks trk"
+                 " on af.trackId = trk.id"
+                 " join albums alb"
+                 " on trk.albumId = alb.id"
+                 " join track_to_artists tta"
+                 " on tta.trackId = trk.id"
+                 " join artists art"
+                 " on tta.artistId = art.id"
+                 " group by alb.id"
+                 " order by trk.trackNumber asc";
   }
 
   query = QString(queryStr.c_str());
   setQuery(query);
-  setHeaderData(0, Qt::Horizontal, QObject::tr("Path"));
-  setHeaderData(1, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(0, Qt::Horizontal, QObject::tr("Track"));
+  setHeaderData(1, Qt::Horizontal, QObject::tr("Artist"));
+  setHeaderData(2, Qt::Horizontal, QObject::tr("Album"));
+  setHeaderData(3, Qt::Horizontal, QObject::tr("Track Number"));
+  setHeaderData(4, Qt::Horizontal, QObject::tr("Year"));
+  setHeaderData(5, Qt::Horizontal, QObject::tr("Path"));
+  setHeaderData(6, Qt::Horizontal, QObject::tr("Id"));
 
   return OK;
 }

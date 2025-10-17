@@ -140,7 +140,7 @@ Result MusicLibraryWindow::connectActions() {
   });
 
   const auto audioFileClickedConnection = connect(audioFileTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant audioFileId = audioFileTableView->model()->index(index.row(), 1).data();
+      const QVariant audioFileId = audioFileTableView->model()->index(index.row(), 5).data();
       filters.set(AUDIO_FILE, audioFileId.toLongLong());
 
       refresh();
