@@ -48,9 +48,8 @@ Result AudioFileQueryModel::refresh() {
                  " on tta.trackId = trk.id"
                  " join artists art"
                  " on tta.artistId = art.id"
-                 " where tta.artistId in " + filters->idSqlArray() +
-                 " group by alb.id"
-                 " order by trk.trackNumber asc";
+                 " where art.id in " + filters->idSqlArray() +
+                 " order by alb.id asc, trk.trackNumber asc";
       break;
     case GENRE:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, af.id from audioFiles af"

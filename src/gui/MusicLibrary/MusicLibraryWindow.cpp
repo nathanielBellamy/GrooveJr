@@ -11,12 +11,10 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   : QWidget(parent)
   , actorSystem(actorSystem)
   , grid(this)
-  , title(this)
   , albumHeader(this)
   , artistHeader(this)
   , genreHeader(this)
   , playlistHeader(this)
-  , trackHeader(this)
   , audioFileHeader(this)
   {
   if (connectToDb() == OK) {
@@ -25,7 +23,6 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
     audioFileTableView = new AudioFileTableView(this, &filters);
     genreTableView = new GenreTableView(this, &filters);
     playlistTableView = new PlaylistTableView(this, &filters);
-    trackTableView = new TrackTableView(this, &filters);
   } else {
     Logging::write(
       Warning,
@@ -34,26 +31,20 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
     );
   }
 
-  title.setText("Music Library");
-  title.setFont({title.font().family(), 18});
-
   albumHeader.setText("Albums");
-  albumHeader.setFont({title.font().family(), 12});
+  albumHeader.setFont({albumHeader.font().family(), 12});
 
   artistHeader.setText("Artists");
-  artistHeader.setFont({title.font().family(), 12});
+  artistHeader.setFont({artistHeader.font().family(), 12});
 
   audioFileHeader.setText("Files");
-  audioFileHeader.setFont({title.font().family(), 12});
+  audioFileHeader.setFont({audioFileHeader.font().family(), 12});
 
   genreHeader.setText("Genres");
-  genreHeader.setFont({title.font().family(), 12});
+  genreHeader.setFont({genreHeader.font().family(), 12});
 
   playlistHeader.setText("Playlists");
-  playlistHeader.setFont({title.font().family(), 12});
-
-  trackHeader.setText("Tracks");
-  trackHeader.setFont({title.font().family(), 12});
+  playlistHeader.setFont({playlistHeader.font().family(), 10});
 
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   connectActions();
@@ -73,7 +64,6 @@ MusicLibraryWindow::~MusicLibraryWindow() {
   delete audioFileTableView;
   delete genreTableView;
   delete playlistTableView;
-  delete trackTableView;
 
   Logging::write(
     Info,
@@ -91,35 +81,29 @@ void MusicLibraryWindow::setStyle() {
 void MusicLibraryWindow::setupGrid() {
   grid.setVerticalSpacing(1);
 
-
-  grid.setRowStretch(0, 2);
-  grid.setRowStretch(1, 1);
-  grid.setRowStretch(2, 4);
-  grid.setRowStretch(3, 1);
-  grid.setRowStretch(4, 4);
+  grid.setRowStretch(0, 1);
+  grid.setRowStretch(1, 4);
+  grid.setRowStretch(2, 1);
+  grid.setRowStretch(3, 4);
 
   grid.setColumnStretch(0, 1);
   grid.setColumnStretch(1, 1);
-  grid.setColumnStretch(2, 2);
-  grid.setColumnStretch(3,2);
-  grid.setColumnStretch(4, 2);
+  grid.setColumnStretch(2, 4);
 
-  grid.addWidget(&title, 0, 0, 1, 1);
+  grid.addWidget(&genreHeader, 0, 0, 1, 1);
+  grid.addWidget(&playlistHeader, 0, 1, 1, 1);
 
-  grid.addWidget(&genreHeader, 1, 0, 1, 1);
-  grid.addWidget(&playlistHeader, 1, 1, 1, 1);
-  grid.addWidget(&artistHeader, 1, 2, 1, 1);
-  grid.addWidget(&albumHeader, 1, 3, 1, 1);
-  grid.addWidget(&trackHeader, 1, 4, 1, 1);
+  grid.addWidget(genreTableView, 1, 0, 1, 1);
+  grid.addWidget(playlistTableView, 1, 1, 1, 1);
 
-  grid.addWidget(genreTableView, 2, 0, 1, 1);
-  grid.addWidget(playlistTableView, 2, 1, 1, 1);
-  grid.addWidget(artistTableView, 2, 2, 1, 1);
-  grid.addWidget(albumTableView, 2, 3, 1, 1);
-  grid.addWidget(trackTableView, 2, 4, 1, 3);
+  grid.addWidget(&artistHeader, 2, 0, 1, 1);
+  grid.addWidget(&albumHeader, 2, 1, 1, 1);
 
-  grid.addWidget(&audioFileHeader, 3, 0, 1, -1);
-  grid.addWidget(audioFileTableView, 4, 0, 1, -1);
+  grid.addWidget(artistTableView, 3, 0, 1, 1);
+  grid.addWidget(albumTableView, 3, 1, 1, 1);
+
+  grid.addWidget(&audioFileHeader, 0, 2, -1, -1);
+  grid.addWidget(audioFileTableView, 0, 2, -1, -1);
 
   setLayout(&grid);
 }
@@ -156,13 +140,6 @@ Result MusicLibraryWindow::connectActions() {
   const auto playlistClickedConnection = connect(playlistTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant playlistId = playlistTableView->model()->index(index.row(), 1).data();
       filters.set(PLAYLIST, playlistId.toLongLong());
-
-      refresh();
-  });
-
-  const auto trackClickedConnection = connect(trackTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant trackId = trackTableView->model()->index(index.row(), 2).data();
-      filters.set(TRACK, trackId.toLongLong());
 
       refresh();
   });

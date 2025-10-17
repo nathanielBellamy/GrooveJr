@@ -24,7 +24,6 @@
 #include "audioFiles/AudioFileTableView.h"
 #include "genres/GenreTableView.h"
 #include "playlists/PlaylistTableView.h"
-#include "tracks/TrackTableView.h"
 
 using namespace caf;
 
@@ -42,7 +41,6 @@ class MusicLibraryWindow final : public QWidget {
       audioFileTableView->hydrateState(appStatePacket);
       genreTableView->hydrateState(appStatePacket);
       playlistTableView->hydrateState(appStatePacket);
-      trackTableView->hydrateState(appStatePacket);
       return OK;
     };
 
@@ -52,14 +50,12 @@ class MusicLibraryWindow final : public QWidget {
       audioFileTableView->refresh();
       genreTableView->refresh();
       playlistTableView->refresh();
-      trackTableView->refresh();
       return OK;
     }
 
   private:
     actor_system& actorSystem;
     QGridLayout grid;
-    QLabel title;
     QLabel albumHeader;
     AlbumTableView* albumTableView;
     QLabel artistHeader;
@@ -68,8 +64,6 @@ class MusicLibraryWindow final : public QWidget {
     GenreTableView* genreTableView;
     QLabel playlistHeader;
     PlaylistTableView* playlistTableView;
-    QLabel trackHeader;
-    TrackTableView* trackTableView;
     QLabel audioFileHeader;
     AudioFileTableView* audioFileTableView;
     Result connectToDb();

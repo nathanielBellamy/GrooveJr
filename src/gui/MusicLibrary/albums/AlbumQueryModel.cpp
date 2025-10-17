@@ -63,18 +63,18 @@ Result AlbumQueryModel::refresh() {
       queryStr = "select title, year, id from albums";
   }
 
-  query = QString(queryStr.c_str());
-  setQuery(query);
-  setHeaderData(0, Qt::Horizontal, QObject::tr("Title"));
-  setHeaderData(1, Qt::Horizontal, QObject::tr("Year"));
-  setHeaderData(2, Qt::Horizontal, QObject::tr("Id"));
+  setQueryString(queryStr);
+  setHeaderData(ALBUM_COL_TITLE, Qt::Horizontal, QObject::tr("Title"));
+  setHeaderData(ALBUM_COL_YEAR, Qt::Horizontal, QObject::tr("Year"));
+  setHeaderData(ALBUM_COL_ID, Qt::Horizontal, QObject::tr("Id"));
 
   return OK;
 }
 
-QVariant AlbumQueryModel::data(const QModelIndex& index, int role) const {
-  // TODO: format
-  return QSqlQueryModel::data(index, role);
+QVariant AlbumQueryModel::data(const QModelIndex& item, int role) const {
+  if (role == Qt::BackgroundRole && isSelected(item, ALBUM_COL_ID))
+    return QVariant::fromValue(QColor(Qt::blue));
+  return QSqlQueryModel::data(item, role);
 }
 
 } // Gui

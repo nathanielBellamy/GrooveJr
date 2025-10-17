@@ -14,20 +14,21 @@
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
 #include "../MusicLibraryFilters.h"
+#include "../MusicLibraryQueryModel.h"
 
 namespace Gj {
 namespace Gui {
 
-class AlbumQueryModel final : public QSqlQueryModel {
-  MusicLibraryFilters* filters;
-  QString query = QString();
-  bool isSelected(const QModelIndex& item) const;
+constexpr size_t ALBUM_COL_TITLE = 0;
+constexpr size_t ALBUM_COL_YEAR = 1;
+constexpr size_t ALBUM_COL_ID = 2;
+
+class AlbumQueryModel final : public MusicLibraryQueryModel {
 
 public:
   Result refresh();
   explicit AlbumQueryModel(QObject* parent, MusicLibraryFilters* filters)
-    : QSqlQueryModel(parent)
-    , filters(filters)
+    : MusicLibraryQueryModel(parent, filters, ALBUM)
     {
     refresh();
   }
