@@ -2,8 +2,8 @@
 // Created by ns on 10/16/25.
 //
 
-#ifndef GJQUERYMODEL_H
-#define GJQUERYMODEL_H
+#ifndef MUSICLIBRARYQUERYMODEL_H
+#define MUSICLIBRARYQUERYMODEL_H
 
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
@@ -19,7 +19,7 @@
 namespace Gj {
 namespace Gui {
 
-class GjQueryModel : public QSqlQueryModel {
+class MusicLibraryQueryModel : public QSqlQueryModel {
   protected:
     MusicLibraryType type;
     MusicLibraryFilters* filters;
@@ -40,7 +40,7 @@ class GjQueryModel : public QSqlQueryModel {
     };
 
   public:
-    GjQueryModel(QObject* parent, MusicLibraryFilters* filters, const MusicLibraryType type)
+    MusicLibraryQueryModel(QObject* parent, MusicLibraryFilters* filters, const MusicLibraryType type)
       : QSqlQueryModel(parent)
       , type(type)
       , filters(filters)
@@ -50,4 +50,4 @@ class GjQueryModel : public QSqlQueryModel {
 } // Gui
 } // Gj
 
-#endif //GJQUERYMODEL_H
+#endif //MUSICLIBRARYQUERYMODEL_H

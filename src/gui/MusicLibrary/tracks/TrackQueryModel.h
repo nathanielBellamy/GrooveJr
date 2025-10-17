@@ -16,7 +16,7 @@
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
 
-#include "../GjQueryModel.h"
+#include "../MusicLibraryQueryModel.h"
 
 namespace Gj {
 namespace Gui {
@@ -25,11 +25,11 @@ constexpr size_t TRACK_COL_TITLE = 0;
 constexpr size_t TRACK_COL_TRACK_NUMBER = 1;
 constexpr size_t TRACK_COL_ID = 2;
 
-class TrackQueryModel final : public GjQueryModel {
+class TrackQueryModel final : public MusicLibraryQueryModel {
 
 public:
   explicit TrackQueryModel(QObject* parent, MusicLibraryFilters* filters)
-    : GjQueryModel(parent, filters, TRACK)
+    : MusicLibraryQueryModel(parent, filters, TRACK)
     {
     refresh();
   }
