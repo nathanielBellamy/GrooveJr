@@ -8,7 +8,6 @@ namespace Gj {
 namespace Gui {
 
 Result PlaylistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
-  std::cout << "how now brown cow" << std::endl;
   Logging::write(
       Info,
       "Gui::PlaylistQueryModel::hydrateState",

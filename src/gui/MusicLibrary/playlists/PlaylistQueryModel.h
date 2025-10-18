@@ -9,8 +9,8 @@
 #include <QVariant>
 
 #include "../../../AppState.h"
-#include "../../../enums/Result.h"
 #include "../../../Logging.h"
+#include "../../../enums/Result.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
 
@@ -27,7 +27,6 @@ public:
     : MusicLibraryQueryModel(parent, filters, PLAYLIST)
     {
     refresh();
-    std::cout << "playlist query model" << std::endl;
   }
 
   Result hydrateState(const AppStatePacket& appStatePacket) override;

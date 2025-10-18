@@ -53,15 +53,11 @@ class MusicLibraryTableView : public QTableView {
           break;
         case PLAYLIST:
           model = new PlaylistQueryModel(parent, filters);
+          break;
         default:
           model = nullptr;
       }
 
-      if (model == nullptr) {
-        std::cout << " uh oh! " << std::endl;
-      } else {
-        std::cout << " model model model will set " << std::endl;
-      }
       setModel(model);
       setStyle();
     };
