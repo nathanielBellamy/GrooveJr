@@ -26,13 +26,15 @@ constexpr size_t ALBUM_COL_ID = 2;
 class AlbumQueryModel final : public MusicLibraryQueryModel {
 
 public:
-  Result refresh();
   explicit AlbumQueryModel(QObject* parent, MusicLibraryFilters* filters)
     : MusicLibraryQueryModel(parent, filters, ALBUM)
     {
     refresh();
   }
-  Result hydrateState(const AppStatePacket& appStatePacket);
+
+  Result hydrateState(const AppStatePacket& appStatePacket) override;
+  Result refresh() override;
+
   QVariant data(const QModelIndex &item, int role) const override;
 };
 
