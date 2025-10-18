@@ -45,6 +45,9 @@ class MusicLibraryQueryModel : public QSqlQueryModel {
       , type(type)
       , filters(filters)
       {}
+
+    virtual Result hydrateState(const AppStatePacket& appStatePacket) = 0;
+    virtual Result refresh() = 0;
 };
 
 } // Gui
