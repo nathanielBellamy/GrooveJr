@@ -11,6 +11,8 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   : QWidget(parent)
   , actorSystem(actorSystem)
   , grid(this)
+  , filesButton(this)
+  , queueButton(this)
   , albumHeader(this)
   , artistHeader(this)
   , audioFileHeader(this)
@@ -30,6 +32,9 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
       "Something went wrong while connecting to the db."
     );
   }
+
+  queueButton.setText("Queue");
+  filesButton.setText("Files");
 
   albumHeader.setText("Albums");
   albumHeader.setFont({albumHeader.font().family(), 12});
@@ -88,7 +93,12 @@ void MusicLibraryWindow::setupGrid() {
 
   grid.setColumnStretch(0, 1);
   grid.setColumnStretch(1, 1);
-  grid.setColumnStretch(2, 4);
+  grid.setColumnStretch(2, 1);
+  grid.setColumnStretch(3, 1);
+  grid.setColumnStretch(4, 4);
+
+  grid.addWidget(&filesButton, 0, 2, 1, 1);
+  grid.addWidget(&queueButton, 0, 3, 1, 1);
 
   grid.addWidget(&genreHeader, 0, 0, 1, 1);
   grid.addWidget(&playlistHeader, 0, 1, 1, 1);
@@ -102,8 +112,8 @@ void MusicLibraryWindow::setupGrid() {
   grid.addWidget(artistTableView, 3, 0, 1, 1);
   grid.addWidget(albumTableView, 3, 1, 1, 1);
 
-  grid.addWidget(&audioFileHeader, 0, 2, -1, -1);
-  grid.addWidget(audioFileTableView, 0, 2, -1, -1);
+  grid.addWidget(&audioFileHeader, 1, 2, -1, -1);
+  grid.addWidget(audioFileTableView, 1, 2, -1, -1);
 
   setLayout(&grid);
 }
@@ -130,6 +140,14 @@ Result MusicLibraryWindow::connectActions() {
       refresh();
   });
 
+  const auto audioFileDoubleClickedConnection = connect(audioFileTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
+      const QVariant audioFileId = audioFileTableView->getModel()->index(index.row(), 6).data();
+
+      // TODO: add to queue/play
+
+      refresh();
+  });
+
   const auto genreClickedConnection = connect(genreTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant genreId = genreTableView->getModel()->index(index.row(), 1).data();
       filters.set(GENRE, genreId.toLongLong());
@@ -140,6 +158,14 @@ Result MusicLibraryWindow::connectActions() {
   const auto playlistClickedConnection = connect(playlistTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant playlistId = playlistTableView->getModel()->index(index.row(), 1).data();
       filters.set(PLAYLIST, playlistId.toLongLong());
+
+      refresh();
+  });
+
+  const auto playlistDoubleClickedConnection = connect(audioFileTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
+      const QVariant playlistId = playlistTableView->getModel()->index(index.row(), 1).data();
+
+      // TODO: add to queue/play
 
       refresh();
   });

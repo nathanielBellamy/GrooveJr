@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QWidget>
 #include <QTableView>
+#include <QPushButton>
 
 #include "../Color.h"
 #include "../../enums/Result.h"
@@ -41,8 +42,7 @@ class MusicLibraryWindow final : public QWidget {
       artistTableView->hydrateState(appStatePacket);
       audioFileTableView->hydrateState(appStatePacket);
       genreTableView->hydrateState(appStatePacket);
-      // TODO: debug pltv->hs()
-      // playlistTableView->hydrateState(appStatePacket);
+      playlistTableView->hydrateState(appStatePacket);
 
       return OK;
     };
@@ -59,6 +59,8 @@ class MusicLibraryWindow final : public QWidget {
   private:
     actor_system& actorSystem;
     QGridLayout grid;
+    QPushButton filesButton;
+    QPushButton queueButton;
     QLabel albumHeader;
     AlbumTableView* albumTableView;
     QLabel artistHeader;
