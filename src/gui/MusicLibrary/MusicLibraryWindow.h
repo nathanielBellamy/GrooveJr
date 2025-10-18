@@ -36,11 +36,14 @@ class MusicLibraryWindow final : public QWidget {
     explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem);
     ~MusicLibraryWindow();
     Result hydrateState(const AppStatePacket& appStatePacket) {
+
       albumTableView->hydrateState(appStatePacket);
       artistTableView->hydrateState(appStatePacket);
       audioFileTableView->hydrateState(appStatePacket);
       genreTableView->hydrateState(appStatePacket);
-      playlistTableView->hydrateState(appStatePacket);
+      // TODO: debug pltv->hs()
+      // playlistTableView->hydrateState(appStatePacket);
+
       return OK;
     };
 
@@ -60,12 +63,12 @@ class MusicLibraryWindow final : public QWidget {
     AlbumTableView* albumTableView;
     QLabel artistHeader;
     ArtistTableView* artistTableView;
+    QLabel audioFileHeader;
+    AudioFileTableView* audioFileTableView;
     QLabel genreHeader;
     GenreTableView* genreTableView;
     QLabel playlistHeader;
     PlaylistTableView* playlistTableView;
-    QLabel audioFileHeader;
-    AudioFileTableView* audioFileTableView;
     Result connectToDb();
     void setStyle();
     void setupGrid();

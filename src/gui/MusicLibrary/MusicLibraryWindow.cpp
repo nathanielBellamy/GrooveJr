@@ -13,9 +13,9 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , grid(this)
   , albumHeader(this)
   , artistHeader(this)
+  , audioFileHeader(this)
   , genreHeader(this)
   , playlistHeader(this)
-  , audioFileHeader(this)
   {
   if (connectToDb() == OK) {
     albumTableView = new AlbumTableView(this, &filters);
@@ -110,35 +110,35 @@ void MusicLibraryWindow::setupGrid() {
 
 Result MusicLibraryWindow::connectActions() {
   const auto albumClickedConnection = connect(albumTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant albumId = albumTableView->model()->index(index.row(), 2).data();
+      const QVariant albumId = albumTableView->getModel()->index(index.row(), 2).data();
       filters.set(ALBUM, albumId.toInt());
 
       refresh();
   });
 
   const auto artistClickedConnection = connect(artistTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant artistId = artistTableView->model()->index(index.row(), 1).data();
+      const QVariant artistId = artistTableView->getModel()->index(index.row(), 1).data();
       filters.set(ARTIST, artistId.toLongLong());
 
       refresh();
   });
 
   const auto audioFileClickedConnection = connect(audioFileTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant audioFileId = audioFileTableView->model()->index(index.row(), 6).data();
+      const QVariant audioFileId = audioFileTableView->getModel()->index(index.row(), 6).data();
       filters.set(AUDIO_FILE, audioFileId.toLongLong());
 
       refresh();
   });
 
   const auto genreClickedConnection = connect(genreTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant genreId = genreTableView->model()->index(index.row(), 1).data();
+      const QVariant genreId = genreTableView->getModel()->index(index.row(), 1).data();
       filters.set(GENRE, genreId.toLongLong());
 
       refresh();
   });
 
   const auto playlistClickedConnection = connect(playlistTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant playlistId = playlistTableView->model()->index(index.row(), 1).data();
+      const QVariant playlistId = playlistTableView->getModel()->index(index.row(), 1).data();
       filters.set(PLAYLIST, playlistId.toLongLong());
 
       refresh();

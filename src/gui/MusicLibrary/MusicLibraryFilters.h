@@ -10,32 +10,24 @@
 
 #include "../../enums/Result.h"
 
+#include "MusicLibraryType.h"
+
 namespace Gj {
 namespace Gui {
-
-enum MusicLibraryType {
-  ALBUM,
-  ARTIST,
-  AUDIO_FILE,
-  GENRE,
-  NONE,
-  PLAYLIST,
-  TRACK
-};
 
 struct MusicLibraryFilters {
   MusicLibraryType type = NONE;
   std::vector<uint64_t> ids {};
 
   std::string idSqlArray() const {
-    std::string oss = "(";
+    std::string res = "(";
     for (size_t i = 0; i < ids.size(); ++i) {
-      oss += std::to_string(ids[i]);
+      res += std::to_string(ids[i]);
       if (i != ids.size() - 1)
-        oss += ", ";
+        res += ", ";
     }
-    oss += ")";
-    return oss;
+    res += ")";
+    return res;
   }
 
   Result set(MusicLibraryType newFilterBy, uint64_t id) {

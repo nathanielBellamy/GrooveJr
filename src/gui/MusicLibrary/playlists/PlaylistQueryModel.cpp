@@ -8,20 +8,13 @@ namespace Gj {
 namespace Gui {
 
 Result PlaylistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
+  std::cout << "how now brown cow" << std::endl;
   Logging::write(
       Info,
       "Gui::PlaylistQueryModel::hydrateState",
       "PlaylistQueryModel::hydrateState"
   );
   return OK;
-}
-
-bool PlaylistQueryModel::isSelected(const QModelIndex& item) const {
-  return std::find(
-    filters->ids.begin(),
-    filters->ids.end(),
-    index(item.row(), PLAYLIST_COL_ID).data()
-  ) != filters->ids.end();
 }
 
 QVariant PlaylistQueryModel::data(const QModelIndex& index, int role) const {
@@ -82,8 +75,7 @@ Result PlaylistQueryModel::refresh() {
       queryStr = "select name from playlists";
   }
 
-  query = QString(queryStr.c_str());
-  setQuery(query);
+  setQueryString(queryStr);
   setHeaderData(PLAYLIST_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
   setHeaderData(PLAYLIST_COL_ID, Qt::Horizontal, QObject::tr("Id"));
 

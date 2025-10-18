@@ -63,8 +63,7 @@ Result GenreQueryModel::refresh() {
       queryStr = "select name, id from genres";
   }
 
-  query = QString(queryStr.c_str());
-  setQuery(query);
+  setQueryString(queryStr);
   setHeaderData(GENRE_COL_ID, Qt::Horizontal, QObject::tr("Name"));
   setHeaderData(GENRE_COL_NAME, Qt::Horizontal, QObject::tr("Id"));
 

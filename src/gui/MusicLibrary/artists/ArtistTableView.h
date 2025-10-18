@@ -5,47 +5,18 @@
 #ifndef ARTISTTABLEVIEW_H
 #define ARTISTTABLEVIEW_H
 
-#include <QTableView>
-
-#include "../../../enums/Result.h"
-#include "ArtistQueryModel.h"
-#include "../../../AppState.h"
-
 #include "../MusicLibraryFilters.h"
+#include "../MusicLibraryTableView.h"
 
 namespace Gj {
 namespace Gui {
 
-class ArtistTableView final : public QTableView {
-  ArtistQueryModel* artistQueryModel;
-  Result setStyle() {
-    setStyleSheet(
-      "font-weight: 500; font-size: 12px;"
-    );
-    return OK;
-  }
+class ArtistTableView final : public MusicLibraryTableView {
 
   public:
     ArtistTableView(QWidget* parent, MusicLibraryFilters* filters)
-        : QTableView(parent)
-        , artistQueryModel(new ArtistQueryModel(this, filters)) {
-      setModel(artistQueryModel);
-      setStyle();
-    };
-
-    ~ArtistTableView() {
-      delete artistQueryModel;
-    }
-
-    Result refresh() {
-      artistQueryModel->refresh();
-      return OK;
-    }
-
-    Result hydrateState(const AppStatePacket& appStatePacket) {
-      artistQueryModel->hydrateState(appStatePacket);
-      return OK;
-    };
+        : MusicLibraryTableView(parent, filters, ARTIST)
+        {};
 };
 
 } // Gui

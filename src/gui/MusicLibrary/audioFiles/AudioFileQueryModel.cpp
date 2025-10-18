@@ -106,8 +106,7 @@ Result AudioFileQueryModel::refresh() {
                  " order by art.name asc, alb.year asc, alb.title asc, trk.trackNumber asc";
   }
 
-  query = QString(queryStr.c_str());
-  setQuery(query);
+  setQueryString(queryStr);
   setHeaderData(0, Qt::Horizontal, QObject::tr("Track"));
   setHeaderData(1, Qt::Horizontal, QObject::tr("Artist"));
   setHeaderData(2, Qt::Horizontal, QObject::tr("Album"));

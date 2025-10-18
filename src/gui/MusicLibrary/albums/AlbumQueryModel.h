@@ -7,8 +7,6 @@
 
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
-#include <QColor>
-#include <QString>
 
 #include "../../../AppState.h"
 #include "../../../Logging.h"

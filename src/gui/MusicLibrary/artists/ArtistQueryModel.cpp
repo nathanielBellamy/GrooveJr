@@ -69,7 +69,7 @@ Result ArtistQueryModel::refresh() {
       queryStr = "select name, id from artists";
   }
 
-  setQuery(QString(queryStr.c_str()));
+  setQueryString(queryStr);
   setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
   setHeaderData(1, Qt::Horizontal, QObject::tr("Id"));
   return OK;

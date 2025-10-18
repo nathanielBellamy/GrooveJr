@@ -7,33 +7,28 @@
 
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
-#include <QColor>
-#include <QString>
 
 #include "../../../AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
+
 #include "../MusicLibraryFilters.h"
+#include "../MusicLibraryQueryModel.h"
 
 namespace Gj {
 namespace Gui {
 
-class ArtistQueryModel final : public QSqlQueryModel {
-  MusicLibraryFilters* filters;
-  QString query;
-  bool isSelected(const QModelIndex& item) const;
+class ArtistQueryModel final : public MusicLibraryQueryModel {
 
-public:
+  public:
   explicit ArtistQueryModel(QObject* parent, MusicLibraryFilters* filters)
-    : QSqlQueryModel(parent)
-    , filters(filters)
+    : MusicLibraryQueryModel(parent, filters, ARTIST)
     {
-
     refresh();
   }
-  Result hydrateState(const AppStatePacket& appStatePacket);
 
-  Result refresh();
+  Result hydrateState(const AppStatePacket& appStatePacket) override;
+  Result refresh() override;
 
   QVariant data(const QModelIndex& index, int role) const override;
 };

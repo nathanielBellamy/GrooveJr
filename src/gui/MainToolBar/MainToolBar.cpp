@@ -20,7 +20,8 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer
 
   title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
   title.setText("GrooveJr");
-  title.setFont({title.font().family(), 36});
+  title.setFont({title.font().family(), 18});
+  title.setStyleSheet("text-align: center;");
 
   addWidget(&title);
   addSeparator();

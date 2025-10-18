@@ -7,13 +7,12 @@
 
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
-#include <QColor>
-#include <QString>
 
 #include "../../../AppState.h"
-#include "../../../Logging.h"
 #include "../../../enums/Result.h"
+#include "../../../Logging.h"
 #include "../MusicLibraryFilters.h"
+#include "../MusicLibraryQueryModel.h"
 
 
 namespace Gj {
@@ -22,20 +21,17 @@ namespace Gui {
 constexpr size_t GENRE_COL_NAME = 0;
 constexpr size_t GENRE_COL_ID = 1;
 
-class GenreQueryModel final : public QSqlQueryModel {
-  MusicLibraryFilters* filters;
-  QString query;
-  bool isSelected(const QModelIndex& item) const;
+class GenreQueryModel final : public MusicLibraryQueryModel {
 
 public:
   explicit GenreQueryModel(QObject* parent, MusicLibraryFilters* filters)
-    : QSqlQueryModel(parent)
-    , filters(filters)
+    : MusicLibraryQueryModel(parent, filters, GENRE)
     {
     refresh();
   }
-  Result hydrateState(const AppStatePacket& appStatePacket);
-  Result refresh();
+
+  Result refresh() override;
+  Result hydrateState(const AppStatePacket &appStatePacket) override;
 
   QVariant data(const QModelIndex &item, int role) const override;
 };
