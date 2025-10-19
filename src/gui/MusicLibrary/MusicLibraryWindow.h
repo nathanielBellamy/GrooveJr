@@ -25,56 +25,69 @@
 #include "audioFiles/AudioFileTableView.h"
 #include "genres/GenreTableView.h"
 #include "playlists/PlaylistTableView.h"
+#include "queue/QueueTableView.h"
 
 using namespace caf;
 
 namespace Gj {
 namespace Gui {
 
+enum MusicLibraryWindowMainSection {
+  FILES,
+  QUEUE
+};
+
 class MusicLibraryWindow final : public QWidget {
+  actor_system& actorSystem;
+  QGridLayout grid;
+  MusicLibraryWindowMainSection mainSection = FILES;
+  QPushButton filesButton;
+  QPushButton queueButton;
+  QLabel albumHeader;
+  AlbumTableView* albumTableView;
+  QLabel artistHeader;
+  ArtistTableView* artistTableView;
+  AudioFileTableView* audioFileTableView;
+  QLabel genreHeader;
+  GenreTableView* genreTableView;
+  QLabel playlistHeader;
+  PlaylistTableView* playlistTableView;
+  QueueTableView* queueTableView;
+  Result connectToDb();
+  void setStyle();
+  void setupGrid();
+  Result connectActions();
+
   public:
     MusicLibraryFilters filters;
     explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem);
     ~MusicLibraryWindow();
-    Result hydrateState(const AppStatePacket& appStatePacket) {
 
+    Result hydrateState(const AppStatePacket& appStatePacket) {
       albumTableView->hydrateState(appStatePacket);
       artistTableView->hydrateState(appStatePacket);
-      audioFileTableView->hydrateState(appStatePacket);
       genreTableView->hydrateState(appStatePacket);
       playlistTableView->hydrateState(appStatePacket);
 
+      if (audioFileTableView != nullptr)
+        audioFileTableView->hydrateState(appStatePacket);
+      if (queueTableView != nullptr)
+        queueTableView->hydrateState(appStatePacket);
       return OK;
     };
 
     Result refresh() {
       albumTableView->refresh();
       artistTableView->refresh();
-      audioFileTableView->refresh();
       genreTableView->refresh();
       playlistTableView->refresh();
+
+      if (audioFileTableView != nullptr)
+        audioFileTableView->refresh();
+      if (queueTableView != nullptr)
+        queueTableView->refresh();
       return OK;
     }
-
-  private:
-    actor_system& actorSystem;
-    QGridLayout grid;
-    QPushButton filesButton;
-    QPushButton queueButton;
-    QLabel albumHeader;
-    AlbumTableView* albumTableView;
-    QLabel artistHeader;
-    ArtistTableView* artistTableView;
-    QLabel audioFileHeader;
-    AudioFileTableView* audioFileTableView;
-    QLabel genreHeader;
-    GenreTableView* genreTableView;
-    QLabel playlistHeader;
-    PlaylistTableView* playlistTableView;
-    Result connectToDb();
-    void setStyle();
-    void setupGrid();
-    Result connectActions();
 };
 
 } // Gui

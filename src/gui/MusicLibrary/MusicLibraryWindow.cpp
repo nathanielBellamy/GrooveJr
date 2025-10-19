@@ -15,7 +15,6 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , queueButton(this)
   , albumHeader(this)
   , artistHeader(this)
-  , audioFileHeader(this)
   , genreHeader(this)
   , playlistHeader(this)
   {
@@ -25,6 +24,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
     audioFileTableView = new AudioFileTableView(this, &filters);
     genreTableView = new GenreTableView(this, &filters);
     playlistTableView = new PlaylistTableView(this, &filters);
+    queueTableView = new QueueTableView(this, &filters);
   } else {
     Logging::write(
       Warning,
@@ -41,9 +41,6 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
 
   artistHeader.setText("Artists");
   artistHeader.setFont({artistHeader.font().family(), 12});
-
-  audioFileHeader.setText("Files");
-  audioFileHeader.setFont({audioFileHeader.font().family(), 12});
 
   genreHeader.setText("Genres");
   genreHeader.setFont({genreHeader.font().family(), 12});
@@ -69,6 +66,7 @@ MusicLibraryWindow::~MusicLibraryWindow() {
   delete audioFileTableView;
   delete genreTableView;
   delete playlistTableView;
+  delete queueTableView;
 
   Logging::write(
     Info,
@@ -112,13 +110,37 @@ void MusicLibraryWindow::setupGrid() {
   grid.addWidget(artistTableView, 3, 0, 1, 1);
   grid.addWidget(albumTableView, 3, 1, 1, 1);
 
-  grid.addWidget(&audioFileHeader, 1, 2, -1, -1);
-  grid.addWidget(audioFileTableView, 1, 2, -1, -1);
+  switch (mainSection) {
+    case QUEUE:
+      grid.addWidget(queueTableView, 1, 2, -1, -1);
+      break;
+    default:
+      grid.addWidget(audioFileTableView, 1, 2, -1, -1);
+  }
 
   setLayout(&grid);
 }
 
 Result MusicLibraryWindow::connectActions() {
+  const auto filesButtonClickedConnection = connect(&filesButton, &QPushButton::clicked, this, [&] () {
+
+    mainSection = FILES;
+    delete audioFileTableView;
+    audioFileTableView = new AudioFileTableView(this, &filters);
+
+    setupGrid();
+    refresh();
+  });
+
+  const auto queueButtonClickedConnection = connect(&queueButton, &QPushButton::clicked, this, [&] () {
+    mainSection = QUEUE;
+    delete queueTableView;
+    queueTableView = new QueueTableView(this, &filters);
+
+    setupGrid();
+    refresh();
+  });
+
   const auto albumClickedConnection = connect(albumTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant albumId = albumTableView->getModel()->index(index.row(), 2).data();
       filters.set(ALBUM, albumId.toInt());

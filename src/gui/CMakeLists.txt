@@ -99,6 +99,9 @@ qt_add_library(GjGui STATIC
         MusicLibrary/playlists/PlaylistTableView.h
         MusicLibrary/playlists/PlaylistQueryModel.h
         MusicLibrary/playlists/PlaylistQueryModel.cpp
+        MusicLibrary/queue/QueueTableView.h
+        MusicLibrary/queue/QueueQueryModel.h
+        MusicLibrary/queue/QueueQueryModel.cpp
         MainToolBar/CurrentlyPlaying.h
         MainToolBar/CurrentlyPlaying.cpp
         MainToolBar/MainToolBar.h
