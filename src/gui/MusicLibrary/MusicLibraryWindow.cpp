@@ -20,17 +20,11 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , playlistHeader(this)
   {
   if (connectToDb() == OK) {
-    std::cout << "foo 1" << std::endl;
     albumTableView = new AlbumTableView(this, &filters);
-    std::cout << "foo 2" << std::endl;
     artistTableView = new ArtistTableView(this, &filters);
-    std::cout << "foo 3" << std::endl;
     audioFileTableView = new AudioFileTableView(this, &filters);
-    std::cout << "foo 4" << std::endl;
     genreTableView = new GenreTableView(this, &filters);
-    std::cout << "foo 5" << std::endl;
     playlistTableView = new PlaylistTableView(this, &filters);
-    std::cout << "foo 6" << std::endl;
   } else {
     Logging::write(
       Warning,
