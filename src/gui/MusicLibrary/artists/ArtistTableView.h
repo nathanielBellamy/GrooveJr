@@ -7,6 +7,7 @@
 
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
+#include "ArtistQueryModel.h"
 
 namespace Gj {
 namespace Gui {
@@ -15,7 +16,7 @@ class ArtistTableView final : public MusicLibraryTableView {
 
   public:
     ArtistTableView(QWidget* parent, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, filters, ARTIST)
+        : MusicLibraryTableView(parent, filters, new ArtistQueryModel(parent, filters))
         {};
 };
 

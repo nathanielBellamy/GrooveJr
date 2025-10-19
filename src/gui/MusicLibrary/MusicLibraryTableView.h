@@ -13,12 +13,6 @@
 #include "MusicLibraryQueryModel.h"
 #include "MusicLibraryFilters.h"
 
-#include "albums/AlbumQueryModel.h"
-#include "audioFiles/AudioFileQueryModel.h"
-#include "artists/ArtistQueryModel.h"
-#include "genres/GenreQueryModel.h"
-#include "playlists/PlaylistQueryModel.h"
-
 namespace Gj {
 namespace Gui {
 
@@ -31,33 +25,15 @@ class MusicLibraryTableView : public QTableView {
   }
 
   protected:
+    MusicLibraryFilters* filters;
     MusicLibraryQueryModel* model;
 
   public:
-    MusicLibraryTableView(QWidget* parent, MusicLibraryFilters* filters, const MusicLibraryType type)
+    MusicLibraryTableView(QWidget* parent, MusicLibraryFilters* filters, MusicLibraryQueryModel* model)
         : QTableView(parent)
+        , filters(filters)
+        , model(model)
         {
-
-      switch (type) {
-        case ALBUM:
-          model = new AlbumQueryModel(parent, filters);
-          break;
-        case ARTIST:
-          model = new ArtistQueryModel(parent, filters);
-          break;
-        case AUDIO_FILE:
-          model = new AudioFileQueryModel(parent, filters);
-          break;
-        case GENRE:
-          model = new GenreQueryModel(parent, filters);
-          break;
-        case PLAYLIST:
-          model = new PlaylistQueryModel(parent, filters);
-          break;
-        default:
-          model = nullptr;
-      }
-
       setModel(model);
       setStyle();
     };

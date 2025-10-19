@@ -16,7 +16,7 @@ class AlbumTableView final : public MusicLibraryTableView {
 
   public:
     AlbumTableView(QWidget* parent, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, filters, ALBUM)
+        : MusicLibraryTableView(parent, filters, new AlbumQueryModel(parent, filters))
         {};
 };
 
