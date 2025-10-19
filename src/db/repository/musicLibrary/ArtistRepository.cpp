@@ -7,11 +7,6 @@
 namespace Gj {
 namespace Db {
 
-ArtistRepository::ArtistRepository(sqlite3** db, AppState* gAppState)
-  : db(db)
-  , gAppState(gAppState)
-  {}
-
 ID ArtistRepository::save(const Artist& artist) const {
   const std::string query = R"sql(
     insert into artists (name)

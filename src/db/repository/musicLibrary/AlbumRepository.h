@@ -7,12 +7,9 @@
 
 #include <vector>
 
-#include <sqlite3.h>
-
-#include "../../Logging.h"
-#include "../../../AppState.h"
 #include "../../../enums/Result.h"
 
+#include "MusicLibraryRepository.h"
 #include "../../dto/musicLibrary/AlbumWithArtist.h"
 #include "../../entity/musicLibrary/Album.h"
 #include "../../Types.h"
@@ -20,13 +17,13 @@
 namespace Gj {
 namespace Db {
 
-class AlbumRepository final {
-
-  sqlite3** db;
-  AppState* gAppState;
+class AlbumRepository final : public MusicLibraryRepository {
 
   public:
-    AlbumRepository(sqlite3** db, AppState* gAppState);
+    AlbumRepository(sqlite3** db, AppState* gAppState)
+      : MusicLibraryRepository(db, gAppState)
+      {};
+
     std::vector<Album> getAll() const;
     ID save(const Album& artist) const;
     ID save(const AlbumWithArtist& albumWithArtist) const;

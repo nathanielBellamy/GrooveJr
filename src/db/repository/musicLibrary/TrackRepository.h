@@ -5,24 +5,20 @@
 #ifndef TRACKREPOSITORY_H
 #define TRACKREPOSITORY_H
 
-#include <sqlite3.h>
-
-#include "../../Logging.h"
-#include "../../../AppState.h"
 #include "../../../enums/Result.h"
 #include "../../entity/musicLibrary/Artist.h"
-
 #include "../../entity/musicLibrary/Track.h"
+#include "MusicLibraryRepository.h"
 
 namespace Gj {
 namespace Db {
 
-class TrackRepository final {
-  sqlite3** db;
-  AppState* gAppState;
-
+class TrackRepository final : public MusicLibraryRepository {
   public:
-    TrackRepository(sqlite3** db, AppState* gAppState);
+    TrackRepository(sqlite3** db, AppState* gAppState)
+      : MusicLibraryRepository(db, gAppState)
+      {};
+
     std::vector<Track> getAll() const;
     ID save(const Track& track) const;
     Track findByAlbumIdAndTrackNumber(ID albumId, TrackNumber trackNumber) const;

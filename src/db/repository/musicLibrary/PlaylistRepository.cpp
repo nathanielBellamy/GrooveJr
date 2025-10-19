@@ -7,11 +7,6 @@
 namespace Gj {
 namespace Db {
 
-PlaylistRepository::PlaylistRepository(sqlite3** db, AppState* gAppState)
-  : db(db)
-  , gAppState(gAppState)
-  {}
-
 std::vector<Playlist> PlaylistRepository::getAll() const {
   std::vector<Playlist> playlists;
   const std::string query = R"sql(

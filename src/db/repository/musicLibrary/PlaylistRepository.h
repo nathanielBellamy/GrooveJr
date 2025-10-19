@@ -7,23 +7,20 @@
 
 #include <optional>
 
-#include <sqlite3.h>
-
-#include "../../Logging.h"
-#include "../../../AppState.h"
+#include "MusicLibraryRepository.h"
 #include "../../../enums/Result.h"
-
 #include "../../entity/musicLibrary/Playlist.h"
 
 namespace Gj {
 namespace Db {
 
-class PlaylistRepository final {
-  sqlite3** db;
-  AppState* gAppState;
+class PlaylistRepository final : public MusicLibraryRepository {
 
   public:
-    PlaylistRepository(sqlite3** db, AppState* gAppState);
+    PlaylistRepository(sqlite3** db, AppState* gAppState)
+      : MusicLibraryRepository(db, gAppState)
+      {};
+
     std::vector<Playlist> getAll() const;
     ID save(const Playlist& playlist) const;
 

@@ -7,10 +7,7 @@
 
 #include <optional>
 
-#include <sqlite3.h>
-
-#include "../../Logging.h"
-#include "../../../AppState.h"
+#include "MusicLibraryRepository.h"
 #include "../../../enums/Result.h"
 
 #include "../../entity/musicLibrary/Genre.h"
@@ -19,15 +16,13 @@
 namespace Gj {
 namespace Db {
 
-class GenreRepository final {
-  sqlite3** db;
-  AppState* gAppState;
+class GenreRepository final : public MusicLibraryRepository{
 
   public:
     GenreRepository(sqlite3** db, AppState* gAppState)
-      : db(db)
-      , gAppState(gAppState)
+      : MusicLibraryRepository(db, gAppState)
       {};
+
     std::vector<Genre> getAll() const;
     ID save(const Genre& genre) const;
     ID save(const GenreWithTrackId& genreWithTrackId) const;

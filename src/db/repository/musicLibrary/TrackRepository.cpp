@@ -7,11 +7,6 @@
 namespace Gj {
 namespace Db {
 
-TrackRepository::TrackRepository(sqlite3** db, AppState* gAppState)
-  : db(db)
-  , gAppState(gAppState)
-  {}
-
 std::vector<Track> TrackRepository::getAll() const {
   std::vector<Track> tracks;
   const std::string query = R"sql(

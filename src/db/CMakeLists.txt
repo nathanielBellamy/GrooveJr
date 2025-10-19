@@ -39,6 +39,8 @@ add_library(GjDb SHARED
         entity/musicLibrary/Genre.cpp
         entity/musicLibrary/Playlist.h
         entity/musicLibrary/Playlist.cpp
+        entity/musicLibrary/Queue.h
+        entity/musicLibrary/Queue.cpp
         entity/musicLibrary/Track.h
         entity/musicLibrary/Track.cpp
         repository/AppStateRepository.h

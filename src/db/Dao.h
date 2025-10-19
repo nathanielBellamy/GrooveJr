@@ -21,6 +21,7 @@
 #include "repository/musicLibrary/AudioFileRepository.h"
 #include "repository/musicLibrary/GenreRepository.h"
 #include "repository/musicLibrary/PlaylistRepository.h"
+#include "repository/musicLibrary/QueueRepository.h"
 #include "repository/musicLibrary/TrackRepository.h"
 #include "repository/AppStateRepository.h"
 
@@ -41,6 +42,7 @@ class Dao {
     AudioFileRepository audioFileRepository;
     GenreRepository genreRepository;
     PlaylistRepository playlistRepository;
+    QueueRepository queueRepository;
     TrackRepository trackRepository;
 
     Dao(AppState* gAppState);
