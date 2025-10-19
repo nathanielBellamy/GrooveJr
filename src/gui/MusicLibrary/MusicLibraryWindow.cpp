@@ -7,9 +7,10 @@
 namespace Gj {
 namespace Gui {
 
-MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSystem)
+MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSystem, Db::Dao* dao)
   : QWidget(parent)
   , actorSystem(actorSystem)
+  , dao(dao)
   , grid(this)
   , filesButton(this)
   , queueButton(this)
@@ -119,6 +120,7 @@ void MusicLibraryWindow::setupGrid() {
   }
 
   setLayout(&grid);
+  connectActions();
 }
 
 Result MusicLibraryWindow::connectActions() {
@@ -165,6 +167,10 @@ Result MusicLibraryWindow::connectActions() {
   const auto audioFileDoubleClickedConnection = connect(audioFileTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant audioFileId = audioFileTableView->getModel()->index(index.row(), 6).data();
 
+      Db::Queue q(audioFileId.toLongLong(), 1);
+      const Db::ID qId = dao->queueRepository.save(q);
+
+      std::cout << "saved q " << std::to_string(qId) << std::endl;
       // TODO: add to queue/play
 
       refresh();

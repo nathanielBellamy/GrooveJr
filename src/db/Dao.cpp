@@ -202,7 +202,7 @@ int Dao::initSchema() const {
     create table if not exists queue (
       id integer primary key autoincrement,
       audioFileId integer not null,
-      trackNumber integer not null,
+      trackNumber integer not null unique,
       createdAt datetime default current_timestamp
     );
 

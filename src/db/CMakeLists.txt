@@ -61,6 +61,8 @@ add_library(GjDb SHARED
         repository/musicLibrary/GenreRepository.cpp
         repository/musicLibrary/PlaylistRepository.h
         repository/musicLibrary/PlaylistRepository.cpp
+        repository/musicLibrary/QueueRepository.h
+        repository/musicLibrary/QueueRepository.cpp
         repository/musicLibrary/TrackRepository.h
         repository/musicLibrary/TrackRepository.cpp
 )

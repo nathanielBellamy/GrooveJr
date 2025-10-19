@@ -18,6 +18,8 @@
 #include "../../Logging.h"
 #include "../../AppState.h"
 #include "../../enums/Result.h"
+#include "../../db/Dao.h"
+#include "../../db/entity/musicLibrary/Queue.h"
 
 #include "MusicLibraryFilters.h"
 #include "albums/AlbumTableView.h"
@@ -39,6 +41,7 @@ enum MusicLibraryWindowMainSection {
 
 class MusicLibraryWindow final : public QWidget {
   actor_system& actorSystem;
+  Db::Dao* dao;
   QGridLayout grid;
   MusicLibraryWindowMainSection mainSection = FILES;
   QPushButton filesButton;
@@ -60,7 +63,7 @@ class MusicLibraryWindow final : public QWidget {
 
   public:
     MusicLibraryFilters filters;
-    explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem);
+    explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem, Db::Dao* dao);
     ~MusicLibraryWindow();
 
     Result hydrateState(const AppStatePacket& appStatePacket) {
