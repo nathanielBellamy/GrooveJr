@@ -13,6 +13,10 @@ ID QueueRepository::save(const Queue& queue) const {
     values (?, ?)
   )sql";
 
+  TrackNumber trackNumber = queue.trackNumber == 0
+                                ? nextTrackNumber()
+                                : queue.trackNumber;
+
   sqlite3_stmt* stmt;
   if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     Logging::write(
@@ -24,7 +28,7 @@ ID QueueRepository::save(const Queue& queue) const {
   }
 
   sqlite3_bind_int(stmt, 1, queue.audioFileId);
-  sqlite3_bind_int(stmt, 2, queue.trackNumber);
+  sqlite3_bind_int(stmt, 2, trackNumber);
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     const char* errmsg = sqlite3_errmsg(*db);
@@ -43,6 +47,35 @@ ID QueueRepository::save(const Queue& queue) const {
   }
 
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
+}
+
+TrackNumber QueueRepository::nextTrackNumber() const {
+  return maxTrackNumber() + 1;
+}
+
+TrackNumber QueueRepository::maxTrackNumber() const {
+  const std::string query = R"sql(
+    select trackNumber from queue
+    order by trackNumber desc
+    limit 1
+  )sql";
+
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::QueueRepository::save",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return 0;
+  }
+
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    const ID id = sqlite3_column_int(stmt, 0);
+    return id;
+  }
+
+  return 0;
 }
 
 } // Db

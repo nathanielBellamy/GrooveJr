@@ -20,6 +20,8 @@ class QueueRepository final : public MusicLibraryRepository {
       {};
 
     ID save(const Queue& queue) const;
+    TrackNumber nextTrackNumber() const;
+    TrackNumber maxTrackNumber() const;
 };
 
 

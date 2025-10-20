@@ -14,9 +14,6 @@ namespace Gj {
 namespace Db {
 
 class AudioFileRepository final : public MusicLibraryRepository {
-  sqlite3** db;
-  AppState* gAppState;
-
   public:
     AudioFileRepository(sqlite3** db, AppState* gAppState)
       : MusicLibraryRepository(db, gAppState)

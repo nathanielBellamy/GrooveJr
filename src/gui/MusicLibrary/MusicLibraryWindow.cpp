@@ -167,10 +167,9 @@ Result MusicLibraryWindow::connectActions() {
   const auto audioFileDoubleClickedConnection = connect(audioFileTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant audioFileId = audioFileTableView->getModel()->index(index.row(), 6).data();
 
-      Db::Queue q(audioFileId.toLongLong(), 1);
-      const Db::ID qId = dao->queueRepository.save(q);
+      Db::Queue q(audioFileId.toLongLong(), 0);
+      dao->queueRepository.save(q);
 
-      std::cout << "saved q " << std::to_string(qId) << std::endl;
       // TODO: add to queue/play
 
       refresh();
