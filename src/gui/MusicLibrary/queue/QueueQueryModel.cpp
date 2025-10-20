@@ -37,7 +37,7 @@ Result QueueQueryModel::refresh() {
                  " join artists art"
                  " on tta.artistId = art.id"
                  " where alb.id in " + filters->idSqlArray() +
-                 " order by q.trakNumber asc";
+                 " order by q.trackNumber asc";
       break;
     case ARTIST:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, q.id from queue q"
@@ -52,7 +52,7 @@ Result QueueQueryModel::refresh() {
                  " join artists art"
                  " on tta.artistId = art.id"
                  " where art.id in " + filters->idSqlArray() +
-                 " order by q.trakNumber asc";
+                 " order by q.trackNumber asc";
       break;
     case GENRE:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, q.id from queue q"
@@ -69,7 +69,7 @@ Result QueueQueryModel::refresh() {
                  " join track_to_genres ttg"
                  " on trk.id = ttg.trackId"
                  " where ttg.genreId in " + filters->idSqlArray() +
-                 " order by q.trakNumber asc";
+                 " order by q.trackNumber asc";
       break;
     case PLAYLIST:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, q.id from queue q"
@@ -86,7 +86,7 @@ Result QueueQueryModel::refresh() {
                  " join audioFile_to_playlists atp"
                  " on af.id = atp.audioFileId"
                  " where atp.playlistId in " + filters->idSqlArray() +
-                 " order by q.trakNumber asc";
+                 " order by q.trackNumber asc";
       break;
     case TRACK:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, q.id from queue q"
@@ -101,7 +101,7 @@ Result QueueQueryModel::refresh() {
                  " join artists art"
                  " on tta.artistId = art.id"
                  " where trk.id in " + filters->idSqlArray() +
-                 " order by q.trakNumber asc";
+                 " order by q.trackNumber asc";
       break;
     default:
       queryStr = " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, af.filePath, q.id from queue q"
@@ -115,7 +115,7 @@ Result QueueQueryModel::refresh() {
                  " on tta.trackId = trk.id"
                  " join artists art"
                  " on tta.artistId = art.id"
-                 " order by q.trakNumber asc";
+                 " order by q.trackNumber asc";
   }
 
   setQueryString(queryStr);

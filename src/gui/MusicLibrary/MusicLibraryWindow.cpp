@@ -125,7 +125,6 @@ void MusicLibraryWindow::setupGrid() {
 
 Result MusicLibraryWindow::connectActions() {
   const auto filesButtonClickedConnection = connect(&filesButton, &QPushButton::clicked, this, [&] () {
-
     mainSection = FILES;
     delete audioFileTableView;
     audioFileTableView = new AudioFileTableView(this, &filters);
