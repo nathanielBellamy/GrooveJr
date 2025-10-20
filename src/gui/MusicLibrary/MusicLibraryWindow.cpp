@@ -20,12 +20,13 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , playlistHeader(this)
   {
   if (connectToDb() == OK) {
-    albumTableView = new AlbumTableView(this, &filters);
-    artistTableView = new ArtistTableView(this, &filters);
-    audioFileTableView = new AudioFileTableView(this, &filters);
-    genreTableView = new GenreTableView(this, &filters);
-    playlistTableView = new PlaylistTableView(this, &filters);
-    queueTableView = new QueueTableView(this, &filters);
+    albumTableView = new AlbumTableView(this, dao, &filters);
+    artistTableView = new ArtistTableView(this, dao, &filters);
+    audioFileTableView = new AudioFileTableView(this, dao, &filters);
+    genreTableView = new GenreTableView(this, dao, &filters);
+    playlistTableView = new PlaylistTableView(this, dao, &filters);
+    queueTableView = new QueueTableView(this, dao, &filters);
+    showAsMainSection(AUDIO_FILES_VIEW);
   } else {
     Logging::write(
       Warning,
@@ -111,34 +112,21 @@ void MusicLibraryWindow::setupGrid() {
   grid.addWidget(artistTableView, 3, 0, 1, 1);
   grid.addWidget(albumTableView, 3, 1, 1, 1);
 
-  switch (mainSection) {
-    case QUEUE:
-      grid.addWidget(queueTableView, 1, 2, -1, -1);
-      break;
-    default:
-      grid.addWidget(audioFileTableView, 1, 2, -1, -1);
-  }
+  // add overlapping mainSections to hide/show
+  grid.addWidget(queueTableView, 1, 2, -1, -1);
+  grid.addWidget(audioFileTableView, 1, 2, -1, -1);
 
   setLayout(&grid);
-  connectActions();
 }
 
 Result MusicLibraryWindow::connectActions() {
   const auto filesButtonClickedConnection = connect(&filesButton, &QPushButton::clicked, this, [&] () {
-    mainSection = FILES;
-    delete audioFileTableView;
-    audioFileTableView = new AudioFileTableView(this, &filters);
-
-    setupGrid();
+    showAsMainSection(AUDIO_FILES_VIEW);
     refresh();
   });
 
   const auto queueButtonClickedConnection = connect(&queueButton, &QPushButton::clicked, this, [&] () {
-    mainSection = QUEUE;
-    delete queueTableView;
-    queueTableView = new QueueTableView(this, &filters);
-
-    setupGrid();
+    showAsMainSection(QUEUE_VIEW);
     refresh();
   });
 
@@ -166,10 +154,7 @@ Result MusicLibraryWindow::connectActions() {
   const auto audioFileDoubleClickedConnection = connect(audioFileTableView, &QTableView::doubleClicked, this, [&] (const QModelIndex& index) {
       const QVariant audioFileId = audioFileTableView->getModel()->index(index.row(), 6).data();
 
-      Db::Queue q(audioFileId.toLongLong(), 0);
-      dao->queueRepository.save(q);
-
-      // TODO: add to queue/play
+      // TODO: play
 
       refresh();
   });

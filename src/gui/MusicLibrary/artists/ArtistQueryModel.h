@@ -18,6 +18,9 @@
 namespace Gj {
 namespace Gui {
 
+constexpr size_t ARTIST_COL_NAME = 0;
+constexpr size_t ARTIST_COL_ID = 1;
+
 class ArtistQueryModel final : public MusicLibraryQueryModel {
 
   public:

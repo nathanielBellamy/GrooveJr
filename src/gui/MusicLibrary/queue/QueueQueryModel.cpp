@@ -119,13 +119,13 @@ Result QueueQueryModel::refresh() {
   }
 
   setQueryString(queryStr);
-  setHeaderData(0, Qt::Horizontal, QObject::tr("Track"));
-  setHeaderData(1, Qt::Horizontal, QObject::tr("Artist"));
-  setHeaderData(2, Qt::Horizontal, QObject::tr("Album"));
-  setHeaderData(3, Qt::Horizontal, QObject::tr("Track Number"));
-  setHeaderData(4, Qt::Horizontal, QObject::tr("Year"));
-  setHeaderData(5, Qt::Horizontal, QObject::tr("Path"));
-  setHeaderData(6, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(AUDIO_FILE_COL_TRACK, Qt::Horizontal, QObject::tr("Track"));
+  setHeaderData(AUDIO_FILE_COL_ARTIST, Qt::Horizontal, QObject::tr("Artist"));
+  setHeaderData(AUDIO_FILE_COL_ALBUM, Qt::Horizontal, QObject::tr("Album"));
+  setHeaderData(AUDIO_FILE_COL_TRACK_NUMBER, Qt::Horizontal, QObject::tr("Track Number"));
+  setHeaderData(AUDIO_FILE_COL_YEAR, Qt::Horizontal, QObject::tr("Year"));
+  setHeaderData(AUDIO_FILE_COL_PATH, Qt::Horizontal, QObject::tr("Path"));
+  setHeaderData(AUDIO_FILE_COL_ID, Qt::Horizontal, QObject::tr("Id"));
 
   return OK;
 }

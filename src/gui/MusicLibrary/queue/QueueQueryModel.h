@@ -10,6 +10,8 @@
 
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
+#include "../audioFiles/AudioFileQueryModel.h"
+
 #include "../../../AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"

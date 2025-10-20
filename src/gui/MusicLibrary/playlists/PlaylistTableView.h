@@ -7,6 +7,7 @@
 
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
+#include "../MusicLibraryType.h"
 #include "PlaylistQueryModel.h"
 
 namespace Gj {
@@ -15,8 +16,8 @@ namespace Gui {
 class PlaylistTableView final : public MusicLibraryTableView {
 
 public:
-    PlaylistTableView(QWidget* parent, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, filters, new PlaylistQueryModel(parent, filters))
+    PlaylistTableView(QWidget* parent, Db::Dao* dao, MusicLibraryFilters* filters)
+        : MusicLibraryTableView(parent, dao, PLAYLIST, PLAYLIST_COL_ID, filters, new PlaylistQueryModel(parent, filters))
         {};
 };
 

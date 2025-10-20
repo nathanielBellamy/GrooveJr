@@ -70,8 +70,8 @@ Result ArtistQueryModel::refresh() {
   }
 
   setQueryString(queryStr);
-  setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
-  setHeaderData(1, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(ARTIST_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
+  setHeaderData(ARTIST_COL_ID, Qt::Horizontal, QObject::tr("Id"));
   return OK;
 }
 

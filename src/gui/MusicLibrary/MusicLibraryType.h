@@ -15,6 +15,7 @@ enum MusicLibraryType {
   GENRE,
   NONE,
   PLAYLIST,
+  QUEUE,
   TRACK
 };
 

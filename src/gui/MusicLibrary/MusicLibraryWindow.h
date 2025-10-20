@@ -35,15 +35,15 @@ namespace Gj {
 namespace Gui {
 
 enum MusicLibraryWindowMainSection {
-  FILES,
-  QUEUE
+  AUDIO_FILES_VIEW,
+  QUEUE_VIEW
 };
 
 class MusicLibraryWindow final : public QWidget {
   actor_system& actorSystem;
   Db::Dao* dao;
   QGridLayout grid;
-  MusicLibraryWindowMainSection mainSection = FILES;
+  MusicLibraryWindowMainSection mainSection = AUDIO_FILES_VIEW;
   QPushButton filesButton;
   QPushButton queueButton;
   QLabel albumHeader;
@@ -71,24 +71,36 @@ class MusicLibraryWindow final : public QWidget {
       artistTableView->hydrateState(appStatePacket);
       genreTableView->hydrateState(appStatePacket);
       playlistTableView->hydrateState(appStatePacket);
+      audioFileTableView->hydrateState(appStatePacket);
+      queueTableView->hydrateState(appStatePacket);
 
-      if (audioFileTableView != nullptr)
-        audioFileTableView->hydrateState(appStatePacket);
-      if (queueTableView != nullptr)
-        queueTableView->hydrateState(appStatePacket);
       return OK;
     };
 
-    Result refresh() {
+    Result refresh() const {
       albumTableView->refresh();
       artistTableView->refresh();
       genreTableView->refresh();
       playlistTableView->refresh();
+      audioFileTableView->refresh();
+      queueTableView->refresh();
 
-      if (audioFileTableView != nullptr)
-        audioFileTableView->refresh();
-      if (queueTableView != nullptr)
-        queueTableView->refresh();
+      return OK;
+    }
+
+    Result showAsMainSection(MusicLibraryWindowMainSection newMainSection) {
+      mainSection = newMainSection;
+      switch (newMainSection) {
+        case QUEUE_VIEW:
+          audioFileTableView->hide();
+          queueTableView->show();
+          break;
+        default: // case FILES:
+          audioFileTableView->show();
+          queueTableView->hide();
+      }
+
+      refresh();
       return OK;
     }
 };

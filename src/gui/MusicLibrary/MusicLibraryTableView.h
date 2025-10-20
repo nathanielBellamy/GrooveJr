@@ -11,6 +11,7 @@
 
 #include "../../enums/Result.h"
 #include "../../AppState.h"
+#include "../../db/Dao.h"
 
 #include "MusicLibraryQueryModel.h"
 #include "MusicLibraryFilters.h"
@@ -19,6 +20,8 @@ namespace Gj {
 namespace Gui {
 
 class MusicLibraryTableView : public QTableView {
+  QMenu* menu;
+  Db::Dao* dao;
   Result setStyle() {
     setStyleSheet(
       "font-weight: 500; font-size: 12px;"
@@ -27,12 +30,24 @@ class MusicLibraryTableView : public QTableView {
   }
 
   protected:
+    MusicLibraryType type;
+    size_t idCol;
     MusicLibraryFilters* filters;
     MusicLibraryQueryModel* model;
 
   public:
-    MusicLibraryTableView(QWidget* parent, MusicLibraryFilters* filters, MusicLibraryQueryModel* model)
+    MusicLibraryTableView(
+      QWidget* parent,
+      Db::Dao* dao,
+      const MusicLibraryType type,
+      const size_t idCol,
+      MusicLibraryFilters* filters,
+      MusicLibraryQueryModel* model)
         : QTableView(parent)
+        , menu(nullptr)
+        , dao(dao)
+        , type(type)
+        , idCol(idCol)
         , filters(filters)
         , model(model)
         {
@@ -42,6 +57,7 @@ class MusicLibraryTableView : public QTableView {
     };
 
     ~MusicLibraryTableView() {
+      delete menu;
       delete model;
     }
 
@@ -59,16 +75,28 @@ class MusicLibraryTableView : public QTableView {
       return OK;
     }
 
+  // virtual Result addToQueue(Db::ID id) = 0;
+
   void mousePressEvent(QMouseEvent* event) override {
       if (event->button() == Qt::RightButton) {
         if (const QModelIndex index = indexAt(event->pos()); index.isValid()) {
           selectRow(index.row());
 
-          QMenu menu(this);
-          menu.addAction("Add To Queue");
-          menu.addAction("Edit");
+          delete menu;
+          menu = new QMenu(this);
+          const QAction* addToQueueAction = menu->addAction("Add To Queue");
+          connect(addToQueueAction, &QAction::triggered, this, [&]() {
+            const QVariant id = getModel()->index(index.row(), idCol).data();
 
-          menu.exec(viewport()->mapToGlobal(event->pos()));
+            std::cout << "add to queue action type: " << type << " id: " << id.toString().toStdString() << std::endl;
+            const Db::Queue q(id.toLongLong(), 0);
+            dao->queueRepository.save(q);
+
+            refresh();
+          });
+          menu->addAction("Edit");
+
+          menu->exec(viewport()->mapToGlobal(event->pos()));
           return; // don't call base class handler
         }
       }
