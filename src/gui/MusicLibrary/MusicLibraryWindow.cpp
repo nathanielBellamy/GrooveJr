@@ -164,7 +164,7 @@ Result MusicLibraryWindow::connectActions() {
       refresh();
   });
 
-  const auto audioFileDoubleClickedConnection = connect(audioFileTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
+  const auto audioFileDoubleClickedConnection = connect(audioFileTableView, &QTableView::doubleClicked, this, [&] (const QModelIndex& index) {
       const QVariant audioFileId = audioFileTableView->getModel()->index(index.row(), 6).data();
 
       Db::Queue q(audioFileId.toLongLong(), 0);

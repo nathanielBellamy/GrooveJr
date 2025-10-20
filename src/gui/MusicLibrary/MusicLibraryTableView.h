@@ -5,6 +5,8 @@
 #ifndef MUSICLIBRARYTABLEVIEW_H
 #define MUSICLIBRARYTABLEVIEW_H
 
+#include <QMenu>
+#include <QMouseEvent>
 #include <QTableView>
 
 #include "../../enums/Result.h"
@@ -34,6 +36,7 @@ class MusicLibraryTableView : public QTableView {
         , filters(filters)
         , model(model)
         {
+      setContextMenuPolicy(Qt::CustomContextMenu);
       setModel(model);
       setStyle();
     };
@@ -54,6 +57,23 @@ class MusicLibraryTableView : public QTableView {
     Result refresh() const {
       model->refresh();
       return OK;
+    }
+
+  void mousePressEvent(QMouseEvent* event) override {
+      if (event->button() == Qt::RightButton) {
+        if (const QModelIndex index = indexAt(event->pos()); index.isValid()) {
+          selectRow(index.row());
+
+          QMenu menu(this);
+          menu.addAction("Add To Queue");
+          menu.addAction("Edit");
+
+          menu.exec(viewport()->mapToGlobal(event->pos()));
+          return; // don't call base class handler
+        }
+      }
+
+      QTableView::mousePressEvent(event); // default behavior
     }
 };
 
