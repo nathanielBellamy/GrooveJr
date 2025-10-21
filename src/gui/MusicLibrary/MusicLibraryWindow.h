@@ -12,6 +12,7 @@
 #include <QWidget>
 #include <QTableView>
 #include <QPushButton>
+#include <QString>
 
 #include "../Color.h"
 #include "../../enums/Result.h"
@@ -61,6 +62,14 @@ class MusicLibraryWindow final : public QWidget {
   void setupGrid();
   Result connectActions();
 
+  const QString STYLE_STR_BTN_SELECTED = QString(
+    ("background-color: " + Color::toHex(GjC::LIGHT_400) + " ;").c_str()
+  );
+
+  const QString STYLE_STR_BTN_NOT_SELECTED = QString(
+    ("background-color: " + Color::toHex(GjC::DARK_400) + " ;").c_str()
+  );
+
   public:
     MusicLibraryFilters filters;
     explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem, Db::Dao* dao);
@@ -77,7 +86,7 @@ class MusicLibraryWindow final : public QWidget {
       return OK;
     };
 
-    Result refresh() const {
+    Result refresh() {
       albumTableView->refresh();
       artistTableView->refresh();
       genreTableView->refresh();
@@ -92,11 +101,15 @@ class MusicLibraryWindow final : public QWidget {
       mainSection = newMainSection;
       switch (newMainSection) {
         case QUEUE_VIEW:
+          filesButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
           audioFileTableView->hide();
+          queueButton.setStyleSheet(STYLE_STR_BTN_SELECTED);
           queueTableView->show();
           break;
         default: // case FILES:
+          filesButton.setStyleSheet(STYLE_STR_BTN_SELECTED);
           audioFileTableView->show();
+          queueButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
           queueTableView->hide();
       }
 

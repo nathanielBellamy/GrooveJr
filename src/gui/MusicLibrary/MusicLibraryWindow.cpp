@@ -35,6 +35,9 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
     );
   }
 
+  filesButton.setCursor(Qt::PointingHandCursor);
+  queueButton.setCursor(Qt::PointingHandCursor);
+
   queueButton.setText("Queue");
   filesButton.setText("Files");
 
