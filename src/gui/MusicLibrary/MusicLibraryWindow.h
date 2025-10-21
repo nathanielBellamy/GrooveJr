@@ -47,6 +47,7 @@ class MusicLibraryWindow final : public QWidget {
   MusicLibraryWindowMainSection mainSection = AUDIO_FILES_VIEW;
   QPushButton filesButton;
   QPushButton queueButton;
+  QPushButton refreshButton;
   QLabel albumHeader;
   AlbumTableView* albumTableView;
   QLabel artistHeader;

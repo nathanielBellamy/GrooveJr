@@ -37,9 +37,12 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
 
   filesButton.setCursor(Qt::PointingHandCursor);
   queueButton.setCursor(Qt::PointingHandCursor);
+  refreshButton.setCursor(Qt::PointingHandCursor);
 
   queueButton.setText("Queue");
   filesButton.setText("Files");
+  refreshButton.setText("Refresh");
+
 
   albumHeader.setText("Albums");
   albumHeader.setFont({albumHeader.font().family(), 12});
@@ -102,6 +105,7 @@ void MusicLibraryWindow::setupGrid() {
 
   grid.addWidget(&filesButton, 0, 2, 1, 1);
   grid.addWidget(&queueButton, 0, 3, 1, 1);
+  grid.addWidget(&refreshButton, 0, 4, 1, 1);
 
   grid.addWidget(&genreHeader, 0, 0, 1, 1);
   grid.addWidget(&playlistHeader, 0, 1, 1, 1);
@@ -130,6 +134,10 @@ Result MusicLibraryWindow::connectActions() {
 
   const auto queueButtonClickedConnection = connect(&queueButton, &QPushButton::clicked, this, [&] () {
     showAsMainSection(QUEUE_VIEW);
+    refresh();
+  });
+
+  const auto refreshButtonClickedConnection = connect(&refreshButton, &QPushButton::clicked, this, [&] () {
     refresh();
   });
 
