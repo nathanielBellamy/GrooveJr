@@ -247,6 +247,7 @@ struct AudioCore {
     );
     const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
     deckIndex = nextDeckIndex;
+    deckIndexNext = nextDeckIndex;
     decks[deckIndex].setCassetteFromDecoratedAudioFile(decoratedAudioFile);
 
     Logging::write(

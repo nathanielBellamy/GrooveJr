@@ -32,13 +32,13 @@ struct AudioDeck {
   sf_count_t                            frameAdvance;
   float                                 gain = 1.0f;
   float*                                inputBuffers[2]{nullptr, nullptr};
-  std::optional<Cassette>               cassette;
+  Cassette*                             cassette;
   std::optional<Db::DecoratedAudioFile> decoratedAudioFile;
 
   AudioDeck(const int deckIndex, AppState* gAppState)
     : deckIndex(deckIndex)
     , gAppState(gAppState)
-    , cassette(std::optional<Cassette>())
+    , cassette(new Cassette(gAppState))
     , decoratedAudioFile(std::optional<Db::DecoratedAudioFile>())
     {}
 
@@ -58,14 +58,15 @@ struct AudioDeck {
 
   Result setCassetteFromDecoratedAudioFile(const Db::DecoratedAudioFile& newDecoratedAudioFile) {
     decoratedAudioFile = std::optional(newDecoratedAudioFile);
-    cassette = std::optional(Cassette(gAppState, decoratedAudioFile->audioFile.filePath.c_str()));
+    delete cassette;
+    cassette = new Cassette(gAppState, decoratedAudioFile->audioFile.filePath.c_str());
     frames = cassette->sfInfo.frames;
     inputBuffers[0] = cassette->inputBuffers[0];
     inputBuffers[1] = cassette->inputBuffers[1];
 
     Logging::write(
       Info,
-      "Audio::AudioDeck::setCassetteFromFilePath",
+      "Audio::AudioDeck::setCassetteFromDecoratedAudioFile",
       "Added Cassette to deck : " + std::to_string(deckIndex) + ". Identified deck and cassette inputBuffers."
     );
     return OK;

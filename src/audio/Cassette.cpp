@@ -13,10 +13,10 @@ Cassette::Cassette(AppState* gAppState, const char* filePath)
     Logging::write(
       Error,
       "Audio::Cassette::Cassette",
-      "Unable to setup AudioData - status: " + std::to_string(initRes)
+      "Unable to init Cassette - status: " + std::to_string(initRes)
     );
     throw std::runtime_error(
-      "Unable to instantiate Cassette - AudioData status: " + std::to_string(initRes)
+      "Unable to instantiate Cassette - status: " + std::to_string(initRes)
     );
   }
 
@@ -129,8 +129,11 @@ int Cassette::init() {
   if (const auto readCount = sf_read_float(file, buffer, sfInfo.frames * sfInfo.channels); readCount != sfInfo.frames * sfInfo.channels) {
     Logging::write(
       Error,
-      "Audio::Cassette::setupAudioData",
-      "Unable to read file: " + std::string(filePath)
+      "Audio::Cassette::init",
+      "Unable to read file: " + std::string(filePath) +
+              " readcount: " + std::to_string(readCount) +
+              " channels: " + std::to_string(sfInfo.channels) +
+              " frames: " + std::to_string(sfInfo.frames)
     );
     return 3;
   }
