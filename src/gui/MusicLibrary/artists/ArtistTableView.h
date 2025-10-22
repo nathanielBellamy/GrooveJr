@@ -5,6 +5,8 @@
 #ifndef ARTISTTABLEVIEW_H
 #define ARTISTTABLEVIEW_H
 
+#include "caf/actor_system.hpp"
+
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
 #include "../MusicLibraryType.h"
@@ -16,8 +18,8 @@ namespace Gui {
 class ArtistTableView final : public MusicLibraryTableView {
 
   public:
-    ArtistTableView(QWidget* parent, Db::Dao* dao, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, dao, ARTIST, ARTIST_COL_ID, filters, new ArtistQueryModel(parent, filters))
+    ArtistTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, MusicLibraryFilters* filters)
+        : MusicLibraryTableView(parent, actorSystem, dao, filters, new ArtistQueryModel(parent, filters))
         {};
 };
 

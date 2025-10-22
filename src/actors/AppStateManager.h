@@ -54,7 +54,7 @@ struct AppStateManagerTrait {
                                  result<void>(strong_actor_ptr, bool, tc_trig_ff_ar),
 
                                  // Music Library
-                                 result<void>(strong_actor_ptr, uint64_t, tc_trig_play_file_a),
+                                 result<void>(uint64_t, tc_trig_play_file_a),
 
                                  // Read state
                                  result<void>(strong_actor_ptr, read_state_a),
@@ -377,7 +377,7 @@ struct AppStateManagerState {
 
              hydrateStateToDisplay();
            },
-           [this](strong_actor_ptr, const uint64_t audioFileId, tc_trig_play_file_a) {
+           [this](const uint64_t audioFileId, tc_trig_play_file_a) {
              Logging::write(
                Info,
                "Act::AppStateManager::tc_trig_play_file_a",
@@ -402,6 +402,7 @@ struct AppStateManagerState {
                  "Act::AppStateManager::tc_trig_play_file_a",
                  "Unable to addCassette from DecoratedAudioFile filePath: " + decoratedAudioFile->audioFile.filePath
                );
+               return;
              }
 
              Logging::write(

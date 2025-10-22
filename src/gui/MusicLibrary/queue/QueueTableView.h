@@ -16,8 +16,8 @@ namespace Gui {
 class QueueTableView final : public MusicLibraryTableView {
 
   public:
-    QueueTableView(QWidget* parent, Db::Dao* dao, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, dao, QUEUE, AUDIO_FILE_COL_ID, filters, new QueueQueryModel(parent, filters))
+    QueueTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, MusicLibraryFilters* filters)
+        : MusicLibraryTableView(parent, actorSystem, dao, filters, new QueueQueryModel(parent, filters))
         {};
 };
 

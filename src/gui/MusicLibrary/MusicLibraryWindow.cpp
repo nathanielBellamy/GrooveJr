@@ -20,12 +20,12 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , playlistHeader(this)
   {
   if (connectToDb() == OK) {
-    albumTableView = new AlbumTableView(this, dao, &filters);
-    artistTableView = new ArtistTableView(this, dao, &filters);
-    audioFileTableView = new AudioFileTableView(this, dao, &filters);
-    genreTableView = new GenreTableView(this, dao, &filters);
-    playlistTableView = new PlaylistTableView(this, dao, &filters);
-    queueTableView = new QueueTableView(this, dao, &filters);
+    albumTableView = new AlbumTableView(this, actorSystem, dao, &filters);
+    artistTableView = new ArtistTableView(this, actorSystem, dao, &filters);
+    audioFileTableView = new AudioFileTableView(this, actorSystem, dao, &filters);
+    genreTableView = new GenreTableView(this, actorSystem, dao, &filters);
+    playlistTableView = new PlaylistTableView(this, actorSystem, dao, &filters);
+    queueTableView = new QueueTableView(this, actorSystem, dao, &filters);
     showAsMainSection(AUDIO_FILES_VIEW);
   } else {
     Logging::write(

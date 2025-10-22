@@ -5,6 +5,8 @@
 #ifndef GENRETABLEVIEW_H
 #define GENRETABLEVIEW_H
 
+#include "caf/actor_system.hpp"
+
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
 #include "../MusicLibraryType.h"
@@ -15,8 +17,8 @@ namespace Gui {
 
 class GenreTableView final : public MusicLibraryTableView {
   public:
-    GenreTableView(QWidget* parent, Db::Dao* dao, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, dao, GENRE, GENRE_COL_ID, filters, new GenreQueryModel(parent, filters))
+    GenreTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, MusicLibraryFilters* filters)
+        : MusicLibraryTableView(parent, actorSystem, dao, filters, new GenreQueryModel(parent, filters))
         {};
 };
 

@@ -70,13 +70,12 @@ struct SupervisorState {
            auto effectsManager = self->system().spawn(actor_from_state<EffectsManagerState>, actor_cast<strong_actor_ptr>(self), mixer);
            effectsManagerPtr = actor_cast<strong_actor_ptr>(effectsManager);
 
-
-
            auto appStateManager = self->system().spawn(
                actor_from_state<AppStateManagerState>,
                actor_cast<strong_actor_ptr>(self),
                gAppState,
                mixer,
+               mixer->dao,
                audioCore
            );
            appStateManagerPtr = actor_cast<strong_actor_ptr>(appStateManager);
