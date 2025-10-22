@@ -64,8 +64,8 @@ Result GenreQueryModel::refresh() {
   }
 
   setQueryString(queryStr);
-  setHeaderData(GENRE_COL_ID, Qt::Horizontal, QObject::tr("Name"));
-  setHeaderData(GENRE_COL_NAME, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(GENRE_COL_ID, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(GENRE_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
 
   return OK;
 }
