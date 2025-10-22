@@ -7,9 +7,6 @@
 namespace Gj {
 namespace Audio {
 
-const char* ThreadStatics::filePath = "/Users/ns/Music/Amy Winehouse/Back to Black/Amy Winehouse - Back to Black (2006) [FLAC]/06 Love Is A Losing Game.flac";
-std::mutex ThreadStatics::filePathMutex;
-
 sf_count_t ThreadStatics::frameId = 0;
 std::mutex ThreadStatics::frameIdMutex;
 
@@ -24,16 +21,6 @@ std::mutex ThreadStatics::playbackSpeedMutex;
 
 long ThreadStatics::threadId = 0;
 std::mutex ThreadStatics::threadIdMutex;
-
-const char* ThreadStatics::getFilePath() {
-  std::lock_guard guard(filePathMutex);
-  return filePath;
-}
-
-void ThreadStatics::setFilePath(const char* newFilePath) {
-  std::lock_guard guard(filePathMutex);
-  filePath = newFilePath;
-}
 
 sf_count_t ThreadStatics::getFrameId() {
   std::lock_guard guard(frameIdMutex);

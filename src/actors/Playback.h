@@ -55,12 +55,12 @@ struct PlaybackState {
        strong_actor_ptr supervisor,
        AppState* gAppState,
        Audio::Mixer* mixer,
-       Audio::AudioCore* audioCore) :
-          self(self)
+       Audio::AudioCore* audioCore)
+        : self(self)
+        , audioThread(nullptr)
         , gAppState(gAppState)
         , mixer(mixer)
         , audioCore(audioCore)
-        , audioThread(nullptr)
         {
            self->link_to(supervisor);
            self->system().registry().put(PLAYBACK, actor_cast<strong_actor_ptr>(self));
@@ -98,22 +98,19 @@ struct PlaybackState {
 
              bool success = true;
              Audio::ThreadStatics::setPlayState(PLAY);
-             const char* filePath = Audio::ThreadStatics::getFilePath();
-             if ( filePath != nullptr ) {
-               if ( audioThread == nullptr ) {
-                   auto audioThreadActor = self->system().spawn(
-                     actor_from_state<AudioThreadState>,
-                     actor_cast<strong_actor_ptr>(self),
-                     gAppState,
-                     mixer,
-                     audioCore
-                   );
-                   audioThread = actor_cast<AudioThread::pointer>(audioThreadActor);
-                   self->anon_send(
-                       audioThreadActor,
-                       audio_thread_init_a_v
-                   );
-               }
+             if ( audioThread == nullptr ) {
+               auto audioThreadActor = self->system().spawn(
+                 actor_from_state<AudioThreadState>,
+                 actor_cast<strong_actor_ptr>(self),
+                 gAppState,
+                 mixer,
+                 audioCore
+               );
+               audioThread = actor_cast<AudioThread::pointer>(audioThreadActor);
+               self->anon_send(
+                   audioThreadActor,
+                   audio_thread_init_a_v
+               );
              }
 
              actor replyToActor = actor_cast<actor>(reply_to);

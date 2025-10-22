@@ -22,25 +22,22 @@
 namespace Gj {
 namespace Db {
 
-class DecoratedAudioFile final {
+struct DecoratedAudioFile final {
+  DecoratedAudioFile(
+    Album album,
+    Artist artist,
+    AudioFile audioFile,
+    Genre genre,
+    Track track
+  );
 
-  public:
-    DecoratedAudioFile(
-      Album album,
-      Artist artist,
-      AudioFile audioFile,
-      Genre genre,
-      Track track
-    );
+  static DecoratedAudioFile deser(sqlite3_stmt* stmt);
 
-    static DecoratedAudioFile deser(sqlite3_stmt* stmt);
-
-  private:
-    Album album;
-    Artist artist;
-    AudioFile audioFile;
-    Genre genre;
-    Track track;
+  Album album;
+  Artist artist;
+  AudioFile audioFile;
+  Genre genre;
+  Track track;
 };
 
 } // Db

@@ -39,7 +39,6 @@ struct AppState {
   std::atomic<int> sceneId{};
   std::atomic<int> sceneIndex{};
   std::atomic<sf_count_t> crossfade{ 0 };
-  std::atomic<Db::DecoratedAudioFile> currentlyPlaying{};
   std::atomic<bool> queuePlay = false;
   std::atomic<Db::ID> queueIndex = 0;
 

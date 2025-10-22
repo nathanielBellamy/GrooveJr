@@ -15,6 +15,7 @@
 #include "../Logging.h"
 #include "../enums/Result.h"
 #include "../enums/PlayState.h"
+#include "../db/dto/musicLibrary/DecoratedAudioFile.h"
 
 namespace Gj {
 namespace Audio {
@@ -23,20 +24,22 @@ constexpr sf_count_t MIN_FADE_IN = 500;
 constexpr sf_count_t MIN_FADE_OUT = 500;
 
 struct AudioDeck {
-  int                              deckIndex;
-  PlayState                        playState = STOP;
-  AppState*                        gAppState;
-  mutable sf_count_t               frameId = 0;
-  sf_count_t                       frames = 0; // total # of frames
-  sf_count_t                       frameAdvance;
-  float                            gain = 1.0f;
-  float*                           inputBuffers[2]{nullptr, nullptr};
-  Cassette*                        cassette;
+  int                                   deckIndex;
+  PlayState                             playState = STOP;
+  AppState*                             gAppState;
+  mutable sf_count_t                    frameId = 0;
+  sf_count_t                            frames = 0; // total # of frames
+  sf_count_t                            frameAdvance;
+  float                                 gain = 1.0f;
+  float*                                inputBuffers[2]{nullptr, nullptr};
+  std::optional<Cassette>               cassette;
+  std::optional<Db::DecoratedAudioFile> decoratedAudioFile;
 
-  AudioDeck(int deckIndex, AppState* gAppState)
+  AudioDeck(const int deckIndex, AppState* gAppState)
     : deckIndex(deckIndex)
     , gAppState(gAppState)
-    , cassette(new Cassette(gAppState))
+    , cassette(std::optional<Cassette>())
+    , decoratedAudioFile(std::optional<Db::DecoratedAudioFile>())
     {}
 
   ~AudioDeck() {
@@ -46,8 +49,6 @@ struct AudioDeck {
       "Destroying AudioDeck - deckIndex : " + std::to_string(deckIndex)
     );
 
-    delete cassette;
-
     Logging::write(
       Info,
       "AudioDeck::~AudioDeck()",
@@ -55,9 +56,9 @@ struct AudioDeck {
     );
   }
 
-  Result setCassetteFromFilePath(const char* filePath) {
-    delete cassette;
-    cassette = new Cassette(gAppState, filePath);
+  Result setCassetteFromDecoratedAudioFile(const Db::DecoratedAudioFile& newDecoratedAudioFile) {
+    decoratedAudioFile = std::optional(newDecoratedAudioFile);
+    cassette = std::optional(Cassette(gAppState, decoratedAudioFile->audioFile.filePath.c_str()));
     frames = cassette->sfInfo.frames;
     inputBuffers[0] = cassette->inputBuffers[0];
     inputBuffers[1] = cassette->inputBuffers[1];
@@ -87,7 +88,7 @@ struct AudioDeck {
   }
 
   bool validCassetteLoaded() const {
-    if (cassette == nullptr)
+    if (!cassette)
       return false;
 
     const bool nonZeroFrames = frames > 0 && frames == cassette->sfInfo.frames;

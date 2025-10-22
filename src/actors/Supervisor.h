@@ -76,7 +76,8 @@ struct SupervisorState {
                actor_from_state<AppStateManagerState>,
                actor_cast<strong_actor_ptr>(self),
                gAppState,
-               mixer
+               mixer,
+               audioCore
            );
            appStateManagerPtr = actor_cast<strong_actor_ptr>(appStateManager);
 

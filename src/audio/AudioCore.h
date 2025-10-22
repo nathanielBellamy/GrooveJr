@@ -239,20 +239,20 @@ struct AudioCore {
     return soloVal * (1.0f - mute) * (1.0f - muteR) * panRVal * gain * gainR / channelCount;
   }
 
-  Result addCassetteFromFilePath(const char* filePath) {
+  Result addCassetteFromDecoratedAudioFile(const Db::DecoratedAudioFile& decoratedAudioFile) {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromFilePath",
-      "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + filePath
+      "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
     );
     const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
     deckIndex = nextDeckIndex;
-    decks[deckIndex].setCassetteFromFilePath(filePath);
+    decks[deckIndex].setCassetteFromDecoratedAudioFile(decoratedAudioFile);
 
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromFilePath",
-      "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + filePath
+      "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
     );
     return OK;
   }

@@ -17,7 +17,6 @@ namespace Gj {
 namespace Audio {
 
 class ThreadStatics {
-  static const char* filePath;
   static sf_count_t frameId;
   static std::atomic<bool> userSettingFrameId;
   static std::atomic<sf_count_t> frames;
@@ -26,10 +25,6 @@ class ThreadStatics {
   static long threadId;
 
 public:
-  static std::mutex filePathMutex;
-  static void setFilePath(const char* path);
-  static const char* getFilePath();
-
   static std::mutex frameIdMutex;
   static void setFrameId(sf_count_t frameId);
   static sf_count_t getFrameId();

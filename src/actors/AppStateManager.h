@@ -22,6 +22,7 @@
 #include "../messaging/atoms.h"
 #include "../enums/PlayState.h"
 #include "../AppState.h"
+#include "../audio/AudioCore.h"
 #include "../audio/Mixer.h"
 
 using namespace caf;
@@ -70,6 +71,7 @@ struct AppStateManagerState {
      AppStateManager::pointer self;
      AppState* gAppState;
      Audio::Mixer* mixer;
+     Audio::AudioCore* audioCore;
      Db::Dao* dao;
      strong_actor_ptr playback;
      strong_actor_ptr display;
@@ -90,11 +92,19 @@ struct AppStateManagerState {
          );
      };
 
-     AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor, AppState* gAppState, Audio::Mixer* mixer, Db::Dao* dao)
+     AppStateManagerState(
+       AppStateManager::pointer self,
+       strong_actor_ptr supervisor,
+       AppState* gAppState,
+       Audio::Mixer* mixer,
+       Db::Dao* dao,
+       Audio::AudioCore* audioCore
+     )
         : self(self)
         , gAppState(gAppState)
         , mixer(mixer)
         , dao(dao)
+        , audioCore(audioCore)
         {
            self->link_to(supervisor);
            self->system().registry().put(APP_STATE_MANAGER, actor_cast<strong_actor_ptr>(self));
@@ -374,15 +384,36 @@ struct AppStateManagerState {
                "Received TC Trig Play File AudioFileId: " + std::to_string(audioFileId)
              );
 
-             std::optional<Db::DecoratedAudioFile> audioFile = dao->audioFileRepository.findDecoratedAudioFileById(audioFileId);
+             const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
+               dao->audioFileRepository.findDecoratedAudioFileById(audioFileId);
 
-             // TODO
-              // - add cassettee from filepath and play
+             if (!decoratedAudioFile) {
+               Logging::write(
+                 Error,
+                 "Act::AppStateManager::tc_trig_play_file_a",
+                 "Unable to load DecoratedAudioFile Id: " + std::to_string(audioFileId)
+               );
+               return;
+             }
+
+             if (audioCore->addCassetteFromDecoratedAudioFile(decoratedAudioFile.value()) == ERROR) {
+               Logging::write(
+                 Error,
+                 "Act::AppStateManager::tc_trig_play_file_a",
+                 "Unable to addCassette from DecoratedAudioFile filePath: " + decoratedAudioFile->audioFile.filePath
+               );
+             }
 
              Logging::write(
                Info,
-               "Act::AppStateManager::tc_trig_ff_ar",
-               "Updated state. Will HydrateStateToDisplay"
+               "Act::AppStateManager::tc_trig_play_file_a",
+               "Initiated file play. Will HydrateStateToDisplay"
+             );
+
+             self->anon_send(
+                 actor_cast<actor>(playback),
+                 actor_cast<strong_actor_ptr>(self),
+                 tc_trig_play_a_v
              );
 
              hydrateStateToDisplay();

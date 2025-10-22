@@ -4,8 +4,8 @@ namespace Gj {
 namespace Audio {
 
 Cassette::Cassette(AppState* gAppState, const char* filePath)
-  : filePath(filePath)
-  , gAppState(gAppState)
+  : gAppState(gAppState)
+  , filePath(filePath)
   , sfInfo()
   {
 
