@@ -58,8 +58,8 @@ struct AudioFile {
     : id(id)
     , trackId(trackId)
     , filePath(filePath)
-    , valid(valid)
     , sfInfo(sfInfo)
+    , valid(valid)
     {}
 
   Result getSfInfo();

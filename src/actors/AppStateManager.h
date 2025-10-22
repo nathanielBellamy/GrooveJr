@@ -8,11 +8,14 @@
 //
 // Created by ns on 11/11/24.
 //
+#include <optional>
 #include <string>
 
 #include "caf/actor_registry.hpp"
 #include "caf/actor_system.hpp"
 #include "caf/event_based_actor.hpp"
+
+#include "../db/Dao.h"
 
 #include "../Logging.h"
 #include "./ActorIds.h"
@@ -49,6 +52,9 @@ struct AppStateManagerTrait {
                                  result<void>(tc_trig_ff_a),
                                  result<void>(strong_actor_ptr, bool, tc_trig_ff_ar),
 
+                                 // Music Library
+                                 result<void>(strong_actor_ptr, uint64_t, tc_trig_play_file_a),
+
                                  // Read state
                                  result<void>(strong_actor_ptr, read_state_a),
 
@@ -64,6 +70,7 @@ struct AppStateManagerState {
      AppStateManager::pointer self;
      AppState* gAppState;
      Audio::Mixer* mixer;
+     Db::Dao* dao;
      strong_actor_ptr playback;
      strong_actor_ptr display;
 
@@ -83,10 +90,11 @@ struct AppStateManagerState {
          );
      };
 
-     AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor, AppState* gAppState, Audio::Mixer* mixer)
+     AppStateManagerState(AppStateManager::pointer self, strong_actor_ptr supervisor, AppState* gAppState, Audio::Mixer* mixer, Db::Dao* dao)
         : self(self)
         , gAppState(gAppState)
         , mixer(mixer)
+        , dao(dao)
         {
            self->link_to(supervisor);
            self->system().registry().put(APP_STATE_MANAGER, actor_cast<strong_actor_ptr>(self));
@@ -240,7 +248,7 @@ struct AppStateManagerState {
                  tc_trig_pause_a_v
              );
            },
-           [this](strong_actor_ptr, bool success, tc_trig_pause_ar) {
+           [this](strong_actor_ptr, const bool success, tc_trig_pause_ar) {
              Logging::write(
                Info,
                "Act::AppStateManager::tc_trig_pause_a",
@@ -274,7 +282,7 @@ struct AppStateManagerState {
                  tc_trig_stop_a_v
              );
            },
-           [this](strong_actor_ptr, bool success, tc_trig_stop_ar) {
+           [this](strong_actor_ptr, const bool success, tc_trig_stop_ar) {
              Logging::write(
                Info,
                "Act::AppStateManager::tc_trig_stop_ar",
@@ -304,7 +312,7 @@ struct AppStateManagerState {
                  tc_trig_rw_a_v
              );
            },
-           [this](strong_actor_ptr, bool success, tc_trig_rw_ar) {
+           [this](strong_actor_ptr, const bool success, tc_trig_rw_ar) {
              Logging::write(
                Info,
                "Act::AppStateManager::tc_trig_rw_a",
@@ -338,7 +346,7 @@ struct AppStateManagerState {
                  tc_trig_ff_a_v
              );
            },
-           [this](strong_actor_ptr, bool success, tc_trig_ff_ar) {
+           [this](strong_actor_ptr, const bool success, tc_trig_ff_ar) {
              Logging::write(
                Info,
                "Act::AppStateManager::tc_trig_ff_a",
@@ -350,6 +358,26 @@ struct AppStateManagerState {
              } else {
                gAppState->setPlayState(STOP);
              }
+
+             Logging::write(
+               Info,
+               "Act::AppStateManager::tc_trig_ff_ar",
+               "Updated state. Will HydrateStateToDisplay"
+             );
+
+             hydrateStateToDisplay();
+           },
+           [this](strong_actor_ptr, const uint64_t audioFileId, tc_trig_play_file_a) {
+             Logging::write(
+               Info,
+               "Act::AppStateManager::tc_trig_play_file_a",
+               "Received TC Trig Play File AudioFileId: " + std::to_string(audioFileId)
+             );
+
+             std::optional<Db::DecoratedAudioFile> audioFile = dao->audioFileRepository.findDecoratedAudioFileById(audioFileId);
+
+             // TODO
+              // - add cassettee from filepath and play
 
              Logging::write(
                Info,

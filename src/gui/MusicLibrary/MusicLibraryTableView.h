@@ -9,6 +9,8 @@
 #include <QMouseEvent>
 #include <QTableView>
 
+#include "caf/actor_system.hpp"
+
 #include "../../enums/Result.h"
 #include "../../AppState.h"
 #include "../../db/Dao.h"
@@ -19,9 +21,9 @@
 namespace Gj {
 namespace Gui {
 
+using namespace caf;
+
 class MusicLibraryTableView : public QTableView {
-  QMenu* menu;
-  Db::Dao* dao;
   Result setStyle() {
     setStyleSheet(
       "font-weight: 500; font-size: 12px;"
@@ -30,24 +32,23 @@ class MusicLibraryTableView : public QTableView {
   }
 
   protected:
-    MusicLibraryType type;
-    size_t idCol;
+    actor_system& actorSystem;
+    Db::Dao* dao;
+    QMenu* menu;
     MusicLibraryFilters* filters;
     MusicLibraryQueryModel* model;
 
   public:
     MusicLibraryTableView(
       QWidget* parent,
+      actor_system& actorSystem,
       Db::Dao* dao,
-      const MusicLibraryType type,
-      const size_t idCol,
       MusicLibraryFilters* filters,
       MusicLibraryQueryModel* model)
         : QTableView(parent)
-        , menu(nullptr)
+        , actorSystem(actorSystem)
         , dao(dao)
-        , type(type)
-        , idCol(idCol)
+        , menu(nullptr)
         , filters(filters)
         , model(model)
         {
@@ -76,33 +77,6 @@ class MusicLibraryTableView : public QTableView {
     }
 
   // virtual Result addToQueue(Db::ID id) = 0;
-
-  void mousePressEvent(QMouseEvent* event) override {
-      if (event->button() == Qt::RightButton) {
-        if (const QModelIndex index = indexAt(event->pos()); index.isValid()) {
-          selectRow(index.row());
-
-          delete menu;
-          menu = new QMenu(this);
-          const QAction* addToQueueAction = menu->addAction("Add To Queue");
-          connect(addToQueueAction, &QAction::triggered, this, [&]() {
-            const QVariant id = getModel()->index(index.row(), idCol).data();
-
-            std::cout << "add to queue action type: " << type << " id: " << id.toString().toStdString() << std::endl;
-            const Db::Queue q(id.toLongLong(), 0);
-            dao->queueRepository.save(q);
-
-            refresh();
-          });
-          menu->addAction("Edit");
-
-          menu->exec(viewport()->mapToGlobal(event->pos()));
-          return; // don't call base class handler
-        }
-      }
-
-      QTableView::mousePressEvent(event); // default behavior
-    }
 };
 
 } // Gui

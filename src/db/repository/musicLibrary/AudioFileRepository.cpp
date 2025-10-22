@@ -84,9 +84,67 @@ std::optional<AudioFile> AudioFileRepository::findByFilePath(const std::string& 
   sqlite3_bind_text(stmt, 1, filePath.c_str(), -1, SQLITE_STATIC);
 
   if (sqlite3_step(stmt) == SQLITE_ROW)
-    return std::optional<AudioFile>(AudioFile::deser(stmt));
+    return std::optional(AudioFile::deser(stmt));
 
   return std::optional<AudioFile>();
+}
+
+
+std::optional<DecoratedAudioFile> AudioFileRepository::findDecoratedAudioFileById(ID id) const {
+  const std::string query = R"sql(
+    select
+      alb.id,
+      alb.title,
+      alb.year,
+      art.id,
+      art.name,
+      af.id,
+      af.filePath,
+      af.valid,
+      af.sf_frames,
+      af.sf_sampleRate,
+      af.sf_channels,
+      af.sf_format,
+      af.sf_sections,
+      af.sf_seekable,
+      g.id,
+      g.name,
+      trk.id,
+      trk.title,
+      trk.trackNumber
+      from audioFiles af
+    join tracks trk
+    on af.trackId = trk.id
+    join albums alb
+    on trk.albumId = alb.id
+    join track_to_artists tta
+    on tta.trackId = trk.id
+    join track_to_genres ttg
+    on ttg.trackId = trk.id
+    join genres g
+    on g.id = ttg.genreId
+    join artists art
+    on tta.artistId = art.id
+    where af.id = ?
+  )sql";
+
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::AudioFileRepository::findByFilePath",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return std::optional<DecoratedAudioFile>();
+  }
+
+  sqlite3_bind_int(stmt, 1, id);
+
+  if (sqlite3_step(stmt) == SQLITE_ROW)
+    return std::optional(DecoratedAudioFile::deser(stmt));
+
+  return std::optional<DecoratedAudioFile>();
+
 }
 
 } // Db

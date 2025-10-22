@@ -11,6 +11,7 @@
 
 #include <jack/jack.h>
 
+#include "db/dto/musicLibrary/DecoratedAudioFile.h"
 #include "./enums/PlayState.h"
 
 #include "./db/entity/AppStateEntity.h"
@@ -38,6 +39,9 @@ struct AppState {
   std::atomic<int> sceneId{};
   std::atomic<int> sceneIndex{};
   std::atomic<sf_count_t> crossfade{ 0 };
+  std::atomic<Db::DecoratedAudioFile> currentlyPlaying{};
+  std::atomic<bool> queuePlay = false;
+  std::atomic<Db::ID> queueIndex = 0;
 
   AppState();
   AppState(

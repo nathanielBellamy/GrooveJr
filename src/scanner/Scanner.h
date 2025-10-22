@@ -16,7 +16,7 @@
 #include "../db/Types.h"
 #include "../db/dto/musicLibrary/AlbumWithArtist.h"
 #include "../db/dto/musicLibrary/GenreWithTrackId.h"
-#include "../db/dto/musicLibrary/TrackDecoratedDto.h"
+#include "../db/dto/musicLibrary/DecoratedAudioFile.h"
 #include "../db/entity/musicLibrary/Album.h"
 #include "../db/entity/musicLibrary/Artist.h"
 #include "../db/entity/musicLibrary/AudioFile.h"

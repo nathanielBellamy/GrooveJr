@@ -25,6 +25,8 @@ class AudioFileRepository final : public MusicLibraryRepository {
     [[nodiscard]]
     std::optional<AudioFile> findByFilePath(const std::string& filePath) const;
 
+    std::optional<DecoratedAudioFile> findDecoratedAudioFileById(ID id) const;
+
 };
 
 } // Db
