@@ -5,6 +5,8 @@
 #ifndef MUSICLIBRARYQUERYMODEL_H
 #define MUSICLIBRARYQUERYMODEL_H
 
+#include <vector>
+
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
 #include <QColor>
@@ -31,12 +33,12 @@ class MusicLibraryQueryModel : public QSqlQueryModel {
     };
 
     bool isSelected(const QModelIndex& item, const size_t idCol) const {
-      return type == filters->type
-        && std::find(
-          filters->ids.begin(),
-          filters->ids.end(),
+      std::vector<Db::ID> ids = filters->filters.at(type).ids;
+      return std::find(
+          ids.begin(),
+          ids.end(),
           index(item.row(), idCol).data()
-          ) != filters->ids.end();
+          ) != ids.end();
     };
 
   public:

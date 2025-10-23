@@ -42,6 +42,7 @@ enum MusicLibraryWindowMainSection {
 
 class MusicLibraryWindow final : public QWidget {
   actor_system& actorSystem;
+  AppState* gAppState;
   Db::Dao* dao;
   QGridLayout grid;
   MusicLibraryWindowMainSection mainSection = AUDIO_FILES_VIEW;
@@ -73,7 +74,7 @@ class MusicLibraryWindow final : public QWidget {
 
   public:
     MusicLibraryFilters filters;
-    explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem, Db::Dao* dao);
+    explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao);
     ~MusicLibraryWindow();
 
     Result hydrateState(const AppStatePacket& appStatePacket) {

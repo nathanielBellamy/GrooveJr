@@ -5,12 +5,16 @@
 #ifndef AUDIOFILETABLEVIEW_H
 #define AUDIOFILETABLEVIEW_H
 
+#include <list>
+
 #include <caf/actor_registry.hpp>
 
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
 #include "../../../messaging/atoms.h"
 #include "../../../actors/ActorIds.h"
+#include "../../../enums/Result.h"
+#include "../../../AppState.h"
 
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
@@ -24,10 +28,29 @@ using namespace caf;
 
 class AudioFileTableView final : public MusicLibraryTableView {
 
-  public:
-    AudioFileTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, actorSystem, dao, filters, new AudioFileQueryModel(parent, filters))
-        {};
+  AppState* gAppState;
+
+public:
+  AudioFileTableView(QWidget* parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao, MusicLibraryFilters* filters)
+      : MusicLibraryTableView(parent, actorSystem, dao, filters, new AudioFileQueryModel(parent, filters))
+      , gAppState(gAppState)
+      {};
+
+  Result refresh() const {
+    std::list<Db::ID> audioFileIdCache {};
+
+    int i = 0;
+    auto index = model->index(0, AUDIO_FILE_COL_ID);
+
+    while (index.isValid()) {
+      audioFileIdCache.push_back(index.data().toULongLong());
+      i++;
+      index = model->index(i, AUDIO_FILE_COL_ID);
+    }
+
+    MusicLibraryTableView::refresh();
+    return OK;
+  }
 
   void mousePressEvent(QMouseEvent* event) override {
     if (event->button() == Qt::RightButton) {
@@ -57,7 +80,6 @@ class AudioFileTableView final : public MusicLibraryTableView {
 
   void mouseDoubleClickEvent(QMouseEvent *event) override {
     if (const QModelIndex index = indexAt(event->pos()); index.isValid()) {
-      // selectRow(index.row());
       const QVariant id = getModel()->index(index.row(), AUDIO_FILE_COL_ID).data();
 
       const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);

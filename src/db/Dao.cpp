@@ -148,21 +148,18 @@ int Dao::initSchema() const {
       id integer primary key autoincrement,
       title text not null,
       year integer not null,
-      lastPlayedAt datetime default null,
       createdAt datetime default current_timestamp
     );
 
     create table if not exists artists (
       id integer primary key autoincrement,
       name text not null unique,
-      --lastPlayedAt datetime default null,
       createdAt datetime default current_timestamp
     );
 
     create table if not exists playlists (
       id integer primary key autoincrement,
       name text not null unique,
-      --lastPlayedAt datetime default null,
       createdAt datetime default current_timestamp
     );
 
@@ -171,7 +168,6 @@ int Dao::initSchema() const {
       albumId integer not null,
       title text not null,
       trackNumber integer not null,
-      --lastPlayedAt datetime default null,
       createdAt datetime default current_timestamp,
       foreign key (albumId) references albums(id) on delete cascade,
       unique (albumId, trackNumber)
@@ -182,7 +178,6 @@ int Dao::initSchema() const {
       trackId integer not null,
       filePath text not null unique,
       valid int default 0,
-      --lastPlayedAt datetime default null,
       sf_frames integer not null,
       sf_sampleRate integer not null,
       sf_channels integer not null,

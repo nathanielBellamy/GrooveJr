@@ -7,9 +7,10 @@
 namespace Gj {
 namespace Gui {
 
-MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSystem, Db::Dao* dao)
+MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao)
   : QWidget(parent)
   , actorSystem(actorSystem)
+  , gAppState(gAppState)
   , dao(dao)
   , grid(this)
   , filesButton(this)
@@ -22,7 +23,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   if (connectToDb() == OK) {
     albumTableView = new AlbumTableView(this, actorSystem, dao, &filters);
     artistTableView = new ArtistTableView(this, actorSystem, dao, &filters);
-    audioFileTableView = new AudioFileTableView(this, actorSystem, dao, &filters);
+    audioFileTableView = new AudioFileTableView(this, actorSystem, gAppState, dao, &filters);
     genreTableView = new GenreTableView(this, actorSystem, dao, &filters);
     playlistTableView = new PlaylistTableView(this, actorSystem, dao, &filters);
     queueTableView = new QueueTableView(this, actorSystem, dao, &filters);

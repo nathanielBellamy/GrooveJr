@@ -26,7 +26,6 @@ constexpr size_t AUDIO_FILE_COL_PATH = 5;
 constexpr size_t AUDIO_FILE_COL_ID = 6;
 
 class AudioFileQueryModel final : public MusicLibraryQueryModel {
-  bool isSelected(const QModelIndex& item) const;
 
 public:
   explicit AudioFileQueryModel(QObject* parent, MusicLibraryFilters* filters)

@@ -11,7 +11,6 @@
 
 #include <jack/jack.h>
 
-#include "db/dto/musicLibrary/DecoratedAudioFile.h"
 #include "./enums/PlayState.h"
 
 #include "./db/entity/AppStateEntity.h"

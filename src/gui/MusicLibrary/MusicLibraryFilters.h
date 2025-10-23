@@ -5,21 +5,35 @@
 #ifndef MUSICLIBRARYFILTERS_H
 #define MUSICLIBRARYFILTERS_H
 
-#include <vector>
+#include <map>
 #include <string>
+#include <vector>
 
 #include "../../enums/Result.h"
+#include "../../db/Types.h"
 
 #include "MusicLibraryType.h"
 
 namespace Gj {
 namespace Gui {
 
-struct MusicLibraryFilters {
+struct MusicLibraryFilter {
   MusicLibraryType type = NONE;
-  std::vector<uint64_t> ids {};
+  std::vector<Db::ID> ids {};
+};
 
-  std::string idSqlArray() const {
+struct MusicLibraryFilters {
+
+  std::map<MusicLibraryType, MusicLibraryFilter> filters = {
+    {ALBUM, {}},
+    {ARTIST, {}},
+    {AUDIO_FILE, {}},
+    {GENRE, {}},
+    {PLAYLIST, {}}
+  };
+
+  std::string idSqlArray(const MusicLibraryType type) const {
+    const std::vector<Db::ID> ids = filters.at(type).ids;
     std::string res = "(";
     for (size_t i = 0; i < ids.size(); ++i) {
       res += std::to_string(ids[i]);
@@ -30,10 +44,9 @@ struct MusicLibraryFilters {
     return res;
   }
 
-  Result set(MusicLibraryType newFilterBy, uint64_t id) {
-    type = newFilterBy;
-    ids.clear();
-    ids.push_back(id);
+  Result set(const MusicLibraryType type, const uint64_t id) {
+    filters.at(type).ids.clear();
+    filters.at(type).ids.push_back(id);
 
     return OK;
   }

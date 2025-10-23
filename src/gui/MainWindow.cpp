@@ -21,7 +21,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState*
     , sceneLoadAction(QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen), tr("&Select Scene"), this)
     , mainToolBar(this, actorSystem, mixer, &sceneLoadAction)
     , grid(&container)
-    , musicLibraryWindow(&container, actorSystem, mixer->dao)
+    , musicLibraryWindow(&container, actorSystem, gAppState, mixer->dao)
     , mixerWindow(&container, actorSystem, mixer)
     {
 

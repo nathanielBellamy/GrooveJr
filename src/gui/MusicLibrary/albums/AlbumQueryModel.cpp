@@ -17,51 +17,33 @@ Result AlbumQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
 }
 
 Result AlbumQueryModel::refresh() {
-  std::string queryStr;
-  switch (filters->type) {
-    case ARTIST:
-      queryStr = " select title, year, id from albums alb"
-                 " join artist_to_albums ata"
-                 " on alb.id = ata.albumId"
-                 " where ata.artistId in " + filters->idSqlArray();
-      break;
-    case AUDIO_FILE:
-      queryStr = " select alb.title, alb.year, alb.id from albums alb"
-                 " join tracks trk"
-                 " on trk.albumId = alb.id"
-                 " join audioFiles af"
-                 " on af.trackId = trk.id"
-                 " where af.id in " + filters->idSqlArray() +
-                 " group by alb.id";
-      break;
-    case GENRE:
-      queryStr = " select alb.title, alb.year, alb.id from albums alb"
-                 " join tracks trk"
-                 " on alb.id = trk.albumId"
-                 " join track_to_genres ttg"
-                 " on trk.id = ttg.trackId"
-                 " where ttg.genreId in " + filters->idSqlArray() +
-                 " group by alb.id";
-      break;
-    case PLAYLIST:
-      queryStr = " select alb.title, alb.year, alb.id from albums alb"
-                 " join tracks trk"
-                 " on alb.id = trk.albumId"
-                 " join audioFiles af"
-                 " on trk.id = af.trackId"
-                 " join audioFile_to_playlists atp"
-                 " on af.id = atp.audioFileId"
-                 " where atp.playlistId in " + filters->idSqlArray();
-      break;
-    case TRACK:
-      queryStr = " select alb.title, alb.year, alb.id from albums alb"
-                 " join tracks trk"
-                 " on alb.id = trk.albumId"
-                 " where trk.id in " + filters->idSqlArray();
-      break;
-    default:
-      queryStr = "select title, year, id from albums";
-  }
+  std::string queryStr =
+    " select alb.title, alb.year, alb.id from albums alb"
+    " left outer join artist_to_albums ata"
+    " on alb.id = ata.albumId"
+    " join tracks trk"
+    " on alb.id = trk.albumId"
+    " left outer join track_to_genres ttg"
+    " on trk.id = ttg.trackId"
+    // todo:
+    // " join audioFiles af"
+    // " on trk.id = af.trackId"
+    // " left outer join audioFile_to_playlists atp"
+    // " af.id = atp.audioFileId"
+    " where true";
+
+  if (filters->filters.at(ARTIST).ids.size() > 0)
+    queryStr += " and ata.artistId in " + filters->idSqlArray(ARTIST);
+
+  if (filters->filters.at(GENRE).ids.size() > 0)
+    queryStr += " and ttg.genreId in " + filters->idSqlArray(GENRE);
+
+  if (filters->filters.at(PLAYLIST).ids.size() > 0)
+    queryStr += " and atp.playlistId in " + filters->idSqlArray(PLAYLIST);
+
+  queryStr +=
+    " group by alb.id"
+    " order by alb.title, alb.year";
 
   setQueryString(queryStr);
   setHeaderData(ALBUM_COL_TITLE, Qt::Horizontal, QObject::tr("Title"));
