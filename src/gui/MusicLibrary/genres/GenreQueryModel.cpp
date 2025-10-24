@@ -22,46 +22,32 @@ QVariant GenreQueryModel::data(const QModelIndex& index, int role) const {
 }
 
 Result GenreQueryModel::refresh() {
-  std::string queryStr = " select g.name, g.id from genres g";
-  // switch (filters->type) {
-  //   case ALBUM:
-  //     queryStr = " select g.name, g.id from genres g"
-  //                " join track_to_genres ttg"
-  //                " on g.id = ttg.genreId"
-  //                " join tracks trk"
-  //                " on ttg.trackId = trk.id"
-  //                " where trk.albumId in " + filters->idSqlArray() +
-  //                " group by g.name";
-  //     break;
-  //   case ARTIST:
-  //     queryStr = " select g.name, g.id from genres g"
-  //                " join track_to_genres ttg"
-  //                " on g.id = ttg.genreId"
-  //                " join track_to_artists tta"
-  //                " on ttg.trackId = tta.trackId"
-  //                " where tta.artistId in " + filters->idSqlArray() +
-  //                " group by g.name";
-  //     break;
-  //   case PLAYLIST:
-  //     queryStr = " select g.name, g.id from genres g"
-  //                " join track_to_genres ttg"
-  //                " on g.id = ttg.genreId"
-  //                " join audioFiles af"
-  //                " on ttg.trackId = af.trackId"
-  //                " join audioFile_to_playlists atp"
-  //                " on af.id = atp.audioFileId"
-  //                " where atp.playlistId in " + filters->idSqlArray();
-  //     break;
-  //   case TRACK:
-  //     queryStr = " select g.name, g.id from genres g"
-  //                " join track_to_genres ttg"
-  //                " on g.id = ttg.genreId"
-  //                " where ttg.trackId in " + filters->idSqlArray() +
-  //                " group by g.id";
-  //     break;
-  //   default:
-  //     queryStr = "select name, id from genres";
-  // }
+  std::string queryStr =
+    " select g.name, g.id from genres g"
+    " left outer join track_to_genres ttg"
+    " on g.id = ttg.genreId"
+    " left outer join tracks trk"
+    " on trk.id = ttg.trackId"
+    " left outer join track_to_artists tta"
+    " on trk.id = tta.trackId"
+    " left outer join audioFiles af"
+    " on af.trackId = trk.id"
+    " left outer join audioFile_to_playlists atp"
+    " on af.id = atp.audioFileId"
+    " where true";
+
+  if (filters->filters.at(ALBUM).ids.size() > 0)
+    queryStr += " and trk.albumId in " + filters->idSqlArray(ALBUM);
+
+  if (filters->filters.at(ARTIST).ids.size() > 0)
+    queryStr += " and tta.artistId in " + filters->idSqlArray(ARTIST);
+
+  if (filters->filters.at(PLAYLIST).ids.size() > 0)
+    queryStr += " and atp.playlistId in " + filters->idSqlArray(PLAYLIST);
+
+  queryStr +=
+    " group by g.id"
+    " order by g.name";
 
   setQueryString(queryStr);
   setHeaderData(GENRE_COL_ID, Qt::Horizontal, QObject::tr("Id"));
