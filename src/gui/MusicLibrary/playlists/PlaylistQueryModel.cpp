@@ -23,7 +23,7 @@ QVariant PlaylistQueryModel::data(const QModelIndex& index, int role) const {
 
 Result PlaylistQueryModel::refresh() {
   std::string queryStr =
-    " select * from playlists p"
+    " select p.name, p.id from playlists p"
     " left outer join audioFile_to_playlists atp"
     " on p.id = atp.playlistId"
     " left outer join audioFiles af"
