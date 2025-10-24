@@ -22,53 +22,32 @@ QVariant ArtistQueryModel::data(const QModelIndex& index, int role) const {
 }
 
 Result ArtistQueryModel::refresh() {
-  std::string queryStr = " select art.name, art.id from artists art";
-  // todo:
-  // switch (filters->type) {
-  //   case ALBUM:
-  //     queryStr = " select art.name, art.id from artists art"
-  //                " join artist_to_albums ata"
-  //                " on art.id = ata.artistId"
-  //                " where ata.albumId in " + filters->idSqlArray();
-  //     break;
-  //   case AUDIO_FILE:
-  //     queryStr = " select art.name, art.id from artists art"
-  //                " join track_to_artists tta"
-  //                " on art.id = tta.artistId"
-  //                " join audioFiles af"
-  //                " on af.trackId = tta.trackId"
-  //                " where af.id in " + filters->idSqlArray() +
-  //                " group by art.id";
-  //     break;
-  //   case GENRE:
-  //     queryStr = " select art.name, art.id from artists art"
-  //                " join track_to_artists tta"
-  //                " on art.id = tta.artistId"
-  //                " join track_to_genres ttg"
-  //                " on tta.trackId = ttg.trackId"
-  //                " where ttg.genreId in " + filters->idSqlArray() +
-  //                " group by art.id";
-  //     break;
-  //   case PLAYLIST:
-  //     queryStr = " select art.name, art.id from artists art"
-  //                " join track_to_artists tta"
-  //                " on tta.artistId = art.id"
-  //                " join audioFiles af"
-  //                " on tta.trackId = af.trackId"
-  //                " join audioFile_to_playlists atp"
-  //                " on af.id = atp.audioFileId"
-  //                " where atp.playlistId in " + filters->idSqlArray();
-  //     break;
-  //   case TRACK:
-  //     queryStr = " select art.name, art.id from artists art"
-  //                " join track_to_artists tta"
-  //                " on art.id = tta.artistId"
-  //                " where tta.trackId in " + filters->idSqlArray() +
-  //                " group by art.id";
-  //     break;
-  //   default:
-  //     queryStr = "select name, id from artists";
-  // }
+  std::string queryStr =
+    " select art.name, art.id from artists art"
+    " join artist_to_albums ata"
+    " on art.id = ata.artistId"
+    " left outer join track_to_artists tta"
+    " on art.id = tta.artistId"
+    " left outer join track_to_genres ttg"
+    " on tta.trackId = ttg.trackId"
+    " left outer join audioFiles af"
+    " on af.trackId = tta.trackId"
+    " left outer join audioFile_to_playlists atp"
+    " on af.id = atp.audioFileId"
+    " where true";
+
+  if (filters->filters.at(ALBUM).ids.size() > 0)
+    queryStr += " and ata.albumId in " + filters->idSqlArray(ALBUM);
+
+  if (filters->filters.at(GENRE).ids.size() > 0)
+    queryStr += " and ttg.genreId in " + filters->idSqlArray(GENRE);
+
+  if (filters->filters.at(PLAYLIST).ids.size() > 0)
+    queryStr += " and atp.playlistId in " + filters->idSqlArray(PLAYLIST);
+
+  queryStr +=
+    " group by art.id"
+    " order by art.name";
 
   setQueryString(queryStr);
   setHeaderData(ARTIST_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
