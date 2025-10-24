@@ -25,11 +25,10 @@ Result AlbumQueryModel::refresh() {
     " on alb.id = trk.albumId"
     " left outer join track_to_genres ttg"
     " on trk.id = ttg.trackId"
-    // todo:
-    // " join audioFiles af"
-    // " on trk.id = af.trackId"
-    // " left outer join audioFile_to_playlists atp"
-    // " af.id = atp.audioFileId"
+    " join audioFiles af"
+    " on trk.id = af.trackId"
+    " left outer join audioFile_to_playlists atp"
+    " on af.id = atp.audioFileId"
     " where true";
 
   if (filters->filters.at(ARTIST).ids.size() > 0)

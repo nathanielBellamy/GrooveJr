@@ -9,6 +9,7 @@
 
 #include "MusicLibraryRepository.h"
 #include "../../entity/musicLibrary/AudioFile.h"
+#include "../../dto/musicLibrary/DecoratedAudioFile.h"
 
 namespace Gj {
 namespace Db {

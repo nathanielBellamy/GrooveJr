@@ -14,6 +14,7 @@
 #include "./enums/PlayState.h"
 
 #include "./db/entity/AppStateEntity.h"
+#include "./db/Types.h"
 
 namespace Gj {
 
