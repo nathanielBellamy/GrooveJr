@@ -22,8 +22,9 @@ constexpr size_t AUDIO_FILE_COL_ARTIST = 1;
 constexpr size_t AUDIO_FILE_COL_ALBUM = 2;
 constexpr size_t AUDIO_FILE_COL_TRACK_NUMBER = 3;
 constexpr size_t AUDIO_FILE_COL_YEAR = 4;
-constexpr size_t AUDIO_FILE_COL_PATH = 5;
-constexpr size_t AUDIO_FILE_COL_ID = 6;
+constexpr size_t AUDIO_FILE_COL_GENRE = 5;
+constexpr size_t AUDIO_FILE_COL_PATH = 6;
+constexpr size_t AUDIO_FILE_COL_ID = 7;
 
 class AudioFileQueryModel final : public MusicLibraryQueryModel {
 

@@ -5,6 +5,8 @@ project(GrooveJr VERSION 0.0.0)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
+message(INFO " Compiling GrooveJr with CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+
 # TODO: detect OS and set
 # - for linux: -shared
 # - for macOS: -dynamicLib
