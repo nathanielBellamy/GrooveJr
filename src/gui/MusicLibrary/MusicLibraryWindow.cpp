@@ -103,26 +103,37 @@ void MusicLibraryWindow::setupGrid() {
   grid.setColumnStretch(2, 1);
   grid.setColumnStretch(3, 1);
   grid.setColumnStretch(4, 1);
+  grid.setColumnStretch(5, 1);
+  grid.setColumnStretch(6, 1);
+  grid.setColumnStretch(7, 1);
+  grid.setColumnStretch(8, 2);
+  grid.setColumnStretch(9, 2);
+  grid.setColumnStretch(10, 2);
+  grid.setColumnStretch(11, 2);
+  grid.setColumnStretch(12, 2);
+  grid.setColumnStretch(13, 2);
+  grid.setColumnStretch(14, 2);
+  grid.setColumnStretch(15, 2);
 
-  grid.addWidget(&filesButton, 0, 2, 1, 1);
-  grid.addWidget(&queueButton, 0, 3, 1, 1);
-  grid.addWidget(&refreshButton, 0, 4, 1, 1);
+  grid.addWidget(&filesButton, 0, 8, 1, 1);
+  grid.addWidget(&queueButton, 0, 9, 1, 1);
+  grid.addWidget(&refreshButton, 0, 15, 1, 1);
 
   grid.addWidget(&genreHeader, 0, 0, 1, 1);
-  grid.addWidget(&playlistHeader, 0, 1, 1, 1);
+  grid.addWidget(&playlistHeader, 0, 4, 1, 1);
 
-  grid.addWidget(genreTableView, 1, 0, 1, 1);
-  grid.addWidget(playlistTableView, 1, 1, 1, 1);
+  grid.addWidget(genreTableView, 1, 0, 1, 4);
+  grid.addWidget(playlistTableView, 1, 4, 1, 4);
 
   grid.addWidget(&artistHeader, 2, 0, 1, 1);
-  grid.addWidget(&albumHeader, 2, 1, 1, 1);
+  grid.addWidget(&albumHeader, 2, 4, 1, 1);
 
-  grid.addWidget(artistTableView, 3, 0, 1, 1);
-  grid.addWidget(albumTableView, 3, 1, 1, 1);
+  grid.addWidget(artistTableView, 3, 0, 1, 4);
+  grid.addWidget(albumTableView, 3, 4, 1, 4);
 
   // add overlapping mainSections to hide/show
-  grid.addWidget(queueTableView, 1, 2, -1, -1);
-  grid.addWidget(audioFileTableView, 1, 2, -1, -1);
+  grid.addWidget(queueTableView, 1, 8, -1, -1);
+  grid.addWidget(audioFileTableView, 1, 8, -1, -1);
 
   setLayout(&grid);
 }

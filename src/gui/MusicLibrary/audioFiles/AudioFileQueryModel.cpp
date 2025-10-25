@@ -60,6 +60,7 @@ Result AudioFileQueryModel::refresh() {
   setHeaderData(AUDIO_FILE_COL_ALBUM, Qt::Horizontal, QObject::tr("Album"));
   setHeaderData(AUDIO_FILE_COL_TRACK_NUMBER, Qt::Horizontal, QObject::tr("Track Number"));
   setHeaderData(AUDIO_FILE_COL_YEAR, Qt::Horizontal, QObject::tr("Year"));
+  setHeaderData(AUDIO_FILE_COL_GENRE, Qt::Horizontal, QObject::tr("Genre"));
   setHeaderData(AUDIO_FILE_COL_PATH, Qt::Horizontal, QObject::tr("Path"));
   setHeaderData(AUDIO_FILE_COL_ID, Qt::Horizontal, QObject::tr("Id"));
 
