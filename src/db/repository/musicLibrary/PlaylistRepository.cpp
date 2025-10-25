@@ -52,7 +52,6 @@ ID PlaylistRepository::save(const Playlist& playlist) const {
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     const char* errmsg = sqlite3_errmsg(*db);
-
     if (std::strstr(errmsg, "UNIQUE constraint failed: playlists.name") != nullptr) {
       const std::optional<Playlist> found = findByName(playlist.name);
       if (!found.has_value()) {
@@ -62,28 +61,27 @@ ID PlaylistRepository::save(const Playlist& playlist) const {
           "Unable to find duplicate playlist named: " + std::string(playlist.name) + ". This Error should not happen."
         );
         return 0;
-      } else {
-        Logging::write(
-            Warning,
-            "Db::ArtistRepository::save",
-            "Not Saving Playlist " + playlist.name + " as a Playlist with that name already exists - SQLite UNIQUE constraint failed: playlists.name"
-        );
-        return found.value().id;
       }
+      Logging::write(
+          Warning,
+          "Db::ArtistRepository::save",
+          "Not Saving Playlist " + playlist.name + " as a Playlist with that name already exists - SQLite UNIQUE constraint failed: playlists.name"
+      );
+      return found.value().id;
     }
     Logging::write(
       Error,
       "Db::PlaylistRepository::save",
       "Failed to save Playlist " + playlist.name + " Message: " + std::string(sqlite3_errmsg(*db))
     );
-  } else {
-    Logging::write(
-      Info,
-      "Db::PlaylistRepository::save",
-      "Saved Playlist: " + playlist.name
-    );
+    return 0;
   }
 
+  Logging::write(
+    Info,
+    "Db::PlaylistRepository::save",
+    "Saved Playlist: " + playlist.name
+  );
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }
 

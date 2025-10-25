@@ -27,7 +27,6 @@ ID GenreRepository::save(const Genre& genre) const {
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     const char* errmsg = sqlite3_errmsg(*db);
-
     if (std::strstr(errmsg, "UNIQUE constraint failed: genres.name") != nullptr) {
       const std::optional<Genre> found = findByName(genre.name);
       if (!found.has_value()) {
@@ -37,22 +36,28 @@ ID GenreRepository::save(const Genre& genre) const {
             "Failed to find genre with name: " + genre.name + ". This Error Should Not Happen."
         );
         return 0;
-      } else {
-        Logging::write(
-            Warning,
-            "Db::GenreRepository::save",
-            "Not Saving Genre " + genre.name + ". Already exists with Id " + std::to_string(found.value().id) + " - SQLite UNIQUE constraint failed: genres.name"
-        );
-        return found.value().id;
       }
+      Logging::write(
+          Warning,
+          "Db::GenreRepository::save",
+          "Not Saving Genre " + genre.name + ". Already exists with Id " + std::to_string(found.value().id) + " - SQLite UNIQUE constraint failed: genres.name"
+      );
+      return found.value().id;
     }
-  } else {
+
     Logging::write(
-      Info,
-      "Db::GenreRepository::save",
-      "Saved Genre: " + genre.name
+        Error,
+        "Db::GenreRepository::save",
+        "Failed to save genre with name: " + genre.name + ". Message: " + std::string(errmsg)
     );
+    return 0;
   }
+
+  Logging::write(
+    Info,
+    "Db::GenreRepository::save",
+    "Saved Genre: " + genre.name
+  );
 
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }

@@ -54,7 +54,6 @@ ID TrackRepository::save(const Track& track) const {
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     const char* errmsg = sqlite3_errmsg(*db);
-
     if (std::strstr(errmsg, "UNIQUE constraint failed: tracks.albumId, tracks.trackNumber") != nullptr) {
       const Track found = findByAlbumIdAndTrackNumber(track.albumId, track.trackNumber);
       Logging::write(
@@ -69,14 +68,14 @@ ID TrackRepository::save(const Track& track) const {
       "Db::TrackRepository::save",
       "Failed to save Track " + track.title + " Message: " + std::string(sqlite3_errmsg(*db))
     );
-  } else {
-    Logging::write(
-      Info,
-      "Db::TrackRepository::save",
-      "Saved Track: " + track.title
-    );
+    return 0;
   }
 
+  Logging::write(
+    Info,
+    "Db::TrackRepository::save",
+    "Saved Track: " + track.title
+  );
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }
 

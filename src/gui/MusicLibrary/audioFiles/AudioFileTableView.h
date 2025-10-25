@@ -11,10 +11,13 @@
 
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
+
+#include "../../../Logging.h"
 #include "../../../messaging/atoms.h"
 #include "../../../actors/ActorIds.h"
 #include "../../../enums/Result.h"
 #include "../../../AppState.h"
+
 
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
@@ -62,9 +65,21 @@ public:
         const QAction* addToQueueAction = menu->addAction("Add To Queue");
         connect(addToQueueAction, &QAction::triggered, this, [&]() {
           const QVariant id = getModel()->index(index.row(), AUDIO_FILE_COL_ID).data();
+          const Db::Queue q(id.toULongLong(), 0);
 
-          const Db::Queue q(id.toLongLong(), 0);
-          dao->queueRepository.save(q);
+          if (const auto queueId = dao->queueRepository.save(q); queueId > 0) {
+            Logging::write(
+              Info,
+              "Gui::AudioFileTableView::mousePressEvent::addToQueueAction",
+              "Saved AudioFileId " + std::to_string(q.audioFileId) + " to Queue with QueueId: " + std::to_string(queueId)
+            );
+          } else {
+            Logging::write(
+              Error,
+              "Gui::AudioFileTableView::mousePressEvent::addToQueueAction",
+              "Unable to save AudioFileId " + std::to_string(q.audioFileId) + " to Queue."
+            );
+          }
 
           refresh();
         });

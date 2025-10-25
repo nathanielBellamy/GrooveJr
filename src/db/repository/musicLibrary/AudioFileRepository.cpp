@@ -54,14 +54,14 @@ ID AudioFileRepository::save(const AudioFile& audioFile) const {
       "Db::AudioFileRepository::save",
       "Failed to save AudioFile " + audioFile.filePath + " Message: " + std::string(sqlite3_errmsg(*db))
     );
-  } else {
-    Logging::write(
-      Info,
-      "Db::AudioFileRepository::save",
-      "Saved AudioFile: " + audioFile.filePath
-    );
+    return 0;
   }
 
+  Logging::write(
+    Info,
+    "Db::AudioFileRepository::save",
+    "Saved AudioFile: " + audioFile.filePath
+  );
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }
 

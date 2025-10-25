@@ -13,9 +13,9 @@ ID QueueRepository::save(const Queue& queue) const {
     values (?, ?)
   )sql";
 
-  TrackNumber trackNumber = queue.trackNumber == 0
-                                ? nextTrackNumber()
-                                : queue.trackNumber;
+  const TrackNumber trackNumber = queue.trackNumber == 0
+                                    ? nextTrackNumber()
+                                    : queue.trackNumber;
 
   sqlite3_stmt* stmt;
   if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
@@ -31,21 +31,20 @@ ID QueueRepository::save(const Queue& queue) const {
   sqlite3_bind_int(stmt, 2, trackNumber);
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
-    const char* errmsg = sqlite3_errmsg(*db);
-
     Logging::write(
       Error,
       "Db::QueueRepository::save",
-      "Failed to save Queue audioFileId: " + std::to_string(queue.audioFileId) + " Message: " + std::string(sqlite3_errmsg(*db))
+      "Failed to save Queue audioFileId: " + std::to_string(queue.audioFileId) +
+        " Message: " + std::string(sqlite3_errmsg(*db))
     );
-  } else {
-    Logging::write(
-      Info,
-      "Db::QueueRepository::save",
-      "Saved Queue. audioFileId: " + std::to_string(queue.audioFileId) + " trackNumber: " + std::to_string(queue.trackNumber)
-    );
+    return 0;
   }
 
+  Logging::write(
+    Info,
+    "Db::QueueRepository::save",
+    "Saved Queue. audioFileId: " + std::to_string(queue.audioFileId) + " trackNumber: " + std::to_string(queue.trackNumber)
+  );
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }
 

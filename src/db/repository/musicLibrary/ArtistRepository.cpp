@@ -43,14 +43,14 @@ ID ArtistRepository::save(const Artist& artist) const {
       "Db::ArtistRepository::save",
       "Failed to save Artist " + artist.name + " Message: " + std::string(errmsg)
     );
-  } else {
-    Logging::write(
-      Info,
-      "Db::ArtistRepository::save",
-      "Saved Artist: " + artist.name
-    );
+    return 0;
   }
 
+  Logging::write(
+    Info,
+    "Db::ArtistRepository::save",
+    "Saved Artist: " + artist.name
+  );
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }
 

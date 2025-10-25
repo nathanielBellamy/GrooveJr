@@ -54,7 +54,7 @@ Result QueueQueryModel::refresh() {
   if (filters->filters.at(PLAYLIST).ids.size() > 0)
     queryStr += " and atp.playlistId in " + filters->idSqlArray(PLAYLIST);
 
-  queryStr += " order by art.name asc, alb.year asc, alb.title asc, trk.trackNumber asc";
+  queryStr += " order by q.trackNumber asc";
 
   setQueryString(queryStr);
   setHeaderData(AUDIO_FILE_COL_TRACK, Qt::Horizontal, QObject::tr("Track"));

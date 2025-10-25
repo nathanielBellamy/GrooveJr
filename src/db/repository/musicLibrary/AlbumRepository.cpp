@@ -27,19 +27,20 @@ ID AlbumRepository::save(const Album& album) const {
   sqlite3_bind_int(stmt, 2, album.year);
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
+    // TODO: find by albumTitle and artistId
     Logging::write(
       Error,
       "Db::AlbumRepository::save",
       "Failed to save Album " + album.title + " Message: " + std::string(sqlite3_errmsg(*db))
     );
-  } else {
-    Logging::write(
-      Info,
-      "Db::AlbumRepository::save(album)",
-      "Saved Album: " + album.title
-    );
+    return 0;
   }
 
+  Logging::write(
+    Info,
+    "Db::AlbumRepository::save(album)",
+    "Saved Album: " + album.title
+  );
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }
 
