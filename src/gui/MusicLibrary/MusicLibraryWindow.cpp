@@ -15,10 +15,16 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , grid(this)
   , filesButton(this)
   , queueButton(this)
+  , filtersHeader(this)
+  , clearFiltersButton(this)
   , albumHeader(this)
+  , albumClearFilterButton(this)
   , artistHeader(this)
+  , artistClearFilterButton(this)
   , genreHeader(this)
+  , genreClearFilterButton(this)
   , playlistHeader(this)
+  , playlistClearFilterButton(this)
   {
   if (connectToDb() == OK) {
     albumTableView = new AlbumTableView(this, actorSystem, dao, &filters);
@@ -39,11 +45,22 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   filesButton.setCursor(Qt::PointingHandCursor);
   queueButton.setCursor(Qt::PointingHandCursor);
   refreshButton.setCursor(Qt::PointingHandCursor);
+  albumClearFilterButton.setCursor(Qt::PointingHandCursor);
+  artistClearFilterButton.setCursor(Qt::PointingHandCursor);
+  genreClearFilterButton.setCursor(Qt::PointingHandCursor);
+  playlistClearFilterButton.setCursor(Qt::PointingHandCursor);
 
-  queueButton.setText("Queue");
   filesButton.setText("Files");
+  queueButton.setText("Queue");
   refreshButton.setText("Refresh");
+  albumClearFilterButton.setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
+  artistClearFilterButton.setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
+  genreClearFilterButton.setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
+  playlistClearFilterButton.setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
+  clearFiltersButton.setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
 
+  filtersHeader.setText("Filters");
+  filtersHeader.setFont({filtersHeader.font().family(), 14});
 
   albumHeader.setText("Albums");
   albumHeader.setFont({albumHeader.font().family(), 12});
@@ -94,9 +111,10 @@ void MusicLibraryWindow::setupGrid() {
   grid.setVerticalSpacing(1);
 
   grid.setRowStretch(0, 1);
-  grid.setRowStretch(1, 4);
-  grid.setRowStretch(2, 1);
-  grid.setRowStretch(3, 4);
+  grid.setRowStretch(1, 1);
+  grid.setRowStretch(2, 4);
+  grid.setRowStretch(3, 1);
+  grid.setRowStretch(4, 4);
 
   grid.setColumnStretch(0, 1);
   grid.setColumnStretch(1, 1);
@@ -115,21 +133,28 @@ void MusicLibraryWindow::setupGrid() {
   grid.setColumnStretch(14, 2);
   grid.setColumnStretch(15, 2);
 
+  grid.addWidget(&filtersHeader, 0, 0, 1, 3);
+  grid.addWidget(&clearFiltersButton, 0, 7, 1, 1);
+
   grid.addWidget(&filesButton, 0, 8, 1, 1);
   grid.addWidget(&queueButton, 0, 9, 1, 1);
   grid.addWidget(&refreshButton, 0, 15, 1, 1);
 
-  grid.addWidget(&genreHeader, 0, 0, 1, 1);
-  grid.addWidget(&playlistHeader, 0, 4, 1, 1);
+  grid.addWidget(&genreHeader, 1, 0, 1, 1);
+  grid.addWidget(&genreClearFilterButton, 1, 3, 1, 1);
+  grid.addWidget(&playlistHeader, 1, 4, 1, 1);
+  grid.addWidget(&playlistClearFilterButton, 1, 7, 1, 1);
 
-  grid.addWidget(genreTableView, 1, 0, 1, 4);
-  grid.addWidget(playlistTableView, 1, 4, 1, 4);
+  grid.addWidget(genreTableView, 2, 0, 1, 4);
+  grid.addWidget(playlistTableView, 2, 4, 1, 4);
 
-  grid.addWidget(&artistHeader, 2, 0, 1, 1);
-  grid.addWidget(&albumHeader, 2, 4, 1, 1);
+  grid.addWidget(&artistHeader, 3, 0, 1, 1);
+  grid.addWidget(&artistClearFilterButton, 3, 3, 1, 1);
+  grid.addWidget(&albumHeader, 3, 4, 1, 1);
+  grid.addWidget(&albumClearFilterButton, 3, 7, 1, 1);
 
-  grid.addWidget(artistTableView, 3, 0, 1, 4);
-  grid.addWidget(albumTableView, 3, 4, 1, 4);
+  grid.addWidget(artistTableView, 4, 0, 1, 4);
+  grid.addWidget(albumTableView, 4, 4, 1, 4);
 
   // add overlapping mainSections to hide/show
   grid.addWidget(queueTableView, 1, 8, -1, -1);
@@ -150,6 +175,34 @@ Result MusicLibraryWindow::connectActions() {
   });
 
   const auto refreshButtonClickedConnection = connect(&refreshButton, &QPushButton::clicked, this, [&] () {
+    refresh();
+  });
+
+  const auto clearFiltersButtonClickedConnection = connect(&clearFiltersButton, &QPushButton::clicked, this, [&] () {
+    filters.filters.at(ALBUM).ids.clear();
+    filters.filters.at(ARTIST).ids.clear();
+    filters.filters.at(GENRE).ids.clear();
+    filters.filters.at(PLAYLIST).ids.clear();
+    refresh();
+  });
+
+  const auto clearAlbumFilterButtonClickedConnection = connect(&albumClearFilterButton, &QPushButton::clicked, this, [&] () {
+    filters.filters.at(ALBUM).ids.clear();
+    refresh();
+  });
+
+  const auto clearArtistFilterButtonClickedConnection = connect(&artistClearFilterButton, &QPushButton::clicked, this, [&] () {
+    filters.filters.at(ARTIST).ids.clear();
+    refresh();
+  });
+
+  const auto clearGenreFilterButtonClickedConnection = connect(&genreClearFilterButton, &QPushButton::clicked, this, [&] () {
+    filters.filters.at(GENRE).ids.clear();
+    refresh();
+  });
+
+  const auto clearPlaylistFilterButtonClickedConnection = connect(&playlistClearFilterButton, &QPushButton::clicked, this, [&] () {
+    filters.filters.at(PLAYLIST).ids.clear();
     refresh();
   });
 
