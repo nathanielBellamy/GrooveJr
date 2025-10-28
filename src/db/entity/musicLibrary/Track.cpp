@@ -7,6 +7,13 @@
 namespace Gj {
 namespace Db {
 
+Track::Track()
+  : id(0)
+  , albumId(0)
+  , title(" - ")
+  , trackNumber(0)
+  {}
+
 Track::Track(const ID id, const ID albumId, const std::string& title, const TrackNumber trackNumber)
   : id(id)
   , albumId(albumId)

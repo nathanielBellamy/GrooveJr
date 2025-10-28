@@ -24,6 +24,7 @@ struct Track {
   std::string title;
   TrackNumber trackNumber;
 
+  Track();
   Track(ID id, ID albumId, const std::string& title, TrackNumber trackNumber);
   Track(ID albumId, const std::string& title, TrackNumber trackNumber);
 

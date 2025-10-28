@@ -31,16 +31,31 @@ AppState::AppState() {
   crossfade.store( appState.crossfade);
 }
 
-AppStatePacket AppState::toPacket() const {
-    const AppStatePacket packet {
-      id.load(),
-      audioFramesPerBuffer.load(),
-      psToInt(playState.load()),
-      sceneId.load(),
-      sceneIndex.load(),
-      crossfade.load()
-    };
-    return packet;
+AppStatePacket AppState::toPacket() {
+  const Db::DecoratedAudioFile daf = getCurrentlyPlaying();
+  std::string currPlayAlbumTitle, currPlayArtistName, currPlayTrackTitle;
+  if (!daf.isValid()) {
+    currPlayAlbumTitle = "-";
+    currPlayArtistName = "-";
+    currPlayTrackTitle = "-";
+  } else {
+    currPlayAlbumTitle = daf.album.title;
+    currPlayArtistName = daf.artist.name;
+    currPlayTrackTitle = daf.track.title;
+  }
+
+  const AppStatePacket packet {
+    id.load(),
+    audioFramesPerBuffer.load(),
+    psToInt(playState.load()),
+    sceneId.load(),
+    sceneIndex.load(),
+    crossfade.load(),
+    currPlayAlbumTitle,
+    currPlayArtistName,
+    currPlayTrackTitle
+  };
+  return packet;
 }
 
 AppState AppState::fromAppStateEntity(const Db::AppStateEntity appStateEntity) {

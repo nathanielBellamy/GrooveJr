@@ -6,14 +6,16 @@
 #define APPSTATE_H
 
 #include <atomic>
-#include <sndfile.h>
+#include <mutex>
 #include <string>
 
+#include <sndfile.h>
 #include <jack/jack.h>
 
 #include "./enums/PlayState.h"
 
 #include "./db/entity/AppStateEntity.h"
+#include "./db/dto/musicLibrary/DecoratedAudioFile.h"
 #include "./db/Types.h"
 
 namespace Gj {
@@ -25,6 +27,9 @@ struct AppStatePacket {
     int sceneId;
     int sceneIndex;
     sf_count_t crossfade;
+    std::string currentlyPlayingAlbumTitle;
+    std::string currentlyPlayingArtistName;
+    std::string currentlyPlayingTrackTitle;
 };
 
 template <class Inspector>
@@ -39,8 +44,10 @@ struct AppState {
   std::atomic<int> sceneId{};
   std::atomic<int> sceneIndex{};
   std::atomic<sf_count_t> crossfade{ 0 };
+  std::mutex currentlyPlayingMutex;
+  Db::DecoratedAudioFile currentlyPlaying;
   std::atomic<bool> queuePlay = false;
-  std::atomic<Db::ID> queueIndex = 0;
+  std::atomic<Db::TrackNumber> queueIndex = 0;
 
   AppState();
   AppState(
@@ -51,7 +58,7 @@ struct AppState {
     int sceneIndex,
     sf_count_t crossfade
   );
-  AppStatePacket toPacket() const;
+  AppStatePacket toPacket();
   static AppState fromAppStateEntity(Db::AppStateEntity appStateEntity);
 
   // mutations
@@ -102,6 +109,17 @@ struct AppState {
   std::string toString() const {
     return " id: " + std::to_string(id) + " audioFramesPerBuffer: " + std::to_string(audioFramesPerBuffer) + " playState: " + std::to_string(playState) + " sceneId: " + std::to_string(sceneId) + " sceneIndex: " + std::to_string(sceneIndex);
   };
+
+  Result setCurrentlyPlaying(const Db::DecoratedAudioFile& decoratedAudioFile) {
+    std::lock_guard guard(currentlyPlayingMutex);
+    currentlyPlaying = decoratedAudioFile;
+    return OK;
+  }
+
+  Db::DecoratedAudioFile getCurrentlyPlaying() {
+    std::lock_guard guard(currentlyPlayingMutex);
+    return currentlyPlaying;
+  }
 };
 
 } // Gj

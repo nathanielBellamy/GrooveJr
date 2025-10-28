@@ -31,10 +31,13 @@ CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, A
 }
 
 void CurrentlyPlaying::setStyle() {
+  // TODO
 }
 
 void CurrentlyPlaying::hydrateState(const AppStatePacket& appStatePacket) {
-  // TODO
+  track.setText(QString(appStatePacket.currentlyPlayingTrackTitle.c_str()));
+  album.setText(QString(appStatePacket.currentlyPlayingAlbumTitle.c_str()));
+  artist.setText(QString(appStatePacket.currentlyPlayingArtistName.c_str()));
 }
 
 } // Gui

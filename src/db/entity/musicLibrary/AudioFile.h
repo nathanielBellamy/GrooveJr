@@ -28,6 +28,18 @@ struct AudioFile {
   // bool isVariableBitRate;
   // AudioCodec audioCodec;
 
+  AudioFile()
+    : id(0)
+    , trackId(0)
+    , filePath("")
+    {
+    Logging::write(
+      Info,
+      "Db::AudioFile::AudioFile()",
+      "Instantiated Blank AudioFile"
+    );
+  }
+
   AudioFile(const std::string& filePath)
     : id(0)
     , trackId(0)

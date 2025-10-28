@@ -248,7 +248,15 @@ struct AudioCore {
     const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
     deckIndex = nextDeckIndex;
     deckIndexNext = nextDeckIndex;
-    decks[deckIndex].setCassetteFromDecoratedAudioFile(decoratedAudioFile);
+    if (decks[deckIndex].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
+      Logging::write(
+        Error,
+        "Audio::AudioCore::addCassetteFromFilePath",
+        "Unable to set Cassette from DecoratedAudioFile. Path: " + decoratedAudioFile.audioFile.filePath
+      );
+      return ERROR;
+    };
+    gAppState->setCurrentlyPlaying(decoratedAudioFile);
 
     Logging::write(
       Info,
@@ -266,7 +274,6 @@ struct AudioCore {
 
   Result setDeckIndex(const int val) {
     deckIndex = val;
-
     return OK;
   }
 

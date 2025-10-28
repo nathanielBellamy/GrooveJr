@@ -23,6 +23,13 @@ namespace Gj {
 namespace Db {
 
 struct DecoratedAudioFile final {
+  DecoratedAudioFile()
+    : album(Album(" - "))
+    , artist(Artist(" - "))
+    , genre(" - ")
+    {}
+
+
   DecoratedAudioFile(
     Album album,
     Artist artist,
@@ -38,6 +45,10 @@ struct DecoratedAudioFile final {
   AudioFile audioFile;
   Genre genre;
   Track track;
+
+  bool isValid() const {
+    return audioFile.valid;
+  }
 };
 
 } // Db
