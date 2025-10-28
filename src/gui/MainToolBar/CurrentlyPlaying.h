@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QWidget>
 #include <QScrollArea>
+#include <QScrollBar>
 
 #include "../../AppState.h"
 #include "../../audio/Mixer.h"

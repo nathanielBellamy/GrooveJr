@@ -27,12 +27,15 @@ CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, A
   trackScrollArea->setWidget(track);
   trackScrollArea->setWidgetResizable(true);
   trackScrollArea->setMaximumHeight(25);
+  trackScrollArea->horizontalScrollBar()->setStyleSheet("QScrollBar {height:0px;}");
   albumScrollArea->setWidget(album);
   albumScrollArea->setWidgetResizable(true);
   albumScrollArea->setMaximumHeight(25);
+  albumScrollArea->horizontalScrollBar()->setStyleSheet("QScrollBar {height:0px;}");
   artistScrollArea->setWidget(artist);
   artistScrollArea->setWidgetResizable(true);
   artistScrollArea->setMaximumHeight(25);
+  artistScrollArea->horizontalScrollBar()->setStyleSheet("QScrollBar {height:0px;}");
 
   setupGrid();
   setStyle();
@@ -47,7 +50,10 @@ void CurrentlyPlaying::setupGrid() {
 }
 
 void CurrentlyPlaying::setStyle() {
-  setFixedWidth(200);
+  setFixedWidth(226);
+  setStyleSheet(
+    "font-weight: 600; font-size: 14px; background-color: black;"
+  );
 }
 
 void CurrentlyPlaying::hydrateState(const AppStatePacket& appStatePacket) {
