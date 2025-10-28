@@ -11,33 +11,49 @@ CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, A
   : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
-  , track(this)
-  , album(this)
-  , artist(this)
+  , track(new QLabel)
+  , trackScrollArea(new QScrollArea(this))
+  , album(new QLabel)
+  , albumScrollArea(new QScrollArea(this))
+  , artist(new QLabel)
+  , artistScrollArea(new QScrollArea(this))
   , grid(this)
   {
 
-  track.setText("Love is a Losing Game");
-  album.setText("Back to Black");
-  artist.setText("Amy Winehouse");
+  track->setWordWrap(false);
+  album->setWordWrap(false);
+  artist->setWordWrap(false);
 
-  grid.addWidget(&track, 0, 0, 1, -1);
-  grid.addWidget(&album, 1, 0, 1, 1);
-  grid.addWidget(&artist, 1, 1, 1, 1);
+  trackScrollArea->setWidget(track);
+  trackScrollArea->setWidgetResizable(true);
+  trackScrollArea->setMaximumHeight(25);
+  albumScrollArea->setWidget(album);
+  albumScrollArea->setWidgetResizable(true);
+  albumScrollArea->setMaximumHeight(25);
+  artistScrollArea->setWidget(artist);
+  artistScrollArea->setWidgetResizable(true);
+  artistScrollArea->setMaximumHeight(25);
 
-  setLayout(&grid);
-
+  setupGrid();
   setStyle();
 }
 
+void CurrentlyPlaying::setupGrid() {
+  grid.addWidget(trackScrollArea, 0, 0, 1, -1);
+  grid.addWidget(artistScrollArea, 1, 0, 1, -1);
+  grid.addWidget(albumScrollArea, 2, 0, 1, -1);
+
+  setLayout(&grid);
+}
+
 void CurrentlyPlaying::setStyle() {
-  // TODO
+  setFixedWidth(200);
 }
 
 void CurrentlyPlaying::hydrateState(const AppStatePacket& appStatePacket) {
-  track.setText(QString(appStatePacket.currentlyPlayingTrackTitle.c_str()));
-  album.setText(QString(appStatePacket.currentlyPlayingAlbumTitle.c_str()));
-  artist.setText(QString(appStatePacket.currentlyPlayingArtistName.c_str()));
+  track->setText(QString(appStatePacket.currentlyPlayingTrackTitle.c_str()));
+  album->setText(QString(appStatePacket.currentlyPlayingAlbumTitle.c_str()));
+  artist->setText(QString(appStatePacket.currentlyPlayingArtistName.c_str()));
 }
 
 } // Gui

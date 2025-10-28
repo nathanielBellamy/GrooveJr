@@ -10,6 +10,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QWidget>
+#include <QScrollArea>
 
 #include "../../AppState.h"
 #include "../../audio/Mixer.h"
@@ -27,10 +28,14 @@ class CurrentlyPlaying final : public QWidget {
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;
-    QLabel track;
-    QLabel album;
-    QLabel artist;
+    QLabel* track;
+    QScrollArea* trackScrollArea;
+    QLabel* album;
+    QScrollArea* albumScrollArea;
+    QLabel* artist;
+    QScrollArea* artistScrollArea;
     QGridLayout grid;
+    void setupGrid();
     void setStyle();
 };
 

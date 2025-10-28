@@ -220,21 +220,6 @@ Result MusicLibraryWindow::connectActions() {
       refresh();
   });
 
-  const auto audioFileClickedConnection = connect(audioFileTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant audioFileId = audioFileTableView->getModel()->index(index.row(), 6).data();
-      filters.set(AUDIO_FILE, audioFileId.toLongLong());
-
-      refresh();
-  });
-
-  const auto audioFileDoubleClickedConnection = connect(audioFileTableView, &QTableView::doubleClicked, this, [&] (const QModelIndex& index) {
-      const QVariant audioFileId = audioFileTableView->getModel()->index(index.row(), 6).data();
-
-      // TODO: play
-
-      refresh();
-  });
-
   const auto genreClickedConnection = connect(genreTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant genreId = genreTableView->getModel()->index(index.row(), 1).data();
       filters.set(GENRE, genreId.toLongLong());
@@ -245,14 +230,6 @@ Result MusicLibraryWindow::connectActions() {
   const auto playlistClickedConnection = connect(playlistTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
       const QVariant playlistId = playlistTableView->getModel()->index(index.row(), 1).data();
       filters.set(PLAYLIST, playlistId.toLongLong());
-
-      refresh();
-  });
-
-  const auto playlistDoubleClickedConnection = connect(audioFileTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant playlistId = playlistTableView->getModel()->index(index.row(), 1).data();
-
-      // TODO: add to queue/play
 
       refresh();
   });
