@@ -87,6 +87,15 @@ struct PlaybackState {
                "Received TC Trig Play"
              );
 
+             if (!audioCore->currentDeck().hasValidCassetteLoaded()) {
+               Logging::write(
+                 Warning,
+                 "Act::Playback::tc_trig_play_a",
+                 "Attempting to play without Valid Cassette Loaded."
+               );
+               return;
+             }
+
              const PlayState playState = Audio::ThreadStatics::getPlayState();
              if (playState == PLAY)
                return;

@@ -68,7 +68,7 @@ struct AudioThreadState {
              Logging::write(
                Info,
                "Act::AudioThread::audio_thread_init_a",
-               "Instantiating Cassette"
+               "Instantiating AudioPlayer"
              );
              try {
                if (Audio::AudioPlayer audioPlayer (audioCore, mixer, gAppState); audioPlayer.run() == ERROR)
@@ -81,9 +81,14 @@ struct AudioThreadState {
                Logging::write(
                  Error,
                  "Act::AudioThread::audio_thread_init_a",
-                 "Error instantiating or playing Cassette: " + std::string(e.what())
+                 "Error creating AudioPlayer or during AudioPlayer::run: " + std::string(e.what())
                );
              }
+             Logging::write(
+               Info,
+               "Act::AudioThread::audio_thread_init_a",
+               "AudioPlayer run complete."
+             );
            },
        };
      };

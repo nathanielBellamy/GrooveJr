@@ -2,8 +2,8 @@
 // Created by ns on 9/18/25.
 //
 
-#ifndef DECKDATA_H
-#define DECKDATA_H
+#ifndef AUDIODECK_H
+#define AUDIODECK_H
 
 #include <optional>
 
@@ -88,7 +88,7 @@ struct AudioDeck {
     return frameId > std::min(frames - gAppState->getCrossfade(), frames - MIN_FADE_OUT);
   }
 
-  bool validCassetteLoaded() const {
+  bool hasValidCassetteLoaded() const {
     if (!cassette)
       return false;
 
@@ -113,4 +113,4 @@ struct AudioDeck {
 } // Audio
 } // Gj
 
-#endif //DECKDATA_H
+#endif //AUDIODECK_H

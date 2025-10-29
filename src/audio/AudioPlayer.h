@@ -29,7 +29,6 @@ struct AudioPlayer {
   std::shared_ptr<JackClient> jackClient;
 
   bool jackClientIsActive = false;
-  float* effectsChannelsWriteOutBuffer;
   float effectsChannelsSettings[2 * MAX_EFFECTS_CHANNELS]{};
   sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
   sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
@@ -87,8 +86,6 @@ struct AudioPlayer {
   }
 
   ~AudioPlayer() {
-    delete[] effectsChannelsWriteOutBuffer;
-
     if (jackClientIsActive) {
       if (jackClient->deactivate() != OK) {
         Logging::write(
@@ -384,6 +381,9 @@ struct AudioPlayer {
     if (playState == STOP)
       audioCore->setFrameIdAllDecks(0);
 
+    if (!audioCore->currentDeck().hasValidCassetteLoaded())
+      return false;
+
     return  playState != STOP
             && playState != PAUSE;
             //   && audioCore.frameId > -1
@@ -476,6 +476,12 @@ struct AudioPlayer {
       mixer->getSetEqRingBufferFunc()(nullptr);
       mixer->getSetVuRingBufferFunc()(nullptr);
     }
+
+    Logging::write(
+      Info,
+      "Audio::AudioPlayer::run",
+      "Run complete."
+    );
 
     return OK;
   };
