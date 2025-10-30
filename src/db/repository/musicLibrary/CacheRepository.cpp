@@ -19,7 +19,7 @@ Result CacheRepository::clear() const {
       "Db::CacheRepository::clear",
       "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
     );
-    return 0;
+    return ERROR;
   }
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
@@ -29,7 +29,7 @@ Result CacheRepository::clear() const {
       "Failed to clear Cache : "
       "Message: " + std::string(sqlite3_errmsg(*db))
     );
-    return 0;
+    return ERROR;
   }
 
   Logging::write(
