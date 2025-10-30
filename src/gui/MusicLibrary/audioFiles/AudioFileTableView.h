@@ -107,18 +107,18 @@ public:
         caches.push_back(cache);
         i++;
       }
-      Logging::write(
-        Info,
-        "Gui::AudioFileTableView::mouseDoubleClickEvent",
-        "Saving Caches."
-      );
-      if (dao->cacheRepository.save(caches) == ERROR) {
+      if (dao->cacheRepository.save(caches) == ERROR)
         Logging::write(
           Error,
           "Gui::AudioFileTableView::mouseDoubleClickEvent",
           "Unable to save Caches."
         );
-      };
+      else
+        Logging::write(
+          Info,
+          "Gui::AudioFileTableView::mouseDoubleClickEvent",
+          "Saved Caches. Count: " + std::to_string(caches.size())
+        );
 
       const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
       const scoped_actor self{ actorSystem };

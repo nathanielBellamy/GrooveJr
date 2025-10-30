@@ -142,8 +142,8 @@ void MusicLibraryWindow::setupGrid() {
   grid.addWidget(&clearFiltersButton, 0, 7, 1, 1);
 
   grid.addWidget(&filesButton, 0, 8, 1, 1);
-  grid.addWidget(&cacheButton, 0, 9, 1, 1);
-  grid.addWidget(&queueButton, 0, 10, 1, 1);
+  grid.addWidget(&queueButton, 0, 9, 1, 1);
+  grid.addWidget(&cacheButton, 0, 10, 1, 1);
   grid.addWidget(&refreshButton, 0, 15, 1, 1);
 
   grid.addWidget(&genreHeader, 1, 0, 1, 1);
@@ -163,8 +163,8 @@ void MusicLibraryWindow::setupGrid() {
   grid.addWidget(albumTableView, 4, 4, 1, 4);
 
   // add overlapping mainSections to hide/show
-  grid.addWidget(queueTableView, 1, 8, -1, -1);
   grid.addWidget(audioFileTableView, 1, 8, -1, -1);
+  grid.addWidget(queueTableView, 1, 8, -1, -1);
   grid.addWidget(cacheTableView, 1, 8, -1, -1);
 
   setLayout(&grid);

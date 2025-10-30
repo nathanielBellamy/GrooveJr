@@ -40,7 +40,16 @@ Result CacheRepository::clear() const {
   return OK;
 }
 
-ID CacheRepository::save(const std::vector<Cache>& caches) const {
+Result CacheRepository::save(const std::vector<Cache>& caches) const {
+  if (clear() == ERROR) {
+    Logging::write(
+        Error,
+        "Db::CacheRepository::save",
+        "Failed to clear Cache"
+    );
+    return ERROR;
+  }
+
   std::string query = "insert into cache (audioFileId) values ";
 
   for (int i = 0; i < caches.size(); i++) {
@@ -56,7 +65,7 @@ ID CacheRepository::save(const std::vector<Cache>& caches) const {
       "Db::CacheRepository::save",
       "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
     );
-    return 0;
+    return ERROR;
   }
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
@@ -66,7 +75,7 @@ ID CacheRepository::save(const std::vector<Cache>& caches) const {
       "Failed to save Cache : "
         " Message: " + std::string(sqlite3_errmsg(*db))
     );
-    return 0;
+    return ERROR;
   }
 
   Logging::write(
@@ -74,7 +83,7 @@ ID CacheRepository::save(const std::vector<Cache>& caches) const {
     "Db::CacheRepository::save",
     "Saved Cache."
   );
-  return static_cast<ID>(sqlite3_last_insert_rowid(*db));
+  return OK;
 }
 
 } // Db

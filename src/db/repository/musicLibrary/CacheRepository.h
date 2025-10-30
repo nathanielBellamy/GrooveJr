@@ -22,7 +22,7 @@ class CacheRepository final : public MusicLibraryRepository {
       : MusicLibraryRepository(db, gAppState)
       {};
 
-    ID save(const std::vector<Cache>& caches) const;
+    Result save(const std::vector<Cache>& caches) const;
     Result clear() const;
 };
 

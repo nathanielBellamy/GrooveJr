@@ -63,7 +63,7 @@ void Cassette::cleanup() {
     "Freeing resources for file " + std::string(filePath)
   );
 
-  if (!deleteBuffers()) {
+  if (deleteBuffers() == ERROR) {
     Logging::write(
       Error,
       "Audio::Cassette::cleanup",

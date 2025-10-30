@@ -120,7 +120,7 @@ class MusicLibraryWindow final : public QWidget {
           filesButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
           audioFileTableView->hide();
           queueButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
-          queueTableView->show();
+          queueTableView->hide();
           break;
         case QUEUE_VIEW:
           cacheButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
