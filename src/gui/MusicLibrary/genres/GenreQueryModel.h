@@ -13,19 +13,16 @@
 #include "../../../Logging.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
-
+#include "../Constants.h"
 
 namespace Gj {
 namespace Gui {
 
-constexpr size_t GENRE_COL_NAME = 0;
-constexpr size_t GENRE_COL_ID = 1;
-
 class GenreQueryModel final : public MusicLibraryQueryModel {
 
 public:
-  explicit GenreQueryModel(QObject* parent, MusicLibraryFilters* filters)
-    : MusicLibraryQueryModel(parent, filters, GENRE)
+  explicit GenreQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters)
+    : MusicLibraryQueryModel(parent, gAppState, filters, GENRE)
     {
     refresh();
   }

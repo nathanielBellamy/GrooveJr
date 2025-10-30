@@ -19,7 +19,6 @@
 #include "../../../AppState.h"
 #include "../../../db/entity/musicLibrary/Cache.h"
 
-
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
 #include "../MusicLibraryType.h"
@@ -32,12 +31,9 @@ using namespace caf;
 
 class AudioFileTableView final : public MusicLibraryTableView {
 
-  AppState* gAppState;
-
 public:
   AudioFileTableView(QWidget* parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao, MusicLibraryFilters* filters)
-      : MusicLibraryTableView(parent, actorSystem, dao, filters, new AudioFileQueryModel(parent, filters))
-      , gAppState(gAppState)
+      : MusicLibraryTableView(parent, actorSystem, dao, gAppState, filters, new AudioFileQueryModel(parent, gAppState, filters))
       {};
 
   Result refresh() const {

@@ -17,7 +17,9 @@ Result CacheQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
 }
 
 QVariant CacheQueryModel::data(const QModelIndex& index, int role) const {
-  // TODO: format
+  if (role == Qt::BackgroundRole && isCurrentlyPlaying(index, AUDIO_FILE_COL_ID))
+    return QVariant::fromValue(QColor(CURRENTLY_PLAYING_COLOR));
+
   return QSqlQueryModel::data(index, role);
 }
 

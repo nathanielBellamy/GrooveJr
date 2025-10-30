@@ -13,19 +13,16 @@
 #include "../../../enums/Result.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
+#include "../Constants.h"
 
 namespace Gj {
 namespace Gui {
 
-constexpr size_t ALBUM_COL_TITLE = 0;
-constexpr size_t ALBUM_COL_YEAR = 1;
-constexpr size_t ALBUM_COL_ID = 2;
-
 class AlbumQueryModel final : public MusicLibraryQueryModel {
 
 public:
-  explicit AlbumQueryModel(QObject* parent, MusicLibraryFilters* filters)
-    : MusicLibraryQueryModel(parent, filters, ALBUM)
+  explicit AlbumQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters)
+    : MusicLibraryQueryModel(parent, gAppState, filters, ALBUM)
     {
     refresh();
   }

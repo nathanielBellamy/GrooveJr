@@ -34,6 +34,7 @@ class MusicLibraryTableView : public QTableView {
   protected:
     actor_system& actorSystem;
     Db::Dao* dao;
+    AppState* gAppState;
     QMenu* menu;
     MusicLibraryFilters* filters;
     MusicLibraryQueryModel* model;
@@ -43,11 +44,13 @@ class MusicLibraryTableView : public QTableView {
       QWidget* parent,
       actor_system& actorSystem,
       Db::Dao* dao,
+      AppState* gAppState,
       MusicLibraryFilters* filters,
       MusicLibraryQueryModel* model)
         : QTableView(parent)
         , actorSystem(actorSystem)
         , dao(dao)
+        , gAppState(gAppState)
         , menu(nullptr)
         , filters(filters)
         , model(model)

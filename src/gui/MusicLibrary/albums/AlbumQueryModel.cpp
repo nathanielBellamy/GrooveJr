@@ -53,7 +53,7 @@ Result AlbumQueryModel::refresh() {
 }
 
 QVariant AlbumQueryModel::data(const QModelIndex& item, int role) const {
-  if (role == Qt::BackgroundRole && isSelected(item, ALBUM_COL_ID))
+  if (role == Qt::BackgroundRole && isCurrentFilter(item, ALBUM_COL_ID))
     return QVariant::fromValue(QColor(Qt::blue));
   return QSqlQueryModel::data(item, role);
 }

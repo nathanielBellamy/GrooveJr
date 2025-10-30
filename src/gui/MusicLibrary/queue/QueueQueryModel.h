@@ -10,11 +10,11 @@
 
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
-#include "../audioFiles/AudioFileQueryModel.h"
 
 #include "../../../AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
+#include "../Constants.h"
 
 namespace Gj {
 namespace Gui {
@@ -23,8 +23,8 @@ class QueueQueryModel final : public MusicLibraryQueryModel {
   bool isSelected(const QModelIndex& item) const;
 
 public:
-  explicit QueueQueryModel(QObject* parent, MusicLibraryFilters* filters)
-    : MusicLibraryQueryModel(parent, filters, AUDIO_FILE)
+  explicit QueueQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters)
+    : MusicLibraryQueryModel(parent, gAppState, filters, AUDIO_FILE)
     {
     refresh();
   }

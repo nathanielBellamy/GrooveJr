@@ -13,24 +13,16 @@
 #include "../../../AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
+#include "../Constants.h"
 
 namespace Gj {
 namespace Gui {
 
-constexpr size_t AUDIO_FILE_COL_TRACK = 0;
-constexpr size_t AUDIO_FILE_COL_ARTIST = 1;
-constexpr size_t AUDIO_FILE_COL_ALBUM = 2;
-constexpr size_t AUDIO_FILE_COL_TRACK_NUMBER = 3;
-constexpr size_t AUDIO_FILE_COL_YEAR = 4;
-constexpr size_t AUDIO_FILE_COL_GENRE = 5;
-constexpr size_t AUDIO_FILE_COL_PATH = 6;
-constexpr size_t AUDIO_FILE_COL_ID = 7;
-
 class AudioFileQueryModel final : public MusicLibraryQueryModel {
 
 public:
-  explicit AudioFileQueryModel(QObject* parent, MusicLibraryFilters* filters)
-    : MusicLibraryQueryModel(parent, filters, AUDIO_FILE)
+  explicit AudioFileQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters)
+    : MusicLibraryQueryModel(parent, gAppState, filters, AUDIO_FILE)
     {
     refresh();
   }

@@ -5,6 +5,7 @@
 #ifndef QUEUETABLEVIEW_H
 #define QUEUETABLEVIEW_H
 
+#include "../../../AppState.h"
 #include "../MusicLibraryType.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
@@ -16,8 +17,8 @@ namespace Gui {
 class QueueTableView final : public MusicLibraryTableView {
 
   public:
-    QueueTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, actorSystem, dao, filters, new QueueQueryModel(parent, filters))
+    QueueTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, AppState* gAppState, MusicLibraryFilters* filters)
+        : MusicLibraryTableView(parent, actorSystem, dao, gAppState, filters, new QueueQueryModel(parent, gAppState, filters))
         {};
 };
 

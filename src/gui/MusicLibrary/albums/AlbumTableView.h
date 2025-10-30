@@ -7,6 +7,7 @@
 
 #include "caf/actor_system.hpp"
 
+#include "../../../AppState.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
 #include "../MusicLibraryType.h"
@@ -20,8 +21,8 @@ using namespace caf;
 class AlbumTableView final : public MusicLibraryTableView {
 
   public:
-    AlbumTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, actorSystem, dao, filters, new AlbumQueryModel(parent, filters))
+    AlbumTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, AppState* gAppState, MusicLibraryFilters* filters)
+        : MusicLibraryTableView(parent, actorSystem, dao, gAppState, filters, new AlbumQueryModel(parent, gAppState, filters))
         {};
 };
 

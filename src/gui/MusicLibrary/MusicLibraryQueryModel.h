@@ -13,16 +13,17 @@
 #include <QString>
 
 #include "../../AppState.h"
-#include "../../Logging.h"
 #include "../../enums/Result.h"
 
 #include "MusicLibraryFilters.h"
+#include "Constants.h"
 
 namespace Gj {
 namespace Gui {
 
 class MusicLibraryQueryModel : public QSqlQueryModel {
   protected:
+    AppState* gAppState;
     MusicLibraryType type;
     MusicLibraryFilters* filters;
     QString queryString;
@@ -32,7 +33,7 @@ class MusicLibraryQueryModel : public QSqlQueryModel {
       return OK;
     };
 
-    bool isSelected(const QModelIndex& item, const size_t idCol) const {
+    bool isCurrentFilter(const QModelIndex& item, const size_t idCol) const {
       std::vector<Db::ID> ids = filters->filters.at(type).ids;
       return std::find(
           ids.begin(),
@@ -41,9 +42,35 @@ class MusicLibraryQueryModel : public QSqlQueryModel {
           ) != ids.end();
     };
 
+    bool isCurrentlyPlaying(const QModelIndex& item, const size_t idCol) const {
+      const auto currentlyPlaying = gAppState->getCurrentlyPlaying();
+      Db::ID id;
+      switch (type) {
+        case ALBUM:
+          id = index(item.row(), ALBUM_COL_ID).data().toULongLong();
+          return gAppState->getCurrentlyPlaying().album.id == id;
+        case ARTIST:
+          id = index(item.row(), ARTIST_COL_ID).data().toULongLong();
+          return gAppState->getCurrentlyPlaying().album.id == id;
+        case AUDIO_FILE:
+        case CACHE:
+          id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
+          return gAppState->getCurrentlyPlaying().audioFile.id == id && !gAppState->queuePlay;
+        case QUEUE:
+          id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
+          return gAppState->getCurrentlyPlaying().audioFile.id == id && gAppState->queuePlay;
+        case GENRE:
+          id = index(item.row(), GENRE_COL_ID).data().toULongLong();
+          return gAppState->getCurrentlyPlaying().genre.id == id;
+        default:
+          return false;
+      }
+    }
+
   public:
-    MusicLibraryQueryModel(QObject* parent, MusicLibraryFilters* filters, const MusicLibraryType type)
+    MusicLibraryQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, const MusicLibraryType type)
       : QSqlQueryModel(parent)
+      , gAppState(gAppState)
       , type(type)
       , filters(filters)
       {}
