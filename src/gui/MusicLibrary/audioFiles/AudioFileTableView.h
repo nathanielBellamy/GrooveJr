@@ -95,11 +95,20 @@ public:
 
   void mouseDoubleClickEvent(QMouseEvent *event) override {
     if (const QModelIndex index = indexAt(event->pos()); index.isValid()) {
-      const QVariant id = getModel()->index(index.row(), AUDIO_FILE_COL_ID).data();
+      const MusicLibraryQueryModel* model = getModel();
+      const QVariant id = model->index(index.row(), AUDIO_FILE_COL_ID).data();
+
+      int i = 0;
+      while (model->index(i, AUDIO_FILE_COL_ID).isValid()) {
+        const auto audioFileId = model->index(i, AUDIO_FILE_COL_ID).data().toULongLong();
+        // TODO:
+        // - save cache
+        i++;
+      }
 
       const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-
       const scoped_actor self{ actorSystem };
+
       self->anon_send(
           actor_cast<actor>(appStateManagerPtr),
           id.toULongLong(),

@@ -35,12 +35,12 @@ add_library(GjDb SHARED
         entity/musicLibrary/Artist.cpp
         entity/musicLibrary/AudioFile.h
         entity/musicLibrary/AudioFile.cpp
+        entity/musicLibrary/Cache.h
         entity/musicLibrary/Genre.h
         entity/musicLibrary/Genre.cpp
         entity/musicLibrary/Playlist.h
         entity/musicLibrary/Playlist.cpp
         entity/musicLibrary/Queue.h
-        entity/musicLibrary/Queue.cpp
         entity/musicLibrary/Track.h
         entity/musicLibrary/Track.cpp
         repository/AppStateRepository.h
@@ -57,6 +57,8 @@ add_library(GjDb SHARED
         repository/musicLibrary/ArtistRepository.cpp
         repository/musicLibrary/AudioFileRepository.h
         repository/musicLibrary/AudioFileRepository.cpp
+        repository/musicLibrary/CacheRepository.h
+        repository/musicLibrary/CacheRepository.cpp
         repository/musicLibrary/GenreRepository.h
         repository/musicLibrary/GenreRepository.cpp
         repository/musicLibrary/PlaylistRepository.h

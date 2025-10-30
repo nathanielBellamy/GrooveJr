@@ -198,7 +198,15 @@ int Dao::initSchema() const {
       id integer primary key autoincrement,
       audioFileId integer not null,
       trackNumber integer not null unique,
-      createdAt datetime default current_timestamp
+      createdAt datetime default current_timestamp,
+      foreign key (audioFileId) references audioFiles(id) on delete cascade
+    );
+
+    create table if not exists cache (
+      id integer primary key autoincrement,
+      audioFileId integer not null,
+      createdAt datetime default current_timestamp,
+      foreign key (audioFileId) references audioFiles(id) on delete cascade
     );
 
     create table if not exists track_to_artists (
