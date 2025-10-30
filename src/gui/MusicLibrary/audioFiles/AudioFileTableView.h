@@ -17,6 +17,7 @@
 #include "../../../actors/ActorIds.h"
 #include "../../../enums/Result.h"
 #include "../../../AppState.h"
+#include "../../../db/entity/musicLibrary/Cache.h"
 
 
 #include "../MusicLibraryFilters.h"
@@ -98,13 +99,26 @@ public:
       const MusicLibraryQueryModel* model = getModel();
       const QVariant id = model->index(index.row(), AUDIO_FILE_COL_ID).data();
 
+      std::vector<Db::Cache> caches;
       int i = 0;
       while (model->index(i, AUDIO_FILE_COL_ID).isValid()) {
         const auto audioFileId = model->index(i, AUDIO_FILE_COL_ID).data().toULongLong();
-        // TODO:
-        // - save cache
+        const Db::Cache cache(audioFileId);
+        caches.push_back(cache);
         i++;
       }
+      Logging::write(
+        Info,
+        "Gui::AudioFileTableView::mouseDoubleClickEvent",
+        "Saving Caches."
+      );
+      if (dao->cacheRepository.save(caches) == ERROR) {
+        Logging::write(
+          Error,
+          "Gui::AudioFileTableView::mouseDoubleClickEvent",
+          "Unable to save Caches."
+        );
+      };
 
       const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
       const scoped_actor self{ actorSystem };

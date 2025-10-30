@@ -20,7 +20,6 @@
 #include "../AppState.h"
 
 #include "../db/Dao.h"
-#include "../db/Cache.h"
 
 #include "../scanner/Scanner.h"
 
@@ -31,8 +30,7 @@ namespace Act {
 
 struct MusicLibraryManagerTrait {
     using signatures = type_list<
-                                  result<void>(std::string /*dirPath*/, ml_scan_dir_a),
-                                  result<void>(ml_load_tracks_all_a)
+                                  result<void>(std::string /*dirPath*/, ml_scan_dir_a)
                                 >;
 };
 
@@ -42,7 +40,6 @@ struct MusicLibraryManagerState {
    MusicLibraryManager::pointer self;
    Audio::Mixer* mixer;
    Db::Dao* dao;
-   Db::Cache cache;
    AppState* gAppState;
 
    MusicLibraryManagerState(
@@ -54,7 +51,6 @@ struct MusicLibraryManagerState {
      : self(self)
      , mixer(mixer)
      , dao(mixer->dao)
-     , cache(dao)
      , gAppState(gAppState)
      {
          self->link_to(supervisor);
@@ -78,23 +74,6 @@ struct MusicLibraryManagerState {
              Error,
              "Act::MusicLibraryManager::ml_scan_dir_a",
              "An error occurred while scanning dirPath " + dirPath
-           );
-         }
-       },
-       [this](ml_load_tracks_all_a) {
-         Logging::write(
-           Info,
-           "Act::MusicLibraryManager::ml_load_tracks_all_a",
-           "Loading All Tracks Into Cache"
-         );
-
-         try {
-           cache.loadTracksAll();
-         } catch (...) {
-           Logging::write(
-             Error,
-             "Act::MusicLibraryManager::ml_load_tracks_all_a",
-             "An error occurred while loading all Tracks."
            );
          }
        }

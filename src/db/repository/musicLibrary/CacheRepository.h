@@ -5,6 +5,8 @@
 #ifndef CACHEREPOSITORY_H
 #define CACHEREPOSITORY_H
 
+#include <vector>
+
 #include "MusicLibraryRepository.h"
 
 #include "../../../enums/Result.h"
@@ -20,7 +22,7 @@ class CacheRepository final : public MusicLibraryRepository {
       : MusicLibraryRepository(db, gAppState)
       {};
 
-    ID save(const Cache& cache) const;
+    ID save(const std::vector<Cache>& caches) const;
     Result clear() const;
 };
 

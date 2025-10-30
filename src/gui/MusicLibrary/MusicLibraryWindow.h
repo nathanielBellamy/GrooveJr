@@ -26,6 +26,7 @@
 #include "albums/AlbumTableView.h"
 #include "artists/ArtistTableView.h"
 #include "audioFiles/AudioFileTableView.h"
+#include "cache/CacheTableView.h"
 #include "genres/GenreTableView.h"
 #include "playlists/PlaylistTableView.h"
 #include "queue/QueueTableView.h"
@@ -37,6 +38,7 @@ namespace Gui {
 
 enum MusicLibraryWindowMainSection {
   AUDIO_FILES_VIEW,
+  CACHE_VIEW,
   QUEUE_VIEW
 };
 
@@ -46,6 +48,7 @@ class MusicLibraryWindow final : public QWidget {
   Db::Dao* dao;
   QGridLayout grid;
   MusicLibraryWindowMainSection mainSection = AUDIO_FILES_VIEW;
+  QPushButton cacheButton;
   QPushButton filesButton;
   QPushButton queueButton;
   QPushButton refreshButton;
@@ -65,6 +68,7 @@ class MusicLibraryWindow final : public QWidget {
   PlaylistTableView* playlistTableView;
   QPushButton playlistClearFilterButton;
   QueueTableView* queueTableView;
+  CacheTableView* cacheTableView;
   Result connectToDb();
   void setStyle();
   void setupGrid();
@@ -86,6 +90,7 @@ class MusicLibraryWindow final : public QWidget {
     Result hydrateState(const AppStatePacket& appStatePacket) {
       albumTableView->hydrateState(appStatePacket);
       artistTableView->hydrateState(appStatePacket);
+      cacheTableView->hydrateState(appStatePacket);
       genreTableView->hydrateState(appStatePacket);
       playlistTableView->hydrateState(appStatePacket);
       audioFileTableView->hydrateState(appStatePacket);
@@ -97,6 +102,7 @@ class MusicLibraryWindow final : public QWidget {
     Result refresh() {
       albumTableView->refresh();
       artistTableView->refresh();
+      cacheTableView->refresh();
       genreTableView->refresh();
       playlistTableView->refresh();
       audioFileTableView->refresh();
@@ -108,13 +114,25 @@ class MusicLibraryWindow final : public QWidget {
     Result showAsMainSection(MusicLibraryWindowMainSection newMainSection) {
       mainSection = newMainSection;
       switch (newMainSection) {
+        case CACHE_VIEW:
+          cacheButton.setStyleSheet(STYLE_STR_BTN_SELECTED);
+          cacheTableView->show();
+          filesButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
+          audioFileTableView->hide();
+          queueButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
+          queueTableView->show();
+          break;
         case QUEUE_VIEW:
+          cacheButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
+          cacheTableView->hide();
           filesButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
           audioFileTableView->hide();
           queueButton.setStyleSheet(STYLE_STR_BTN_SELECTED);
           queueTableView->show();
           break;
         default: // case FILES:
+          cacheButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
+          cacheTableView->hide();
           filesButton.setStyleSheet(STYLE_STR_BTN_SELECTED);
           audioFileTableView->show();
           queueButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);

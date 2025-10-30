@@ -40,11 +40,14 @@ Result CacheRepository::clear() const {
   return OK;
 }
 
-ID CacheRepository::save(const Cache& cache) const {
-  const std::string query = R"sql(
-    insert into cache (audioFileId)
-    values (?)
-  )sql";
+ID CacheRepository::save(const std::vector<Cache>& caches) const {
+  std::string query = "insert into cache (audioFileId) values ";
+
+  for (int i = 0; i < caches.size(); i++) {
+    query += "(" + std::to_string(caches.at(i).audioFileId) + ")";
+    if (i < caches.size() - 1)
+      query += ", ";
+  }
 
   sqlite3_stmt* stmt;
   if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
@@ -56,13 +59,11 @@ ID CacheRepository::save(const Cache& cache) const {
     return 0;
   }
 
-  sqlite3_bind_int(stmt, 1, cache.audioFileId);
-
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     Logging::write(
       Error,
       "Db::CacheRepository::save",
-      "Failed to save Cache audioFileId: " + std::to_string(cache.audioFileId) +
+      "Failed to save Cache : "
         " Message: " + std::string(sqlite3_errmsg(*db))
     );
     return 0;
@@ -71,7 +72,7 @@ ID CacheRepository::save(const Cache& cache) const {
   Logging::write(
     Info,
     "Db::CacheRepository::save",
-    "Saved Cache. audioFileId: " + std::to_string(cache.audioFileId)
+    "Saved Cache."
   );
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }

@@ -13,6 +13,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , gAppState(gAppState)
   , dao(dao)
   , grid(this)
+  , cacheButton(this)
   , filesButton(this)
   , queueButton(this)
   , filtersHeader(this)
@@ -30,6 +31,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
     albumTableView = new AlbumTableView(this, actorSystem, dao, &filters);
     artistTableView = new ArtistTableView(this, actorSystem, dao, &filters);
     audioFileTableView = new AudioFileTableView(this, actorSystem, gAppState, dao, &filters);
+    cacheTableView = new CacheTableView(this, actorSystem, dao, &filters);
     genreTableView = new GenreTableView(this, actorSystem, dao, &filters);
     playlistTableView = new PlaylistTableView(this, actorSystem, dao, &filters);
     queueTableView = new QueueTableView(this, actorSystem, dao, &filters);
@@ -42,6 +44,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
     );
   }
 
+  cacheButton.setCursor(Qt::PointingHandCursor);
   filesButton.setCursor(Qt::PointingHandCursor);
   queueButton.setCursor(Qt::PointingHandCursor);
   refreshButton.setCursor(Qt::PointingHandCursor);
@@ -50,6 +53,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   genreClearFilterButton.setCursor(Qt::PointingHandCursor);
   playlistClearFilterButton.setCursor(Qt::PointingHandCursor);
 
+  cacheButton.setText("Cache");
   filesButton.setText("Files");
   queueButton.setText("Queue");
   refreshButton.setText("Refresh");
@@ -90,6 +94,7 @@ MusicLibraryWindow::~MusicLibraryWindow() {
   delete albumTableView;
   delete artistTableView;
   delete audioFileTableView;
+  delete cacheTableView;
   delete genreTableView;
   delete playlistTableView;
   delete queueTableView;
@@ -137,7 +142,8 @@ void MusicLibraryWindow::setupGrid() {
   grid.addWidget(&clearFiltersButton, 0, 7, 1, 1);
 
   grid.addWidget(&filesButton, 0, 8, 1, 1);
-  grid.addWidget(&queueButton, 0, 9, 1, 1);
+  grid.addWidget(&cacheButton, 0, 9, 1, 1);
+  grid.addWidget(&queueButton, 0, 10, 1, 1);
   grid.addWidget(&refreshButton, 0, 15, 1, 1);
 
   grid.addWidget(&genreHeader, 1, 0, 1, 1);
@@ -159,6 +165,7 @@ void MusicLibraryWindow::setupGrid() {
   // add overlapping mainSections to hide/show
   grid.addWidget(queueTableView, 1, 8, -1, -1);
   grid.addWidget(audioFileTableView, 1, 8, -1, -1);
+  grid.addWidget(cacheTableView, 1, 8, -1, -1);
 
   setLayout(&grid);
 }
@@ -171,6 +178,11 @@ Result MusicLibraryWindow::connectActions() {
 
   const auto queueButtonClickedConnection = connect(&queueButton, &QPushButton::clicked, this, [&] () {
     showAsMainSection(QUEUE_VIEW);
+    refresh();
+  });
+
+  const auto cacheButtonClickedConnection = connect(&cacheButton, &QPushButton::clicked, this, [&] () {
+    showAsMainSection(CACHE_VIEW);
     refresh();
   });
 

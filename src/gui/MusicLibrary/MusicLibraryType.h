@@ -12,6 +12,7 @@ enum MusicLibraryType {
   ALBUM,
   ARTIST,
   AUDIO_FILE,
+  CACHE,
   GENRE,
   NONE,
   PLAYLIST,

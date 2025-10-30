@@ -19,6 +19,7 @@
 #include "repository/musicLibrary/AlbumRepository.h"
 #include "repository/musicLibrary/ArtistRepository.h"
 #include "repository/musicLibrary/AudioFileRepository.h"
+#include "repository/musicLibrary/CacheRepository.h"
 #include "repository/musicLibrary/GenreRepository.h"
 #include "repository/musicLibrary/PlaylistRepository.h"
 #include "repository/musicLibrary/QueueRepository.h"
@@ -40,6 +41,7 @@ class Dao {
     AlbumRepository albumRepository;
     ArtistRepository artistRepository;
     AudioFileRepository audioFileRepository;
+    CacheRepository cacheRepository;
     GenreRepository genreRepository;
     PlaylistRepository playlistRepository;
     QueueRepository queueRepository;
