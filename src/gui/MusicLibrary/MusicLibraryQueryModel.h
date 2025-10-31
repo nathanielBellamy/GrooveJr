@@ -53,6 +53,8 @@ class MusicLibraryQueryModel : public QSqlQueryModel {
           id = index(item.row(), ARTIST_COL_ID).data().toULongLong();
           return gAppState->getCurrentlyPlaying().album.id == id;
         case AUDIO_FILE:
+          id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
+          return gAppState->getCurrentlyPlaying().audioFile.id == id;
         case CACHE:
           id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
           return gAppState->getCurrentlyPlaying().audioFile.id == id && !gAppState->queuePlay;

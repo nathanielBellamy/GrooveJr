@@ -90,10 +90,10 @@ class MusicLibraryWindow final : public QWidget {
     Result hydrateState(const AppStatePacket& appStatePacket) {
       albumTableView->hydrateState(appStatePacket);
       artistTableView->hydrateState(appStatePacket);
+      audioFileTableView->hydrateState(appStatePacket);
       cacheTableView->hydrateState(appStatePacket);
       genreTableView->hydrateState(appStatePacket);
       playlistTableView->hydrateState(appStatePacket);
-      audioFileTableView->hydrateState(appStatePacket);
       queueTableView->hydrateState(appStatePacket);
 
       return OK;
@@ -102,10 +102,10 @@ class MusicLibraryWindow final : public QWidget {
     Result refresh() {
       albumTableView->refresh();
       artistTableView->refresh();
+      audioFileTableView->refresh();
       cacheTableView->refresh();
       genreTableView->refresh();
       playlistTableView->refresh();
-      audioFileTableView->refresh();
       queueTableView->refresh();
 
       return OK;
