@@ -11,6 +11,8 @@
 #include "caf/caf_main.hpp"
 #include "caf/event_based_actor.hpp"
 
+#include "QApplication"
+
 #include "../Logging.h"
 #include "./ActorIds.h"
 #include "../messaging/atoms.h"
@@ -35,6 +37,7 @@ struct SupervisorTrait {
 
 using Supervisor = typed_actor<SupervisorTrait>;
 
+  // TODO: actor formatting
 struct SupervisorState {
      strong_actor_ptr playbackActorPtr;
      strong_actor_ptr effectsManagerPtr;
@@ -43,17 +46,15 @@ struct SupervisorState {
      strong_actor_ptr displayPtr;
 
      Supervisor::pointer self;
-     Gui::MainWindow* mainWindowPtr;
      bool running;
 
      SupervisorState(
        Supervisor::pointer self,
        AppState* gAppState,
-       Gui::MainWindow* mainWindowPtr,
        Audio::Mixer* mixer,
-       Audio::AudioCore* audioCore)
+       Audio::AudioCore* audioCore,
+       void (*shutdown_handler)(int))
        : self(self)
-       , mainWindowPtr(mainWindowPtr)
        , running(false)
          {
            self->system().registry().put(SUPERVISOR, actor_cast<strong_actor_ptr>(self));
@@ -80,10 +81,16 @@ struct SupervisorState {
            );
            appStateManagerPtr = actor_cast<strong_actor_ptr>(appStateManager);
 
+          constexpr int arg = 0;
+          int argc = arg;
+          char *argv[0] = {};
+          auto qtApp = new QApplication {argc, argv};
            auto display = self->system().spawn(
                actor_from_state<DisplayState>,
                actor_cast<strong_actor_ptr>(self),
-               mainWindowPtr
+               mixer,
+               gAppState,
+               shutdown_handler
            );
            displayPtr = actor_cast<strong_actor_ptr>(display);
 
@@ -96,6 +103,7 @@ struct SupervisorState {
            musicLibraryManagerPtr = actor_cast<strong_actor_ptr>(musicLibraryManager);
 
            running = true;
+           qtApp->exec();
          }
 
      Supervisor::behavior_type make_behavior() {

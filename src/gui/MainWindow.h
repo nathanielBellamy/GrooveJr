@@ -13,6 +13,7 @@
 #include "../actors/ActorIds.h"
 #include "../messaging/atoms.h"
 #include "../messaging/EnvelopeQtPtr.h"
+#include "../enums/Result.h"
 
 #include "../Logging.h"
 
@@ -43,7 +44,7 @@ class MainWindow final : public QMainWindow {
       AppState* gAppState,
       void (*shutdown_handler) (int)
     );
-    int hydrateState(const AppStatePacket& appStatePacket);
+    Result hydrateState(const AppStatePacket& appStatePacket);
     void closeEvent(QCloseEvent* event) override;
     void setChannels();
     void setEffects();

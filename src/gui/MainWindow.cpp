@@ -37,7 +37,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState*
   setWindowTitle("GrooveJr");
 }
 
-int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
+Result MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
     Logging::write(
       Info,
       "Gui::MainWindow::hydrateState",
@@ -54,7 +54,7 @@ int MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
       "Done hydrating state."
     );
 
-    return 0;
+    return OK;
 }
 
 void MainWindow::setupGrid() {

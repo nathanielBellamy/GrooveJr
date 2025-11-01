@@ -67,45 +67,9 @@ void shutdown_handler(const int sig) {
   exit(sig);
 }
 
-void caf_main(
-  int argc,
-  char *argv[],
-  void (*shutdown_handler) (int),
-  actor_system& sys,
-  AppState* gAppState,
-  Audio::Mixer* mixer,
-  Audio::AudioCore* audioCore) {
-  Logging::write(Info, "caf_main", "Starting caf_main");
-
-  // init Qt App
-  auto qtApp = QApplication {argc, argv};
-  auto mainWindow = Gui::MainWindow { sys, mixer, gAppState, shutdown_handler };
-
-  Logging::write(Info, "caf_main", "Qt instantiated");
-
-  // init ActorSystem
-  auto supervisor = sys.spawn(
-    actor_from_state<Act::SupervisorState>,
-    gAppState,
-    &mainWindow,
-    mixer,
-    audioCore
-  );
-
-  Logging::write(Info, "caf_main", "Supervisor actor spawned");
-
-  mainWindow.show();
-  mainWindow.setChannels();
-  mainWindow.setEffects();
-  qtApp.exec();
-}
-
 void initVst3PluginContext() {
     PluginContext = new Audio::Effects::Vst3::Host::App();
     PluginContextFactory::instance().setPluginContext (PluginContext);
-}
-
-void initSql() {
 }
 
 extern "C" {
@@ -177,8 +141,15 @@ extern "C" {
         actor_system_config cfg;
         // Create the actor system.
         actor_system sys{cfg};
-        // Run user-defined code.
-        caf_main(argc, argv, &shutdown_handler, sys, gAppState, Mixer, audioCore);
+
+        // spawn supervisor
+        auto supervisor = sys.spawn(
+        actor_from_state<Act::SupervisorState>,
+          gAppState,
+          Mixer,
+          audioCore,
+          shutdown_handler
+        );
 
         return 0;
     }
