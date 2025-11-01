@@ -39,89 +39,83 @@ using Supervisor = typed_actor<SupervisorTrait>;
 
   // TODO: actor formatting
 struct SupervisorState {
-     strong_actor_ptr playbackActorPtr;
-     strong_actor_ptr effectsManagerPtr;
-     strong_actor_ptr appStateManagerPtr;
-     strong_actor_ptr musicLibraryManagerPtr;
-     strong_actor_ptr displayPtr;
+  strong_actor_ptr playbackActorPtr;
+  strong_actor_ptr effectsManagerPtr;
+  strong_actor_ptr appStateManagerPtr;
+  strong_actor_ptr musicLibraryManagerPtr;
+  strong_actor_ptr displayPtr;
+  Supervisor::pointer self;
 
-     Supervisor::pointer self;
-     bool running;
+  SupervisorState(
+    Supervisor::pointer self,
+    AppState* gAppState,
+    Audio::Mixer* mixer,
+    Audio::AudioCore* audioCore,
+    void (*shutdown_handler)(int)
+    )
+    : self(self)
+    {
 
-     SupervisorState(
-       Supervisor::pointer self,
-       AppState* gAppState,
-       Audio::Mixer* mixer,
-       Audio::AudioCore* audioCore,
-       void (*shutdown_handler)(int))
-       : self(self)
-       , running(false)
-         {
-           self->system().registry().put(SUPERVISOR, actor_cast<strong_actor_ptr>(self));
+    self->system().registry().put(SUPERVISOR, actor_cast<strong_actor_ptr>(self));
+    auto playback = self->system().spawn(
+      actor_from_state<PlaybackState>,
+      actor_cast<strong_actor_ptr>(self),
+      gAppState,
+      mixer,
+      audioCore
+    );
+    playbackActorPtr = actor_cast<strong_actor_ptr>(playback);
 
-           auto playback = self->system().spawn(
-             actor_from_state<PlaybackState>,
-             actor_cast<strong_actor_ptr>(self),
-             gAppState,
-             mixer,
-             audioCore
-           );
-           playbackActorPtr = actor_cast<strong_actor_ptr>(playback);
+    auto effectsManager = self->system().spawn(actor_from_state<EffectsManagerState>, actor_cast<strong_actor_ptr>(self), mixer);
+    effectsManagerPtr = actor_cast<strong_actor_ptr>(effectsManager);
 
-           auto effectsManager = self->system().spawn(actor_from_state<EffectsManagerState>, actor_cast<strong_actor_ptr>(self), mixer);
-           effectsManagerPtr = actor_cast<strong_actor_ptr>(effectsManager);
+    auto appStateManager = self->system().spawn(
+      actor_from_state<AppStateManagerState>,
+      actor_cast<strong_actor_ptr>(self),
+      gAppState,
+      mixer,
+      mixer->dao,
+      audioCore
+    );
+    appStateManagerPtr = actor_cast<strong_actor_ptr>(appStateManager);
 
-           auto appStateManager = self->system().spawn(
-               actor_from_state<AppStateManagerState>,
-               actor_cast<strong_actor_ptr>(self),
-               gAppState,
-               mixer,
-               mixer->dao,
-               audioCore
-           );
-           appStateManagerPtr = actor_cast<strong_actor_ptr>(appStateManager);
+    constexpr int arg = 0;
+    int argc = arg;
+    char *argv[0] = {};
+    auto qtApp = new QApplication {argc, argv};
+    auto display = self->system().spawn(
+      actor_from_state<DisplayState>,
+      actor_cast<strong_actor_ptr>(self),
+      mixer,
+      gAppState,
+      shutdown_handler
+    );
+    displayPtr = actor_cast<strong_actor_ptr>(display);
 
-          constexpr int arg = 0;
-          int argc = arg;
-          char *argv[0] = {};
-          auto qtApp = new QApplication {argc, argv};
-           auto display = self->system().spawn(
-               actor_from_state<DisplayState>,
-               actor_cast<strong_actor_ptr>(self),
-               mixer,
-               gAppState,
-               shutdown_handler
-           );
-           displayPtr = actor_cast<strong_actor_ptr>(display);
+    auto musicLibraryManager = self->system().spawn(
+      actor_from_state<MusicLibraryManagerState>,
+      actor_cast<strong_actor_ptr>(self),
+      mixer,
+      gAppState
+    );
+    musicLibraryManagerPtr = actor_cast<strong_actor_ptr>(musicLibraryManager);
 
-           auto musicLibraryManager = self->system().spawn(
-             actor_from_state<MusicLibraryManagerState>,
-             actor_cast<strong_actor_ptr>(self),
-             mixer,
-             gAppState
-           );
-           musicLibraryManagerPtr = actor_cast<strong_actor_ptr>(musicLibraryManager);
+    // NOTE:
+    // - QApplication::exec: Must be called from the main thread
+    qtApp->exec();
+  }
 
-           running = true;
-           qtApp->exec();
-         }
-
-     Supervisor::behavior_type make_behavior() {
-       return {
-           [this](strong_actor_ptr replyToPtr, supervisor_status_a) {
-             Logging::write(
-               Info,
-               "Act::Supervisor::supervisor_status_a",
-               "Supervisor running status - " + std::to_string(running)
-              );
-
-//             self->anon_send(
-//                 actor_cast<strong_actor_ptr>(replyToPtr),
-//                 this->running
-//             );
-           },
-       };
+   Supervisor::behavior_type make_behavior() {
+     return {
+         [this](strong_actor_ptr replyToPtr, supervisor_status_a) {
+           Logging::write(
+             Info,
+             "Act::Supervisor::supervisor_status_a",
+             "Supervisor running"
+            );
+         },
      };
+   };
 };
 
 } // Act
