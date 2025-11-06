@@ -31,6 +31,7 @@ qt_add_library(GjGui STATIC
         Color.h
         MainWindow.h
         MainWindow.cpp
+        Hydrater.h
         QSql/SqlWorker.h
         QSql/SqlWorker.cpp
         QSql/WorkerPool.h

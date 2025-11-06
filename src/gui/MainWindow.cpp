@@ -141,9 +141,6 @@ void MainWindow::connectActions() {
       );
     }
   });
-
-  const auto hydrateDisplayConnection =
-    connect(this, &MainWindow::triggerHydrateState, &MainWindow::hydrateState);
 }
 
 } // Gui

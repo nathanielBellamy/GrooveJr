@@ -16,6 +16,7 @@
 #include "./Playback.h"
 #include "../AppState.h"
 #include "../gui/MainWindow.h"
+#include "../gui/Hydrater.h"
 
 using namespace caf;
 
@@ -36,6 +37,7 @@ struct DisplayState {
   Display::pointer self;
   QApplication* qtApp;
   Gui::MainWindow* mainWindow;
+  Gui::Hydrater hydrater {};
   strong_actor_ptr guiThreadPtr;
 
   DisplayState(
@@ -69,6 +71,7 @@ struct DisplayState {
 
 
       mainWindow = new Gui::MainWindow { self->system(), mixer, gAppState, shutdown_handler };
+      mainWindow->connectHydrater(hydrater);
       mainWindow->show();
       mainWindow->setChannels();
       mainWindow->setEffects();
@@ -104,7 +107,7 @@ struct DisplayState {
           "Act::Display::current_state_a",
           "Received current state, will trigger hydrate display."
         );
-        emit mainWindow->triggerHydrateState(appStatePacket);
+        emit hydrater.hydrate(appStatePacket);
         Logging::write(
           Info,
           "Act::Display::current_state_a",

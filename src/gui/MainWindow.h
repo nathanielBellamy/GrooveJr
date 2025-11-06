@@ -25,6 +25,7 @@
 
 #include "../AppState.h"
 #include "../audio/Mixer.h"
+#include "Hydrater.h"
 
 #include <QAction>
 #include <QCloseEvent>
@@ -49,9 +50,13 @@ class MainWindow final : public QMainWindow {
     void closeEvent(QCloseEvent* event) override;
     void setChannels();
     void setEffects();
-
-  signals:
-    void triggerHydrateState(const AppStatePacket& appStatePacket);
+    void connectHydrater(Hydrater& hydrater) {
+      const auto hydraterConnection =
+        connect(&hydrater, &Hydrater::hydrate, this, [&](const AppStatePacket& packet) {
+          std::cout << "foooooooo 13131131313131313" << std::endl;
+          hydrateState(packet);
+        });
+    };
 
   public slots:
     Result hydrateState(const AppStatePacket& appStatePacket);
