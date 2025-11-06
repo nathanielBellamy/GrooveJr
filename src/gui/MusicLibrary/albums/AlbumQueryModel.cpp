@@ -52,10 +52,10 @@ Result AlbumQueryModel::refresh() {
   return OK;
 }
 
-QVariant AlbumQueryModel::data(const QModelIndex& item, int role) const {
+QVariant AlbumQueryModel::data(const QModelIndex& item, const int role) const {
   if (role == Qt::BackgroundRole && isCurrentFilter(item, ALBUM_COL_ID))
     return QVariant::fromValue(QColor(Qt::blue));
-  return QSqlQueryModel::data(item, role);
+  return QStandardItemModel::data(item, role);
 }
 
 } // Gui

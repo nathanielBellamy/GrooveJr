@@ -43,6 +43,8 @@ enum MusicLibraryWindowMainSection {
 };
 
 class MusicLibraryWindow final : public QWidget {
+  Q_OBJECT
+
   actor_system& actorSystem;
   AppState* gAppState;
   Db::Dao* dao;
@@ -87,6 +89,7 @@ class MusicLibraryWindow final : public QWidget {
     explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao);
     ~MusicLibraryWindow();
 
+  public slots:
     Result hydrateState(const AppStatePacket& appStatePacket) {
       albumTableView->hydrateState(appStatePacket);
       artistTableView->hydrateState(appStatePacket);
@@ -111,6 +114,7 @@ class MusicLibraryWindow final : public QWidget {
       return OK;
     }
 
+private:
     Result showAsMainSection(MusicLibraryWindowMainSection newMainSection) {
       mainSection = newMainSection;
       switch (newMainSection) {

@@ -24,6 +24,8 @@ namespace Gui {
 using namespace caf;
 
 class MusicLibraryTableView : public QTableView {
+  Q_OBJECT
+
   Result setStyle() {
     setStyleSheet(
       "font-weight: 500; font-size: 12px;"
@@ -69,8 +71,10 @@ class MusicLibraryTableView : public QTableView {
       return model;
     }
 
+  public slots:
     Result hydrateState(const AppStatePacket& appStatePacket) const {
       model->hydrateState(appStatePacket);
+      refresh();
       return OK;
     }
 

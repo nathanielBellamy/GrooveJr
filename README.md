@@ -35,6 +35,10 @@
 - build the following from source in `GJ_BASE_DIR`
   - [CAF](https://www.actor-framework.org/)
   - [Qt](https://www.qt.io/)
+    - make sure to build moc
+    ```bash
+      cmake --build . --target qmake moc rcc uic
+    ```
   - [Vst3](https://github.com/steinbergmedia/vst3sdk)
     - On macOS:
       - after installing XCode from the app store, if cmake has trouble finding it while

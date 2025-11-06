@@ -16,9 +16,9 @@ Result GenreQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
-QVariant GenreQueryModel::data(const QModelIndex& index, int role) const {
+QVariant GenreQueryModel::data(const QModelIndex& item, const int role) const {
   // TODO: format
-  return QSqlQueryModel::data(index, role);
+  return QStandardItemModel::data(item, role);
 }
 
 Result GenreQueryModel::refresh() {

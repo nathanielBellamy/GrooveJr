@@ -31,6 +31,10 @@ qt_add_library(GjGui STATIC
         Color.h
         MainWindow.h
         MainWindow.cpp
+        QSql/SqlWorker.h
+        QSql/SqlWorker.cpp
+        QSql/WorkerPool.h
+        QSql/WorkerPool.cpp
         MenuBar/MenuBar.h
         MenuBar/MenuBar.cpp
         MenuBar/Menus/FileMenu.h
@@ -92,6 +96,7 @@ qt_add_library(GjGui STATIC
         MusicLibrary/artists/ArtistQueryModel.h
         MusicLibrary/artists/ArtistQueryModel.cpp
         MusicLibrary/audioFiles/AudioFileTableView.h
+        MusicLibrary/audioFiles/AudioFileTableView.cpp
         MusicLibrary/audioFiles/AudioFileQueryModel.h
         MusicLibrary/audioFiles/AudioFileQueryModel.cpp
         MusicLibrary/cache/CacheTableView.h

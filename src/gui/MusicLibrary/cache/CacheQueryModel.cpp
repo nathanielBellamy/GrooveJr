@@ -16,11 +16,11 @@ Result CacheQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
-QVariant CacheQueryModel::data(const QModelIndex& index, int role) const {
-  if (role == Qt::BackgroundRole && isCurrentlyPlaying(index, AUDIO_FILE_COL_ID))
+QVariant CacheQueryModel::data(const QModelIndex& item, const int role) const {
+  if (role == Qt::BackgroundRole && isCurrentlyPlaying(item, AUDIO_FILE_COL_ID))
     return QVariant::fromValue(QColor(CURRENTLY_PLAYING_COLOR));
 
-  return QSqlQueryModel::data(index, role);
+  return QStandardItemModel::data(item, role);
 }
 
 Result CacheQueryModel::refresh() {

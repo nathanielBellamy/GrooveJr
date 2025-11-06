@@ -13,14 +13,15 @@ Result AudioFileQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
       "Gui::AudioFileQueryModel::hydrateState",
       "AudioFileQueryModel::hydrateState"
   );
+  refresh();
   return OK;
 }
 
-QVariant AudioFileQueryModel::data(const QModelIndex& index, int role) const {
-  if (role == Qt::BackgroundRole && isCurrentlyPlaying(index, AUDIO_FILE_COL_ID))
+QVariant AudioFileQueryModel::data(const QModelIndex& item, const int role) const {
+  if (role == Qt::BackgroundRole && isCurrentlyPlaying(item, AUDIO_FILE_COL_ID))
     return QVariant::fromValue(QColor(CURRENTLY_PLAYING_COLOR));
 
-  return QSqlQueryModel::data(index, role);
+  return QStandardItemModel::data(item, role);
 }
 
 Result AudioFileQueryModel::refresh() {
@@ -56,7 +57,7 @@ Result AudioFileQueryModel::refresh() {
 
   queryStr += " order by art.name asc, alb.year asc, alb.title asc, trk.trackNumber asc";
 
-  setQueryString(queryStr);
+  emit runQuery(id, QString(queryStr.c_str()));
   setHeaderData(AUDIO_FILE_COL_TRACK, Qt::Horizontal, QObject::tr("Track"));
   setHeaderData(AUDIO_FILE_COL_ARTIST, Qt::Horizontal, QObject::tr("Artist"));
   setHeaderData(AUDIO_FILE_COL_ALBUM, Qt::Horizontal, QObject::tr("Album"));
@@ -69,6 +70,33 @@ Result AudioFileQueryModel::refresh() {
   return OK;
 }
 
+
+Result AudioFileQueryModel::connectActions() {
+  const auto queryResultsReadyConnection =
+    connect(sqlWorker, &SqlWorker::queryResultsReady, this, [&](const QList<QVariantList>& rows) {
+      std::cout << "queryResultsReady XXXXXXXXXXXXXXXXXXXXXXXX" << std::endl << std::endl << std::endl;
+      clear();
+      for (const auto& row : rows) {
+        QList<QStandardItem*> items;
+        for (const auto& val : row) {
+          std::cout << "foo bar " << val.toString().toStdString() << std::endl;
+          items << new QStandardItem(val.toString());
+        }
+        appendRow(items);
+      }
+    });
+
+  const auto errorOccurredConnection =
+    connect(sqlWorker, &SqlWorker::errorOccurred, this, [&](const QString& error) {
+      Logging::write(
+        Error,
+        "Gui::AudioFileQueryModel::sqlWorker::errorOccurred()",
+        "Error: " + error.toStdString()
+      );
+    });
+
+  return OK;
+};
 
 } // Gui
 } // Gj

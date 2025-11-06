@@ -16,9 +16,9 @@ Result PlaylistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
-QVariant PlaylistQueryModel::data(const QModelIndex& index, int role) const {
+QVariant PlaylistQueryModel::data(const QModelIndex& item, const int role) const {
   // TODO: format
-  return QSqlQueryModel::data(index, role);
+  return QStandardItemModel::data(item, role);
 }
 
 Result PlaylistQueryModel::refresh() {

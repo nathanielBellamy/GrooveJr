@@ -9,8 +9,6 @@
 #include "caf/actor_system.hpp"
 #include "caf/event_based_actor.hpp"
 
-#include "QApplication"
-
 #include "../enums/Result.h"
 #include "../Logging.h"
 #include "./ActorIds.h"
@@ -52,6 +50,24 @@ struct DisplayState {
       self->link_to(supervisor);
       self->system().registry().put(DISPLAY, actor_cast<strong_actor_ptr>(self));
 
+  QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+  db.setDatabaseName("/Users/ns/groovejr.db");
+
+  if (!db.open()) {
+    Logging::write(
+      Error,
+      "Gui::MusicLibraryWindow::connectToDb",
+      "Failed to connect to the database"
+    );
+  }
+
+  Logging::write(
+    Info,
+      "Gui::MusicLibraryWindow::connectToDb",
+    "MusicLibraryWindow Successfully Connected to Db"
+  );
+
+
       mainWindow = new Gui::MainWindow { self->system(), mixer, gAppState, shutdown_handler };
       mainWindow->show();
       mainWindow->setChannels();
@@ -86,14 +102,14 @@ struct DisplayState {
         Logging::write(
           Info,
           "Act::Display::current_state_a",
-          "Received current state, will hydrate display."
+          "Received current state, will trigger hydrate display."
         );
-        if (mainWindow->hydrateState(appStatePacket) == ERROR)
-          Logging::write(
-            Error,
-            "Act::Display::current_state_a",
-            "Unable to hydrate state to main window"
-          );
+        emit mainWindow->triggerHydrateState(appStatePacket);
+        Logging::write(
+          Info,
+          "Act::Display::current_state_a",
+          "Triggered hydrate state to main window"
+        );
       },
     };
   };

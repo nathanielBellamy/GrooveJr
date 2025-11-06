@@ -7,7 +7,9 @@
 
 #include <vector>
 
+#include <QObject>
 #include <QtSql/qsqlquerymodel.h>
+#include <QStandardItemModel>
 #include <QVariant>
 #include <QColor>
 #include <QString>
@@ -21,7 +23,9 @@
 namespace Gj {
 namespace Gui {
 
-class MusicLibraryQueryModel : public QSqlQueryModel {
+class MusicLibraryQueryModel : public QStandardItemModel {
+  Q_OBJECT
+
   protected:
     AppState* gAppState;
     MusicLibraryType type;
@@ -29,7 +33,7 @@ class MusicLibraryQueryModel : public QSqlQueryModel {
     QString queryString;
     Result setQueryString(const std::string& newQueryString) {
       queryString = QString(newQueryString.c_str());
-      setQuery(queryString);
+      // setQuery(queryString);
       return OK;
     };
 
@@ -71,14 +75,18 @@ class MusicLibraryQueryModel : public QSqlQueryModel {
 
   public:
     MusicLibraryQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, const MusicLibraryType type)
-      : QSqlQueryModel(parent)
+      : QStandardItemModel(parent)
       , gAppState(gAppState)
       , type(type)
       , filters(filters)
-      {}
+    {}
 
     virtual Result hydrateState(const AppStatePacket& appStatePacket) = 0;
     virtual Result refresh() = 0;
+
+    signals:
+      void initSqlWorker(QString id);
+      void runQuery(QString id, QString query);
 };
 
 } // Gui

@@ -37,6 +37,8 @@ namespace Gj {
 namespace Gui {
 
 class MainWindow final : public QMainWindow {
+  Q_OBJECT
+
   public:
     explicit MainWindow(
       actor_system& actorSystem,
@@ -44,10 +46,15 @@ class MainWindow final : public QMainWindow {
       AppState* gAppState,
       void (*shutdown_handler) (int)
     );
-    Result hydrateState(const AppStatePacket& appStatePacket);
     void closeEvent(QCloseEvent* event) override;
     void setChannels();
     void setEffects();
+
+  signals:
+    void triggerHydrateState(const AppStatePacket& appStatePacket);
+
+  public slots:
+    Result hydrateState(const AppStatePacket& appStatePacket);
 
   private:
     AppState* gAppState;

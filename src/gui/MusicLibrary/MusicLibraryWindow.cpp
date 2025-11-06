@@ -250,17 +250,17 @@ Result MusicLibraryWindow::connectActions() {
 }
 
 Result MusicLibraryWindow::connectToDb() {
-  QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-  db.setDatabaseName("/Users/ns/groovejr.db");
-
-  if (!db.open()) {
-    Logging::write(
-      Error,
-      "Gui::MusicLibraryWindow::connectToDb",
-      "Failed to connect to the database"
-    );
-    return ERROR;
-  }
+  // // QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+  // // db.setDatabaseName("/Users/ns/groovejr.db");
+  //
+  // if (!db.open()) {
+  //   Logging::write(
+  //     Error,
+  //     "Gui::MusicLibraryWindow::connectToDb",
+  //     "Failed to connect to the database"
+  //   );
+  //   return ERROR;
+  // }
 
   Logging::write(
     Info,

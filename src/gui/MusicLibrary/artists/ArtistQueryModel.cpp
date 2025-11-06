@@ -16,9 +16,9 @@ Result ArtistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
-QVariant ArtistQueryModel::data(const QModelIndex& index, int role) const {
+QVariant ArtistQueryModel::data(const QModelIndex& index, const int role) const {
   // TODO: format
-  return QSqlQueryModel::data(index, role);
+  return QStandardItemModel::data(index, role);
 }
 
 Result ArtistQueryModel::refresh() {
