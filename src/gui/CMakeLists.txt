@@ -34,8 +34,8 @@ qt_add_library(GjGui STATIC
         Hydrater.h
         QSql/SqlWorker.h
         QSql/SqlWorker.cpp
-        QSql/WorkerPool.h
-        QSql/WorkerPool.cpp
+        QSql/SqlWorkerPool.h
+        QSql/SqlWorkerPool.cpp
         MenuBar/MenuBar.h
         MenuBar/MenuBar.cpp
         MenuBar/Menus/FileMenu.h

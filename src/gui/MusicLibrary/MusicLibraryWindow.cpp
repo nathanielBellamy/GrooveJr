@@ -27,7 +27,12 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , playlistHeader(this)
   , playlistClearFilterButton(this)
   {
-  if (connectToDb() == OK) {
+
+  workerPool = new SqlWorkerPool();
+  if (workerPool != nullptr) {
+    workerPool->moveToThread(&workerPoolThread);
+    workerPool->run();
+
     albumTableView = new AlbumTableView(this, actorSystem, dao, gAppState, &filters);
     artistTableView = new ArtistTableView(this, actorSystem, dao, gAppState, &filters);
     audioFileTableView = new AudioFileTableView(this, actorSystem, gAppState, dao, &filters);
@@ -245,28 +250,6 @@ Result MusicLibraryWindow::connectActions() {
 
       refresh();
   });
-
-  return OK;
-}
-
-Result MusicLibraryWindow::connectToDb() {
-  // // QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-  // // db.setDatabaseName("/Users/ns/groovejr.db");
-  //
-  // if (!db.open()) {
-  //   Logging::write(
-  //     Error,
-  //     "Gui::MusicLibraryWindow::connectToDb",
-  //     "Failed to connect to the database"
-  //   );
-  //   return ERROR;
-  // }
-
-  Logging::write(
-    Info,
-      "Gui::MusicLibraryWindow::connectToDb",
-    "MusicLibraryWindow Successfully Connected to Db"
-  );
 
   return OK;
 }

@@ -14,32 +14,41 @@
 
 #include "../../Logging.h"
 #include "../../enums/Result.h"
-#include "../MusicLibrary/MusicLibraryQueryModel.h"
+#include "SqlWorkerPool.h"
 
 namespace Gj {
 namespace Gui {
 
 class SqlWorker : public QObject {
   Q_OBJECT
-
-  QString id;
+  int idx;
+  std::atomic<bool> busy;
+  Result connectActions(const SqlWorkerPool* pool);
 
 public:
-  explicit SqlWorker(MusicLibraryQueryModel* model)
+  explicit SqlWorker(SqlWorkerPool* pool, const int idx)
       : QObject(nullptr)
+      , idx(idx)
       {
-    connectActions(model);
+    connectActions(pool);
   };
   ~SqlWorker();
 
-  Result connectActions(MusicLibraryQueryModel* model);
+  int getIdx() const {
+    return idx;
+  };
+
+  bool isBusy() const {
+    return busy.load();
+  };
+
 
   public slots:
-    void init(const QString& newId);
-    void runQuery(const QString& queryString);
+    void init();
+    void runQuery(const QString& callerId, const QString& queryString);
 
   signals:
-    void queryResultsReady(const QList<QVariantList>& rows);
+    void queryResultsReady(const QString& callerId, const QList<QVariantList>& rows);
     void errorOccurred(const QString& error);
 
 private:

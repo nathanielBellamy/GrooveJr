@@ -50,10 +50,9 @@ class MainWindow final : public QMainWindow {
     void closeEvent(QCloseEvent* event) override;
     void setChannels();
     void setEffects();
-    void connectHydrater(Hydrater& hydrater) {
+    void connectHydrater(const Hydrater& hydrater) {
       const auto hydraterConnection =
         connect(&hydrater, &Hydrater::hydrate, this, [&](const AppStatePacket& packet) {
-          std::cout << "foooooooo 13131131313131313" << std::endl;
           hydrateState(packet);
         });
     };

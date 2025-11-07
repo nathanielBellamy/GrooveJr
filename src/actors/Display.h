@@ -52,24 +52,6 @@ struct DisplayState {
       self->link_to(supervisor);
       self->system().registry().put(DISPLAY, actor_cast<strong_actor_ptr>(self));
 
-  QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-  db.setDatabaseName("/Users/ns/groovejr.db");
-
-  if (!db.open()) {
-    Logging::write(
-      Error,
-      "Gui::MusicLibraryWindow::connectToDb",
-      "Failed to connect to the database"
-    );
-  }
-
-  Logging::write(
-    Info,
-      "Gui::MusicLibraryWindow::connectToDb",
-    "MusicLibraryWindow Successfully Connected to Db"
-  );
-
-
       mainWindow = new Gui::MainWindow { self->system(), mixer, gAppState, shutdown_handler };
       mainWindow->connectHydrater(hydrater);
       mainWindow->show();

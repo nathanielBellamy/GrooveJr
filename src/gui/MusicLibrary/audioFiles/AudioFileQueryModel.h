@@ -9,7 +9,7 @@
 #include <QVariant>
 #include <QThread>
 
-#include "../../QSql/SqlWorker.h"
+#include "../../QSql/SqlWorkerPool.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
 #include "../../../AppState.h"
@@ -34,16 +34,8 @@ public:
     , id(QString("AudioFileQueryModel"))
     {
 
-    sqlWorker = new SqlWorker(this);
-    sqlWorker->moveToThread(&sqlWorkerThread);
-    sqlWorkerThread.start();
     connectActions();
-    emit initSqlWorker(id);
     refresh();
-  }
-  ~AudioFileQueryModel() {
-    sqlWorkerThread.quit();
-    sqlWorkerThread.wait();
   }
   QVariant data(const QModelIndex& item, int role) const override;
 

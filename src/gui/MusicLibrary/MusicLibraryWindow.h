@@ -22,6 +22,8 @@
 #include "../../db/Dao.h"
 #include "../../db/entity/musicLibrary/Queue.h"
 
+#include "../QSql/SqlWorkerPool.h"
+
 #include "MusicLibraryFilters.h"
 #include "albums/AlbumTableView.h"
 #include "artists/ArtistTableView.h"
@@ -48,6 +50,8 @@ class MusicLibraryWindow final : public QWidget {
   actor_system& actorSystem;
   AppState* gAppState;
   Db::Dao* dao;
+  QThread workerPoolThread;
+  SqlWorkerPool* workerPool;
   QGridLayout grid;
   MusicLibraryWindowMainSection mainSection = AUDIO_FILES_VIEW;
   QPushButton cacheButton;
@@ -71,7 +75,6 @@ class MusicLibraryWindow final : public QWidget {
   QPushButton playlistClearFilterButton;
   QueueTableView* queueTableView;
   CacheTableView* cacheTableView;
-  Result connectToDb();
   void setStyle();
   void setupGrid();
   Result connectActions();
