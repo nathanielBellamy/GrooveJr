@@ -8,7 +8,7 @@ namespace Gj {
 namespace Gui {
 
 MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao)
-  : QWidget(parent)
+  : SqlWorkerPoolHost(parent)
   , actorSystem(actorSystem)
   , gAppState(gAppState)
   , dao(dao)
@@ -31,7 +31,7 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   workerPool = new SqlWorkerPool();
   if (workerPool != nullptr) {
     workerPool->moveToThread(&workerPoolThread);
-    workerPool->run();
+    emit initSqlWorkerPool();
 
     albumTableView = new AlbumTableView(this, actorSystem, dao, gAppState, &filters);
     artistTableView = new ArtistTableView(this, actorSystem, dao, gAppState, &filters);
@@ -40,6 +40,15 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
     genreTableView = new GenreTableView(this, actorSystem, dao, gAppState, &filters);
     playlistTableView = new PlaylistTableView(this, actorSystem, dao, gAppState, &filters);
     queueTableView = new QueueTableView(this, actorSystem, dao, gAppState, &filters);
+
+    workerPool->connectClient(albumTableView->getModel());
+    workerPool->connectClient(artistTableView->getModel());
+    workerPool->connectClient(audioFileTableView->getModel());
+    workerPool->connectClient(cacheTableView->getModel());
+    workerPool->connectClient(genreTableView->getModel());
+    workerPool->connectClient(playlistTableView->getModel());
+    workerPool->connectClient(queueTableView->getModel());
+
     showAsMainSection(AUDIO_FILES_VIEW);
   } else {
     Logging::write(

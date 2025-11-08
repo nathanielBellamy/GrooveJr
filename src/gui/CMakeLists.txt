@@ -36,6 +36,10 @@ qt_add_library(GjGui STATIC
         QSql/SqlWorker.cpp
         QSql/SqlWorkerPool.h
         QSql/SqlWorkerPool.cpp
+        QSql/SqlWorkerPoolClient.h
+        QSql/SqlWorkerPoolClient.cpp
+        QSql/SqlWorkerPoolHost.h
+        QSql/SqlWorkerPoolHost.cpp
         MenuBar/MenuBar.h
         MenuBar/MenuBar.cpp
         MenuBar/Menus/FileMenu.h

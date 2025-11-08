@@ -21,10 +21,6 @@ namespace Gj {
 namespace Gui {
 
 class AudioFileQueryModel final : public MusicLibraryQueryModel {
-  Q_OBJECT
-
-  QThread sqlWorkerThread;
-  SqlWorker* sqlWorker;
   Result connectActions();
   QString id;
 
@@ -39,10 +35,10 @@ public:
   }
   QVariant data(const QModelIndex& item, int role) const override;
 
-  public slots:
-    Result hydrateState(const AppStatePacket& appStatePacket) override;
-    Result refresh() override;
+  Result hydrateState(const AppStatePacket& appStatePacket) override;
+  Result refresh() override;
 
+  void initSqlWorkerPool();
 };
 
 } // Gui

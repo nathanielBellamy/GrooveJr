@@ -2,8 +2,8 @@
 // Created by ns on 3/2/25.
 //
 
-#ifndef MUSICLIBRARYWINDOW_H
-#define MUSICLIBRARYWINDOW_H
+#ifndef GJGUIMUSICLIBRARYWINDOW_H
+#define GJGUIMUSICLIBRARYWINDOW_H
 
 #include "caf/actor_system.hpp"
 
@@ -23,6 +23,7 @@
 #include "../../db/entity/musicLibrary/Queue.h"
 
 #include "../QSql/SqlWorkerPool.h"
+#include "../QSql/SqlWorkerPoolHost.h"
 
 #include "MusicLibraryFilters.h"
 #include "albums/AlbumTableView.h"
@@ -44,9 +45,7 @@ enum MusicLibraryWindowMainSection {
   QUEUE_VIEW
 };
 
-class MusicLibraryWindow final : public QWidget {
-  Q_OBJECT
-
+class MusicLibraryWindow final : public SqlWorkerPoolHost {
   actor_system& actorSystem;
   AppState* gAppState;
   Db::Dao* dao;
@@ -92,8 +91,7 @@ class MusicLibraryWindow final : public QWidget {
     explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao);
     ~MusicLibraryWindow();
 
-  public slots:
-    Result hydrateState(const AppStatePacket& appStatePacket) {
+    Result hydrateState(const AppStatePacket& appStatePacket) const {
       albumTableView->hydrateState(appStatePacket);
       artistTableView->hydrateState(appStatePacket);
       audioFileTableView->hydrateState(appStatePacket);
@@ -105,7 +103,7 @@ class MusicLibraryWindow final : public QWidget {
       return OK;
     };
 
-    Result refresh() {
+    Result refresh() const {
       albumTableView->refresh();
       artistTableView->refresh();
       audioFileTableView->refresh();
@@ -156,4 +154,4 @@ private:
 
 
 
-#endif //MUSICLIBRARYWINDOW_H
+#endif //GJGUIMUSICLIBRARYWINDOW_H

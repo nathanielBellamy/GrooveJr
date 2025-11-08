@@ -14,10 +14,11 @@
 
 #include "../../Logging.h"
 #include "../../enums/Result.h"
-#include "SqlWorkerPool.h"
 
 namespace Gj {
 namespace Gui {
+
+class SqlWorkerPool; // forward decl
 
 class SqlWorker : public QObject {
   Q_OBJECT
@@ -42,14 +43,13 @@ public:
     return busy.load();
   };
 
+public slots:
+  void init();
+  void runQuery(const QString& callerId, const QString& queryString);
 
-  public slots:
-    void init();
-    void runQuery(const QString& callerId, const QString& queryString);
-
-  signals:
-    void queryResultsReady(const QString& callerId, const QList<QVariantList>& rows);
-    void errorOccurred(const QString& error);
+signals:
+  void queryResultsReady(const QString& callerId, const QList<QVariantList>& rows);
+  void errorOccurred(const QString& error);
 
 private:
   QSqlDatabase db;

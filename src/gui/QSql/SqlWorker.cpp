@@ -3,7 +3,7 @@
 //
 
 #include "SqlWorker.h"
-
+#include "SqlWorkerPool.h"
 
 namespace Gj {
 namespace Gui {

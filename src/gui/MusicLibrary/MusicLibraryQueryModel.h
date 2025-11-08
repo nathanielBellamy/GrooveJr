@@ -17,15 +17,14 @@
 #include "../../AppState.h"
 #include "../../enums/Result.h"
 
+#include "../QSql/SqlWorkerPoolClient.h"
 #include "MusicLibraryFilters.h"
 #include "Constants.h"
 
 namespace Gj {
 namespace Gui {
 
-class MusicLibraryQueryModel : public QStandardItemModel {
-  Q_OBJECT
-
+class MusicLibraryQueryModel : public SqlWorkerPoolClient {
   protected:
     AppState* gAppState;
     MusicLibraryType type;
@@ -75,7 +74,7 @@ class MusicLibraryQueryModel : public QStandardItemModel {
 
   public:
     MusicLibraryQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, const MusicLibraryType type)
-      : QStandardItemModel(parent)
+      : SqlWorkerPoolClient()
       , gAppState(gAppState)
       , type(type)
       , filters(filters)
@@ -83,10 +82,6 @@ class MusicLibraryQueryModel : public QStandardItemModel {
 
     virtual Result hydrateState(const AppStatePacket& appStatePacket) = 0;
     virtual Result refresh() = 0;
-
-    signals:
-      void initSqlWorker(QString id);
-      void runQuery(QString id, QString query);
 };
 
 } // Gui

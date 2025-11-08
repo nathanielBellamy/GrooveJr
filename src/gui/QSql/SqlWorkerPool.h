@@ -6,12 +6,15 @@
 #define GJGUISQLWORKERPOOL_H
 
 #include <queue>
+#include <vector>
 
 #include <QObject>
 #include <QThread>
 
 #include "../../enums/Result.h"
 #include "SqlWorker.h"
+#include "SqlWorkerPoolClient.h"
+#include "SqlWorkerPoolHost.h"
 
 namespace Gj {
 namespace Gui {
@@ -26,28 +29,40 @@ constexpr size_t WORKER_POOL_SIZE = 3;
 class SqlWorkerPool final : public QObject {
   Q_OBJECT
 
+  std::vector<QObject*> clients;
+  SqlWorkerPoolHost* host;
   std::queue<QueryQueueItem> queryQueue;
-  QThread threads[WORKER_POOL_SIZE]{};
+  QThread* threads[WORKER_POOL_SIZE];
   SqlWorker* workers[WORKER_POOL_SIZE]{ nullptr };
   Result addQueryToQueue;
   Result connectActions();
 
 public:
-  explicit SqlWorkerPool()
-    : QObject(nullptr) {
-
+  explicit SqlWorkerPool(SqlWorkerPoolHost* host = nullptr) // todo: generalize parent to interface
+    : QObject(nullptr) // this will move to another thread
+    , host(host)
+    {
     for (int i = 0; i < WORKER_POOL_SIZE; i++) {
+      threads[i] = new QThread();
       workers[i] = new SqlWorker(this, i);
-      workers[i]->moveToThread(&threads[0]);
+      workers[i]->moveToThread(threads[0]);
       emit initSqlWorker(i);
     }
   };
   ~SqlWorkerPool() {
-    for (auto thread : threads)
-      thread.quit();
+    for (int i = 0; i < WORKER_POOL_SIZE; i++) {
+      delete workers[i];
+      threads[i]->quit();
+      delete threads[i];
+    }
   }
 
-  void run() {
+  void connectClient(SqlWorkerPoolClient* client) { // todo: generalize client to interface
+    clients.push_back(client);
+    const auto clientConnection = connect(client, &SqlWorkerPoolClient::runQuery, this, &SqlWorkerPool::runQuery);
+  };
+
+  void runPool() {
     while (true) {
       if (queryQueue.empty())
         continue;
@@ -65,6 +80,7 @@ public:
       auto [callerId, query] = queryQueue.front();
       queryQueue.pop();
       emit runQueryWithWorker(workerIdxToUse, callerId, query);
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
   };
 
@@ -81,8 +97,6 @@ public slots:
   void runQuery(const QString& callerId, const QString& query) {
     queryQueue.push(QueryQueueItem{callerId, query});
   }
-};
-
 };
 
 }  // Gui
