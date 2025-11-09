@@ -8,6 +8,7 @@
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
 
+#include "../../QSql/SqlWorkerPool.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
 
@@ -23,8 +24,8 @@ class CacheQueryModel final : public MusicLibraryQueryModel {
   bool isSelected(const QModelIndex& item) const;
 
 public:
-  explicit CacheQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters)
-    : MusicLibraryQueryModel(parent, gAppState, filters, CACHE)
+  explicit CacheQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, SqlWorkerPool* sqlWorkerPool)
+    : MusicLibraryQueryModel(parent, gAppState, filters, CACHE, QString("Cache"), sqlWorkerPool)
     {
     refresh();
   }

@@ -17,8 +17,22 @@ namespace Gui {
 class CacheTableView final : public MusicLibraryTableView {
 
   public:
-    CacheTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, AppState* gAppState, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, actorSystem, dao, gAppState, filters, new CacheQueryModel(parent, gAppState, filters))
+    CacheTableView(
+      QWidget* parent,
+      actor_system& actorSystem,
+      Db::Dao* dao,
+      AppState* gAppState,
+      MusicLibraryFilters* filters,
+      SqlWorkerPool* sqlWorkerPool
+    )
+        : MusicLibraryTableView(
+            parent,
+            actorSystem,
+            dao,
+            gAppState,
+            filters,
+            new CacheQueryModel(parent, gAppState, filters, sqlWorkerPool)
+        )
         {};
 };
 

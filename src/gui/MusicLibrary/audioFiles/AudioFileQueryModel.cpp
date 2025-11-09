@@ -72,19 +72,19 @@ Result AudioFileQueryModel::refresh() {
 
 
 Result AudioFileQueryModel::connectActions() {
-  // const auto queryResultsReadyConnection =
-  //   connect(sqlWorker, &SqlWorker::queryResultsReady, this, [&](const QList<QVariantList>& rows) {
-  //     std::cout << "queryResultsReady XXXXXXXXXXXXXXXXXXXXXXXX" << std::endl << std::endl << std::endl;
-  //     clear();
-  //     for (const auto& row : rows) {
-  //       QList<QStandardItem*> items;
-  //       for (const auto& val : row) {
-  //         std::cout << "foo bar " << val.toString().toStdString() << std::endl;
-  //         items << new QStandardItem(val.toString());
-  //       }
-  //       appendRow(items);
-  //     }
-  //   });
+  const auto queryResultsReadyConnection =
+    connect(sqlWorkerPool, &SqlWorkerPool::queryResultsReady, [&](const QString& callerId, const QList<QVariantList>& rows) {
+      if (callerId != id)
+        return;
+
+      clear();
+      for (const auto& row : rows) {
+        QList<QStandardItem*> items;
+        for (const auto& val : row)
+          items << new QStandardItem(val.toString());
+        appendRow(items);
+      }
+    });
   //
   // const auto errorOccurredConnection =
   //   connect(sqlWorker, &SqlWorker::errorOccurred, this, [&](const QString& error) {

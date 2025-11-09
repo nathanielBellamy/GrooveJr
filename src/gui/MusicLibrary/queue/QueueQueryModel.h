@@ -8,12 +8,14 @@
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
 
+#include "../../QSql/SqlWorkerPool.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
 
 #include "../../../AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
+#include "../../QSql/SqlWorkerPool.h"
 #include "../Constants.h"
 
 namespace Gj {
@@ -23,8 +25,8 @@ class QueueQueryModel final : public MusicLibraryQueryModel {
   bool isSelected(const QModelIndex& item) const;
 
 public:
-  explicit QueueQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters)
-    : MusicLibraryQueryModel(parent, gAppState, filters, AUDIO_FILE)
+  explicit QueueQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, SqlWorkerPool* sqlWorkerPool)
+    : MusicLibraryQueryModel(parent, gAppState, filters, AUDIO_FILE, QString("QueueQueryModel"), sqlWorkerPool)
     {
     refresh();
   }

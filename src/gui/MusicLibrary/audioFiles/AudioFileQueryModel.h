@@ -22,14 +22,11 @@ namespace Gui {
 
 class AudioFileQueryModel final : public MusicLibraryQueryModel {
   Result connectActions();
-  QString id;
 
 public:
-  explicit AudioFileQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters)
-    : MusicLibraryQueryModel(parent, gAppState, filters, AUDIO_FILE)
-    , id(QString("AudioFileQueryModel"))
+  explicit AudioFileQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, SqlWorkerPool* sqlWorkerPool)
+    : MusicLibraryQueryModel(parent, gAppState, filters, AUDIO_FILE, QString("AudioFileQueryModel"), sqlWorkerPool)
     {
-
     connectActions();
     refresh();
   }

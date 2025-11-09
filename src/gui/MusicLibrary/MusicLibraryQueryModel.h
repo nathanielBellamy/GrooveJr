@@ -17,19 +17,24 @@
 #include "../../AppState.h"
 #include "../../enums/Result.h"
 
+#include "../QSql/SqlWorkerPool.h"
 #include "../QSql/SqlWorkerPoolClient.h"
 #include "MusicLibraryFilters.h"
 #include "Constants.h"
 
 namespace Gj {
 namespace Gui {
+  class SqlWorkerPool;
 
-class MusicLibraryQueryModel : public SqlWorkerPoolClient {
+  class MusicLibraryQueryModel : public SqlWorkerPoolClient {
   protected:
+    QString id;
+    SqlWorkerPool* sqlWorkerPool;
     AppState* gAppState;
     MusicLibraryType type;
     MusicLibraryFilters* filters;
     QString queryString;
+
     Result setQueryString(const std::string& newQueryString) {
       queryString = QString(newQueryString.c_str());
       // setQuery(queryString);
@@ -73,8 +78,17 @@ class MusicLibraryQueryModel : public SqlWorkerPoolClient {
     }
 
   public:
-    MusicLibraryQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, const MusicLibraryType type)
-      : SqlWorkerPoolClient()
+    MusicLibraryQueryModel(
+      QObject* parent,
+      AppState* gAppState,
+      MusicLibraryFilters* filters,
+      const MusicLibraryType type,
+      const QString& id,
+      SqlWorkerPool* sqlWorkerPool
+      )
+      : SqlWorkerPoolClient(parent)
+      , id(id)
+      , sqlWorkerPool(sqlWorkerPool)
       , gAppState(gAppState)
       , type(type)
       , filters(filters)

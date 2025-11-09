@@ -11,6 +11,7 @@
 #include "../../../AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
+#include "../../QSql/SqlWorkerPool.h"
 
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
@@ -22,8 +23,8 @@ namespace Gui {
 class ArtistQueryModel final : public MusicLibraryQueryModel {
 
 public:
-  explicit ArtistQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters)
-    : MusicLibraryQueryModel(parent, gAppState, filters, ARTIST)
+  explicit ArtistQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, SqlWorkerPool* sqlWorkerPool)
+    : MusicLibraryQueryModel(parent, gAppState, filters, ARTIST, QString("ArtistQueryModel"), sqlWorkerPool)
     {
     refresh();
   }

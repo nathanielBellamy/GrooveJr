@@ -19,9 +19,23 @@ namespace Gui {
 class PlaylistTableView final : public MusicLibraryTableView {
 
 public:
-    PlaylistTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, AppState* gAppState, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, actorSystem, dao, gAppState, filters, new PlaylistQueryModel(parent, gAppState, filters))
-        {};
+    PlaylistTableView(
+      QWidget* parent,
+      actor_system& actorSystem,
+      Db::Dao* dao,
+      AppState* gAppState,
+      MusicLibraryFilters* filters,
+      SqlWorkerPool* sqlWorkerPool
+    )
+    : MusicLibraryTableView(
+        parent,
+        actorSystem,
+        dao,
+        gAppState,
+        filters,
+        new PlaylistQueryModel(parent, gAppState, filters, sqlWorkerPool)
+      )
+    {};
 };
 
 } // Gui

@@ -11,6 +11,7 @@
 #include "../../../AppState.h"
 #include "../../../enums/Result.h"
 #include "../../../Logging.h"
+#include "../../QSql/SqlWorkerPool.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
 #include "../Constants.h"
@@ -21,8 +22,8 @@ namespace Gui {
 class GenreQueryModel final : public MusicLibraryQueryModel {
 
 public:
-  explicit GenreQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters)
-    : MusicLibraryQueryModel(parent, gAppState, filters, GENRE)
+  explicit GenreQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, SqlWorkerPool* sqlWorkerPool)
+    : MusicLibraryQueryModel(parent, gAppState, filters, GENRE, QString("GenreQueryModel"), sqlWorkerPool)
     {
     refresh();
   }

@@ -12,7 +12,6 @@ namespace Gj {
 namespace Gui {
 
 class SqlWorkerPoolHost : public QWidget {
-
   Q_OBJECT
 
 public:

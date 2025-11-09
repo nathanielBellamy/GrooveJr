@@ -35,12 +35,25 @@ namespace Gui {
 using namespace caf;
 
 class AudioFileTableView final : public MusicLibraryTableView {
-  Q_OBJECT
 
 public:
-  AudioFileTableView(QWidget* parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao, MusicLibraryFilters* filters)
-      : MusicLibraryTableView(parent, actorSystem, dao, gAppState, filters, new AudioFileQueryModel(parent, gAppState, filters))
-      {};
+  AudioFileTableView(
+    QWidget* parent,
+    actor_system& actorSystem,
+    AppState* gAppState,
+    Db::Dao* dao,
+    MusicLibraryFilters* filters,
+    SqlWorkerPool* sqlWorkerPool
+  )
+  : MusicLibraryTableView(
+      parent,
+      actorSystem,
+      dao,
+      gAppState,
+      filters,
+      new AudioFileQueryModel(parent, gAppState, filters, sqlWorkerPool)
+    )
+  {};
 
   void mousePressEvent(QMouseEvent* event) override;
   void mouseDoubleClickEvent(QMouseEvent *event) override;

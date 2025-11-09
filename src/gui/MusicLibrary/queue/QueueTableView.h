@@ -17,9 +17,23 @@ namespace Gui {
 class QueueTableView final : public MusicLibraryTableView {
 
   public:
-    QueueTableView(QWidget* parent, actor_system& actorSystem, Db::Dao* dao, AppState* gAppState, MusicLibraryFilters* filters)
-        : MusicLibraryTableView(parent, actorSystem, dao, gAppState, filters, new QueueQueryModel(parent, gAppState, filters))
-        {};
+    QueueTableView(
+      QWidget* parent,
+      actor_system& actorSystem,
+      Db::Dao* dao,
+      AppState* gAppState,
+      MusicLibraryFilters* filters,
+      SqlWorkerPool* sqlWorkerPool
+    )
+      : MusicLibraryTableView(
+          parent,
+          actorSystem,
+          dao,
+          gAppState,
+          filters,
+          new QueueQueryModel(parent, gAppState, filters, sqlWorkerPool)
+        )
+      {};
 
   void mouseDoubleClickEvent(QMouseEvent *event) override {
     if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {

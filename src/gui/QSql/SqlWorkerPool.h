@@ -36,52 +36,16 @@ class SqlWorkerPool final : public QObject {
   SqlWorker* workers[WORKER_POOL_SIZE]{ nullptr };
   Result addQueryToQueue;
   Result connectActions();
+  void runPool();
 
 public:
-  explicit SqlWorkerPool(SqlWorkerPoolHost* host = nullptr) // todo: generalize parent to interface
-    : QObject(nullptr) // this will move to another thread
-    , host(host)
-    {
-    for (int i = 0; i < WORKER_POOL_SIZE; i++) {
-      threads[i] = new QThread();
-      workers[i] = new SqlWorker(this, i);
-      workers[i]->moveToThread(threads[0]);
-      emit initSqlWorker(i);
-    }
-  };
-  ~SqlWorkerPool() {
-    for (int i = 0; i < WORKER_POOL_SIZE; i++) {
-      delete workers[i];
-      threads[i]->quit();
-      delete threads[i];
-    }
-  }
+  explicit SqlWorkerPool(SqlWorkerPoolHost* host);
+  ~SqlWorkerPool();
 
   void connectClient(SqlWorkerPoolClient* client) { // todo: generalize client to interface
     clients.push_back(client);
-    const auto clientConnection = connect(client, &SqlWorkerPoolClient::runQuery, this, &SqlWorkerPool::runQuery);
-  };
-
-  void runPool() {
-    while (true) {
-      if (queryQueue.empty())
-        continue;
-
-      int workerIdxToUse = -1;
-      for (const auto worker : workers) {
-        if (worker->isBusy())
-          continue;
-        workerIdxToUse = worker->getIdx();
-      }
-
-      if (workerIdxToUse == -1)
-        continue;
-
-      auto [callerId, query] = queryQueue.front();
-      queryQueue.pop();
-      emit runQueryWithWorker(workerIdxToUse, callerId, query);
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
+    const auto clientConnection =
+      connect(client, &SqlWorkerPoolClient::runQuery, this, &SqlWorkerPool::runQuery);
   };
 
 signals:
@@ -95,7 +59,14 @@ signals:
 
 public slots:
   void runQuery(const QString& callerId, const QString& query) {
-    queryQueue.push(QueryQueueItem{callerId, query});
+    int workerIdxToUse = -1;
+    for (const auto worker : workers) {
+      if (!worker->isBusy()) {
+        workerIdxToUse = worker->getIdx();
+        break;
+      }
+    }
+    emit runQueryWithWorker(workerIdxToUse, callerId, query);
   }
 };
 

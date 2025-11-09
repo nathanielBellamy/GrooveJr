@@ -15,8 +15,10 @@ SqlWorker::~SqlWorker() {
 Result SqlWorker::connectActions(const SqlWorkerPool* pool) {
   const auto initConnection =
     connect(pool, &SqlWorkerPool::initSqlWorker, [&](const int idxToInit) {
-      if (idx == idxToInit)
+      std::cout << " sql worker " << idx << "init sql worker " << idxToInit << std::endl;
+      if (idx == idxToInit) {
         init();
+      }
     });
 
   const auto runQueryConnection =
@@ -32,6 +34,11 @@ void SqlWorker::init() {
   db = QSqlDatabase::addDatabase("QSQLITE", "gj_gui_musiclibrary_worker_" + QString::number(idx));
   db.setDatabaseName("/Users/ns/groovejr.db");
   if (!db.open()) {
+    Logging::write(
+        Info,
+        "Gui::SqlWorker::init",
+        "Connection not established. Error: " + db.lastError().text().toStdString()
+    );
     emit errorOccurred(db.lastError().text());
     return;
   }
@@ -43,6 +50,7 @@ void SqlWorker::init() {
 }
 
 void SqlWorker::runQuery(const QString& callerId, const QString& queryString) {
+  std::cout << " SqlWorker" << idx << "runQuery " << callerId.toStdString() << " " << queryString.toStdString() << std::endl;
   busy = true;
   if (!db.open()) {
     Logging::write(
@@ -50,20 +58,14 @@ void SqlWorker::runQuery(const QString& callerId, const QString& queryString) {
         "Gui::SqlWorker::runQuery",
         "Db Connection Not Open"
     );
-    return;
     busy = false;
+    return;
   }
 
-  QSqlQuery query(queryString);
-//  if (!query.exec(queryString)) {
-//    std::cout << "sqlworkerqueryerror - " << query.lastError().text().toStdString() << std::endl;
-//    emit errorOccurred(query.lastError().text());
-//    return;
-//  }
+  QSqlQuery query(queryString, db);
 
   QList<QVariantList> rows;
   while (query.next()) {
-    std::cout << "query.next(): " << query.value(0).toString().toStdString() << std::endl;
     QVariantList row;
     for (int i = 0; i < query.record().count(); ++i)
       row << query.value(i);

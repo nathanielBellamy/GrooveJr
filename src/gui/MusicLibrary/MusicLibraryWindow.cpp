@@ -28,18 +28,19 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , playlistClearFilterButton(this)
   {
 
-  workerPool = new SqlWorkerPool();
+  workerPool = new SqlWorkerPool(this);
   if (workerPool != nullptr) {
     workerPool->moveToThread(&workerPoolThread);
+    workerPoolThread.start();
     emit initSqlWorkerPool();
 
-    albumTableView = new AlbumTableView(this, actorSystem, dao, gAppState, &filters);
-    artistTableView = new ArtistTableView(this, actorSystem, dao, gAppState, &filters);
-    audioFileTableView = new AudioFileTableView(this, actorSystem, gAppState, dao, &filters);
-    cacheTableView = new CacheTableView(this, actorSystem, dao, gAppState, &filters);
-    genreTableView = new GenreTableView(this, actorSystem, dao, gAppState, &filters);
-    playlistTableView = new PlaylistTableView(this, actorSystem, dao, gAppState, &filters);
-    queueTableView = new QueueTableView(this, actorSystem, dao, gAppState, &filters);
+    albumTableView = new AlbumTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
+    artistTableView = new ArtistTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
+    audioFileTableView = new AudioFileTableView(this, actorSystem, gAppState, dao, &filters, workerPool);
+    cacheTableView = new CacheTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
+    genreTableView = new GenreTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
+    playlistTableView = new PlaylistTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
+    queueTableView = new QueueTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
 
     workerPool->connectClient(albumTableView->getModel());
     workerPool->connectClient(artistTableView->getModel());
@@ -112,6 +113,9 @@ MusicLibraryWindow::~MusicLibraryWindow() {
   delete genreTableView;
   delete playlistTableView;
   delete queueTableView;
+
+  workerPoolThread.quit();
+  // workerPoolThread.wait();
 
   Logging::write(
     Info,
