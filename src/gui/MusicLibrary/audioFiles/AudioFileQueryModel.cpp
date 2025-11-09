@@ -70,33 +70,5 @@ Result AudioFileQueryModel::refresh() {
   return OK;
 }
 
-
-Result AudioFileQueryModel::connectActions() {
-  const auto queryResultsReadyConnection =
-    connect(sqlWorkerPool, &SqlWorkerPool::queryResultsReady, [&](const QString& callerId, const QList<QVariantList>& rows) {
-      if (callerId != id)
-        return;
-
-      clear();
-      for (const auto& row : rows) {
-        QList<QStandardItem*> items;
-        for (const auto& val : row)
-          items << new QStandardItem(val.toString());
-        appendRow(items);
-      }
-    });
-  //
-  // const auto errorOccurredConnection =
-  //   connect(sqlWorker, &SqlWorker::errorOccurred, this, [&](const QString& error) {
-  //     Logging::write(
-  //       Error,
-  //       "Gui::AudioFileQueryModel::sqlWorker::errorOccurred()",
-  //       "Error: " + error.toStdString()
-  //     );
-  //   });
-
-  return OK;
-};
-
 } // Gui
 } // Gj

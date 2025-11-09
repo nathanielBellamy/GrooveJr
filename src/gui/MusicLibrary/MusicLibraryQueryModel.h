@@ -27,6 +27,32 @@ namespace Gui {
   class SqlWorkerPool;
 
   class MusicLibraryQueryModel : public SqlWorkerPoolClient {
+    Result connectToPool() {
+      const auto queryResultsReadyConnection =
+        connect(sqlWorkerPool, &SqlWorkerPool::queryResultsReady, [&](const QString& callerId, const QList<QVariantList>& rows) {
+          if (callerId != id)
+            return;
+
+          clear();
+          for (const auto& row : rows) {
+            QList<QStandardItem*> items;
+            for (const auto& val : row)
+              items << new QStandardItem(val.toString());
+            appendRow(items);
+          }
+        });
+      //
+      // const auto errorOccurredConnection =
+      //   connect(sqlWorker, &SqlWorker::errorOccurred, this, [&](const QString& error) {
+      //     Logging::write(
+      //       Error,
+      //       "Gui::AudioFileQueryModel::sqlWorker::errorOccurred()",
+      //       "Error: " + error.toStdString()
+      //     );
+      //   });
+      return OK;
+    };
+
   protected:
     QString id;
     SqlWorkerPool* sqlWorkerPool;
@@ -85,14 +111,16 @@ namespace Gui {
       const MusicLibraryType type,
       const QString& id,
       SqlWorkerPool* sqlWorkerPool
-      )
+    )
       : SqlWorkerPoolClient(parent)
       , id(id)
       , sqlWorkerPool(sqlWorkerPool)
       , gAppState(gAppState)
       , type(type)
       , filters(filters)
-    {}
+      {
+      connectToPool();
+    }
 
     virtual Result hydrateState(const AppStatePacket& appStatePacket) = 0;
     virtual Result refresh() = 0;

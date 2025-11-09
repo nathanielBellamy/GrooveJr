@@ -21,13 +21,11 @@ namespace Gj {
 namespace Gui {
 
 class AudioFileQueryModel final : public MusicLibraryQueryModel {
-  Result connectActions();
 
 public:
   explicit AudioFileQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, SqlWorkerPool* sqlWorkerPool)
     : MusicLibraryQueryModel(parent, gAppState, filters, AUDIO_FILE, QString("AudioFileQueryModel"), sqlWorkerPool)
     {
-    connectActions();
     refresh();
   }
   QVariant data(const QModelIndex& item, int role) const override;

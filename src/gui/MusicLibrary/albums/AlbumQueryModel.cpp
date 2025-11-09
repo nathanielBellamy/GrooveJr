@@ -44,7 +44,7 @@ Result AlbumQueryModel::refresh() {
     " group by alb.id"
     " order by alb.title, alb.year";
 
-  setQueryString(queryStr);
+  emit runQuery(id, QString(queryStr.c_str()));
   setHeaderData(ALBUM_COL_TITLE, Qt::Horizontal, QObject::tr("Title"));
   setHeaderData(ALBUM_COL_YEAR, Qt::Horizontal, QObject::tr("Year"));
   setHeaderData(ALBUM_COL_ID, Qt::Horizontal, QObject::tr("Id"));

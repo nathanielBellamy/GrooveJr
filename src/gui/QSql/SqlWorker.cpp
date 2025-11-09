@@ -15,10 +15,8 @@ SqlWorker::~SqlWorker() {
 Result SqlWorker::connectActions(const SqlWorkerPool* pool) {
   const auto initConnection =
     connect(pool, &SqlWorkerPool::initSqlWorker, [&](const int idxToInit) {
-      std::cout << " sql worker " << idx << "init sql worker " << idxToInit << std::endl;
-      if (idx == idxToInit) {
+      if (idx == idxToInit)
         init();
-      }
     });
 
   const auto runQueryConnection =

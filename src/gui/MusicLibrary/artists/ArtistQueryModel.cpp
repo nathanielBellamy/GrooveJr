@@ -49,7 +49,7 @@ Result ArtistQueryModel::refresh() {
     " group by art.id"
     " order by art.name";
 
-  setQueryString(queryStr);
+  emit runQuery(id, QString(queryStr.c_str()));
   setHeaderData(ARTIST_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
   setHeaderData(ARTIST_COL_ID, Qt::Horizontal, QObject::tr("Id"));
   return OK;

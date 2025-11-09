@@ -49,7 +49,7 @@ Result PlaylistQueryModel::refresh() {
     " group by p.id"
     " order by p.name";
 
-  setQueryString(queryStr);
+  emit runQuery(id, QString(queryStr.c_str()));
   setHeaderData(PLAYLIST_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
   setHeaderData(PLAYLIST_COL_ID, Qt::Horizontal, QObject::tr("Id"));
 

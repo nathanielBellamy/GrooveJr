@@ -49,7 +49,7 @@ Result GenreQueryModel::refresh() {
     " group by g.id"
     " order by g.name";
 
-  setQueryString(queryStr);
+  emit runQuery(id, QString(queryStr.c_str()));
   setHeaderData(GENRE_COL_ID, Qt::Horizontal, QObject::tr("Id"));
   setHeaderData(GENRE_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
 
