@@ -62,7 +62,6 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   cacheButton.setCursor(Qt::PointingHandCursor);
   filesButton.setCursor(Qt::PointingHandCursor);
   queueButton.setCursor(Qt::PointingHandCursor);
-  refreshButton.setCursor(Qt::PointingHandCursor);
   albumClearFilterButton.setCursor(Qt::PointingHandCursor);
   artistClearFilterButton.setCursor(Qt::PointingHandCursor);
   genreClearFilterButton.setCursor(Qt::PointingHandCursor);
@@ -71,7 +70,6 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   cacheButton.setText("Cache");
   filesButton.setText("Files");
   queueButton.setText("Queue");
-  refreshButton.setText("Refresh");
   albumClearFilterButton.setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
   artistClearFilterButton.setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
   genreClearFilterButton.setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
@@ -115,7 +113,6 @@ MusicLibraryWindow::~MusicLibraryWindow() {
   delete queueTableView;
 
   workerPoolThread.quit();
-  // workerPoolThread.wait();
 
   Logging::write(
     Info,
@@ -162,7 +159,6 @@ void MusicLibraryWindow::setupGrid() {
   grid.addWidget(&filesButton, 0, 8, 1, 1);
   grid.addWidget(&queueButton, 0, 9, 1, 1);
   grid.addWidget(&cacheButton, 0, 10, 1, 1);
-  grid.addWidget(&refreshButton, 0, 15, 1, 1);
 
   grid.addWidget(&genreHeader, 1, 0, 1, 1);
   grid.addWidget(&genreClearFilterButton, 1, 3, 1, 1);
@@ -201,10 +197,6 @@ Result MusicLibraryWindow::connectActions() {
 
   const auto cacheButtonClickedConnection = connect(&cacheButton, &QPushButton::clicked, this, [&] () {
     showAsMainSection(CACHE_VIEW);
-    refresh();
-  });
-
-  const auto refreshButtonClickedConnection = connect(&refreshButton, &QPushButton::clicked, this, [&] () {
     refresh();
   });
 

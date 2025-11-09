@@ -56,7 +56,6 @@ class MusicLibraryWindow final : public SqlWorkerPoolHost {
   QPushButton cacheButton;
   QPushButton filesButton;
   QPushButton queueButton;
-  QPushButton refreshButton;
   QLabel filtersHeader;
   QPushButton clearFiltersButton;
   QLabel albumHeader;
