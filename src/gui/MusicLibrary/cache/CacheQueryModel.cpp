@@ -56,7 +56,10 @@ Result CacheQueryModel::refresh() {
   if (filters->filters.at(PLAYLIST).ids.size() > 0)
     queryStr += " and atp.playlistId in " + filters->idSqlArray(PLAYLIST);
 
-  emit runQuery(id, QString(queryStr.c_str()));
+  if (queryHasChanged(queryStr.c_str())) {
+    emit runQuery(id, QString(queryStr.c_str()));
+    setPreviousQuery(queryStr);
+  }
   return OK;
 }
 

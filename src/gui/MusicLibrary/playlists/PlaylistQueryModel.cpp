@@ -49,7 +49,10 @@ Result PlaylistQueryModel::refresh() {
     " group by p.id"
     " order by p.name";
 
-  emit runQuery(id, QString(queryStr.c_str()));
+  if (queryHasChanged(queryStr.c_str())) {
+    emit runQuery(id, QString(queryStr.c_str()));
+    setPreviousQuery(queryStr);
+  }
 
   return OK;
 }

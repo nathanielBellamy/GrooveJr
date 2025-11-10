@@ -57,7 +57,10 @@ Result AudioFileQueryModel::refresh() {
 
   queryStr += " order by art.name asc, alb.year asc, alb.title asc, trk.trackNumber asc";
 
-  emit runQuery(id, QString(queryStr.c_str()));
+  if (queryHasChanged(queryStr.c_str())) {
+    emit runQuery(id, QString(queryStr.c_str()));
+    setPreviousQuery(queryStr);
+  }
   return OK;
 }
 

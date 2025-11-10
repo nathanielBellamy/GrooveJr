@@ -49,7 +49,10 @@ Result ArtistQueryModel::refresh() {
     " group by art.id"
     " order by art.name";
 
-  emit runQuery(id, QString(queryStr.c_str()));
+  if (queryHasChanged(queryStr.c_str())) {
+    emit runQuery(id, QString(queryStr.c_str()));
+    setPreviousQuery(queryStr);
+  }
   return OK;
 }
 

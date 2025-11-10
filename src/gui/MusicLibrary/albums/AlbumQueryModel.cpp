@@ -44,7 +44,10 @@ Result AlbumQueryModel::refresh() {
     " group by alb.id"
     " order by alb.title, alb.year";
 
-  emit runQuery(id, QString(queryStr.c_str()));
+  if (queryHasChanged(queryStr.c_str())) {
+    emit runQuery(id, QString(queryStr.c_str()));
+    setPreviousQuery(queryStr);
+  }
   return OK;
 }
 

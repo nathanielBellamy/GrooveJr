@@ -58,7 +58,11 @@ Result QueueQueryModel::refresh() {
 
   queryStr += " order by q.trackNumber asc";
 
-  emit runQuery(id, QString(queryStr.c_str()));
+  if (queryHasChanged(queryStr.c_str())) {
+    emit runQuery(id, QString(queryStr.c_str()));
+    setPreviousQuery(queryStr);
+  }
+
   return OK;
 }
 

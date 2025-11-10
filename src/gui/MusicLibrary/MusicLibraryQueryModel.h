@@ -6,6 +6,7 @@
 #define MUSICLIBRARYQUERYMODEL_H
 
 #include <vector>
+#include <cstring>
 
 #include <QObject>
 #include <QtSql/qsqlquerymodel.h>
@@ -27,6 +28,7 @@ namespace Gui {
   class SqlWorkerPool;
 
   class MusicLibraryQueryModel : public SqlWorkerPoolClient {
+    const char* previousQuery = "";
     Result connectToPool() {
       const auto queryResultsReadyConnection =
         connect(sqlWorkerPool, &SqlWorkerPool::queryResultsReady, [&](const QString& callerId, const QList<QVariantList>& rows) {
@@ -61,13 +63,20 @@ namespace Gui {
     AppState* gAppState;
     MusicLibraryType type;
     MusicLibraryFilters* filters;
-    QString queryString;
 
-    Result setQueryString(const std::string& newQueryString) {
-      queryString = QString(newQueryString.c_str());
-      // setQuery(queryString);
+    Result setPreviousQuery(const std::string& newQueryString) {
+      previousQuery = newQueryString.c_str();
       return OK;
     };
+
+    bool queryHasChanged(const char* newQuery) {
+      if (previousQuery == nullptr) {
+        setPreviousQuery(std::string(newQuery));
+        return true;
+      }
+
+      return std::strcmp(previousQuery, newQuery) != 0;
+    }
 
     bool isCurrentFilter(const QModelIndex& item, const size_t idCol) const {
       std::vector<Db::ID> ids = filters->filters.at(type).ids;

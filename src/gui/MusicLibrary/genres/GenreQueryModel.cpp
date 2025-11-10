@@ -49,7 +49,10 @@ Result GenreQueryModel::refresh() {
     " group by g.id"
     " order by g.name";
 
-  emit runQuery(id, QString(queryStr.c_str()));
+  if (queryHasChanged(queryStr.c_str())) {
+    emit runQuery(id, QString(queryStr.c_str()));
+    setPreviousQuery(queryStr);
+  }
   return OK;
 }
 
