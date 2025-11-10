@@ -50,9 +50,13 @@ Result PlaylistQueryModel::refresh() {
     " order by p.name";
 
   emit runQuery(id, QString(queryStr.c_str()));
+
+  return OK;
+}
+
+Result PlaylistQueryModel::setHeaders() {
   setHeaderData(PLAYLIST_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
   setHeaderData(PLAYLIST_COL_ID, Qt::Horizontal, QObject::tr("Id"));
-
   return OK;
 }
 

@@ -40,6 +40,8 @@ namespace Gui {
               items << new QStandardItem(val.toString());
             appendRow(items);
           }
+
+          setHeaders();
         });
       //
       // const auto errorOccurredConnection =
@@ -124,6 +126,7 @@ namespace Gui {
 
     virtual Result hydrateState(const AppStatePacket& appStatePacket) = 0;
     virtual Result refresh() = 0;
+    virtual Result setHeaders() = 0;
 };
 
 } // Gui

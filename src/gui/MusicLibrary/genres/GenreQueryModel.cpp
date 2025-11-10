@@ -50,9 +50,12 @@ Result GenreQueryModel::refresh() {
     " order by g.name";
 
   emit runQuery(id, QString(queryStr.c_str()));
+  return OK;
+}
+
+Result GenreQueryModel::setHeaders() {
   setHeaderData(GENRE_COL_ID, Qt::Horizontal, QObject::tr("Id"));
   setHeaderData(GENRE_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
-
   return OK;
 }
 

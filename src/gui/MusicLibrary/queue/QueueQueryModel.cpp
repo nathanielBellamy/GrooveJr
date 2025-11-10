@@ -59,6 +59,10 @@ Result QueueQueryModel::refresh() {
   queryStr += " order by q.trackNumber asc";
 
   emit runQuery(id, QString(queryStr.c_str()));
+  return OK;
+}
+
+Result QueueQueryModel::setHeaders() {
   setHeaderData(AUDIO_FILE_COL_TRACK, Qt::Horizontal, QObject::tr("Track"));
   setHeaderData(AUDIO_FILE_COL_ARTIST, Qt::Horizontal, QObject::tr("Artist"));
   setHeaderData(AUDIO_FILE_COL_ALBUM, Qt::Horizontal, QObject::tr("Album"));

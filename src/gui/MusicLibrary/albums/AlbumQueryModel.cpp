@@ -45,12 +45,15 @@ Result AlbumQueryModel::refresh() {
     " order by alb.title, alb.year";
 
   emit runQuery(id, QString(queryStr.c_str()));
+  return OK;
+}
+
+Result AlbumQueryModel::setHeaders() {
   setHeaderData(ALBUM_COL_TITLE, Qt::Horizontal, QObject::tr("Title"));
   setHeaderData(ALBUM_COL_YEAR, Qt::Horizontal, QObject::tr("Year"));
   setHeaderData(ALBUM_COL_ID, Qt::Horizontal, QObject::tr("Id"));
-
   return OK;
-}
+};
 
 QVariant AlbumQueryModel::data(const QModelIndex& item, const int role) const {
   if (role == Qt::BackgroundRole && isCurrentFilter(item, ALBUM_COL_ID))

@@ -31,6 +31,7 @@ public:
 
   Result hydrateState(const AppStatePacket& appStatePacket) override;
   Result refresh() override;
+  Result setHeaders() override;
 
   QVariant data(const QModelIndex& index, int role) const override;
 };

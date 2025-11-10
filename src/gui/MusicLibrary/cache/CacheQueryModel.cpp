@@ -57,6 +57,10 @@ Result CacheQueryModel::refresh() {
     queryStr += " and atp.playlistId in " + filters->idSqlArray(PLAYLIST);
 
   emit runQuery(id, QString(queryStr.c_str()));
+  return OK;
+}
+
+Result CacheQueryModel::setHeaders() {
   setHeaderData(AUDIO_FILE_COL_TRACK, Qt::Horizontal, QObject::tr("Track"));
   setHeaderData(AUDIO_FILE_COL_ARTIST, Qt::Horizontal, QObject::tr("Artist"));
   setHeaderData(AUDIO_FILE_COL_ALBUM, Qt::Horizontal, QObject::tr("Album"));

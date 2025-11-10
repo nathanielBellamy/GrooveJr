@@ -58,6 +58,10 @@ Result AudioFileQueryModel::refresh() {
   queryStr += " order by art.name asc, alb.year asc, alb.title asc, trk.trackNumber asc";
 
   emit runQuery(id, QString(queryStr.c_str()));
+  return OK;
+}
+
+Result AudioFileQueryModel::setHeaders() {
   setHeaderData(AUDIO_FILE_COL_TRACK, Qt::Horizontal, QObject::tr("Track"));
   setHeaderData(AUDIO_FILE_COL_ARTIST, Qt::Horizontal, QObject::tr("Artist"));
   setHeaderData(AUDIO_FILE_COL_ALBUM, Qt::Horizontal, QObject::tr("Album"));
@@ -66,7 +70,6 @@ Result AudioFileQueryModel::refresh() {
   setHeaderData(AUDIO_FILE_COL_GENRE, Qt::Horizontal, QObject::tr("Genre"));
   setHeaderData(AUDIO_FILE_COL_PATH, Qt::Horizontal, QObject::tr("Path"));
   setHeaderData(AUDIO_FILE_COL_ID, Qt::Horizontal, QObject::tr("Id"));
-
   return OK;
 }
 

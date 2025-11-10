@@ -32,6 +32,7 @@ public:
 
   Result hydrateState(const AppStatePacket& appStatePacket) override;
   Result refresh() override;
+  Result setHeaders() override;
 
   void initSqlWorkerPool();
 };
