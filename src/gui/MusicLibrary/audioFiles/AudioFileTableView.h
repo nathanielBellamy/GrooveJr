@@ -18,6 +18,7 @@
 
 #include "../../../Logging.h"
 #include "../../../messaging/atoms.h"
+#include "../../../messaging/DecksState.h"
 #include "../../../actors/ActorIds.h"
 #include "../../../enums/Result.h"
 #include "../../../AppState.h"

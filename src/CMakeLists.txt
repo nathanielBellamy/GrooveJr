@@ -87,6 +87,7 @@ add_executable(GrooveJr
         enums/PlayState.h
         enums/Result.h
         messaging/atoms.h
+        messaging/DecksState.h
         messaging/EnvelopeQtPtr.h
         gui/MainToolBar/transport/TransportControl.cpp
         gui/MainToolBar/transport/TransportControl.h

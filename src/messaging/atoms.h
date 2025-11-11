@@ -4,12 +4,14 @@
 
 #include "../AppState.h"
 #include "./EnvelopeQtPtr.h"
+#include "./DecksState.h"
 
 CAF_BEGIN_TYPE_ID_BLOCK(groovejr, first_custom_type_id)
 
   // typeIds
   CAF_ADD_TYPE_ID(groovejr, (Gj::AppStatePacket))
   CAF_ADD_TYPE_ID(groovejr, (Gj::EnvelopeQtPtr))
+  CAF_ADD_TYPE_ID(groovejr, (Gj::DecksState))
 
   // atoms
   CAF_ADD_ATOM(groovejr, supervisor_status_a)

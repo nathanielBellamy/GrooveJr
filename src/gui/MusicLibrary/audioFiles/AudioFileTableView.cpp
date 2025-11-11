@@ -75,7 +75,20 @@ Result AudioFileTableView::saveCache() const {
 void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent *event) {
   if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {
     const MusicLibraryQueryModel* model = getModel();
-    const Db::ID id = model->index(clickedIndex.row(), AUDIO_FILE_COL_ID).data().toULongLong();
+    const int clickedRow = clickedIndex.row();
+    DecksState decksState;
+    if (clickedRow < 1) {
+      decksState.currentDeckIdx = 0;
+      for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
+        decksState.audioFileIds[i] = model->index(clickedRow + i, AUDIO_FILE_COL_ID).data().toULongLong();
+      }
+      const Db::ID id = model->index(clickedIndex.row(), AUDIO_FILE_COL_ID).data().toULongLong();
+    } else {
+      decksState.currentDeckIdx = 1;
+      for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
+        decksState.audioFileIds[i] = model->index(clickedRow + i - 1, AUDIO_FILE_COL_ID).data().toULongLong();
+      }
+    }
 
     if (saveCache() == ERROR) {
       Logging::write(
@@ -86,27 +99,16 @@ void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent *event) {
       return;
     }
 
-    if (gAppState->getCurrentlyPlaying().audioFile.id == id && !gAppState->queuePlay)
+    if (gAppState->getCurrentlyPlaying().audioFile.id == decksState.audioFileIds[decksState.currentDeckIdx]
+          && !gAppState->queuePlay)
       return;
-
-    gAppState->queuePlay = false;
-    const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
-      dao->audioFileRepository.findDecoratedAudioFileById(id);
-
-    if (!decoratedAudioFile) {
-      Logging::write(
-        Error,
-        "Gui::AudioFileTableView::mouseDoubleClickEvent",
-        "Unable to load DecoratedAudioFile Id: " + std::to_string(id)
-      );
-      return;
-    }
 
     const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
     const scoped_actor self{ actorSystem };
     self->anon_send(
         actor_cast<actor>(appStateManagerPtr),
-        id,
+        false, // queuePlay
+        decksState,
         tc_trig_play_file_a_v
     );
   }

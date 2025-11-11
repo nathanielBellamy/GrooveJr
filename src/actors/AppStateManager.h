@@ -20,6 +20,7 @@
 #include "../Logging.h"
 #include "./ActorIds.h"
 #include "../messaging/atoms.h"
+#include "../messaging/DecksState.h"
 #include "../enums/PlayState.h"
 #include "../AppState.h"
 #include "../audio/AudioCore.h"
@@ -54,7 +55,7 @@ struct AppStateManagerTrait {
                                  result<void>(strong_actor_ptr, bool, tc_trig_ff_ar),
 
                                  // Music Library
-                                 result<void>(uint64_t, tc_trig_play_file_a),
+                                 result<void>(bool /* queuePlay */, DecksState, tc_trig_play_file_a),
 
                                  // Read state
                                  result<void>(strong_actor_ptr, read_state_a),
@@ -377,13 +378,15 @@ struct AppStateManagerState {
 
              hydrateStateToDisplay();
            },
-           [this](const uint64_t audioFileId, tc_trig_play_file_a) {
+           [this](const bool queuePlay, const DecksState decksState, tc_trig_play_file_a) {
+             const int audioFileId = decksState.audioFileIds[decksState.currentDeckIdx];
              Logging::write(
                Info,
                "Act::AppStateManager::tc_trig_play_file_a",
                "Received TC Trig Play File AudioFileId: " + std::to_string(audioFileId)
              );
 
+             gAppState->queuePlay = queuePlay;
              const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
                dao->audioFileRepository.findDecoratedAudioFileById(audioFileId);
 

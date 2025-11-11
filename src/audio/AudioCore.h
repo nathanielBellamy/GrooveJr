@@ -21,7 +21,6 @@
 
 namespace Gj {
 namespace Audio {
-  constexpr int AUDIO_CORE_DECK_COUNT = 3;
 
 struct AudioCore {
   long                             threadId;
