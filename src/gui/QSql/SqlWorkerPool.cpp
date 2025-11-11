@@ -49,7 +49,6 @@ void SqlWorkerPool::runPool() {
     if (queryQueue.empty())
       continue;
 
-    std::cout << "runPool 1" << std::endl;
     int workerIdxToUse = -1;
     for (const auto worker : workers) {
       if (worker->isBusy())
@@ -57,16 +56,13 @@ void SqlWorkerPool::runPool() {
       workerIdxToUse = worker->getIdx();
     }
 
-    std::cout << "runPool 2" << std::endl;
     if (workerIdxToUse == -1)
       continue;
 
-    std::cout << "runPool 3" << std::endl;
     auto [callerId, query] = queryQueue.front();
     queryQueue.pop();
     emit runQueryWithWorker(workerIdxToUse, callerId, query);
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    std::cout << "runPool 4" << std::endl;
   }
 };
 

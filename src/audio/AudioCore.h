@@ -265,6 +265,30 @@ struct AudioCore {
     return OK;
   }
 
+  Result addCassetteFromDecoratedAudioFileAtIdx(const Db::DecoratedAudioFile& decoratedAudioFile, const int deckIndexToSet) {
+    Logging::write(
+      Info,
+      "Audio::AudioCore::addCassetteFromFilePath",
+      "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
+    );
+    if (decks[deckIndexToSet].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
+      Logging::write(
+        Error,
+        "Audio::AudioCore::addCassetteFromFilePath",
+        "Unable to set Cassette from DecoratedAudioFile. Path: " + decoratedAudioFile.audioFile.filePath
+      );
+      return ERROR;
+    };
+    gAppState->setCurrentlyPlaying(decoratedAudioFile);
+
+    Logging::write(
+      Info,
+      "Audio::AudioCore::addCassetteFromFilePath",
+      "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
+    );
+    return OK;
+  }
+
   Result setChannelCount(float val) {
     effectsChannelCount = static_cast<int>(val);
     channelCount = val;

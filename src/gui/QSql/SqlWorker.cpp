@@ -48,7 +48,6 @@ void SqlWorker::init() {
 }
 
 void SqlWorker::runQuery(const QString& callerId, const QString& queryString) {
-  std::cout << " SqlWorker" << idx << "runQuery " << callerId.toStdString() << " " << queryString.toStdString() << std::endl;
   busy = true;
   if (!db.open()) {
     Logging::write(

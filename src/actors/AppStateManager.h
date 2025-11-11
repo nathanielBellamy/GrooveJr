@@ -387,26 +387,34 @@ struct AppStateManagerState {
              );
 
              gAppState->queuePlay = queuePlay;
-             const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
-               dao->audioFileRepository.findDecoratedAudioFileById(audioFileId);
-
-             if (!decoratedAudioFile) {
-               Logging::write(
-                 Error,
-                 "Act::AppStateManager::tc_trig_play_file_a",
-                 "Unable to load DecoratedAudioFile Id: " + std::to_string(audioFileId)
-               );
-               return;
+             Db::DecoratedAudioFile decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT];
+             for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
+               const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
+                 dao->audioFileRepository.findDecoratedAudioFileById(decksState.audioFileIds[i]);
+               if (decoratedAudioFile) {
+                 decoratedAudioFiles[i] = decoratedAudioFile.value();
+               } else {
+                 Logging::write(
+                   Error,
+                   "Act::AppStateManager::tc_trig_play_file_a",
+                   "Unable to load DecoratedAudioFile Id: " + std::to_string(audioFileId)
+                 );
+               }
              }
 
-             if (audioCore->addCassetteFromDecoratedAudioFile(decoratedAudioFile.value()) == ERROR) {
-               Logging::write(
-                 Error,
-                 "Act::AppStateManager::tc_trig_play_file_a",
-                 "Unable to addCassette from DecoratedAudioFile filePath: " + decoratedAudioFile->audioFile.filePath
-               );
-               return;
+             for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
+               if (audioCore->addCassetteFromDecoratedAudioFileAtIdx(decoratedAudioFiles[i], i) == ERROR) {
+                 Logging::write(
+                   Error,
+                   "Act::AppStateManager::tc_trig_play_file_a",
+                   "Unable to addCassette from DecoratedAudioFile filePath: " + decoratedAudioFiles[i].audioFile.filePath
+                 );
+                 return;
+               }
              }
+             audioCore->deckIndex = decksState.currentDeckIdx;
+             audioCore->deckIndexNext = decksState.currentDeckIdx;
+             gAppState->setCurrentlyPlaying(audioCore->currentDeck().decoratedAudioFile.value());
 
              Logging::write(
                Info,
