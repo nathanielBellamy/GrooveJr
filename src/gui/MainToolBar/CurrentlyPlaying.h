@@ -24,7 +24,7 @@ using namespace caf;
 class CurrentlyPlaying final : public QWidget {
   public:
     explicit CurrentlyPlaying(QWidget *parent, actor_system& actorSystem, Audio::Mixer* mixer);
-    void hydrateState(const AppStatePacket& appStatePacket);
+    void hydrateState(const AppStatePacket& appStatePacket) const;
 
   private:
     actor_system& actorSystem;

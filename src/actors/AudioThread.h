@@ -71,7 +71,7 @@ struct AudioThreadState {
                "Instantiating AudioPlayer"
              );
              try {
-               if (Audio::AudioPlayer audioPlayer (audioCore, mixer, gAppState); audioPlayer.run() == ERROR)
+               if (Audio::AudioPlayer audioPlayer (self->system(), audioCore, mixer, gAppState); audioPlayer.run() == ERROR)
                  Logging::write(
                    Error,
                    "Act::AudioThread::audio_thread_init_a",

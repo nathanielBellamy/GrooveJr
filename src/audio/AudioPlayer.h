@@ -9,6 +9,9 @@
 #include <thread>
 #include <chrono>
 
+#include "caf/actor_system.hpp"
+#include "caf/scoped_actor.hpp"
+
 #include "AudioCore.h"
 #include "Constants.h"
 #include "Mixer.h"
@@ -20,9 +23,12 @@
 namespace Gj {
 namespace Audio {
 
+using namespace caf;
+
 struct AudioPlayer {
 
   long threadId;
+  actor_system& actorSystem;
   AudioCore* audioCore;
   Mixer* mixer;
   AppState* gAppState;
@@ -35,8 +41,9 @@ struct AudioPlayer {
   float fft_eq_buffer[FFT_EQ_RING_BUFFER_SIZE]{};
   float vu_buffer[VU_RING_BUFFER_SIZE]{};
 
-  AudioPlayer(AudioCore* audioCore, Mixer* mixer, AppState* gAppState)
+  AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer* mixer, AppState* gAppState)
     : threadId(ThreadStatics::incrThreadId())
+    , actorSystem(actorSystem)
     , audioCore(audioCore)
     , mixer(mixer)
     , gAppState(gAppState)
@@ -420,8 +427,20 @@ struct AudioPlayer {
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj
-      if (audioCore->shouldUpdateDeckIndex())
+
+      if (vu_ring_buffer_out == nullptr)
+        std::cout << "ooooooo nooooooo" << std::endl;
+
+      if (audioCore->shouldUpdateDeckIndex()) {
         audioCore->updateDeckIndexToNext();
+
+        const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+        const scoped_actor self{ actorSystem };
+        self->anon_send(
+            actor_cast<actor>(appStateManagerPtr),
+           hydrate_display_a_v
+        );
+      }
 
       updateRingBuffers(
         audioCore->effectsChannelsSettingsRB,

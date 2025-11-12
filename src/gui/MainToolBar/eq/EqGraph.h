@@ -36,7 +36,7 @@ namespace Gui {
   constexpr int EG_GRAPH_TRIM = 125;
   constexpr int EG_GRAPH_AVG_SIZE = 6;
 
-class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
+class EqGraph final : public QOpenGLWidget, protected QOpenGLFunctions {
 
   public:
     EqGraph(QWidget* parent, Audio::Mixer* mixer);
@@ -48,6 +48,7 @@ class EqGraph : public QOpenGLWidget, protected QOpenGLFunctions {
     void animationLoop();
 
   private:
+    bool running = false;
     int h = 75;
     int w = Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM;
     int maxBarH = 30;

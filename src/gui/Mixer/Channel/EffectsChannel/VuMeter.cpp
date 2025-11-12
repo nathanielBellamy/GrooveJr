@@ -7,14 +7,14 @@
 namespace Gj {
 namespace Gui {
 
-VuMeter::VuMeter(QWidget* parent, Audio::Mixer* mixer, std::atomic<float>* vuPtr, int channelIndex)
+VuMeter::VuMeter(QWidget* parent, Audio::Mixer* mixer, std::atomic<float>* vuPtr, const int channelIndex)
   : QOpenGLWidget(parent)
-  , mixer(mixer)
+  , channelIndex(channelIndex)
   , vao(0)
   , vbo(0)
-  , vuPtr(vuPtr)
-  , channelIndex(channelIndex)
   , program(nullptr)
+  , mixer(mixer)
+  , vuPtr(vuPtr)
   {
 
   animationStart();
@@ -37,7 +37,7 @@ void VuMeter::initializeGL() {
   initializeOpenGLFunctions();
   glClearColor(0, 0, 0, 255);
 
-  static const char* vertexShaderSource = R"(
+  static auto vertexShaderSource = R"(
       attribute highp vec4 vertex;
       // uniform highp mat4 matrix;
       void main(void) {
@@ -45,7 +45,7 @@ void VuMeter::initializeGL() {
       }
   )";
 
-  static const char* fragmentShaderSource = R"(
+  static auto fragmentShaderSource = R"(
     uniform mediump vec4 color;
     void main(void) {
        gl_FragColor = color;
@@ -58,7 +58,7 @@ void VuMeter::initializeGL() {
   program->link();
   program->bind();
 
-  int vertexLocation = program->attributeLocation("vertex");
+  const int vertexLocation = program->attributeLocation("vertex");
   program->enableAttributeArray(vertexLocation);
   colorLocation = program->uniformLocation("color");
 
@@ -74,12 +74,12 @@ void VuMeter::initializeGL() {
 }
 
 void VuMeter::paintGL() {
-//  if (runAnimation.load()) {
-//    glClearColor(0, 0, 0, 255);
-//    glClear(GL_COLOR_BUFFER_BIT);
-//  } else {
-//    return;
-//  }
+  if (runAnimation.load()) {
+    glClearColor(0, 0, 0, 255);
+    glClear(GL_COLOR_BUFFER_BIT);
+  } else {
+    return;
+  }
 
   program->bind();
 
@@ -148,6 +148,7 @@ void VuMeter::animationLoop() {
 
   vuVals[0] = vuPtr[0].load();
   vuVals[1] = vuPtr[1].load();
+
   update();
 }
 

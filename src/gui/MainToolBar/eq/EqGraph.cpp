@@ -198,11 +198,17 @@ void EqGraph::mousePressEvent(QMouseEvent* event) {
 Result EqGraph::hydrateState(const AppStatePacket& appStatePacket) {
   switch (appStatePacket.playState) {
     case PLAY:
-      startWorker();
+      if (!running) {
+        running = true;
+        startWorker();
+      }
       break;
     case PAUSE:
     case STOP:
-      stopWorker();
+      if (running) {
+        stopWorker();
+        running = false;
+      }
       break;
   }
 

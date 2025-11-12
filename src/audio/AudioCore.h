@@ -312,7 +312,12 @@ struct AudioCore {
     );
 
     decks[deckIndex].playState = STOP;
-    decks[deckIndexNext].playState = PLAY;
+    if (decks[deckIndexNext].decoratedAudioFile) {
+      gAppState->setCurrentlyPlaying(decks[deckIndexNext].decoratedAudioFile.value());
+      decks[deckIndexNext].playState = PLAY;
+    } else {
+      decks[deckIndexNext].playState = STOP;
+    }
     deckIndex = deckIndexNext;
     return OK;
   }
