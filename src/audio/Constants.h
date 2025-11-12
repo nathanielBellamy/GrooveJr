@@ -9,6 +9,7 @@ namespace Gj {
 namespace Audio {
 
   constexpr unsigned int AUDIO_CORE_DECK_COUNT = 3;
+  constexpr size_t RING_BUFFER_PADDING = 64; //128;
 
   constexpr unsigned int MAX_EFFECTS_CHANNELS = 50;
   constexpr unsigned int VU_RING_BUFFER_SIZE  = 2 * MAX_EFFECTS_CHANNELS;

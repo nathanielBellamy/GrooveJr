@@ -560,7 +560,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   }
 
   const float nframesF = static_cast<float>(nframes);
-  for (int effectsChannelIdx = 1; effectsChannelIdx < audioCore->effectsChannelCount + 1; effectsChannelIdx++) {
+  for (int effectsChannelIdx = 1; effectsChannelIdx < MAX_EFFECTS_CHANNELS; effectsChannelIdx++) {
     const int bufferIndex = 2 * effectsChannelIdx;
     audioCore->vu_buffer_in[bufferIndex] = std::sqrt(rmsL[effectsChannelIdx] / nframesF);
     audioCore->vu_buffer_in[bufferIndex + 1] = std::sqrt(rmsR[effectsChannelIdx] / nframesF);

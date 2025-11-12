@@ -39,7 +39,9 @@ struct AudioPlayer {
   sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
   sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
   float fft_eq_buffer[FFT_EQ_RING_BUFFER_SIZE]{};
+  jack_ringbuffer_t* fft_eq_ring_buffer_out;
   float vu_buffer[VU_RING_BUFFER_SIZE]{};
+  jack_ringbuffer_t* vu_ring_buffer_out;
 
   AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer* mixer, AppState* gAppState)
     : threadId(ThreadStatics::incrThreadId())
@@ -102,6 +104,8 @@ struct AudioPlayer {
         );
       }
     }
+    jack_ringbuffer_free(vu_ring_buffer_out);
+    jack_ringbuffer_free(fft_eq_ring_buffer_out);
     jackClientIsActive = false;
   }
 
@@ -222,21 +226,11 @@ struct AudioPlayer {
     };
   }
 
-  Result updateRingBuffers(
-    jack_ringbuffer_t* effectsChannelsSettingsRB,
-    jack_ringbuffer_t* playbackSettingsToAudioThreadRB,
-    jack_ringbuffer_t* playbackSettingsFromAudioThreadRB,
-    jack_ringbuffer_t* fft_eq_ring_buffer,
-    jack_ringbuffer_t* fft_eq_ring_buffer_out,
-    jack_ringbuffer_t* vu_ring_buffer,
-    jack_ringbuffer_t* vu_ring_buffer_out,
-    int channelCount
-  ) {
-
+  Result updateRingBuffers(const int channelCount) {
     // read vu_ring_buffer
-    if (jack_ringbuffer_read_space(vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
+    if (jack_ringbuffer_read_space(audioCore->vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
       jack_ringbuffer_read(
-        vu_ring_buffer,
+        audioCore->vu_ring_buffer,
         reinterpret_cast<char*>(vu_buffer),
         VU_RING_BUFFER_SIZE
       );
@@ -251,9 +245,9 @@ struct AudioPlayer {
     }
 
     // read fft_eq_ring_buffer
-    if (jack_ringbuffer_read_space(fft_eq_ring_buffer) > FFT_EQ_RING_BUFFER_SIZE - 2) {
+    if (jack_ringbuffer_read_space(audioCore->fft_eq_ring_buffer) > FFT_EQ_RING_BUFFER_SIZE - 2) {
       jack_ringbuffer_read(
-        fft_eq_ring_buffer,
+        audioCore->fft_eq_ring_buffer,
         reinterpret_cast<char*>(fft_eq_buffer),
         FFT_EQ_RING_BUFFER_SIZE
       );
@@ -268,9 +262,9 @@ struct AudioPlayer {
     }
 
     // read playbackSettingsFromAudioThread ring buffer
-    if (jack_ringbuffer_read_space(playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
+    if (jack_ringbuffer_read_space(audioCore->playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
       jack_ringbuffer_read(
-        playbackSettingsFromAudioThreadRB,
+        audioCore->playbackSettingsFromAudioThreadRB,
         reinterpret_cast<char*>(playbackSettingsFromAudioThread),
         PlaybackSettingsFromAudioThread_RB_SIZE
       );
@@ -292,9 +286,9 @@ struct AudioPlayer {
     }
 
     // write to playbackSettingsToAudioThread ring buffer
-    if (jack_ringbuffer_write_space(playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE - 2) {
+    if (jack_ringbuffer_write_space(audioCore->playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE - 2) {
       jack_ringbuffer_write(
-        playbackSettingsToAudioThreadRB,
+        audioCore->playbackSettingsToAudioThreadRB,
         reinterpret_cast<char*>(playbackSettingsToAudioThread),
         PlaybackSettingsToAudioThread_RB_SIZE
       );
@@ -373,8 +367,8 @@ struct AudioPlayer {
     }
 
     // write to effectsSettings ring buffer
-    if (jack_ringbuffer_write_space(effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE) {
-      jack_ringbuffer_write(effectsChannelsSettingsRB, reinterpret_cast<char*>(effectsChannelsSettings), EffectsSettings_RB_SIZE);
+    if (jack_ringbuffer_write_space(audioCore->effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE) {
+      jack_ringbuffer_write(audioCore->effectsChannelsSettingsRB, reinterpret_cast<char*>(effectsChannelsSettings), EffectsSettings_RB_SIZE);
     }
 
     return OK;
@@ -397,6 +391,16 @@ struct AudioPlayer {
               // && frameId < sfInfo.frames
   }
 
+  Result createRingBuffers() {
+    fft_eq_ring_buffer_out = jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE);
+    mixer->getSetEqRingBufferFunc()(fft_eq_ring_buffer_out);
+
+    vu_ring_buffer_out = jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS);
+    mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
+
+    return OK;
+  }
+
   Result run() {
     Logging::write(
       Info,
@@ -406,19 +410,7 @@ struct AudioPlayer {
 
     const int channelCount = mixer->getEffectsChannelsCount() + 1;
 
-    audioCore->effectsChannelsSettingsRB = jack_ringbuffer_create(EffectsSettings_RB_SIZE);
-    audioCore->playbackSettingsToAudioThreadRB = jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE);
-    audioCore->playbackSettingsFromAudioThreadRB = jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE);
-
-    audioCore->fft_eq_ring_buffer = jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE);
-
-    jack_ringbuffer_t* fft_eq_ring_buffer_out = jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE);
-    mixer->getSetEqRingBufferFunc()(fft_eq_ring_buffer_out);
-
-    audioCore->vu_ring_buffer = jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS);
-
-    jack_ringbuffer_t* vu_ring_buffer_out = jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS);
-    mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
+    createRingBuffers();
 
     audioCore->playState = PLAY;
     audioCore->decks[audioCore->deckIndex].playState = PLAY;
@@ -427,9 +419,6 @@ struct AudioPlayer {
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj
-
-      if (vu_ring_buffer_out == nullptr)
-        std::cout << "ooooooo nooooooo" << std::endl;
 
       if (audioCore->shouldUpdateDeckIndex()) {
         audioCore->updateDeckIndexToNext();
@@ -442,16 +431,7 @@ struct AudioPlayer {
         );
       }
 
-      updateRingBuffers(
-        audioCore->effectsChannelsSettingsRB,
-        audioCore->playbackSettingsToAudioThreadRB,
-        audioCore->playbackSettingsFromAudioThreadRB,
-        audioCore->fft_eq_ring_buffer,
-        fft_eq_ring_buffer_out,
-        audioCore->vu_ring_buffer,
-        vu_ring_buffer_out,
-        channelCount
-      );
+      updateRingBuffers(channelCount);
 
       if ( audioCore->threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
         // TODO

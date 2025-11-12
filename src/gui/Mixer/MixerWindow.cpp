@@ -15,6 +15,7 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
   , soloChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::AudioInputMicrophone), tr("&Solo Channel"), this)
   , grid(this)
   , title(this)
+  , vuRingBuffer(nullptr)
   , mainChannelContainer(
     this, actorSystem, mixer,
     &muteChannelAction, &muteLChannelAction, &muteRChannelAction,
@@ -67,6 +68,7 @@ Result MixerWindow::vuWorkerStart() {
       }
 
       vuAvgIndex = (vuAvgIndex + 1) % VU_METER_AVG_SIZE;
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
   });
   vuWorker.detach();
@@ -76,7 +78,6 @@ Result MixerWindow::vuWorkerStart() {
 
 Result MixerWindow::vuWorkerStop() {
   stopVuWorker.store(true);
-
   return OK;
 }
 

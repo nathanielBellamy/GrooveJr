@@ -141,7 +141,6 @@ void EqGraph::startWorker() {
         }
 
         const float wF = static_cast<float>(Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM);
-        const float xZero = (Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM) / 2;
         const float barWidth = 2.0f / wF;
 
         for (int i = 0; i < Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM - 1; i += 2) {

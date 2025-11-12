@@ -80,6 +80,11 @@ struct AudioCore {
 
   AudioCore(AppState* gAppState)
     : gAppState(gAppState)
+    , fft_eq_ring_buffer(jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE))
+    , vu_ring_buffer(jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS))
+    , effectsChannelsSettingsRB(jack_ringbuffer_create(EffectsSettings_RB_SIZE))
+    , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE))
+    , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE))
     {
     Logging::write(
       Info,
@@ -101,6 +106,12 @@ struct AudioCore {
     fftwf_destroy_plan(fft_eq_1_plan_r2c);
     fftwf_destroy_plan(fft_pv_plan_r2c);
     fftwf_destroy_plan(fft_pv_plan_c2r);
+
+    jack_ringbuffer_free(fft_eq_ring_buffer);
+    jack_ringbuffer_free(vu_ring_buffer);
+    jack_ringbuffer_free(effectsChannelsSettingsRB);
+    jack_ringbuffer_free(playbackSettingsToAudioThreadRB);
+    jack_ringbuffer_free(playbackSettingsFromAudioThreadRB);
 
     Logging::write(
       Info,
