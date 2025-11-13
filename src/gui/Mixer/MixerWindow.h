@@ -28,6 +28,7 @@ namespace Gui {
 class MixerWindow final : public QWidget {
   public:
     explicit MixerWindow(QWidget *parent, actor_system& actorSystem, Audio::Mixer* mixer);
+    ~MixerWindow();
     void hydrateState(const AppStatePacket& appStatePacket);
     void setChannels();
     void setEffects();
@@ -48,6 +49,7 @@ class MixerWindow final : public QWidget {
     EffectsChannelsContainer effectsChannelsContainer;
 
     std::thread vuWorker;
+    std::atomic<bool> vuWorkerRunning = false;
     std::atomic<bool> stopVuWorker;
     jack_ringbuffer_t* vuRingBuffer;
     float vuBufferIn[Audio::VU_RING_BUFFER_SIZE]{ 0.0f };

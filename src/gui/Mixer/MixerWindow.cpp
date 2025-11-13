@@ -42,10 +42,15 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
   setupGrid();
 }
 
+MixerWindow::~MixerWindow() {
+  vuWorkerStop();
+}
+
 Result MixerWindow::vuWorkerStart() {
   stopVuWorker.store(false);
   vuWorker = std::thread([this]() {
-    while (!stopVuWorker.load()) {
+    vuWorkerRunning = true;
+    while (!stopVuWorker) {
       if (vuRingBuffer == nullptr)
         continue;
 
@@ -70,6 +75,8 @@ Result MixerWindow::vuWorkerStart() {
       vuAvgIndex = (vuAvgIndex + 1) % VU_METER_AVG_SIZE;
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+
+    vuWorkerRunning = false;
   });
   vuWorker.detach();
 
@@ -85,10 +92,12 @@ void MixerWindow::hydrateState(const AppStatePacket &appState) {
   mainChannelContainer.hydrateState(appState);
   effectsChannelsContainer.hydrateState(appState);
 
-  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW)
-    vuWorkerStart();
-  else
+  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
+    if (!vuWorkerRunning)
+      vuWorkerStart();
+  } else {
     vuWorkerStop();
+  }
 }
 
 void MixerWindow::setStyle() {
