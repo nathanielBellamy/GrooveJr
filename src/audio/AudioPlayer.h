@@ -275,7 +275,7 @@ struct AudioPlayer {
 
     playbackSettingsToAudioThread[0] = 0;
     playbackSettingsToAudioThread[1] = 0;
-    playbackSettingsToAudioThread[2] = ThreadStatics::getPlaybackSpeed();
+    playbackSettingsToAudioThread[2] = std::floor(audioCore->playbackSpeed * 100.0f);
 
     if (ThreadStatics::getUserSettingFrameId()) {
       const sf_count_t newFrameId = ThreadStatics::getFrameId();
@@ -436,7 +436,6 @@ struct AudioPlayer {
       if ( audioCore->threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
         // TODO
       } else {
-        audioCore->playbackSpeed = ThreadStatics::getPlaybackSpeed();
         audioCore->playState = ThreadStatics::getPlayState();
         ThreadStatics::setFrameId( audioCore->currentDeck().frameId );
       }

@@ -121,12 +121,6 @@ int main(int argc, char *argv[]) {
     "main",
     "Instantiated vst3PluginContext"
   );
-  Mixer = new Audio::Mixer(gAppState, Dao);
-  Logging::write(
-    Info,
-    "main",
-    "Instantiated Mixer"
-    );
 
   audioCore = new Audio::AudioCore(gAppState);
   Logging::write(
@@ -134,6 +128,13 @@ int main(int argc, char *argv[]) {
     "main",
     "Instantiated audioCore"
   );
+
+  Mixer = new Audio::Mixer(gAppState, Dao, audioCore);
+  Logging::write(
+    Info,
+    "main",
+    "Instantiated Mixer"
+    );
 
   // init actor system
   init_global_meta_objects<id_block::groovejr>();

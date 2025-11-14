@@ -75,6 +75,7 @@ int Dao::initSchema() const {
       sceneId integer,
       sceneIndex integer,
       crossfade integer,
+      currentlyPlaying integer,
       createdAt datetime default current_timestamp
     );
 
@@ -83,6 +84,7 @@ int Dao::initSchema() const {
       id integer primary key autoincrement,
       sceneIndex integer not null,
       name text not null,
+      playbackSpeed real not null default 1.0,
       version integer not null,
       createdAt datetime default current_timestamp
     );

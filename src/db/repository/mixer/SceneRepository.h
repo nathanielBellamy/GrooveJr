@@ -6,6 +6,7 @@
 #define SCENEREPOSITORY_H
 
 #include <vector>
+#include <optional>
 
 #include <sqlite3.h>
 
@@ -15,6 +16,7 @@
 #include "../../entity/mixer/Scene.h"
 #include "../../entity/mixer/Effect.h"
 #include "../../entity/mixer/ChannelEntity.h"
+#include "../../Types.h"
 
 namespace Gj {
 namespace Db {
@@ -30,6 +32,7 @@ class SceneRepository {
     std::vector<ChannelEntity> getChannels(int sceneId) const;
     std::vector<Effect> getEffects(int sceneId) const;
     int findOrCreateBySceneIndex(int sceneIndex) const;
+    std::optional<Scene> find(ID sceneId) const;
 };
 
 } // Db

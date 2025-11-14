@@ -16,9 +16,6 @@ std::atomic<sf_count_t> ThreadStatics::frames { 0 };
 PlayState ThreadStatics::playState = STOP;
 std::mutex ThreadStatics::playStateMutex;
 
-sf_count_t ThreadStatics::playbackSpeed = 100LL;
-std::mutex ThreadStatics::playbackSpeedMutex;
-
 long ThreadStatics::threadId = 0;
 std::mutex ThreadStatics::threadIdMutex;
 
@@ -30,16 +27,6 @@ sf_count_t ThreadStatics::getFrameId() {
 void ThreadStatics::setFrameId(sf_count_t newId) {
   std::lock_guard guard(frameIdMutex);
   frameId = newId;
-}
-
-void ThreadStatics::setPlaybackSpeed(const sf_count_t newSpeed) {
-  std::lock_guard guard(playbackSpeedMutex);
-  playbackSpeed = newSpeed;
-}
-
-sf_count_t ThreadStatics::getPlaybackSpeed() {
-  std::lock_guard guard(playbackSpeedMutex);
-  return playbackSpeed;
 }
 
 Gj::PlayState ThreadStatics::getPlayState() {

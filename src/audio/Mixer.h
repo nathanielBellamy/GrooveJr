@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <memory>
 #include <atomic>
+#include <optional>
 
 #include <sndfile.hh>
 #include <jack/ringbuffer.h>
@@ -28,6 +29,7 @@
 #include "../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
 #include "effects/vst3/Util.h"
 #include "ThreadStatics.h"
+#include "AudioCore.h"
 
 namespace Gj {
 namespace Audio {
@@ -49,8 +51,9 @@ class Mixer {
   void incorporateLatencySamples(int latencySamples) const;
 
 public:
+  AudioCore* audioCore;
   Db::Dao* dao;
-  explicit Mixer(AppState*, Db::Dao*);
+  explicit Mixer(AppState*, Db::Dao*, AudioCore*);
   ~Mixer();
 
   [[nodiscard]]
@@ -59,12 +62,12 @@ public:
   };
 
   Result setPlaybackSpeed(const int newPlaybackSpeed) {
-    ThreadStatics::setPlaybackSpeed(newPlaybackSpeed);
+    audioCore->playbackSpeed = static_cast<float>(newPlaybackSpeed) / 100.0f;
     return OK;
   }
 
   sf_count_t getPlaybackSpeed() const {
-    return ThreadStatics::getPlaybackSpeed();
+    return std::floor(audioCore->playbackSpeed * 100.0f);
   }
 
   [[nodiscard]]
@@ -122,7 +125,7 @@ public:
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);
   };
 
-  int loadScene();
+  Result loadScene();
   int loadSceneByIndex(int sceneIndex);
   int deleteChannels();
   int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);

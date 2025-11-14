@@ -16,10 +16,11 @@ struct Scene {
   int id;
   int sceneIndex;
   std::string name;
+  float playbackSpeed = 1.0f;
   int version = 0;
 
-  Scene(int id, int sceneIndex, const std::string& name, int version);
-  Scene(int sceneIndex, const std::string& name);
+  Scene(int id, int sceneIndex, const std::string& name, float playbackSpeed, int version);
+  Scene(int sceneIndex, const std::string& name, float playbackSpeed);
   static Scene deser(sqlite3_stmt* stmt);
 };
 

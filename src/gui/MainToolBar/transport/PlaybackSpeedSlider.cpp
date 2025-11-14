@@ -14,7 +14,7 @@ PlaybackSpeedSlider::PlaybackSpeedSlider(QWidget* parent, Audio::Mixer* mixer)
   setMinimum(-200);
   setMaximum(200);
   setTickInterval(1);
-  setValue(100);
+  setValue(std::floor(mixer->audioCore->playbackSpeed * 100.0f));
   setTickPosition(QSlider::NoTicks);
   auto connection = connect(this, &QSlider::valueChanged, [&mixer](const int newPlaybackSpeed) {
     mixer->setPlaybackSpeed(newPlaybackSpeed);

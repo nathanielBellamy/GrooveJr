@@ -9,9 +9,10 @@
 #include <sndfile.h>
 #include <jack/jack.h>
 
+#include "../Types.h"
+
 namespace Gj {
 namespace Db {
-
 
 struct AppStateEntity {
   int id;
@@ -19,8 +20,16 @@ struct AppStateEntity {
   int sceneId;
   int sceneIndex;
   sf_count_t crossfade;
+  ID currentlyPlaying;
 
-  AppStateEntity(int id, jack_nframes_t audioFramesPerBuffer, int sceneId, int sceneIndex, sf_count_t crossfade);
+  AppStateEntity(
+    int id,
+    jack_nframes_t audioFramesPerBuffer,
+    int sceneId,
+    int sceneIndex,
+    sf_count_t crossfade,
+    ID currentlyPlaying
+  );
 
   static AppStateEntity deser(sqlite3_stmt* stmt);
 

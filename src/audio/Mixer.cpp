@@ -9,11 +9,12 @@ namespace Audio {
 
 using namespace Steinberg;
 
-Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
+Mixer::Mixer(AppState* gAppState, Db::Dao* dao, AudioCore* audioCore)
   : gAppState(gAppState)
-  , dao(dao)
   , jackClient(new JackClient(this))
   , channelCount(1.0f)
+  , audioCore(audioCore)
+  , dao(dao)
   {
 
   Logging::write(
@@ -240,13 +241,24 @@ bool Mixer::setGainOnChannel(const int channelIdx, const float gain) const {
   return effectsChannels.at(channelIdx)->setGain(gain);
 }
 
-int Mixer::loadScene() {
+Result Mixer::loadScene() {
   const int sceneId = gAppState->getSceneId();
   Logging::write(
     Info,
     "Audio::Mixer::loadScene",
     "Loading sceneIndex: " + std::to_string(gAppState->getSceneIndex()) + " sceneId: " + std::to_string(sceneId)
   );
+
+  const std::optional<Db::Scene> scene = dao->sceneRepository.find(sceneId);
+  if (!scene) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::loadScene",
+      "Unable to load scene sceneId: " + std::to_string(sceneId)
+    );
+    return ERROR;
+  }
+  audioCore->playbackSpeed = scene->playbackSpeed;
 
   const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(sceneId);
   setChannels(channels);
@@ -259,7 +271,7 @@ int Mixer::loadScene() {
     "Loading scene id: " + std::to_string(sceneId)
   );
 
-  return 0;
+  return OK;
 }
 
 int Mixer::loadSceneByIndex(const int sceneIndex) {
@@ -390,7 +402,7 @@ int Mixer::saveScene() const {
     "Saving scene, sceneIndex: " + std::to_string(gAppState->sceneIndex)
   );
 
-  const auto scene = Db::Scene(gAppState->sceneIndex, "Mixer Scene");
+  const auto scene = Db::Scene(gAppState->sceneIndex, "Mixer Scene", audioCore->playbackSpeed);
   const int sceneId = dao->sceneRepository.save(scene);
   gAppState->setSceneId(sceneId);
   if (const int persistRes = dao->appStateRepository.persistAndSet(); persistRes != 0) {

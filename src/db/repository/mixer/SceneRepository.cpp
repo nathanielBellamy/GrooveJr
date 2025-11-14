@@ -132,6 +132,45 @@ std::vector<Effect> SceneRepository::getEffects(const int sceneId) const {
   return effects;
 }
 
+std::optional<Scene> SceneRepository::find(const ID sceneId) const {
+  // find
+  const std::string query = R"sql(
+    select *
+    from scenes
+    where id = ?
+    limit 1
+  )sql";
+
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::SceneRepository::find",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return std::nullopt;
+  }
+
+  sqlite3_bind_int(stmt, 1, sceneId);
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    const auto scene = Scene::deser(stmt);
+    Logging::write(
+      Info,
+      "Db::SceneRepository::find",
+      "Found scene sceneId: " + std::to_string(scene.id) + " sceneIndex: " + std::to_string(scene.sceneIndex)
+    );
+    return std::optional(scene);
+  }
+
+  Logging::write(
+    Error,
+    "Db::SceneRepository::find",
+    "Unable to find scene sceneId: " + std::to_string(sceneId)
+  );
+  return std::nullopt;
+}
+
 int SceneRepository::findOrCreateBySceneIndex(const int sceneIndex) const {
   // find
   const std::string query = R"sql(
@@ -146,7 +185,7 @@ int SceneRepository::findOrCreateBySceneIndex(const int sceneIndex) const {
   if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     Logging::write(
       Error,
-      "Db::SceneRepository::getEffects",
+      "Db::SceneRepository::findOrCreateBySceneIndex",
       "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
     );
     return 0;
