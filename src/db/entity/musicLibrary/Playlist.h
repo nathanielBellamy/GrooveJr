@@ -13,13 +13,14 @@
 
 #include "../../../enums/AudioCodec.h"
 #include "../../Types.h"
+#include "../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Db {
 
 struct Playlist {
   ID id;
-  std::string name;
+  AtomicStr name;
 
   Playlist(ID id, const std::string& name);
   Playlist(const std::string& name);

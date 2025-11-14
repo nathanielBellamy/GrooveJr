@@ -10,13 +10,14 @@
 #include <sqlite3.h>
 
 #include "../../Types.h"
+#include "../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Db {
 
 struct Artist {
   ID id;
-  std::string name;
+  AtomicStr name;
 
   Artist(const ID id, const std::string& name)
       : id(id)

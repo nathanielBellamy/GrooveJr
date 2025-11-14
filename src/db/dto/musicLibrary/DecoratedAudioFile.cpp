@@ -16,7 +16,7 @@ DecoratedAudioFile::DecoratedAudioFile(Album album, Artist artist, AudioFile aud
   Logging::write(
     Info,
     "Db::TrackDecorate::TrackDecoratedDto",
-    "Created TrackDecorate for track title: " + track.title
+    "Created TrackDecorate for track title: " + track.title.std_str()
   );
 }
 

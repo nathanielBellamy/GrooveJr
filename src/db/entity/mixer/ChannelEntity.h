@@ -8,6 +8,7 @@
 #include <string>
 
 #include <sqlite3.h>
+#include "../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Db {
@@ -15,7 +16,7 @@ namespace Db {
 struct ChannelEntity {
   int id;
   int channelIndex;
-  std::string name;
+  AtomicStr name;
   float gain;
   float mute;
   float solo;

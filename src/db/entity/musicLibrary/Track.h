@@ -14,6 +14,7 @@
 
 #include "../../../enums/AudioCodec.h"
 #include "../../Types.h"
+#include "../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Db {
@@ -21,7 +22,7 @@ namespace Db {
 struct Track {
   ID id;
   ID albumId;
-  std::string title;
+  AtomicStr title;
   TrackNumber trackNumber;
 
   Track();

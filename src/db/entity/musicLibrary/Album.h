@@ -10,27 +10,28 @@
 #include <sqlite3.h>
 
 #include "../../Types.h"
+#include "../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Db {
 
 struct Album {
   ID id;
-  std::string title;
+  AtomicStr title;
   Year year = 0;
 
-  Album(std::string title)
+  Album(const std::string& title)
       : id(0)
       , title(title)
       {}
 
-  Album(std::string title, Year year)
+  Album(const std::string& title, Year year)
       : id(0)
       , title(title)
       , year(year)
       {}
 
-  Album(ID id, std::string title, Year year)
+  Album(ID id, const std::string& title, Year year)
       : id(id)
       , title(title)
       , year(year)

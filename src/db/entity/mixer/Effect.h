@@ -11,15 +11,16 @@
 #include <sqlite3.h>
 
 #include "../../Logging.h"
+#include "../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Db {
 
 struct Effect {
   int id = 0;
-  std::string filePath;
-  std::string format;
-  std::string name;
+  AtomicStr filePath;
+  AtomicStr format;
+  AtomicStr name;
   int channelIndex;
   int effectIndex;
   int version;

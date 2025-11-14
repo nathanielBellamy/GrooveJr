@@ -104,13 +104,21 @@ int main(int argc, char *argv[]) {
       );
   }
 
-  gAppState->setFromEntity(Dao->appStateRepository.get());
+  const auto appStateEntityReloaded = Dao->appStateRepository.get();
+  const auto sceneOpt = Dao->sceneRepository.find(appStateEntityReloaded.sceneId);
+  const Db::Scene scene = sceneOpt
+    ? sceneOpt.value()
+    : Db::Scene::base();
+  gAppState->setFromEntityAndScene(
+    appStateEntityReloaded,
+    scene
+  );
   Logging::write(
     Info,
     "main",
     "Loaded gAppState: id = " + std::to_string(gAppState->id) +
       " audioFramesPerBuffer = " + std::to_string(gAppState->getAudioFramesPerBuffer()) +
-      ", sceneId: " + std::to_string(gAppState->getSceneId()) +
+      ", sceneId: " + std::to_string(gAppState->getScene().id) +
       ", sceneIndex: " + std::to_string(gAppState->getSceneIndex())
     );
 

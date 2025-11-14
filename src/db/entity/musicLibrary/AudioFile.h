@@ -14,6 +14,7 @@
 #include "../../Logging.h"
 #include "../../../enums/AudioCodec.h"
 #include "../../../enums/Result.h"
+#include "../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Db {
@@ -21,7 +22,7 @@ namespace Db {
 struct AudioFile {
   ID id;
   ID trackId;
-  std::string filePath;
+  AtomicStr filePath;
   SF_INFO sfInfo;
   bool valid = false;
   // bool isLossless;

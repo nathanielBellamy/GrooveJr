@@ -6,7 +6,6 @@
 #define APPSTATE_H
 
 #include <atomic>
-#include <mutex>
 #include <string>
 
 #include <sndfile.h>
@@ -15,18 +14,20 @@
 #include "./enums/PlayState.h"
 
 #include "./db/entity/AppStateEntity.h"
+#include "./db/entity/mixer/Scene.h"
 #include "./db/dto/musicLibrary/DecoratedAudioFile.h"
 #include "./db/Types.h"
 
 namespace Gj {
 
 struct AppStatePacket {
-    int id;
+    Db::ID id;
     jack_nframes_t audioFramesPerBuffer;
     int playState;
-    int sceneId;
+    Db::ID sceneId;
     int sceneIndex;
     sf_count_t crossfade;
+    Db::ID currentlyPlayingId;
     std::string currentlyPlayingAlbumTitle;
     std::string currentlyPlayingArtistName;
     std::string currentlyPlayingTrackTitle;
@@ -41,11 +42,10 @@ struct AppState {
   std::atomic<int> id{};
   std::atomic<jack_nframes_t> audioFramesPerBuffer{};
   std::atomic<PlayState> playState{};
-  std::atomic<int> sceneId{};
+  std::atomic<Db::Scene> scene;
   std::atomic<int> sceneIndex{};
   std::atomic<sf_count_t> crossfade{ 0 };
-  std::mutex currentlyPlayingMutex;
-  Db::DecoratedAudioFile currentlyPlaying;
+  std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
   std::atomic<bool> queuePlay = false;
   std::atomic<Db::TrackNumber> queueIndex = 0;
 
@@ -62,13 +62,13 @@ struct AppState {
   static AppState fromAppStateEntity(Db::AppStateEntity appStateEntity);
 
   // mutations
-  void setFromEntity(const Db::AppStateEntity appStateEntity) {
+  void setFromEntityAndScene(const Db::AppStateEntity& appStateEntity, const Db::Scene& newScene) {
     id.store(appStateEntity.id);
     audioFramesPerBuffer.store(appStateEntity.audioFramesPerBuffer);
     playState.store( STOP);
-    sceneId.store(appStateEntity.sceneId);
     sceneIndex.store(appStateEntity.sceneIndex);
     crossfade.store(appStateEntity.crossfade);
+    scene.store(newScene);
   };
 
   jack_nframes_t getAudioFramesPerBuffer() const {
@@ -85,11 +85,11 @@ struct AppState {
     playState.store(val);
   };
 
-  int getSceneId() const {
-    return sceneId.load();
+  Db::Scene getScene() const {
+    return scene.load();
   };
-  void setSceneId(const int val) {
-    sceneId.store(val);
+  void setScene(const Db::Scene& val) {
+    scene.store(val);
   };
 
   int getSceneIndex() const {
@@ -107,18 +107,16 @@ struct AppState {
   }
 
   std::string toString() const {
-    return " id: " + std::to_string(id) + " audioFramesPerBuffer: " + std::to_string(audioFramesPerBuffer) + " playState: " + std::to_string(playState) + " sceneId: " + std::to_string(sceneId) + " sceneIndex: " + std::to_string(sceneIndex);
+    return " id: " + std::to_string(id) + " audioFramesPerBuffer: " + std::to_string(audioFramesPerBuffer) + " playState: " + std::to_string(playState) + " sceneId: " + std::to_string(scene.load().id) + " sceneIndex: " + std::to_string(sceneIndex);
   };
 
   Result setCurrentlyPlaying(const Db::DecoratedAudioFile& decoratedAudioFile) {
-    std::lock_guard guard(currentlyPlayingMutex);
-    currentlyPlaying = decoratedAudioFile;
+    currentlyPlaying.store(decoratedAudioFile);
     return OK;
   }
 
   Db::DecoratedAudioFile getCurrentlyPlaying() {
-    std::lock_guard guard(currentlyPlayingMutex);
-    return currentlyPlaying;
+    return currentlyPlaying.load();
   }
 };
 
