@@ -10,7 +10,7 @@ namespace Db {
 ChannelEntity::ChannelEntity(
     const int id,
     const int channelIndex,
-    const std::string name,
+    const AtomicStr& name,
     const float gain,
     const float mute,
     const float solo,
@@ -60,7 +60,7 @@ ChannelEntity ChannelEntity::deser(sqlite3_stmt *stmt) {
   return {
     id,
     channelIndex,
-    std::string(reinterpret_cast<const char*>(name)),
+    AtomicStr(reinterpret_cast<const char*>(name)),
     gain,
     mute,
     solo,

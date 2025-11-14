@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../../../enums/Result.h"
+#include "../../../types/AtomicStr.h"
 
 #include "MusicLibraryRepository.h"
 #include "../../dto/musicLibrary/AlbumWithArtist.h"

@@ -70,11 +70,11 @@ void SqlWorker::runQuery(const QString& callerId, const QString& queryString) {
   }
   emit queryResultsReady(callerId, rows);
   busy = false;
-  Logging::write(
-      Info,
-      "Gui::SqlWorker::runQuery",
-      "Executed Query. Result Row Count: " + std::to_string(rows.size())
-  );
+  // Logging::write(
+  //     Info,
+  //     "Gui::SqlWorker::runQuery",
+  //     "Executed Query. Result Row Count: " + std::to_string(rows.size())
+  // );
 }
 
 } // Gui

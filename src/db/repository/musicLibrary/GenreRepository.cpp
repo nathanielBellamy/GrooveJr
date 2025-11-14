@@ -75,7 +75,7 @@ ID GenreRepository::save(const GenreWithTrackId& genreWithTrackId) const {
   return genreId;
 }
 
-std::optional<Genre> GenreRepository::findByName(const std::string& name) const {
+std::optional<Genre> GenreRepository::findByName(const AtomicStr& name) const {
   const std::string query = R"sql(
     select * from genres g
     where g.name = ?;

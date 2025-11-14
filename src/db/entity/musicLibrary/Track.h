@@ -26,8 +26,8 @@ struct Track {
   TrackNumber trackNumber;
 
   Track();
-  Track(ID id, ID albumId, const std::string& title, TrackNumber trackNumber);
-  Track(ID albumId, const std::string& title, TrackNumber trackNumber);
+  Track(ID id, ID albumId, const AtomicStr& title, TrackNumber trackNumber);
+  Track(ID albumId, const AtomicStr& title, TrackNumber trackNumber);
 
   static Track empty() {
     return Track(0, 0, "- Empty Track -", 0);

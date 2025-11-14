@@ -37,9 +37,9 @@ std::vector<Scene> SceneRepository::getAll() const {
   return scenes;
 }
 
-int SceneRepository::save(const Scene& scene) const {
+ID SceneRepository::save(const Scene& scene) const {
   const std::string query = R"sql(
-    insert into scenes (sceneIndex, name, version)
+    insert into scenes (name, playbackSpeed, version)
     values (?, ?, ?)
   )sql";
 
@@ -53,25 +53,25 @@ int SceneRepository::save(const Scene& scene) const {
     return 0;
   }
 
-  sqlite3_bind_int(stmt, 1, scene.sceneIndex);
-  sqlite3_bind_text(stmt, 2, scene.name.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 1, scene.name.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_double(stmt, 2, scene.playbackSpeed);
   sqlite3_bind_int(stmt, 3, scene.version + 1);
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     Logging::write(
       Error,
       "Db::SceneRepository::save",
-      "Failed to save Scene " + scene.name + " at index " + std::to_string(scene.sceneIndex) + " Message: " + std::string(sqlite3_errmsg(*db))
+      "Failed to save Scene " + scene.name + " Message: " + std::string(sqlite3_errmsg(*db))
     );
   } else {
     Logging::write(
       Info,
       "Db::SceneRepository::save",
-      "Saved " + scene.name + " at index " + std::to_string(scene.sceneIndex)
+      "Saved " + scene.name
     );
   }
 
-  return static_cast<int>(sqlite3_last_insert_rowid(*db));
+  return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }
 
 std::vector<ChannelEntity> SceneRepository::getChannels(const int sceneId) const {
@@ -158,7 +158,7 @@ std::optional<Scene> SceneRepository::find(const ID sceneId) const {
     Logging::write(
       Info,
       "Db::SceneRepository::find",
-      "Found scene sceneId: " + std::to_string(scene.id) + " sceneIndex: " + std::to_string(scene.sceneIndex)
+      "Found scene sceneId: " + std::to_string(scene.id)
     );
     return std::optional(scene);
   }
@@ -171,65 +171,15 @@ std::optional<Scene> SceneRepository::find(const ID sceneId) const {
   return std::nullopt;
 }
 
-int SceneRepository::findOrCreateBySceneIndex(const int sceneIndex) const {
-  // find
-  const std::string query = R"sql(
-    select *
-    from scenes
-    where sceneIndex = ?
-    order by id desc
-    limit 1
-  )sql";
-
-  sqlite3_stmt* stmt;
-  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-    Logging::write(
-      Error,
-      "Db::SceneRepository::findOrCreateBySceneIndex",
-      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
-    );
-    return 0;
+Scene SceneRepository::findOrCreate(const ID sceneId) const {
+  if (const auto found = find(sceneId)) {
+    return found.value();
   }
 
-  sqlite3_bind_int(stmt, 1, sceneIndex);
-
-  if (sqlite3_step(stmt) == SQLITE_ROW) {
-    const auto scene = Scene::deser(stmt);
-    Logging::write(
-      Info,
-      "Db::SceneRepository::findOrCreateBySceneIndex",
-      "Found scene sceneId: " + std::to_string(scene.id) + " sceneIndex: " + std::to_string(scene.sceneIndex)
-    );
-    return scene.id;
-  }
-
-  // or create
-  const std::string insertQuery = R"sql(
-    insert into scenes (sceneIndex, name, version)
-    values (?, "Empty Scene", 1);
-  )sql";
-
-  sqlite3_stmt* insertStmt;
-  if (sqlite3_prepare_v2(*db, insertQuery.c_str(), -1, &insertStmt, nullptr) != SQLITE_OK) {
-    Logging::write(
-      Error,
-      "Db::SceneRepository::findOrCreateBySceneIndex",
-      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
-    );
-    return 0;
-  }
-
-  sqlite3_bind_int(insertStmt, 1, sceneIndex);
-
-  if (sqlite3_step(insertStmt) == SQLITE_DONE)
-    return static_cast<int>(sqlite3_last_insert_rowid(*db));
-
-  Logging::write(
-    Error,
-    "Db::SceneRepository::findOrCreateBySceneIndex",
-    "Failed to create sceneIndex: " + std::to_string(sceneIndex)
-  );
-  return 0;
+  auto base = Scene::base();
+  const auto newId = save(base);
+  base.id = newId;
+  return base;
 }
 
 

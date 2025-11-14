@@ -25,7 +25,6 @@ class EffectRepository {
     std::vector<Effect> getAll() const;
     int save(const Effect& effect) const;
     std::vector<Effect> getBySceneId(int sceneId) const;
-    std::vector<Effect> getBySceneIndex(int sceneIndex) const;
 };
 
 } // Db

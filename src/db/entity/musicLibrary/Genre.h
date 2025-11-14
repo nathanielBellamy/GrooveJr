@@ -5,8 +5,6 @@
 #ifndef GENRE_H
 #define GENRE_H
 
-#include <string>
-
 #include <sqlite3.h>
 
 #include "../../Types.h"
@@ -19,12 +17,12 @@ struct Genre {
   ID id;
   AtomicStr name;
 
-  explicit Genre(const std::string& name)
+  explicit Genre(const AtomicStr& name)
       : id(0)
       , name(name)
       {};
 
-  Genre(const ID id, const std::string& name)
+  Genre(const ID id, const AtomicStr& name)
       : id(id)
       , name(name)
       {};

@@ -134,8 +134,6 @@ qt_add_library(GjGui STATIC
         MainToolBar/scenes/Scenes.cpp
         MainToolBar/scenes/SceneSaveButton.h
         MainToolBar/scenes/SceneSaveButton.cpp
-        MainToolBar/scenes/SceneSelectButton.h
-        MainToolBar/scenes/SceneSelectButton.cpp
 )
 
 message(GUI_VST3_SDK="${VST3SDK_HOME}")

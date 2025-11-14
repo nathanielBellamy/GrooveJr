@@ -118,8 +118,7 @@ int main(int argc, char *argv[]) {
     "main",
     "Loaded gAppState: id = " + std::to_string(gAppState->id) +
       " audioFramesPerBuffer = " + std::to_string(gAppState->getAudioFramesPerBuffer()) +
-      ", sceneId: " + std::to_string(gAppState->getScene().id) +
-      ", sceneIndex: " + std::to_string(gAppState->getSceneIndex())
+      ", sceneId: " + std::to_string(gAppState->getSceneId())
     );
 
   // setup Audio

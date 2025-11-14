@@ -19,12 +19,12 @@ struct Artist {
   ID id;
   AtomicStr name;
 
-  Artist(const ID id, const std::string& name)
+  Artist(const ID id, const AtomicStr& name)
       : id(id)
       , name(name)
       {}
 
-  Artist(const std::string& name)
+  Artist(const AtomicStr& name)
       : id(0)
       , name(name)
       {}

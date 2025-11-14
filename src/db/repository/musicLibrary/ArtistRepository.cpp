@@ -54,7 +54,7 @@ ID ArtistRepository::save(const Artist& artist) const {
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }
 
-Artist ArtistRepository::findByName(const std::string& name) const {
+Artist ArtistRepository::findByName(const AtomicStr& name) const {
   const std::string query = R"sql(
     select * from artists a
     where a.name = ?;

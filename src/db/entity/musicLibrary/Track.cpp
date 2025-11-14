@@ -14,14 +14,14 @@ Track::Track()
   , trackNumber(0)
   {}
 
-Track::Track(const ID id, const ID albumId, const std::string& title, const TrackNumber trackNumber)
+Track::Track(const ID id, const ID albumId, const AtomicStr& title, const TrackNumber trackNumber)
   : id(id)
   , albumId(albumId)
   , title(title)
   , trackNumber(trackNumber)
   {}
 
-Track::Track(const ID albumId, const std::string& title, const TrackNumber trackNumber)
+Track::Track(const ID albumId, const AtomicStr& title, const TrackNumber trackNumber)
   : id(0)
   , albumId(albumId)
   , title(title)
@@ -37,7 +37,7 @@ Track Track::deser(sqlite3_stmt* stmt) {
   return Track(
     id,
     albumId,
-    std::string(reinterpret_cast<const char*>(title)),
+    AtomicStr(reinterpret_cast<const char*>(title)),
     trackNumber
   );
 }

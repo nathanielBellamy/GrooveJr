@@ -65,7 +65,7 @@ ID AudioFileRepository::save(const AudioFile& audioFile) const {
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }
 
-std::optional<AudioFile> AudioFileRepository::findByFilePath(const std::string& filePath) const {
+std::optional<AudioFile> AudioFileRepository::findByFilePath(const AtomicStr& filePath) const {
   const std::string query = R"sql(
     select * from audioFiles a
     where a.filePath = ?;

@@ -22,8 +22,8 @@ struct Playlist {
   ID id;
   AtomicStr name;
 
-  Playlist(ID id, const std::string& name);
-  Playlist(const std::string& name);
+  Playlist(ID id, const AtomicStr& name);
+  Playlist(const AtomicStr& name);
 
   static Playlist empty() {
     return Playlist("- Empty Playlist -");

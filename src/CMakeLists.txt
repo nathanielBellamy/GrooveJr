@@ -76,13 +76,14 @@ add_executable(GrooveJr
         AppState.cpp
         Logging.h
         Logging.cpp
-        actors/Supervisor.h
-        actors/Playback.h
         actors/ActorIds.h
         actors/AppStateManager.h
         actors/AudioThread.h
+        actors/Display.h
         actors/EffectsManager.h
         actors/MusicLibraryManager.h
+        actors/Playback.h
+        actors/Supervisor.h
         enums/AudioCodec.h
         enums/PlayState.h
         enums/Result.h
@@ -91,7 +92,7 @@ add_executable(GrooveJr
         messaging/EnvelopeQtPtr.h
         gui/MainToolBar/transport/TransportControl.cpp
         gui/MainToolBar/transport/TransportControl.h
-        actors/Display.h
+        types/AtomicStr.h
 )
 target_link_libraries(GrooveJr
         PUBLIC

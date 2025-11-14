@@ -7,17 +7,15 @@
 namespace Gj {
 
 AppState::AppState(
-  const int id,
+  const Db::ID id,
   const jack_nframes_t audioFramesPerBuffer,
   const PlayState playState,
-  const int sceneId,
-  const int sceneIndex,
+  const Db::Scene scene,
   const sf_count_t crossfade)
   : id(id)
   , audioFramesPerBuffer(audioFramesPerBuffer)
   , playState(playState)
-  , sceneId(sceneId)
-  , sceneIndex(sceneIndex)
+  , scene(scene)
   , crossfade(crossfade)
   {}
 
@@ -26,18 +24,17 @@ AppState::AppState() {
   id.store(appState.id);
   audioFramesPerBuffer.store( appState.audioFramesPerBuffer);
   playState.store( appState.playState);
-  sceneId.store( appState.sceneId);
-  sceneIndex.store(appState.sceneIndex);
+  scene.store( appState.scene);
   crossfade.store( appState.crossfade);
 }
 
 AppStatePacket AppState::toPacket() {
   const Db::DecoratedAudioFile daf = getCurrentlyPlaying();
-  std::string currPlayAlbumTitle, currPlayArtistName, currPlayTrackTitle;
+  AtomicStr currPlayAlbumTitle, currPlayArtistName, currPlayTrackTitle;
   if (!daf.isValid()) {
-    currPlayAlbumTitle = "-";
-    currPlayArtistName = "-";
-    currPlayTrackTitle = "-";
+    currPlayAlbumTitle = AtomicStr("-");
+    currPlayArtistName = AtomicStr("-");
+    currPlayTrackTitle = AtomicStr("-");
   } else {
     currPlayAlbumTitle = daf.album.title;
     currPlayArtistName = daf.artist.name;
@@ -48,9 +45,9 @@ AppStatePacket AppState::toPacket() {
     id.load(),
     audioFramesPerBuffer.load(),
     psToInt(playState.load()),
-    sceneId.load(),
-    sceneIndex.load(),
+    scene.load().id,
     crossfade.load(),
+    daf.audioFile.id,
     currPlayAlbumTitle,
     currPlayArtistName,
     currPlayTrackTitle
@@ -59,13 +56,13 @@ AppStatePacket AppState::toPacket() {
 }
 
 AppState AppState::fromAppStateEntity(const Db::AppStateEntity appStateEntity) {
+  Db::Scene scene("My Scene", 1.0f);
   return {
     appStateEntity.id,
     appStateEntity.audioFramesPerBuffer,
     STOP,
-    appStateEntity.sceneId,
-    appStateEntity.sceneIndex,
-    appStateEntity.crossfade
+    scene,
+    appStateEntity.crossfade,
   };
 }
 

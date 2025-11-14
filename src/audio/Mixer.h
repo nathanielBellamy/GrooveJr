@@ -125,8 +125,7 @@ public:
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);
   };
 
-  Result loadScene();
-  int loadSceneByIndex(int sceneIndex);
+  Result loadScene(Db::ID sceneId);
   int deleteChannels();
   int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);
   int setEffects(const std::vector<Db::Effect>& effects) const;

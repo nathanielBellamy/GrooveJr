@@ -17,18 +17,17 @@ namespace Db {
 
 struct Scene {
   ID id;
-  int sceneIndex;
   AtomicStr name;
   float playbackSpeed = 1.0f;
   int version = 0;
 
-  Scene(int id, int sceneIndex, const std::string& name, float playbackSpeed, int version);
-  Scene(int sceneIndex, const std::string& name, float playbackSpeed);
+  Scene(ID id, const AtomicStr& name, float playbackSpeed, int version);
+  Scene(const AtomicStr& name, float playbackSpeed);
   static Scene deser(sqlite3_stmt* stmt);
 
   static Scene base() {
     return {
-      0, 0, "Empty Scene", 1.0f, 0
+      0, "Empty Scene", 1.0f, 0
     };
   }
 };

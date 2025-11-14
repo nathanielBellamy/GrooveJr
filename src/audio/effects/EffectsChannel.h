@@ -15,6 +15,7 @@
 #include "../../db/entity/mixer/Effect.h"
 #include "../Logging.h"
 #include "../JackClient.h"
+#include "../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Audio {
@@ -27,7 +28,7 @@ class EffectsChannel {
   std::shared_ptr<JackClient> jackClient;
   int id { 0 };
   int index;
-  std::string name { "Channel" };
+  AtomicStr name { "Channel" };
   std::vector<Vst3::Plugin*> vst3Plugins;
 
   public:

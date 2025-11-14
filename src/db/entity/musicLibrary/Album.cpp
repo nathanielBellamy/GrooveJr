@@ -14,7 +14,7 @@ Album Album::deser(sqlite3_stmt* stmt) {
 
   return Album(
       id,
-      std::string(reinterpret_cast<const char*>(title)),
+      AtomicStr(reinterpret_cast<const char*>(title)),
       year
   );
 }

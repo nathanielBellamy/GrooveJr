@@ -41,7 +41,7 @@ struct AudioFile {
     );
   }
 
-  AudioFile(const std::string& filePath)
+  AudioFile(const AtomicStr& filePath)
     : id(0)
     , trackId(0)
     , filePath(filePath)
@@ -50,11 +50,11 @@ struct AudioFile {
       Logging::write(
         Error,
         "Db::AudioFile::AudioFile(filePath)",
-        "An Error Occurred while reading SF_INFO for filepath: " + filePath
+        "An Error Occurred while reading SF_INFO for filepath: " + filePath.std_str()
       );
   }
 
-  AudioFile(const ID trackId, const std::string& filePath)
+  AudioFile(const ID trackId, const AtomicStr& filePath)
     : id(0)
     , trackId(trackId)
     , filePath(filePath)
@@ -67,7 +67,7 @@ struct AudioFile {
       );
   }
 
-  AudioFile(const ID id, const ID trackId, const std::string& filePath, const bool valid, const SF_INFO& sfInfo)
+  AudioFile(const ID id, const ID trackId, const AtomicStr& filePath, const bool valid, const SF_INFO& sfInfo)
     : id(id)
     , trackId(trackId)
     , filePath(filePath)

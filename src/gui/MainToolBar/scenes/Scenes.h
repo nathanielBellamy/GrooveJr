@@ -15,12 +15,12 @@
 #include <QGridLayout>
 
 #include "../../../AppState.h"
+#include "../../../enums/Result.h"
 #include "../../../audio/Mixer.h"
 #include "../../../actors/ActorIds.h"
 #include "../../../messaging/atoms.h"
 
 #include "SceneSaveButton.h"
-#include "SceneSelectButton.h"
 
 namespace Gj {
 namespace Gui {
@@ -34,18 +34,13 @@ class Scenes final : public QWidget {
   QLabel title;
   QAction sceneSaveAction;
   SceneSaveButton sceneSaveButton;
-  SceneSelectButton selectButtonZero;
-  SceneSelectButton selectButtonOne;
-  SceneSelectButton selectButtonTwo;
-  SceneSelectButton selectButtonThree;
-  SceneSelectButton selectButtonFour;
 
   void connectActions();
   void setupGrid();
 
   public:
     Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction* sceneLoadAction);
-    void hydrateState(const AppStatePacket& appStatePacket);
+    Result hydrateState(const AppStatePacket& appStatePacket);
 };
 
 

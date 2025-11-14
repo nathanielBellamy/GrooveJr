@@ -41,7 +41,7 @@ Result MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
     Logging::write(
       Info,
       "Gui::MainWindow::hydrateState",
-      "Hydrating app state to Gui: id: " + std::to_string(appStatePacket.id) +  " sceneId: " + std::to_string(appStatePacket.sceneId) + " sceneIndex: " + std::to_string(appStatePacket.sceneIndex)
+      "Hydrating app state to Gui: id: " + std::to_string(appStatePacket.id) +  " sceneId: " + std::to_string(appStatePacket.sceneId)
     );
 
     mainToolBar.hydrateState(appStatePacket);
@@ -123,21 +123,21 @@ void MainWindow::setEffects() {
 
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
-    if (const int sceneIndex = sceneLoadAction.data().toInt(); gAppState->getSceneIndex() != sceneIndex) {
+    if (const int sceneId = sceneLoadAction.data().toULongLong(); gAppState->getSceneId() != sceneId) {
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",
-        "Loading sceneIndex: " + std::to_string(sceneIndex)
+        "Loading sceneId: " + std::to_string(sceneId)
       );
 
-      mixer->loadSceneByIndex(sceneIndex);
+      mixer->loadScene(sceneId);
       setChannels();
       setEffects();
 
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",
-        "Done loading sceneIndex: " + std::to_string(sceneIndex)
+        "Done loading sceneId: " + std::to_string(sceneId)
       );
     }
   });

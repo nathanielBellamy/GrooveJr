@@ -7,12 +7,12 @@
 namespace Gj {
 namespace Db {
 
-Playlist::Playlist(const ID id, const std::string& name)
+Playlist::Playlist(const ID id, const AtomicStr& name)
   : id(id)
   , name(name)
   {}
 
-Playlist::Playlist(const std::string& name)
+Playlist::Playlist(const AtomicStr& name)
   : id(0)
   , name(name)
   {}
@@ -23,7 +23,7 @@ Playlist Playlist::deser(sqlite3_stmt* stmt) {
 
   return Playlist(
     id,
-    std::string(reinterpret_cast<const char*>(name))
+    AtomicStr(reinterpret_cast<const char*>(name))
   );
 }
 

@@ -13,7 +13,7 @@ Genre Genre::deser(sqlite3_stmt* stmt) {
 
   return Genre(
     id,
-    std::string(reinterpret_cast<const char*>(name))
+    AtomicStr(reinterpret_cast<const char*>(name))
   );
 }
 

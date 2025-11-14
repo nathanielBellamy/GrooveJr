@@ -12,7 +12,9 @@ namespace Gj {
 constexpr size_t ATOMIC_STR_SIZE = 512;
 
 struct AtomicStr {
-  char value[ATOMIC_STR_SIZE];
+  char value[ATOMIC_STR_SIZE] { ' ' };
+
+  AtomicStr() {}
 
   AtomicStr(const char* str) {
     for (int i = 0; str[i] != '\0' && i < ATOMIC_STR_SIZE; i++) {
@@ -34,6 +36,15 @@ struct AtomicStr {
     return std::string(value);
   }
 };
+
+
+inline std::string operator+(const std::string& lhs, const AtomicStr& rhs) {
+  return lhs + rhs.std_str();
+}
+
+inline std::string operator+(const AtomicStr& lhs, const std::string& rhs) {
+  return lhs.std_str() + rhs;
+}
 
 }
 

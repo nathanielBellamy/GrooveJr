@@ -7,6 +7,7 @@
 
 #include <vector>
 
+#include "../../../types/AtomicStr.h"
 #include "MusicLibraryRepository.h"
 #include "../../entity/musicLibrary/Artist.h"
 #include "../../Types.h"
@@ -23,7 +24,7 @@ class ArtistRepository final : public MusicLibraryRepository {
     std::vector<Artist> getAll() const;
     ID save(const Artist& artist) const;
     ID saveAll(const std::vector<Artist>& artist) const;
-    Artist findByName(const std::string& name) const;
+    Artist findByName(const AtomicStr& name) const;
 
 };
 

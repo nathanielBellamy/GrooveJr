@@ -15,18 +15,16 @@ namespace Gj {
 namespace Db {
 
 struct AppStateEntity {
-  int id;
+  ID id;
   jack_nframes_t audioFramesPerBuffer;
-  int sceneId;
-  int sceneIndex;
+  ID sceneId;
   sf_count_t crossfade;
   ID currentlyPlaying;
 
   AppStateEntity(
-    int id,
+    ID id,
     jack_nframes_t audioFramesPerBuffer,
-    int sceneId,
-    int sceneIndex,
+    ID sceneId,
     sf_count_t crossfade,
     ID currentlyPlaying
   );

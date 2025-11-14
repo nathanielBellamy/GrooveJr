@@ -73,16 +73,15 @@ int Dao::initSchema() const {
       id integer primary key autoincrement,
       audioFramesPerBuffer integer,
       sceneId integer,
-      sceneIndex integer,
       crossfade integer,
       currentlyPlaying integer,
-      createdAt datetime default current_timestamp
+      createdAt datetime default current_timestamp,
+      foreign key (sceneId) references scenes(id) on delete cascade
     );
 
     -- mixer
     create table if not exists scenes (
       id integer primary key autoincrement,
-      sceneIndex integer not null,
       name text not null,
       playbackSpeed real not null default 1.0,
       version integer not null,

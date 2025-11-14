@@ -5,11 +5,13 @@
 #ifndef APPSTATEREPOSITORY_H
 #define APPSTATEREPOSITORY_H
 
+#include <optional>
 #include <sqlite3.h>
 
 #include "../Logging.h"
 #include "../../AppState.h"
 #include "../entity/AppStateEntity.h"
+#include "../entity/mixer/Scene.h"
 
 namespace Gj {
 namespace Db {
@@ -23,6 +25,9 @@ class AppStateRepository {
     AppStateEntity get() const;
     int save() const;
     int persistAndSet() const;
+    std::optional<Scene> findScene(ID sceneId) const;
+
+
 };
 
 } // Db

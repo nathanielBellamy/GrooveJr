@@ -49,7 +49,7 @@ AppStateEntity AppStateRepository::get() const {
 
 int AppStateRepository::save() const {
   const std::string query = R"sql(
-    insert into appState (audioFramesPerBuffer, sceneId, sceneIndex, crossfade)
+    insert into appState (audioFramesPerBuffer, sceneId, crossfade)
     values (?, ?, ?, ?)
   )sql";
 
@@ -65,8 +65,7 @@ int AppStateRepository::save() const {
 
   sqlite3_bind_int(stmt, 1, gAppState->getAudioFramesPerBuffer());
   sqlite3_bind_int(stmt, 2, gAppState->getSceneId());
-  sqlite3_bind_int(stmt, 3, gAppState->getSceneIndex());
-  sqlite3_bind_int(stmt, 4, gAppState->getCrossfade());
+  sqlite3_bind_int(stmt, 3, gAppState->getCrossfade());
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     Logging::write(
@@ -88,7 +87,8 @@ int AppStateRepository::save() const {
 int AppStateRepository::persistAndSet() const {
   try {
     const auto id = save();
-    gAppState->setFromEntity(get());
+    // lookup scene
+    gAppState->setFromEntityAndScene(get(), gAppState->scene);
 
     Logging::write(
       Info,
@@ -107,6 +107,35 @@ int AppStateRepository::persistAndSet() const {
   }
 }
 
+std::optional<Scene> AppStateRepository::findScene(ID sceneId) const {
+  const std::string query = R"sql(
+    select * from scenes s
+    where s.id = ?
+    limit 1;
+  )sql";
+
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::SceneRepository::find",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return std::nullopt;
+  }
+
+  sqlite3_bind_int(stmt, 1, sceneId);
+
+  if (sqlite3_step(stmt) == SQLITE_ROW)
+    return std::optional(Scene::deser(stmt));
+
+  Logging::write(
+    Warning,
+    "Db::SceneRepository::find",
+    "Unable to find sceneId " + std::to_string(sceneId)
+  );
+  return std::nullopt;
+}
 
 } // Db
 } // Gj

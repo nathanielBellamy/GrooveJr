@@ -7,6 +7,7 @@
 
 #include <optional>
 
+#include "../../../types/AtomicStr.h"
 #include "MusicLibraryRepository.h"
 #include "../../entity/musicLibrary/AudioFile.h"
 #include "../../dto/musicLibrary/DecoratedAudioFile.h"
@@ -24,7 +25,7 @@ class AudioFileRepository final : public MusicLibraryRepository {
     ID save(const AudioFile& audioFile) const;
 
     [[nodiscard]]
-    std::optional<AudioFile> findByFilePath(const std::string& filePath) const;
+    std::optional<AudioFile> findByFilePath(const AtomicStr& filePath) const;
 
     std::optional<DecoratedAudioFile> findDecoratedAudioFileById(ID id) const;
 

@@ -31,7 +31,7 @@ AudioFile AudioFile::deser(sqlite3_stmt* stmt) {
   return AudioFile(
       id,
       trackId,
-      std::string(reinterpret_cast<const char*>(filePath)),
+      AtomicStr(reinterpret_cast<const char*>(filePath)),
       valid ? true : false,
       sfInfo
   );

@@ -29,11 +29,7 @@ Mixer::Mixer(AppState* gAppState, Db::Dao* dao, AudioCore* audioCore)
     "Retrieving effects..."
   );
 
-  if (gAppState->getSceneId() == 0) {
-    loadSceneByIndex(0);
-  } else {
-    loadScene();
-  }
+  loadScene(gAppState->getSceneId());
 
   jackClient->initialize("GrooveJr");
 
@@ -241,16 +237,14 @@ bool Mixer::setGainOnChannel(const int channelIdx, const float gain) const {
   return effectsChannels.at(channelIdx)->setGain(gain);
 }
 
-Result Mixer::loadScene() {
-  const int sceneId = gAppState->getSceneId();
+Result Mixer::loadScene(const Db::ID sceneId) {
   Logging::write(
     Info,
     "Audio::Mixer::loadScene",
-    "Loading sceneIndex: " + std::to_string(gAppState->getSceneIndex()) + " sceneId: " + std::to_string(sceneId)
+    "Loading sceneId: " + std::to_string(sceneId)
   );
 
-  const std::optional<Db::Scene> scene = dao->sceneRepository.find(sceneId);
-  if (!scene) {
+  if (const std::optional<Db::Scene> scene = dao->sceneRepository.find(sceneId); !scene) {
     Logging::write(
       Error,
       "Audio::Mixer::loadScene",
@@ -258,49 +252,19 @@ Result Mixer::loadScene() {
     );
     return ERROR;
   }
-  audioCore->playbackSpeed = scene->playbackSpeed;
-
-  const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(sceneId);
+  const Db::Scene scene = dao->sceneRepository.findOrCreate(sceneId);
+  const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(scene.id);
   setChannels(channels);
-  const std::vector<Db::Effect> effects = dao->sceneRepository.getEffects(sceneId);
+  const std::vector<Db::Effect> effects = dao->sceneRepository.getEffects(scene.id);
   setEffects(effects);
 
   Logging::write(
     Info,
     "Audio::Mixer::loadSceneById",
-    "Loading scene id: " + std::to_string(sceneId)
+    "Loading scene id: " + std::to_string(scene.id)
   );
 
   return OK;
-}
-
-int Mixer::loadSceneByIndex(const int sceneIndex) {
-  Logging::write(
-    Info,
-    "Audio::Mixer::loadScene",
-    "Loading scene index: " + std::to_string(sceneIndex)
-  );
-
-  gAppState->setSceneIndex(sceneIndex);
-  const int sceneId = dao->sceneRepository.findOrCreateBySceneIndex(sceneIndex);
-  Logging::write(
-    Info,
-    "Audio::Mixer::loadSceneByIndex",
-    "Found sceneIndex: " + std::to_string(sceneIndex) + " with sceneId: " + std::to_string(sceneId)
-  );
-
-  gAppState->setSceneId(sceneId);
-  if (const int persistRes = dao->appStateRepository.persistAndSet(); persistRes != 0) {
-    Logging::write(
-      Error,
-      "Audio::Mixer::loadSceneByIndex",
-      "Failed to persist state: " + std::to_string(persistRes)
-    );
-    return persistRes;
-  }
-
-  loadScene();
-  return 0;
 }
 
 int Mixer::deleteChannels() {
@@ -399,12 +363,14 @@ int Mixer::saveScene() const {
   Logging::write(
     Info,
     "Audio::Mixer::saveScene",
-    "Saving scene, sceneIndex: " + std::to_string(gAppState->sceneIndex)
+    "Saving scene."
   );
 
-  const auto scene = Db::Scene(gAppState->sceneIndex, "Mixer Scene", audioCore->playbackSpeed);
+  auto scene = Db::Scene("Mixer Scene", audioCore->playbackSpeed);
   const int sceneId = dao->sceneRepository.save(scene);
-  gAppState->setSceneId(sceneId);
+  scene.id = sceneId;
+  gAppState->setScene(scene);
+
   if (const int persistRes = dao->appStateRepository.persistAndSet(); persistRes != 0) {
     Logging::write(
       Error,

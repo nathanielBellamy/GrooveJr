@@ -58,7 +58,7 @@ ID PlaylistRepository::save(const Playlist& playlist) const {
         Logging::write(
           Error,
           "Db::PlaylistRepository::save(playlist)",
-          "Unable to find duplicate playlist named: " + std::string(playlist.name) + ". This Error should not happen."
+          "Unable to find duplicate playlist named: " + playlist.name + ". This Error should not happen."
         );
         return 0;
       }
@@ -85,7 +85,7 @@ ID PlaylistRepository::save(const Playlist& playlist) const {
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }
 
-std::optional<Playlist> PlaylistRepository::findByName(const std::string& name) const {
+std::optional<Playlist> PlaylistRepository::findByName(const AtomicStr& name) const {
   const std::string query = R"sql(
     select * from playlists p
     where p.name = ?

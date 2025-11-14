@@ -28,10 +28,10 @@ class SceneRepository {
   public:
     SceneRepository(sqlite3** db, AppState* appState);
     std::vector<Scene> getAll() const;
-    int save(const Scene& scene) const;
+    ID save(const Scene& scene) const;
     std::vector<ChannelEntity> getChannels(int sceneId) const;
     std::vector<Effect> getEffects(int sceneId) const;
-    int findOrCreateBySceneIndex(int sceneIndex) const;
+    Scene findOrCreate(ID sceneId) const;
     std::optional<Scene> find(ID sceneId) const;
 };
 

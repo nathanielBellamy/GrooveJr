@@ -9,9 +9,9 @@ namespace Db {
 
 Effect::Effect(
     const int id,
-    const std::string& filePath,
-    const std::string& format,
-    const std::string& name,
+    const AtomicStr& filePath,
+    const AtomicStr& format,
+    const AtomicStr& name,
     const int channelIndex,
     const int effectIndex,
     std::vector<uint8_t> audioHostComponentStateBlob,
@@ -32,9 +32,9 @@ Effect::Effect(
   {}
 
 Effect::Effect(
-    const std::string& filePath,
-    const std::string& format,
-    const std::string& name,
+    const AtomicStr& filePath,
+    const AtomicStr& format,
+    const AtomicStr& name,
     const int channelIndex,
     const int effectIndex,
     std::vector<uint8_t> audioHostComponentStateBlob,
@@ -122,9 +122,9 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
   );
   return {
     id,
-    std::string(reinterpret_cast<const char*>(filePath)),
-    std::string(reinterpret_cast<const char*>(format)),
-    std::string(reinterpret_cast<const char*>(name)),
+    AtomicStr(reinterpret_cast<const char*>(filePath)),
+    AtomicStr(reinterpret_cast<const char*>(format)),
+    AtomicStr(reinterpret_cast<const char*>(name)),
     channelIndex,
     effectIndex,
     audioHostComponentStateBlobDeser,

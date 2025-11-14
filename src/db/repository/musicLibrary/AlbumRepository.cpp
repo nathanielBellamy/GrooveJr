@@ -49,7 +49,9 @@ ID AlbumRepository::save(const AlbumWithArtist& albumWithArtist) const {
     Logging::write(
         Warning,
         "Db::AlbumRepository::save(albumWithArtist)",
-        "Album " + albumWithArtist.album.title + " by Artist " + albumWithArtist.artist.name + " Already Exists"
+        "Album " + albumWithArtist.album.title +
+          " by Artist " + albumWithArtist.artist.name +
+          " Already Exists"
     );
     return albumMatchId;
   }

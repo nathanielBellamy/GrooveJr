@@ -34,7 +34,7 @@ struct ChannelEntity {
   ChannelEntity(
     int id,
     int channelIndex,
-    std::string name,
+    const AtomicStr& name,
     float gain,
     float mute,
     float solo,

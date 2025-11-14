@@ -21,7 +21,7 @@
 #include "./host/editorhost/source/editorhost.h"
 #include "../../../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
 #include "Util.h"
-
+#include "../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Audio {
@@ -33,7 +33,7 @@ using namespace Steinberg;
 struct Plugin {
     AppState*                           gAppState;
     std::string                         name;
-    const std::string                   path;
+    AtomicStr                           path;
     VST3::Hosting::Module::Ptr          module;
     AudioHost::App*                     audioHost;
     EditorHost::App*                    editorHost;
@@ -41,7 +41,7 @@ struct Plugin {
     std::unique_ptr<ResizableMemoryIBStream> editorHostControllerStateStream;
 
     Plugin(
-        std::string path,
+        const std::string& path,
         AppState* gAppState,
         std::shared_ptr<JackClient> jackClient
     );

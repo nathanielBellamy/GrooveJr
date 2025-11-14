@@ -15,11 +15,6 @@ Scenes::Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction*
   , title(this)
   , sceneSaveAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSave), tr("&Save Scene"), this)
   , sceneSaveButton(this, &sceneSaveAction)
-  , selectButtonZero(this, sceneLoadAction, 0)
-  , selectButtonOne(this, sceneLoadAction, 1)
-  , selectButtonTwo(this, sceneLoadAction, 2)
-  , selectButtonThree(this, sceneLoadAction, 3)
-  , selectButtonFour(this, sceneLoadAction, 4)
   {
 
   title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
@@ -34,11 +29,6 @@ Scenes::Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction*
 void Scenes::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.addWidget(&sceneSaveButton, 0, 3, 1, 2);
-  grid.addWidget(&selectButtonZero, 1, 0, 1, 1);
-  grid.addWidget(&selectButtonOne, 1, 1, 1, 1);
-  grid.addWidget(&selectButtonTwo, 1, 2, 1, 1);
-  grid.addWidget(&selectButtonThree, 1, 3, 1, 1);
-  grid.addWidget(&selectButtonFour, 1, 4, 1, 1);
 
   setLayout(&grid);
 }
@@ -54,12 +44,8 @@ void Scenes::connectActions() {
   });
 }
 
-void Scenes::hydrateState(const AppStatePacket& appStatePacket) {
-  selectButtonZero.hydrateState(appStatePacket);
-  selectButtonOne.hydrateState(appStatePacket);
-  selectButtonTwo.hydrateState(appStatePacket);
-  selectButtonThree.hydrateState(appStatePacket);
-  selectButtonFour.hydrateState(appStatePacket);
+Result Scenes::hydrateState(const AppStatePacket& appStatePacket) {
+  return OK;
 }
 
 } // Gui

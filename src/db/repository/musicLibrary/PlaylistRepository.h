@@ -24,7 +24,7 @@ class PlaylistRepository final : public MusicLibraryRepository {
     std::vector<Playlist> getAll() const;
     ID save(const Playlist& playlist) const;
 
-    std::optional<Playlist> findByName(const std::string& name) const;
+    std::optional<Playlist> findByName(const AtomicStr& name) const;
     Result addAudioFileAtTrackNumber(ID audioFileId, TrackNumber trackNumber) const;
 };
 

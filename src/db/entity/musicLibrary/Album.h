@@ -20,18 +20,18 @@ struct Album {
   AtomicStr title;
   Year year = 0;
 
-  Album(const std::string& title)
+  Album(const AtomicStr& title)
       : id(0)
       , title(title)
       {}
 
-  Album(const std::string& title, Year year)
+  Album(const AtomicStr& title, Year year)
       : id(0)
       , title(title)
       , year(year)
       {}
 
-  Album(ID id, const std::string& title, Year year)
+  Album(ID id, const AtomicStr& title, Year year)
       : id(id)
       , title(title)
       , year(year)

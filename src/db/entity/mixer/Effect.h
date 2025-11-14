@@ -38,9 +38,9 @@ struct Effect {
 
   Effect(
     int id,
-    const std::string& filePath,
-    const std::string& format,
-    const std::string& name,
+    const AtomicStr& filePath,
+    const AtomicStr& format,
+    const AtomicStr& name,
     int channelIndex,
     int effectIndex,
     std::vector<uint8_t> audioHostComponentStateBlob,
@@ -50,9 +50,9 @@ struct Effect {
   );
 
   explicit Effect(
-    const std::string& filePath,
-    const std::string& format,
-    const std::string& name,
+    const AtomicStr& filePath,
+    const AtomicStr& format,
+    const AtomicStr& name,
     int channelIndex,
     int effectIndex,
     std::vector<uint8_t> audioHostComponentStateBlob,

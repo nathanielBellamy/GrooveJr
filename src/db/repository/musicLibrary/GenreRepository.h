@@ -12,6 +12,7 @@
 
 #include "../../entity/musicLibrary/Genre.h"
 #include "../../dto/musicLibrary/GenreWithTrackId.h"
+#include "../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Db {
@@ -26,7 +27,7 @@ class GenreRepository final : public MusicLibraryRepository{
     std::vector<Genre> getAll() const;
     ID save(const Genre& genre) const;
     ID save(const GenreWithTrackId& genreWithTrackId) const;
-    std::optional<Genre> findByName(const std::string& name) const;
+    std::optional<Genre> findByName(const AtomicStr& name) const;
     Result join(const ID genreId, const ID trackId) const;
 };
 

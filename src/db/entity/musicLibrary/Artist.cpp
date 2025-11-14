@@ -13,7 +13,7 @@ Artist Artist::deser(sqlite3_stmt* stmt) {
 
   return Artist(
     id,
-    std::string(reinterpret_cast<const char*>(name))
+    AtomicStr(reinterpret_cast<const char*>(name))
   );
 }
 
