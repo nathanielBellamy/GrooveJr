@@ -85,6 +85,12 @@ EffectsChannel::EffectsChannel(
   setupPanRSlider(channel.panR.load());
   setStyle();
   setupGrid();
+
+  Logging::write(
+    Info,
+    "Gui::EffectsChannel::EffectsChannel()",
+    "Instantiated EffectsChannel channelIdx: " + std::to_string(channelIndex)
+  );
 }
 
 EffectsChannel::~EffectsChannel() {
@@ -318,7 +324,7 @@ void EffectsChannel::addEffect(const int effectIndex) {
 
   effectsSlots.addEffectSlot();
   const int newEffectIndex = effectIndex < 0 ? mixer->effectsOnChannelCount(channelIndex) - 1 : effectIndex;
-  const std::string name = mixer->getPluginName(channelIndex, newEffectIndex);
+  const AtomicStr name = mixer->getPluginName(channelIndex, newEffectIndex);
   effectsContainer.addEffect(newEffectIndex, name);
 
   Logging::write(

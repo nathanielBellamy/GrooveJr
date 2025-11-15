@@ -46,7 +46,7 @@ class EffectsSlots final : public QWidget {
     Audio::Mixer* mixer;
     int channelIndex;
     QGridLayout grid;
-    std::vector<std::unique_ptr<EffectSlot>> effectsSlots;
+    std::vector<std::unique_ptr<EffectSlot>> effectsSlots {};
     QAction* replaceEffectAction;
     QAction* removeEffectAction;
     void setupGrid();

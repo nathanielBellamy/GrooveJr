@@ -21,6 +21,7 @@
 #include "../AddEffectButton.h"
 #include "../../../../../audio/Mixer.h"
 #include "../../../../../Logging.h"
+#include "../../../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Gui {
@@ -30,7 +31,7 @@ class EffectsContainer final : public QWidget {
   public:
     EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex, QAction* addEffectAction);
     ~EffectsContainer() override;
-    void addEffect(int newEffectIndex, std::string pluginName);
+    void addEffect(int newEffectIndex, const AtomicStr& pluginName);
 
   private:
     Audio::Mixer* mixer;
@@ -38,10 +39,10 @@ class EffectsContainer final : public QWidget {
     QAction* addEffectAction;
     AddEffectButton addEffectButton;
     QGridLayout grid;
-    std::vector<std::shared_ptr<VstWindow>> vstWindows;
+    std::vector<std::shared_ptr<VstWindow>> vstWindows {};
     QAction selectVstWindowAction;
-    std::vector<VstWindowSelectButton*> vstWindowSelectButtons;
-    std::vector<QLabel*> vstWindowSelectLabels;
+    std::vector<VstWindowSelectButton*> vstWindowSelectButtons {};
+    std::vector<QLabel*> vstWindowSelectLabels {};
 
     void connectActions();
     void clearButtonsAndLabels();

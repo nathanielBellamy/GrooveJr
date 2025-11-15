@@ -15,7 +15,6 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
   , soloChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::AudioInputMicrophone), tr("&Solo Channel"), this)
   , grid(this)
   , title(this)
-  , vuRingBuffer(nullptr)
   , mainChannelContainer(
     this, actorSystem, mixer,
     &muteChannelAction, &muteLChannelAction, &muteRChannelAction,
@@ -27,7 +26,10 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
     &muteChannelAction, &muteLChannelAction, &muteRChannelAction,
     &soloChannelAction, &soloLChannelAction, &soloRChannelAction,
     reinterpret_cast<std::atomic<float>*>(&vuBuffer)
-  ) {
+  )
+  , vuRingBuffer(nullptr) {
+
+  std::cout << "wowza 1" << std::endl;
 
   mixer->setSetVuRingBufferFunc(
     [this](jack_ringbuffer_t* vuRingBuffer) { setVuRingBuffer(vuRingBuffer); }
@@ -36,10 +38,18 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
   title.setText("Mixer");
   title.setFont({title.font().family(), 18});
 
+  std::cout << "wowza 2" << std::endl;
+
   connectActions();
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyle();
   setupGrid();
+
+  Logging::write(
+    Info,
+    "Gui::MixerWindow::MixerWindow()",
+    "Instantiated MixerWindow"
+  );
 }
 
 MixerWindow::~MixerWindow() {

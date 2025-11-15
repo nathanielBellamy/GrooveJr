@@ -7,8 +7,8 @@
 namespace Gj {
 namespace Gui {
 
-VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const int effectIndex, std::string pluginName, QAction* selectAction)
-  : QPushButton(pluginName.data(), parent)
+VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const int effectIndex, const AtomicStr& pluginName, QAction* selectAction)
+  : QPushButton(pluginName.c_str(), parent)
   , effectIndex(effectIndex)
   , selectAction(selectAction)
   {

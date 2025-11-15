@@ -32,7 +32,7 @@ using namespace Steinberg;
 
 struct Plugin {
     AppState*                           gAppState;
-    std::string                         name;
+    AtomicStr                           name;
     AtomicStr                           path;
     VST3::Hosting::Module::Ptr          module;
     AudioHost::App*                     audioHost;
@@ -41,7 +41,7 @@ struct Plugin {
     std::unique_ptr<ResizableMemoryIBStream> editorHostControllerStateStream;
 
     Plugin(
-        const std::string& path,
+        const AtomicStr& path,
         AppState* gAppState,
         std::shared_ptr<JackClient> jackClient
     );
@@ -68,7 +68,7 @@ struct Plugin {
     Result terminateEditorHost() const;
 
     [[nodiscard]]
-    std::string getName() const { return name; };
+    AtomicStr getName() const { return name; };
 
     void setState(
         ResizableMemoryIBStream* audioHostComponentState,

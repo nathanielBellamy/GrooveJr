@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-VstWindow::VstWindow(QWidget* parent, int channelIndex, int effectIndex, std::string name)
+VstWindow::VstWindow(QWidget* parent, int channelIndex, int effectIndex, const AtomicStr& name)
   : QWidget(parent)
   , channelIndex(channelIndex)
   , effectIndex(effectIndex)
@@ -15,7 +15,7 @@ VstWindow::VstWindow(QWidget* parent, int channelIndex, int effectIndex, std::st
   , grid(this)
   {
 
-  setWindowTitle("Channel " + QString::number(channelIndex) + " - Effect " + QString::number(effectIndex + 1) + " - " + name.data());
+  setWindowTitle("Channel " + QString::number(channelIndex) + " - Effect " + QString::number(effectIndex + 1) + " - " + name.c_str());
 
   setStyle();
   setupGrid();

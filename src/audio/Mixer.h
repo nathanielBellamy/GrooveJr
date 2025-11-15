@@ -29,7 +29,6 @@
 #include "../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
 #include "effects/vst3/Util.h"
 #include "ThreadStatics.h"
-#include "AudioCore.h"
 
 namespace Gj {
 namespace Audio {
@@ -51,9 +50,8 @@ class Mixer {
   void incorporateLatencySamples(int latencySamples) const;
 
 public:
-  AudioCore* audioCore;
   Db::Dao* dao;
-  explicit Mixer(AppState*, Db::Dao*, AudioCore*);
+  explicit Mixer(AppState*, Db::Dao*);
   ~Mixer();
 
   [[nodiscard]]
@@ -62,12 +60,14 @@ public:
   };
 
   Result setPlaybackSpeed(const int newPlaybackSpeed) {
-    audioCore->playbackSpeed = static_cast<float>(newPlaybackSpeed) / 100.0f;
+    auto scene = gAppState->getScene();
+    scene.playbackSpeed = newPlaybackSpeed;
+    gAppState->scene.store(scene);
     return OK;
   }
 
   sf_count_t getPlaybackSpeed() const {
-    return std::floor(audioCore->playbackSpeed * 100.0f);
+    return std::floor(gAppState->scene.load().playbackSpeed * 100.0f);
   }
 
   [[nodiscard]]
@@ -121,7 +121,7 @@ public:
   void setSetVuRingBufferFunc(std::function<void(jack_ringbuffer_t* vuRingBuffer)> func) { setVuRingBufferFunc = func; };
   std::function<void(jack_ringbuffer_t* vuRingBuffer)> getSetVuRingBufferFunc() { return setVuRingBufferFunc; };
 
-  std::string getPluginName(const int channelIdx, const int pluginIndex) const {
+  AtomicStr getPluginName(const int channelIdx, const int pluginIndex) const {
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);
   };
 

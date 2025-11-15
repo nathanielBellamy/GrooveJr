@@ -222,7 +222,7 @@ class EffectsChannel {
 
     bool removeEffect(int effectIdx);
 
-    std::string getPluginName(const int pluginIndex) const { return vst3Plugins.at(pluginIndex)->getName(); };
+    AtomicStr getPluginName(const int pluginIndex) const { return vst3Plugins.at(pluginIndex)->getName(); };
 
     Db::ChannelEntity toEntity() {
       return {

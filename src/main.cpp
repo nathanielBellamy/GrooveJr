@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
     "Instantiated audioCore"
   );
 
-  Mixer = new Audio::Mixer(gAppState, Dao, audioCore);
+  Mixer = new Audio::Mixer(gAppState, Dao);
   Logging::write(
     Info,
     "main",

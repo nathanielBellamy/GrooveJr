@@ -11,7 +11,7 @@ namespace Vst3 {
 
 using namespace Steinberg;
 
-Plugin::Plugin(const std::string& path, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
+Plugin::Plugin(const AtomicStr& path, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
 	: gAppState(gAppState)
 	, path(path)
 	{
@@ -25,10 +25,10 @@ Plugin::Plugin(const std::string& path, AppState* gAppState, std::shared_ptr<Jac
 	);
 
 	std::string error;
-	module = VST3::Hosting::Module::create(path, error);
+	module = VST3::Hosting::Module::create(path.std_str(), error);
 	if (!module) {
 		std::string reason = "Could not create Module for file:";
-		reason += path;
+		reason += path.std_str();
 		reason += "\nError: ";
 		reason += error;
 		Logging::write(
@@ -41,7 +41,7 @@ Plugin::Plugin(const std::string& path, AppState* gAppState, std::shared_ptr<Jac
 	const auto moduleName = module->getName();
 	name = moduleName.substr(0, moduleName.find_last_of('.'));
 
-	const auto& cmdArgs = std::vector { path };
+	const auto& cmdArgs = std::vector { path.std_str() };
 
 	try {
 		audioHost = new AudioHost::App(

@@ -35,6 +35,12 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState*
   addToolBar(Qt::TopToolBarArea, &mainToolBar);
   setUnifiedTitleAndToolBarOnMac(true);
   setWindowTitle("GrooveJr");
+
+  Logging::write(
+    Info,
+    "Gui::MainWindow::MainWindow()",
+    "Instantiated MainWindow"
+  );
 }
 
 Result MainWindow::hydrateState(const AppStatePacket& appStatePacket) {

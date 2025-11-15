@@ -46,6 +46,12 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   connectActions();
   setStyle();
   setupGrid();
+
+  Logging::write(
+    Info,
+    "Gui::EffectsChannelsContainer::EffectsChannelsContainer()",
+    "Instantiated EffectsChannelsContainer"
+  );
 }
 
 void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {

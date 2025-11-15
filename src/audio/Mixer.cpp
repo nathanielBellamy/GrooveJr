@@ -9,11 +9,10 @@ namespace Audio {
 
 using namespace Steinberg;
 
-Mixer::Mixer(AppState* gAppState, Db::Dao* dao, AudioCore* audioCore)
+Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
   : gAppState(gAppState)
   , jackClient(new JackClient(this))
   , channelCount(1.0f)
-  , audioCore(audioCore)
   , dao(dao)
   {
 
@@ -244,14 +243,6 @@ Result Mixer::loadScene(const Db::ID sceneId) {
     "Loading sceneId: " + std::to_string(sceneId)
   );
 
-  if (const std::optional<Db::Scene> scene = dao->sceneRepository.find(sceneId); !scene) {
-    Logging::write(
-      Error,
-      "Audio::Mixer::loadScene",
-      "Unable to load scene sceneId: " + std::to_string(sceneId)
-    );
-    return ERROR;
-  }
   const Db::Scene scene = dao->sceneRepository.findOrCreate(sceneId);
   const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(scene.id);
   setChannels(channels);
@@ -366,7 +357,7 @@ int Mixer::saveScene() const {
     "Saving scene."
   );
 
-  auto scene = Db::Scene("Mixer Scene", audioCore->playbackSpeed);
+  auto scene = gAppState->getScene();
   const int sceneId = dao->sceneRepository.save(scene);
   scene.id = sceneId;
   gAppState->setScene(scene);

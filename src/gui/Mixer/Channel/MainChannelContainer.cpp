@@ -39,6 +39,12 @@ MainChannelContainer::MainChannelContainer(
   {
   setupGrid();
   setStyle();
+
+  Logging::write(
+    Info,
+    "Gui::MainChannelContainer::MainChannelContainer()",
+    "Instantiated MainChannelContainer"
+  );
 }
 
 void MainChannelContainer::hydrateState(const AppStatePacket &appState) const {

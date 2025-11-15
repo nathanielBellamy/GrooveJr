@@ -95,6 +95,11 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   connectActions();
   setStyle();
   setupGrid();
+  Logging::write(
+    Info,
+    "Gui::MusicLibraryWindow::MusicLibraryWindow()",
+    "Instantiated MusicLibraryWindow"
+  );
 }
 
 MusicLibraryWindow::~MusicLibraryWindow() {

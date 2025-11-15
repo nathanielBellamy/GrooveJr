@@ -13,6 +13,7 @@
 #include "public.sdk/source/vst/hosting/plugprovider.h"
 
 #include "../../../../../Logging.h"
+#include "../../../../../types/AtomicStr.h"
 
 namespace Gj {
 namespace Gui {
@@ -24,13 +25,13 @@ class VstWindow final : public QWidget, public IWindow {
 private:
 	int channelIndex;
 	int effectIndex;
-	std::string name;
+	AtomicStr name;
 	QGridLayout grid;
 	void setStyle();
 	void setupGrid();
 
 public:
-  explicit VstWindow(QWidget* parent, int channelIndex, int effectIndex, std::string name);
+  explicit VstWindow(QWidget* parent, int channelIndex, int effectIndex, const AtomicStr& name);
 	~VstWindow () noexcept override;
 
 	void show () override;

@@ -9,6 +9,8 @@
 #include <QMouseEvent>
 #include <QPushButton>
 
+#include "../../../../../types/AtomicStr.h"
+
 namespace Gj {
 namespace Gui {
 
@@ -18,7 +20,7 @@ class VstWindowSelectButton final : public QPushButton {
   void mousePressEvent(QMouseEvent* event) override;
 
   public:
-    VstWindowSelectButton(QWidget* parent, int effectIndex, std::string pluginName, QAction* selectAction);
+    VstWindowSelectButton(QWidget* parent, int effectIndex, const AtomicStr& pluginName, QAction* selectAction);
 };
 
 } // Gui

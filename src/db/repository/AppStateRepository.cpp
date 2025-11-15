@@ -50,7 +50,7 @@ AppStateEntity AppStateRepository::get() const {
 int AppStateRepository::save() const {
   const std::string query = R"sql(
     insert into appState (audioFramesPerBuffer, sceneId, crossfade)
-    values (?, ?, ?, ?)
+    values (?, ?, ?)
   )sql";
 
   sqlite3_stmt* stmt;

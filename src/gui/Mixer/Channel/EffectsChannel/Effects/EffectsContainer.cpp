@@ -104,7 +104,7 @@ void EffectsContainer::showEvent(QShowEvent *event) {
   );
 }
 
-void EffectsContainer::addEffect(const int newEffectIndex, const std::string pluginName) {
+void EffectsContainer::addEffect(const int newEffectIndex, const AtomicStr& pluginName) {
   auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, newEffectIndex, pluginName);
   vstWindows.push_back(std::move(vstWindow));
   vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, newEffectIndex, pluginName, &selectVstWindowAction));
