@@ -10,7 +10,7 @@ AppState::AppState(
   const Db::ID id,
   const jack_nframes_t audioFramesPerBuffer,
   const PlayState playState,
-  const Db::Scene scene,
+  const Db::Scene& scene,
   const sf_count_t crossfade)
   : id(id)
   , audioFramesPerBuffer(audioFramesPerBuffer)
@@ -55,7 +55,7 @@ AppStatePacket AppState::toPacket() {
   return packet;
 }
 
-AppState AppState::fromAppStateEntity(const Db::AppStateEntity appStateEntity) {
+AppState AppState::fromAppStateEntity(const Db::AppStateEntity& appStateEntity) {
   Db::Scene scene("My Scene", 1.0f);
   return {
     appStateEntity.id,

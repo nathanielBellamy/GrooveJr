@@ -93,8 +93,7 @@ int main(int argc, char *argv[]) {
   // setup Sql
   gAppState = new AppState;
   Dao = new Db::Dao(gAppState);
-  const auto appStateEntity = Dao->appStateRepository.get();
-  if (appStateEntity.id == 0) {
+  if (const auto appStateEntity = Dao->appStateRepository.get(); appStateEntity.id == 0) {
     // no appState in Db, init one
     if (Dao->appStateRepository.save() == 0)
       Logging::write(
@@ -105,14 +104,12 @@ int main(int argc, char *argv[]) {
   }
 
   const auto appStateEntityReloaded = Dao->appStateRepository.get();
-  const auto sceneOpt = Dao->sceneRepository.find(appStateEntityReloaded.sceneId);
-  const Db::Scene scene = sceneOpt
-    ? sceneOpt.value()
-    : Db::Scene::base();
+  const auto scene = Dao->sceneRepository.findOrCreate(appStateEntityReloaded.sceneId);
   gAppState->setFromEntityAndScene(
     appStateEntityReloaded,
     scene
   );
+
   Logging::write(
     Info,
     "main",

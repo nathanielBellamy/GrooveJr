@@ -275,7 +275,7 @@ struct AudioPlayer {
 
     playbackSettingsToAudioThread[0] = 0;
     playbackSettingsToAudioThread[1] = 0;
-    playbackSettingsToAudioThread[2] = std::floor(audioCore->playbackSpeed * 100.0f);
+    playbackSettingsToAudioThread[2] = static_cast<sf_count_t>(std::floor(gAppState->getScene().playbackSpeed * 100.0f));
 
     if (ThreadStatics::getUserSettingFrameId()) {
       const sf_count_t newFrameId = ThreadStatics::getFrameId();

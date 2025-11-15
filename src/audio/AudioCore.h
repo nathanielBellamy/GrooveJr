@@ -31,7 +31,6 @@ struct AudioCore {
   int                              deckIndexNext = 0;
   sf_count_t                       frameAdvance;
   std::atomic<PlayState>           playState = STOP;
-  float                            playbackSpeed = 1.0f;
   float                            fft_eq_time[2][FFT_EQ_TIME_SIZE]{ 0.0 };
   fftwf_complex                    fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
   float                            fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{};

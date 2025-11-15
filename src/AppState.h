@@ -39,9 +39,9 @@ bool inspect(Inspector& f, AppStatePacket& x) {
 }
 
 struct AppState {
-  std::atomic<Db::ID> id{};
-  std::atomic<jack_nframes_t> audioFramesPerBuffer{};
-  std::atomic<PlayState> playState{};
+  std::atomic<Db::ID> id;
+  std::atomic<jack_nframes_t> audioFramesPerBuffer;
+  std::atomic<PlayState> playState;
   std::atomic<Db::Scene> scene;
   std::atomic<sf_count_t> crossfade{ 0 };
   std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
@@ -53,11 +53,11 @@ struct AppState {
     Db::ID id,
     jack_nframes_t audioFramesPerBuffer,
     PlayState playState,
-    Db::Scene scene,
+    const Db::Scene& scene,
     sf_count_t crossfade
   );
   AppStatePacket toPacket();
-  static AppState fromAppStateEntity(Db::AppStateEntity appStateEntity);
+  static AppState fromAppStateEntity(const Db::AppStateEntity& appStateEntity);
 
   // mutations
   void setFromEntityAndScene(const Db::AppStateEntity& appStateEntity, const Db::Scene& newScene) {
@@ -85,6 +85,7 @@ struct AppState {
   Db::Scene getScene() const {
     return scene.load();
   };
+
   void setScene(const Db::Scene& val) {
     scene.store(val);
   };

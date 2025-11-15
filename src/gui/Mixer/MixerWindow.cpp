@@ -29,16 +29,12 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
   )
   , vuRingBuffer(nullptr) {
 
-  std::cout << "wowza 1" << std::endl;
-
   mixer->setSetVuRingBufferFunc(
     [this](jack_ringbuffer_t* vuRingBuffer) { setVuRingBuffer(vuRingBuffer); }
   );
 
   title.setText("Mixer");
   title.setFont({title.font().family(), 18});
-
-  std::cout << "wowza 2" << std::endl;
 
   connectActions();
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);

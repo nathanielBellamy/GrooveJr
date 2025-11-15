@@ -16,7 +16,8 @@ Scene::Scene(const ID id, const AtomicStr& name, const float playbackSpeed, cons
   {}
 
 Scene::Scene(const AtomicStr& name, const float playbackSpeed)
-  : name(name)
+  : id(0)
+  , name(name)
   , playbackSpeed(playbackSpeed)
   {}
 

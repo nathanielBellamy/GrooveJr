@@ -59,9 +59,9 @@ public:
     return jackClient;
   };
 
-  Result setPlaybackSpeed(const int newPlaybackSpeed) {
-    auto scene = gAppState->getScene();
-    scene.playbackSpeed = newPlaybackSpeed;
+  Result setPlaybackSpeed(const int newPlaybackSpeed) const {
+    auto scene = gAppState->scene.load();
+    scene.playbackSpeed = static_cast<float>(newPlaybackSpeed) / 100.0f;
     gAppState->scene.store(scene);
     return OK;
   }
