@@ -74,7 +74,7 @@ Result AudioFileTableView::saveCache() const {
 
 void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent *event) {
   if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {
-    const MusicLibraryQueryModel* model = getModel();
+    const SqlQueryModel* model = getModel();
     const int clickedRow = clickedIndex.row();
     DecksState decksState;
     if (clickedRow < 1) {

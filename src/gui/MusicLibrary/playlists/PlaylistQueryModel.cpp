@@ -17,7 +17,9 @@ Result PlaylistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
 }
 
 QVariant PlaylistQueryModel::data(const QModelIndex& item, const int role) const {
-  // TODO: format
+  if (const QVariant parentData = MusicLibraryQueryModel::data(item, role); !parentData.isNull())
+    return parentData;
+
   return QStandardItemModel::data(item, role);
 }
 
@@ -62,6 +64,11 @@ Result PlaylistQueryModel::setHeaders() {
   setHeaderData(PLAYLIST_COL_ID, Qt::Horizontal, QObject::tr("Id"));
   return OK;
 }
+
+bool PlaylistQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
+  const Db::ID id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
+  return false; // TODO
+};
 
 } // Gui
 } // Gj

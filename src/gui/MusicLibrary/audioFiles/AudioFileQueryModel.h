@@ -33,6 +33,7 @@ public:
   Result hydrateState(const AppStatePacket& appStatePacket) override;
   Result refresh() override;
   Result setHeaders() override;
+  bool isCurrentlyPlaying(const QModelIndex& item) const override;
 
   void initSqlWorkerPool();
 };

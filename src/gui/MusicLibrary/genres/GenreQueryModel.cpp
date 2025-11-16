@@ -17,7 +17,9 @@ Result GenreQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
 }
 
 QVariant GenreQueryModel::data(const QModelIndex& item, const int role) const {
-  // TODO: format
+  if (const QVariant parentData = MusicLibraryQueryModel::data(item, role); !parentData.isNull())
+    return parentData;
+
   return QStandardItemModel::data(item, role);
 }
 
@@ -60,6 +62,11 @@ Result GenreQueryModel::setHeaders() {
   setHeaderData(GENRE_COL_ID, Qt::Horizontal, QObject::tr("Id"));
   setHeaderData(GENRE_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
   return OK;
+}
+
+bool GenreQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
+  const Db::ID id = index(item.row(), GENRE_COL_ID).data().toULongLong();
+  return gAppState->getCurrentlyPlaying().genre.id == id;
 }
 
 } // Gui

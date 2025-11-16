@@ -25,19 +25,19 @@ class QueueTableView final : public MusicLibraryTableView {
       MusicLibraryFilters* filters,
       SqlWorkerPool* sqlWorkerPool
     )
-      : MusicLibraryTableView(
-          parent,
-          actorSystem,
-          dao,
-          gAppState,
-          filters,
-          new QueueQueryModel(parent, gAppState, filters, sqlWorkerPool)
-        )
-      {};
+    : MusicLibraryTableView(
+        parent,
+        actorSystem,
+        dao,
+        gAppState,
+        new QueueQueryModel(parent, gAppState, filters, sqlWorkerPool),
+        filters
+      )
+    {};
 
   void mouseDoubleClickEvent(QMouseEvent *event) override {
     if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {
-      const MusicLibraryQueryModel* model = getModel();
+      const SqlQueryModel* model = getModel();
       const Db::ID id = model->index(clickedIndex.row(), AUDIO_FILE_COL_ID).data().toULongLong();
 
       if (gAppState->getCurrentlyPlaying().audioFile.id == id && !gAppState->queuePlay)

@@ -31,8 +31,8 @@ class GenreTableView final : public MusicLibraryTableView {
       actorSystem,
       dao,
       gAppState,
-      filters,
-      new GenreQueryModel(parent, gAppState, filters, sqlWorkerPool)
+      new GenreQueryModel(parent, gAppState, filters, sqlWorkerPool),
+      filters
     )
     {};
 };

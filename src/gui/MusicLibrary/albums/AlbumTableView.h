@@ -34,8 +34,8 @@ class AlbumTableView final : public MusicLibraryTableView {
         actorSystem,
         dao,
         gAppState,
-        filters,
-        new AlbumQueryModel(parent, gAppState, filters, sqlWorkerPool)
+        new AlbumQueryModel(parent, gAppState, filters, sqlWorkerPool),
+        filters
       )
     {};
 };

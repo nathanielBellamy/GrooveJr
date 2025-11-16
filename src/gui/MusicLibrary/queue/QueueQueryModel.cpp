@@ -17,8 +17,8 @@ Result QueueQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
 }
 
 QVariant QueueQueryModel::data(const QModelIndex& item, const int role) const {
-  if (role == Qt::BackgroundRole && isCurrentlyPlaying(item, AUDIO_FILE_COL_ID))
-    return QVariant::fromValue(QColor(CURRENTLY_PLAYING_COLOR));
+  if (const QVariant parentData = MusicLibraryQueryModel::data(item, role); !parentData.isNull())
+    return parentData;
 
   return QStandardItemModel::data(item, role);
 }
@@ -78,6 +78,10 @@ Result QueueQueryModel::setHeaders() {
   return OK;
 }
 
+bool QueueQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
+  const Db::ID id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
+  return gAppState->getCurrentlyPlaying().audioFile.id == id && gAppState->queuePlay;
+};
 
 } // Gui
 } // Gj

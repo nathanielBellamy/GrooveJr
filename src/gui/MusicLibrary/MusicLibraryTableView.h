@@ -7,7 +7,6 @@
 
 #include <QMenu>
 #include <QMouseEvent>
-#include <QTableView>
 
 #include "caf/actor_system.hpp"
 
@@ -15,6 +14,7 @@
 #include "../../AppState.h"
 #include "../../db/Dao.h"
 
+#include "../QSql/SqlTableView.h"
 #include "MusicLibraryQueryModel.h"
 #include "MusicLibraryFilters.h"
 
@@ -24,18 +24,8 @@ namespace Gui {
 
 using namespace caf;
 
-class MusicLibraryTableView : public QTableView {
-  Result setStyle() {
-    setStyleSheet(
-      "font-weight: 500; font-size: 12px;"
-    );
-    return OK;
-  }
-
+class MusicLibraryTableView : public SqlTableView {
   protected:
-    actor_system& actorSystem;
-    Db::Dao* dao;
-    AppState* gAppState;
     QMenu* menu;
     MusicLibraryFilters* filters;
     MusicLibraryQueryModel* model;
@@ -46,42 +36,13 @@ class MusicLibraryTableView : public QTableView {
       actor_system& actorSystem,
       Db::Dao* dao,
       AppState* gAppState,
-      MusicLibraryFilters* filters,
-      MusicLibraryQueryModel* model)
-        : QTableView(parent)
-        , actorSystem(actorSystem)
-        , dao(dao)
-        , gAppState(gAppState)
-        , menu(nullptr)
-        , filters(filters)
-        , model(model)
-        {
-      setContextMenuPolicy(Qt::CustomContextMenu);
-      setModel(model);
-      setStyle();
-    };
-
-    ~MusicLibraryTableView() {
-      delete menu;
-      delete model;
-    }
-
-    MusicLibraryQueryModel* getModel() const {
-      return model;
-    }
-
-    Result hydrateState(const AppStatePacket& appStatePacket) const {
-      model->hydrateState(appStatePacket);
-      refresh();
-      return OK;
-    }
-
-    Result refresh() const {
-      model->refresh();
-      return OK;
-    }
-
-  // virtual Result addToQueue(Db::ID id) = 0;
+      SqlQueryModel* model,
+      MusicLibraryFilters* filters
+    )
+    : SqlTableView(parent, actorSystem, dao, gAppState, model)
+    , menu(nullptr)
+    , filters(filters)
+    {};
 };
 
 } // Gui

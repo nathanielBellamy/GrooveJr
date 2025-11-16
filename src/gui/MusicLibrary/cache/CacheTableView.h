@@ -25,15 +25,15 @@ class CacheTableView final : public MusicLibraryTableView {
       MusicLibraryFilters* filters,
       SqlWorkerPool* sqlWorkerPool
     )
-        : MusicLibraryTableView(
-            parent,
-            actorSystem,
-            dao,
-            gAppState,
-            filters,
-            new CacheQueryModel(parent, gAppState, filters, sqlWorkerPool)
-        )
-        {};
+    : MusicLibraryTableView(
+      parent,
+      actorSystem,
+      dao,
+      gAppState,
+      new CacheQueryModel(parent, gAppState, filters, sqlWorkerPool),
+      filters
+    )
+    {};
 };
 
 } // Gui

@@ -16,9 +16,11 @@ Result ArtistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
-QVariant ArtistQueryModel::data(const QModelIndex& index, const int role) const {
-  // TODO: format
-  return QStandardItemModel::data(index, role);
+QVariant ArtistQueryModel::data(const QModelIndex& item, const int role) const {
+  if (const QVariant parentData = MusicLibraryQueryModel::data(item, role); !parentData.isNull())
+    return parentData;
+
+  return QStandardItemModel::data(item, role);
 }
 
 Result ArtistQueryModel::refresh() {
@@ -61,6 +63,11 @@ Result ArtistQueryModel::setHeaders() {
   setHeaderData(ARTIST_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
   setHeaderData(ARTIST_COL_ID, Qt::Horizontal, QObject::tr("Id"));
   return OK;
+}
+
+bool ArtistQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
+  const Db::ID id = index(item.row(), ARTIST_COL_ID).data().toULongLong();
+  return gAppState->getCurrentlyPlaying().artist.id == id;
 }
 
 } // Gui

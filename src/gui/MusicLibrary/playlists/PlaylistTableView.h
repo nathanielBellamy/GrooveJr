@@ -32,8 +32,8 @@ public:
         actorSystem,
         dao,
         gAppState,
-        filters,
-        new PlaylistQueryModel(parent, gAppState, filters, sqlWorkerPool)
+        new PlaylistQueryModel(parent, gAppState, filters, sqlWorkerPool),
+        filters
       )
     {};
 };

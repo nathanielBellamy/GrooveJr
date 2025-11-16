@@ -31,6 +31,7 @@ public:
   Result hydrateState(const AppStatePacket& appStatePacket) override;
   Result refresh() override;
   Result setHeaders() override;
+  bool isCurrentlyPlaying(const QModelIndex& item) const override;
 
   QVariant data(const QModelIndex &item, int role) const override;
 };

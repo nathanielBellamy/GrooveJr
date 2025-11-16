@@ -31,8 +31,8 @@ class ArtistTableView final : public MusicLibraryTableView {
         actorSystem,
         dao,
         gAppState,
-        filters,
-        new ArtistQueryModel(parent, gAppState, filters, sqlWorkerPool)
+        new ArtistQueryModel(parent, gAppState, filters, sqlWorkerPool),
+        filters
       )
     {};
 };

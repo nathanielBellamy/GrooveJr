@@ -51,8 +51,8 @@ public:
       actorSystem,
       dao,
       gAppState,
-      filters,
-      new AudioFileQueryModel(parent, gAppState, filters, sqlWorkerPool)
+      new AudioFileQueryModel(parent, gAppState, filters, sqlWorkerPool),
+      filters
     )
   {};
 

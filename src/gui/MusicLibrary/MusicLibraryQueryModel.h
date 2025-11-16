@@ -20,6 +20,7 @@
 
 #include "../QSql/SqlWorkerPool.h"
 #include "../QSql/SqlWorkerPoolClient.h"
+#include "../QSql/SqlQueryModel.h"
 #include "MusicLibraryFilters.h"
 #include "Constants.h"
 
@@ -27,35 +28,8 @@ namespace Gj {
 namespace Gui {
   class SqlWorkerPool;
 
-  class MusicLibraryQueryModel : public SqlWorkerPoolClient {
+  class MusicLibraryQueryModel : public SqlQueryModel {
     const char* previousQuery = "";
-    Result connectToPool() {
-      const auto queryResultsReadyConnection =
-        connect(sqlWorkerPool, &SqlWorkerPool::queryResultsReady, [&](const QString& callerId, const QList<QVariantList>& rows) {
-          if (callerId != id)
-            return;
-
-          clear();
-          for (const auto& row : rows) {
-            QList<QStandardItem*> items;
-            for (const auto& val : row)
-              items << new QStandardItem(val.toString());
-            appendRow(items);
-          }
-
-          setHeaders();
-        });
-      //
-      // const auto errorOccurredConnection =
-      //   connect(sqlWorker, &SqlWorker::errorOccurred, this, [&](const QString& error) {
-      //     Logging::write(
-      //       Error,
-      //       "Gui::AudioFileQueryModel::sqlWorker::errorOccurred()",
-      //       "Error: " + error.toStdString()
-      //     );
-      //   });
-      return OK;
-    };
 
   protected:
     QString id;
@@ -87,33 +61,6 @@ namespace Gui {
           ) != ids.end();
     };
 
-    bool isCurrentlyPlaying(const QModelIndex& item, const size_t idCol) const {
-      const auto currentlyPlaying = gAppState->getCurrentlyPlaying();
-      Db::ID id;
-      switch (type) {
-        case ALBUM:
-          id = index(item.row(), ALBUM_COL_ID).data().toULongLong();
-          return gAppState->getCurrentlyPlaying().album.id == id;
-        case ARTIST:
-          id = index(item.row(), ARTIST_COL_ID).data().toULongLong();
-          return gAppState->getCurrentlyPlaying().album.id == id;
-        case AUDIO_FILE:
-          id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
-          return gAppState->getCurrentlyPlaying().audioFile.id == id;
-        case CACHE:
-          id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
-          return gAppState->getCurrentlyPlaying().audioFile.id == id && !gAppState->queuePlay;
-        case QUEUE:
-          id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
-          return gAppState->getCurrentlyPlaying().audioFile.id == id && gAppState->queuePlay;
-        case GENRE:
-          id = index(item.row(), GENRE_COL_ID).data().toULongLong();
-          return gAppState->getCurrentlyPlaying().genre.id == id;
-        default:
-          return false;
-      }
-    }
-
   public:
     MusicLibraryQueryModel(
       QObject* parent,
@@ -123,19 +70,25 @@ namespace Gui {
       const QString& id,
       SqlWorkerPool* sqlWorkerPool
     )
-      : SqlWorkerPoolClient(parent)
-      , id(id)
-      , sqlWorkerPool(sqlWorkerPool)
-      , gAppState(gAppState)
-      , type(type)
-      , filters(filters)
-      {
-      connectToPool();
-    }
+    : SqlQueryModel(parent, gAppState, id, sqlWorkerPool)
+    , id(id)
+    , sqlWorkerPool(sqlWorkerPool)
+    , gAppState(gAppState)
+    , type(type)
+    , filters(filters)
+    {}
 
     virtual Result hydrateState(const AppStatePacket& appStatePacket) = 0;
     virtual Result refresh() = 0;
     virtual Result setHeaders() = 0;
+    virtual bool isCurrentlyPlaying(const QModelIndex& item) const = 0;
+
+    QVariant data(const QModelIndex& item, const int role) const {
+      if (role == Qt::BackgroundRole && isCurrentlyPlaying(item))
+        return QVariant::fromValue(QColor(CURRENTLY_PLAYING_COLOR));
+
+      return {};
+    }
 };
 
 } // Gui
