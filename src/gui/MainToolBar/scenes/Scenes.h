@@ -20,6 +20,7 @@
 #include "../../../actors/ActorIds.h"
 #include "../../../messaging/atoms.h"
 
+#include "ScenesTableView.h"
 #include "SceneSaveButton.h"
 
 namespace Gj {
@@ -29,9 +30,11 @@ using namespace caf;
 
 class Scenes final : public QWidget {
   actor_system& sys;
+  AppState* gAppState;
   Audio::Mixer* mixer;
   QGridLayout grid;
   QLabel title;
+  ScenesTableView tableView;
   QAction sceneSaveAction;
   SceneSaveButton sceneSaveButton;
 
@@ -39,7 +42,7 @@ class Scenes final : public QWidget {
   void setupGrid();
 
   public:
-    Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction* sceneLoadAction);
+    Scenes(QWidget* parent, actor_system& sys, AppState* gAppState, Audio::Mixer* mixer, QAction* sceneLoadAction);
     Result hydrateState(const AppStatePacket& appStatePacket);
 };
 

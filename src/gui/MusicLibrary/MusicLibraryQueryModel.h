@@ -29,7 +29,6 @@ namespace Gui {
   class SqlWorkerPool;
 
   class MusicLibraryQueryModel : public SqlQueryModel {
-    const char* previousQuery = "";
 
   protected:
     QString id;
@@ -37,20 +36,6 @@ namespace Gui {
     AppState* gAppState;
     MusicLibraryType type;
     MusicLibraryFilters* filters;
-
-    Result setPreviousQuery(const std::string& newQueryString) {
-      previousQuery = newQueryString.c_str();
-      return OK;
-    };
-
-    bool queryHasChanged(const char* newQuery) {
-      if (previousQuery == nullptr) {
-        setPreviousQuery(std::string(newQuery));
-        return true;
-      }
-
-      return std::strcmp(previousQuery, newQuery) != 0;
-    }
 
     bool isCurrentFilter(const QModelIndex& item, const size_t idCol) const {
       std::vector<Db::ID> ids = filters->filters.at(type).ids;
@@ -78,9 +63,6 @@ namespace Gui {
     , filters(filters)
     {}
 
-    virtual Result hydrateState(const AppStatePacket& appStatePacket) = 0;
-    virtual Result refresh() = 0;
-    virtual Result setHeaders() = 0;
     virtual bool isCurrentlyPlaying(const QModelIndex& item) const = 0;
 
     QVariant data(const QModelIndex& item, const int role) const {

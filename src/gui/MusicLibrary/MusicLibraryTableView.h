@@ -28,7 +28,6 @@ class MusicLibraryTableView : public SqlTableView {
   protected:
     QMenu* menu;
     MusicLibraryFilters* filters;
-    MusicLibraryQueryModel* model;
 
   public:
     MusicLibraryTableView(

@@ -5,15 +5,7 @@
 #ifndef GJSQLQUERYMODEL_H
 #define GJSQLQUERYMODEL_H
 
-#include <vector>
 #include <cstring>
-
-#include <QObject>
-#include <QtSql/qsqlquerymodel.h>
-#include <QStandardItemModel>
-#include <QVariant>
-#include <QColor>
-#include <QString>
 
 #include "../../AppState.h"
 #include "../../enums/Result.h"
@@ -27,6 +19,7 @@ namespace Gui {
 
   class SqlQueryModel : public SqlWorkerPoolClient {
     const char* previousQuery = "";
+
     Result connectToPool() {
       const auto queryResultsReadyConnection =
         connect(sqlWorkerPool, &SqlWorkerPool::queryResultsReady, [&](const QString& callerId, const QList<QVariantList>& rows) {

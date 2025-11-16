@@ -14,12 +14,12 @@ struct Cache {
   ID id;
   ID audioFileId;
 
-  Cache(ID id, ID audioFileId)
+  Cache(const ID id, const ID audioFileId)
     : id(id)
     , audioFileId(audioFileId)
     {}
 
-  Cache(ID audioFileId)
+  Cache(const ID audioFileId)
     : id(0)
     , audioFileId(audioFileId)
     {}

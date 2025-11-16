@@ -28,14 +28,15 @@ public:
     {
     refresh();
   }
-  QVariant data(const QModelIndex& item, int role) const override;
 
+  // SqlQueryModel
+  QVariant data(const QModelIndex& item, int role) const override;
   Result hydrateState(const AppStatePacket& appStatePacket) override;
   Result refresh() override;
   Result setHeaders() override;
-  bool isCurrentlyPlaying(const QModelIndex& item) const override;
 
-  void initSqlWorkerPool();
+  // MusicLibraryQueryModel
+  bool isCurrentlyPlaying(const QModelIndex& item) const override;
 };
 
 } // Gui

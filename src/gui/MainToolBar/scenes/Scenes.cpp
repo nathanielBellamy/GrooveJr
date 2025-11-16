@@ -7,12 +7,13 @@
 namespace Gj {
 namespace Gui {
 
-Scenes::Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction* sceneLoadAction)
+Scenes::Scenes(QWidget* parent, actor_system& sys, AppState* gAppState, Audio::Mixer* mixer, QAction* sceneLoadAction)
   : QWidget(parent)
   , sys(sys)
   , mixer(mixer)
   , grid(this)
   , title(this)
+  , tableView(this, sys, mixer->dao, gAppState, nullptr) // TODO: lift and pass workerPool
   , sceneSaveAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSave), tr("&Save Scene"), this)
   , sceneSaveButton(this, &sceneSaveAction)
   {
@@ -29,6 +30,7 @@ Scenes::Scenes(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction*
 void Scenes::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.addWidget(&sceneSaveButton, 0, 3, 1, 2);
+  grid.addWidget(&tableView, 1, 0, -1, -1);
 
   setLayout(&grid);
 }

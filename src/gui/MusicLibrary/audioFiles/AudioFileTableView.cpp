@@ -54,6 +54,7 @@ Result AudioFileTableView::saveCache() const {
     caches.push_back(cache);
     i++;
   }
+
   if (dao->cacheRepository.save(caches) == ERROR) {
     Logging::write(
       Error,
@@ -82,7 +83,6 @@ void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent *event) {
       for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
         decksState.audioFileIds[i] = model->index(clickedRow + i, AUDIO_FILE_COL_ID).data().toULongLong();
       }
-      const Db::ID id = model->index(clickedIndex.row(), AUDIO_FILE_COL_ID).data().toULongLong();
     } else {
       decksState.currentDeckIdx = 1;
       for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {

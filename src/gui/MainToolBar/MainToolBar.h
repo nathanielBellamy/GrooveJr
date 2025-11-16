@@ -16,6 +16,7 @@
 #include <QWidget>
 
 #include "../../Logging.h"
+#include "../../AppState.h"
 #include "../../actors/ActorIds.h"
 #include "../../messaging/atoms.h"
 #include "../../messaging/EnvelopeQtPtr.h"
@@ -35,7 +36,7 @@ using namespace caf;
 
 class MainToolBar final : public QToolBar {
   public:
-    MainToolBar(QWidget* parent, actor_system& sys, Audio::Mixer* mixer, QAction* sceneLoadAction);
+    MainToolBar(QWidget* parent, actor_system& sys, AppState* gAppState, Audio::Mixer* mixer, QAction* sceneLoadAction);
     int hydrateState(const AppStatePacket& appStatePacket);
 
   private:
