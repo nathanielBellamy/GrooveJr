@@ -6,12 +6,12 @@
 #define SQLWORKERPOOLHOST_H
 
 #include <QObject>
-#include <QWidget>
+#include <QMainWindow>
 
 namespace Gj {
 namespace Gui {
 
-class SqlWorkerPoolHost : public QWidget {
+class SqlWorkerPoolHost : public QMainWindow {
   Q_OBJECT
 
 public:

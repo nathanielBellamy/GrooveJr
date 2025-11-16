@@ -8,7 +8,7 @@ namespace Gj {
 namespace Gui {
 
 SqlWorkerPoolHost::SqlWorkerPoolHost(QWidget* parent)
-  : QWidget(parent)
+  : QMainWindow(parent)
   {};
 
 } // Gui

@@ -31,13 +31,15 @@
 #include <QCloseEvent>
 #include <QMainWindow>
 #include <QGridLayout>
+#include <QThread>
+#include "QSql/SqlWorkerPoolHost.h"
 
 using namespace caf;
 
 namespace Gj {
 namespace Gui {
 
-class MainWindow final : public QMainWindow {
+class MainWindow final : public SqlWorkerPoolHost {
   Q_OBJECT
 
   public:
@@ -65,6 +67,8 @@ class MainWindow final : public QMainWindow {
     actor_system& actorSystem;
     Audio::Mixer* mixer;
     void (*shutdown_handler)(int);
+    SqlWorkerPool* sqlWorkerPool;
+    QThread sqlWorkerPoolThread;
     QWidget container;
     MenuBar* menuBar;
     QAction sceneLoadAction;
@@ -75,6 +79,7 @@ class MainWindow final : public QMainWindow {
 
     void setupGrid();
     void connectActions();
+    Result initQSql();
 };
 
 } // Gui

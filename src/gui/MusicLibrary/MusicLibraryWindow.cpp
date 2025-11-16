@@ -7,8 +7,14 @@
 namespace Gj {
 namespace Gui {
 
-MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao)
-  : SqlWorkerPoolHost(parent)
+MusicLibraryWindow::MusicLibraryWindow(
+  QWidget* parent,
+  actor_system& actorSystem,
+  AppState* gAppState,
+  Db::Dao* dao,
+  SqlWorkerPool* sqlWorkerPool
+  )
+  : QWidget(parent)
   , actorSystem(actorSystem)
   , gAppState(gAppState)
   , dao(dao)
@@ -28,36 +34,8 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   , playlistClearFilterButton(this)
   {
 
-  workerPool = new SqlWorkerPool(this);
-  if (workerPool != nullptr) {
-    workerPool->moveToThread(&workerPoolThread);
-    workerPoolThread.start();
-    emit initSqlWorkerPool();
-
-    albumTableView = new AlbumTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
-    artistTableView = new ArtistTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
-    audioFileTableView = new AudioFileTableView(this, actorSystem, gAppState, dao, &filters, workerPool);
-    cacheTableView = new CacheTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
-    genreTableView = new GenreTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
-    playlistTableView = new PlaylistTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
-    queueTableView = new QueueTableView(this, actorSystem, dao, gAppState, &filters, workerPool);
-
-    workerPool->connectClient(albumTableView->getModel());
-    workerPool->connectClient(artistTableView->getModel());
-    workerPool->connectClient(audioFileTableView->getModel());
-    workerPool->connectClient(cacheTableView->getModel());
-    workerPool->connectClient(genreTableView->getModel());
-    workerPool->connectClient(playlistTableView->getModel());
-    workerPool->connectClient(queueTableView->getModel());
-
-    showAsMainSection(AUDIO_FILES_VIEW);
-  } else {
-    Logging::write(
-      Warning,
-      "Gui::MusicLibraryWindow::MusicLibraryWindow()",
-      "Something went wrong while connecting to the db."
-    );
-  }
+  createAndConnectTableViews(sqlWorkerPool);
+  showAsMainSection(AUDIO_FILES_VIEW);
 
   cacheButton.setCursor(Qt::PointingHandCursor);
   filesButton.setCursor(Qt::PointingHandCursor);
@@ -102,6 +80,24 @@ MusicLibraryWindow::MusicLibraryWindow(QWidget* parent, actor_system& actorSyste
   );
 }
 
+Result MusicLibraryWindow::createAndConnectTableViews(SqlWorkerPool* sqlWorkerPool) {
+  albumTableView = new AlbumTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
+  artistTableView = new ArtistTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
+  audioFileTableView = new AudioFileTableView(this, actorSystem, gAppState, dao, &filters, sqlWorkerPool);
+  cacheTableView = new CacheTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
+  genreTableView = new GenreTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
+  playlistTableView = new PlaylistTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
+  queueTableView = new QueueTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
+
+  sqlWorkerPool->connectClient(albumTableView->getModel());
+  sqlWorkerPool->connectClient(artistTableView->getModel());
+  sqlWorkerPool->connectClient(audioFileTableView->getModel());
+  sqlWorkerPool->connectClient(cacheTableView->getModel());
+  sqlWorkerPool->connectClient(genreTableView->getModel());
+  sqlWorkerPool->connectClient(playlistTableView->getModel());
+  sqlWorkerPool->connectClient(queueTableView->getModel());
+}
+
 MusicLibraryWindow::~MusicLibraryWindow() {
   Logging::write(
     Info,
@@ -116,8 +112,6 @@ MusicLibraryWindow::~MusicLibraryWindow() {
   delete genreTableView;
   delete playlistTableView;
   delete queueTableView;
-
-  workerPoolThread.quit();
 
   Logging::write(
     Info,

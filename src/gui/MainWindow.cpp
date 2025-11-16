@@ -12,7 +12,8 @@ namespace Gj {
 namespace Gui {
 
 MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState* gAppState, void (*shutdown_handler) (int))
-    : gAppState(gAppState)
+    : SqlWorkerPoolHost(nullptr)
+    , gAppState(gAppState)
     , actorSystem(actorSystem)
     , mixer(mixer)
     , shutdown_handler(shutdown_handler)
@@ -24,6 +25,8 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState*
     , musicLibraryWindow(&container, actorSystem, gAppState, mixer->dao)
     , mixerWindow(&container, actorSystem, mixer)
     {
+
+  initQSql();
 
   container.setMinimumSize(QSize(1300, 700));
   setCentralWidget(&container);
@@ -41,6 +44,14 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState*
     "Gui::MainWindow::MainWindow()",
     "Instantiated MainWindow"
   );
+}
+
+Result MainWindow::initQSql() {
+  sqlWorkerPool = new SqlWorkerPool(this);
+  sqlWorkerPool->moveToThread(&sqlWorkerPoolThread);
+  sqlWorkerPoolThread.start();
+  emit initSqlWorkerPool();
+  return OK;
 }
 
 Result MainWindow::hydrateState(const AppStatePacket& appStatePacket) {

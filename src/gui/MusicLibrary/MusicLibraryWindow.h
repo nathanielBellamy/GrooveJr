@@ -45,12 +45,10 @@ enum MusicLibraryWindowMainSection {
   QUEUE_VIEW
 };
 
-class MusicLibraryWindow final : public SqlWorkerPoolHost {
+class MusicLibraryWindow final : public QWidget {
   actor_system& actorSystem;
   AppState* gAppState;
   Db::Dao* dao;
-  QThread workerPoolThread;
-  SqlWorkerPool* workerPool;
   QGridLayout grid;
   MusicLibraryWindowMainSection mainSection = AUDIO_FILES_VIEW;
   QPushButton cacheButton;
@@ -76,6 +74,7 @@ class MusicLibraryWindow final : public SqlWorkerPoolHost {
   void setStyle();
   void setupGrid();
   Result connectActions();
+  Result createAndConnectTableViews(SqlWorkerPool* sqlWorkerPool);
 
   const QString STYLE_STR_BTN_SELECTED = QString(
     ("background-color: " + Color::toHex(GjC::LIGHT_400) + " ;").c_str()
@@ -87,7 +86,7 @@ class MusicLibraryWindow final : public SqlWorkerPoolHost {
 
   public:
     MusicLibraryFilters filters;
-    explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao);
+    explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao, SqlWorkerPool* sqlWorkerPool);
     ~MusicLibraryWindow();
 
     Result hydrateState(const AppStatePacket& appStatePacket) const {
