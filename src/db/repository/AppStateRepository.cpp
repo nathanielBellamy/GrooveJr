@@ -86,9 +86,16 @@ int AppStateRepository::save() const {
 
 int AppStateRepository::persistAndSet() const {
   try {
-    const auto id = save();
-    // lookup scene
-    gAppState->setFromEntityAndScene(get(), gAppState->scene);
+    save();
+
+    // reload
+    const auto appStateEntity = get();
+    const auto sceneOpt = findScene(appStateEntity.sceneId);
+    const Scene scene = sceneOpt
+      ? sceneOpt.value()
+      : Scene::base();
+
+    gAppState->setFromEntityAndScene(appStateEntity, scene);
 
     Logging::write(
       Info,

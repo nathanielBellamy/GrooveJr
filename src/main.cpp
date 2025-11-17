@@ -109,6 +109,7 @@ int main(int argc, char *argv[]) {
     appStateEntityReloaded,
     scene
   );
+  Dao->appStateRepository.persistAndSet();
 
   Logging::write(
     Info,
