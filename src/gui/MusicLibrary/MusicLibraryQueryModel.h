@@ -32,7 +32,6 @@ namespace Gui {
 
   protected:
     QString id;
-    SqlWorkerPool* sqlWorkerPool;
     AppState* gAppState;
     MusicLibraryType type;
     MusicLibraryFilters* filters;
@@ -57,7 +56,6 @@ namespace Gui {
     )
     : SqlQueryModel(parent, gAppState, id, sqlWorkerPool)
     , id(id)
-    , sqlWorkerPool(sqlWorkerPool)
     , gAppState(gAppState)
     , type(type)
     , filters(filters)

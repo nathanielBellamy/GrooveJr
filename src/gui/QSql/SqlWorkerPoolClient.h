@@ -5,6 +5,8 @@
 #ifndef SQLWORKERPOOLCLIENT_H
 #define SQLWORKERPOOLCLIENT_H
 
+#include <iostream>
+
 #include <QObject>
 #include <QStandardItemModel>
 #include <QString>
@@ -13,7 +15,6 @@ namespace Gj {
 namespace Gui {
 
 class SqlWorkerPoolClient : public QStandardItemModel {
-
   Q_OBJECT
 
 public:
@@ -21,7 +22,6 @@ public:
 
   signals:
     void runQuery(const QString& id, const QString& query);
-
 };
 
 } // Gui

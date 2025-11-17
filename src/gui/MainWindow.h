@@ -49,6 +49,7 @@ class MainWindow final : public SqlWorkerPoolHost {
       AppState* gAppState,
       void (*shutdown_handler) (int)
     );
+    ~MainWindow();
     void closeEvent(QCloseEvent* event) override;
     void setChannels();
     void setEffects();
@@ -67,8 +68,8 @@ class MainWindow final : public SqlWorkerPoolHost {
     actor_system& actorSystem;
     Audio::Mixer* mixer;
     void (*shutdown_handler)(int);
-    SqlWorkerPool* sqlWorkerPool;
     QThread sqlWorkerPoolThread;
+    SqlWorkerPool* sqlWorkerPool;
     QWidget container;
     MenuBar* menuBar;
     QAction sceneLoadAction;
@@ -79,7 +80,7 @@ class MainWindow final : public SqlWorkerPoolHost {
 
     void setupGrid();
     void connectActions();
-    Result initQSql();
+    SqlWorkerPool* initQSql();
 };
 
 } // Gui

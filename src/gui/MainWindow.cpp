@@ -17,16 +17,20 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState*
     , actorSystem(actorSystem)
     , mixer(mixer)
     , shutdown_handler(shutdown_handler)
+    , sqlWorkerPool(initQSql())
     , container(this)
     , menuBar(new MenuBar(actorSystem, this))
     , sceneLoadAction(QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen), tr("&Select Scene"), this)
-    , mainToolBar(this, actorSystem, gAppState, mixer, &sceneLoadAction)
+    , mainToolBar(this, actorSystem, gAppState, mixer, sqlWorkerPool, &sceneLoadAction)
     , grid(&container)
-    , musicLibraryWindow(&container, actorSystem, gAppState, mixer->dao)
+    , musicLibraryWindow(&container, actorSystem, gAppState, mixer->dao, sqlWorkerPool)
     , mixerWindow(&container, actorSystem, mixer)
     {
-
-  initQSql();
+  Logging::write(
+    Info,
+    "Gui::MainWindow::MainWindow()",
+    "Initialized QSql."
+  );
 
   container.setMinimumSize(QSize(1300, 700));
   setCentralWidget(&container);
@@ -46,12 +50,17 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState*
   );
 }
 
-Result MainWindow::initQSql() {
-  sqlWorkerPool = new SqlWorkerPool(this);
+MainWindow::~MainWindow() {
+  sqlWorkerPoolThread.quit();
+  delete sqlWorkerPool;
+}
+
+SqlWorkerPool* MainWindow::initQSql() {
+  const auto sqlWorkerPool = new SqlWorkerPool(this);
   sqlWorkerPool->moveToThread(&sqlWorkerPoolThread);
   sqlWorkerPoolThread.start();
   emit initSqlWorkerPool();
-  return OK;
+  return sqlWorkerPool;
 }
 
 Result MainWindow::hydrateState(const AppStatePacket& appStatePacket) {

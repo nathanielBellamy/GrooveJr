@@ -34,15 +34,23 @@ class Scenes final : public QWidget {
   Audio::Mixer* mixer;
   QGridLayout grid;
   QLabel title;
-  ScenesTableView tableView;
+  ScenesTableView* tableView = nullptr;
   QAction sceneSaveAction;
   SceneSaveButton sceneSaveButton;
+  QAction sceneLoadAction;
 
   void connectActions();
   void setupGrid();
 
   public:
-    Scenes(QWidget* parent, actor_system& sys, AppState* gAppState, Audio::Mixer* mixer, QAction* sceneLoadAction);
+    Scenes(
+      QWidget* parent,
+      actor_system& sys,
+      AppState* gAppState,
+      Audio::Mixer* mixer,
+      SqlWorkerPool* sqlWorkerPool,
+      QAction* sceneLoadAction
+    );
     Result hydrateState(const AppStatePacket& appStatePacket);
 };
 

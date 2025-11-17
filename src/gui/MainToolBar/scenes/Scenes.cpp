@@ -7,16 +7,24 @@
 namespace Gj {
 namespace Gui {
 
-Scenes::Scenes(QWidget* parent, actor_system& sys, AppState* gAppState, Audio::Mixer* mixer, QAction* sceneLoadAction)
+Scenes::Scenes(
+  QWidget* parent,
+  actor_system& sys,
+  AppState* gAppState,
+  Audio::Mixer* mixer,
+  SqlWorkerPool* sqlWorkerPool,
+  QAction* sceneLoadAction)
   : QWidget(parent)
   , sys(sys)
   , mixer(mixer)
   , grid(this)
   , title(this)
-  , tableView(this, sys, mixer->dao, gAppState, nullptr) // TODO: lift and pass workerPool
   , sceneSaveAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSave), tr("&Save Scene"), this)
   , sceneSaveButton(this, &sceneSaveAction)
+  , sceneLoadAction(sceneLoadAction)
   {
+
+  tableView = new ScenesTableView(this, sys, mixer->dao, gAppState, sqlWorkerPool);
 
   title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
   title.setText("Scenes");
@@ -26,11 +34,10 @@ Scenes::Scenes(QWidget* parent, actor_system& sys, AppState* gAppState, Audio::M
   setupGrid();
 }
 
-
 void Scenes::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.addWidget(&sceneSaveButton, 0, 3, 1, 2);
-  grid.addWidget(&tableView, 1, 0, -1, -1);
+  grid.addWidget(tableView, 1, 0, -1, -1);
 
   setLayout(&grid);
 }
@@ -42,6 +49,16 @@ void Scenes::connectActions() {
       Info,
       "Gui::Scenes::sceneSaveAction",
       "Saved scene id: " + std::to_string(sceneId)
+    );
+  });
+
+  const auto loadSceneConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
+    // TODO
+    const auto sceneId = 0;
+    Logging::write(
+      Info,
+      "Gui::Scenes::sceneSaveAction",
+      "Loading scene id: " + std::to_string(sceneId)
     );
   });
 }

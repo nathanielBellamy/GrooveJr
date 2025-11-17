@@ -34,7 +34,6 @@ class SqlTableView : public QTableView {
     actor_system& actorSystem;
     Db::Dao* dao;
     AppState* gAppState;
-    QMenu* menu;
     SqlQueryModel* model;
 
   public:
@@ -44,22 +43,11 @@ class SqlTableView : public QTableView {
       Db::Dao* dao,
       AppState* gAppState,
       SqlQueryModel* model
-    )
-    : QTableView(parent)
-    , actorSystem(actorSystem)
-    , dao(dao)
-    , gAppState(gAppState)
-    , menu(nullptr)
-    , model(model)
-    {
-      setContextMenuPolicy(Qt::CustomContextMenu);
-      setModel(model);
-      setStyle();
-    };
+    );
 
-    ~SqlTableView() {
-      delete menu;
+    ~SqlTableView() override {
       delete model;
+      QTableView::~QTableView();
     }
 
     SqlQueryModel* getModel() const {

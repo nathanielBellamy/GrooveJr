@@ -11,7 +11,6 @@
 namespace Gj {
 namespace Gui {
 
-
 constexpr size_t ALBUM_COL_TITLE = 0;
 constexpr size_t ALBUM_COL_YEAR = 1;
 constexpr size_t ALBUM_COL_ID = 2;

@@ -20,6 +20,12 @@ SqlWorkerPool::SqlWorkerPool(SqlWorkerPoolHost* host)
   }
 
   connectActions();
+
+  Logging::write(
+    Info,
+    "Gui::SqlWorkerPool::SqlWorkerPool()",
+    "Instantiated SqlWorkerPool."
+  );
 };
 
 SqlWorkerPool::~SqlWorkerPool() {

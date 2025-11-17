@@ -96,6 +96,8 @@ Result MusicLibraryWindow::createAndConnectTableViews(SqlWorkerPool* sqlWorkerPo
   sqlWorkerPool->connectClient(genreTableView->getModel());
   sqlWorkerPool->connectClient(playlistTableView->getModel());
   sqlWorkerPool->connectClient(queueTableView->getModel());
+
+  return OK;
 }
 
 MusicLibraryWindow::~MusicLibraryWindow() {

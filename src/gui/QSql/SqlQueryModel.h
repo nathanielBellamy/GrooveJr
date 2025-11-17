@@ -73,13 +73,10 @@ namespace Gui {
       AppState* gAppState,
       const QString& id,
       SqlWorkerPool* sqlWorkerPool
-    )
-    : SqlWorkerPoolClient(parent)
-    , id(id)
-    , sqlWorkerPool(sqlWorkerPool)
-    , gAppState(gAppState)
-    {
-      connectToPool();
+    );
+
+    QString initId(const QString& id) {
+      return id;
     }
 
     virtual Result hydrateState(const AppStatePacket& appStatePacket) = 0;

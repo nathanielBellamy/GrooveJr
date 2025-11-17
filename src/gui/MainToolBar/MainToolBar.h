@@ -23,6 +23,7 @@
 #include "../../enums/PlayState.h"
 #include "../../audio/Mixer.h"
 #include "../Color.h"
+#include "../QSql/SqlWorkerPool.h"
 
 #include "CurrentlyPlaying.h"
 #include "eq/EqGraph.h"
@@ -36,7 +37,14 @@ using namespace caf;
 
 class MainToolBar final : public QToolBar {
   public:
-    MainToolBar(QWidget* parent, actor_system& sys, AppState* gAppState, Audio::Mixer* mixer, QAction* sceneLoadAction);
+    MainToolBar(
+      QWidget* parent,
+      actor_system& sys,
+      AppState* gAppState,
+      Audio::Mixer* mixer,
+      SqlWorkerPool* sqlWorkerPool,
+      QAction* sceneLoadAction
+    );
     int hydrateState(const AppStatePacket& appStatePacket);
 
   private:

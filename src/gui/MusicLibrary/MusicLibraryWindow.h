@@ -86,7 +86,13 @@ class MusicLibraryWindow final : public QWidget {
 
   public:
     MusicLibraryFilters filters;
-    explicit MusicLibraryWindow(QWidget *parent, actor_system& actorSystem, AppState* gAppState, Db::Dao* dao, SqlWorkerPool* sqlWorkerPool);
+    explicit MusicLibraryWindow(
+      QWidget *parent,
+      actor_system& actorSystem,
+      AppState* gAppState,
+      Db::Dao* dao,
+      SqlWorkerPool* sqlWorkerPool
+    );
     ~MusicLibraryWindow();
 
     Result hydrateState(const AppStatePacket& appStatePacket) const {

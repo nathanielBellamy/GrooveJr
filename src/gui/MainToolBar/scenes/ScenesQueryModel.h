@@ -10,7 +10,13 @@
 namespace Gj {
 namespace Gui {
 
-class ScenesQueryModel : public SqlQueryModel {
+constexpr size_t SCENES_COL_NAME = 0;
+constexpr size_t SCENES_COL_DESCRIPTION = 1;
+constexpr size_t SCENES_COL_ID = 2;
+
+constexpr auto CURRENT_SCENE_COLOR = Qt::cyan;
+
+class ScenesQueryModel final : public SqlQueryModel {
 
 public:
   ScenesQueryModel(
@@ -28,6 +34,8 @@ public:
   Result hydrateState(const AppStatePacket& appStatePacket) override;
   Result refresh() override;
   Result setHeaders() override;
+
+  bool isCurrentScene(const QModelIndex& item) const;
 };
 
 } // Gui

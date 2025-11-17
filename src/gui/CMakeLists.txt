@@ -32,6 +32,10 @@ qt_add_library(GjGui STATIC
         MainWindow.h
         MainWindow.cpp
         Hydrater.h
+        QSql/SqlQueryModel.h
+        QSql/SqlQueryModel.cpp
+        QSql/SqlTableView.h
+        QSql/SqlTableView.cpp
         QSql/SqlWorker.h
         QSql/SqlWorker.cpp
         QSql/SqlWorkerPool.h

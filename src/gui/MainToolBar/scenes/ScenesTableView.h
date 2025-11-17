@@ -11,7 +11,11 @@
 namespace Gj {
 namespace Gui {
 
-class ScenesTableView : public SqlTableView {
+class ScenesTableView final : public SqlTableView {
+  Result setStyle() {
+    setMaximumHeight(60);
+    return OK;
+  }
 
   public:
     ScenesTableView(
@@ -26,9 +30,13 @@ class ScenesTableView : public SqlTableView {
           actorSystem,
           dao,
           gAppState,
-          new ScenesQueryModel(this, gAppState, QString("ScenesQueryModel"), workerPool)
-      )
-    {};
+          new ScenesQueryModel(parent, gAppState, QString("ScenesQueryModel"), workerPool)
+      ) {
+
+      workerPool->connectClient(model);
+      setStyle();
+      refresh();
+    };
 };
 
 } // Gui
