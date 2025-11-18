@@ -27,7 +27,7 @@ struct Scene {
 
   static Scene base() {
     return {
-      0, "Bank Scene", 1.0f, 0
+      0, "Blank Scene", 1.0f, 0
     };
   }
 };
