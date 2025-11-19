@@ -29,7 +29,7 @@ public:
   }
 
   Result hydrateState(const AppStatePacket& appStatePacket) override;
-  Result refresh() override;
+  Result refresh(bool hard = false) override;
   Result setHeaders() override;
   bool isCurrentlyPlaying(const QModelIndex& item) const override;
 

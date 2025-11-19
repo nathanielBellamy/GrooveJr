@@ -23,7 +23,7 @@ QVariant QueueQueryModel::data(const QModelIndex& item, const int role) const {
   return QStandardItemModel::data(item, role);
 }
 
-Result QueueQueryModel::refresh() {
+Result QueueQueryModel::refresh(const bool hard) {
   std::string queryStr =
       " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, g.name, af.filePath, af.id from queue q"
       " join audioFiles af"
@@ -58,7 +58,7 @@ Result QueueQueryModel::refresh() {
 
   queryStr += " order by q.trackNumber asc";
 
-  if (queryHasChanged(queryStr.c_str())) {
+  if (hard || queryHasChanged(queryStr.c_str())) {
     emit runQuery(id, QString(queryStr.c_str()));
     setPreviousQuery(queryStr);
   }

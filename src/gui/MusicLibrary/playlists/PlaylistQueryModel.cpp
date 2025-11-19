@@ -23,7 +23,7 @@ QVariant PlaylistQueryModel::data(const QModelIndex& item, const int role) const
   return QStandardItemModel::data(item, role);
 }
 
-Result PlaylistQueryModel::refresh() {
+Result PlaylistQueryModel::refresh(const bool hard) {
   std::string queryStr =
     " select p.name, p.id from playlists p"
     " left outer join audioFile_to_playlists atp"
@@ -51,7 +51,7 @@ Result PlaylistQueryModel::refresh() {
     " group by p.id"
     " order by p.name";
 
-  if (queryHasChanged(queryStr.c_str())) {
+  if (hard || queryHasChanged(queryStr.c_str())) {
     emit runQuery(id, QString(queryStr.c_str()));
     setPreviousQuery(queryStr);
   }

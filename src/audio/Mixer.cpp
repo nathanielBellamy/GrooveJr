@@ -251,11 +251,30 @@ Result Mixer::loadScene(const Db::ID sceneId) {
 
   Logging::write(
     Info,
-    "Audio::Mixer::loadSceneById",
-    "Loading scene id: " + std::to_string(scene.id)
+    "Audio::Mixer::loadScene",
+    "Loaded scene id: " + std::to_string(scene.id)
   );
 
   return OK;
+}
+
+Db::ID Mixer::newScene() const {
+  Logging::write(
+    Info,
+    "Audio::Mixer::newScene",
+    "Creating New Scene."
+  );
+
+  const auto scene = Db::Scene::base();
+  const auto id = dao->sceneRepository.save(scene);
+
+  Logging::write(
+    Info,
+    "Audio::Mixer::loadSceneById",
+    "Created New Scene sceneId: " + std::to_string(id)
+  );
+
+  return id;
 }
 
 int Mixer::deleteChannels() {

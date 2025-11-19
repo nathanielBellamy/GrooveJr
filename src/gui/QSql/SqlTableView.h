@@ -60,8 +60,8 @@ class SqlTableView : public QTableView {
       return OK;
     }
 
-    Result refresh() const {
-      model->refresh();
+    Result refresh(const bool hard = false) const {
+      model->refresh(hard);
       return OK;
     }
 };

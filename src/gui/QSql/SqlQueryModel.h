@@ -80,7 +80,7 @@ namespace Gui {
     }
 
     virtual Result hydrateState(const AppStatePacket& appStatePacket) = 0;
-    virtual Result refresh() = 0;
+    virtual Result refresh(bool hard = false) = 0;
     virtual Result setHeaders() = 0;
 };
 

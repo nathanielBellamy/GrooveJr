@@ -23,7 +23,7 @@ QVariant ArtistQueryModel::data(const QModelIndex& item, const int role) const {
   return QStandardItemModel::data(item, role);
 }
 
-Result ArtistQueryModel::refresh() {
+Result ArtistQueryModel::refresh(const bool hard) {
   std::string queryStr =
     " select art.name, art.id from artists art"
     " join artist_to_albums ata"
@@ -51,7 +51,7 @@ Result ArtistQueryModel::refresh() {
     " group by art.id"
     " order by art.name";
 
-  if (queryHasChanged(queryStr.c_str())) {
+  if (hard || queryHasChanged(queryStr.c_str())) {
     emit runQuery(id, QString(queryStr.c_str()));
     setPreviousQuery(queryStr);
   }

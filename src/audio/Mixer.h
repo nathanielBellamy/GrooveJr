@@ -126,6 +126,7 @@ public:
   };
 
   Result loadScene(Db::ID sceneId);
+  Db::ID newScene() const;
   int deleteChannels();
   int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);
   int setEffects(const std::vector<Db::Effect>& effects) const;

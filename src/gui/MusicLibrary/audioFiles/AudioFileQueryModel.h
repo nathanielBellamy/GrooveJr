@@ -32,7 +32,7 @@ public:
   // SqlQueryModel
   QVariant data(const QModelIndex& item, int role) const override;
   Result hydrateState(const AppStatePacket& appStatePacket) override;
-  Result refresh() override;
+  Result refresh(bool hard = false) override;
   Result setHeaders() override;
 
   // MusicLibraryQueryModel

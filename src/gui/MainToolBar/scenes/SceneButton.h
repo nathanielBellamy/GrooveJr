@@ -10,9 +10,9 @@
 namespace Gj {
 namespace Gui {
 
-class SceneSaveButton final : public QPushButton {
+class SceneButton final : public QPushButton {
   public:
-    SceneSaveButton(QWidget* parent, QAction* action);
+    SceneButton(QWidget* parent, QAction* action, const QString& title);
 
   private:
     QAction* action;

@@ -19,8 +19,10 @@ Scenes::Scenes(
   , mixer(mixer)
   , grid(this)
   , title(this)
-  , sceneSaveAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSave), tr("&Save Scene"), this)
-  , sceneSaveButton(this, &sceneSaveAction)
+  , sceneNewAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentNew), tr("&New"), this)
+  , sceneNewButton(this, &sceneNewAction, QString("New"))
+  , sceneSaveAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSave), tr("&Save"), this)
+  , sceneSaveButton(this, &sceneSaveAction, QString("Save"))
   , sceneLoadAction(sceneLoadAction)
   {
 
@@ -36,13 +38,24 @@ Scenes::Scenes(
 
 void Scenes::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, -1);
-  grid.addWidget(&sceneSaveButton, 0, 3, 1, 2);
+  grid.addWidget(&sceneNewButton, 0, 2, 1, 1);
+  grid.addWidget(&sceneSaveButton, 0, 3, 1, 1);
   grid.addWidget(tableView, 1, 0, -1, -1);
 
   setLayout(&grid);
 }
 
 void Scenes::connectActions() {
+  const auto newSceneConnection = connect(&sceneNewAction, &QAction::triggered, [&] {
+    const auto sceneId = mixer->newScene();
+    Logging::write(
+      Info,
+      "Gui::Scenes::sceneNewAction",
+      "New scene id: " + std::to_string(sceneId)
+    );
+    tableView->refresh(true);
+  });
+
   const auto saveSceneConnection = connect(&sceneSaveAction, &QAction::triggered, [&] {
     const auto sceneId = mixer->saveScene();
     Logging::write(

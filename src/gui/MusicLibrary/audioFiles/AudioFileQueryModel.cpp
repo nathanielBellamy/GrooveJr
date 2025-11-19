@@ -24,7 +24,7 @@ QVariant AudioFileQueryModel::data(const QModelIndex& item, const int role) cons
   return QStandardItemModel::data(item, role);
 }
 
-Result AudioFileQueryModel::refresh() {
+Result AudioFileQueryModel::refresh(const bool hard) {
   std::string queryStr =
       " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, g.name, af.filePath, af.id from audioFiles af"
       " left outer join audioFile_to_playlists atp"
@@ -57,7 +57,7 @@ Result AudioFileQueryModel::refresh() {
 
   queryStr += " order by art.name asc, alb.year asc, alb.title asc, trk.trackNumber asc";
 
-  if (queryHasChanged(queryStr.c_str())) {
+  if (hard || queryHasChanged(queryStr.c_str())) {
     emit runQuery(id, QString(queryStr.c_str()));
     setPreviousQuery(queryStr);
   }

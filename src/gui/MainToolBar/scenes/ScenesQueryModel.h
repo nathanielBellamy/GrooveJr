@@ -11,8 +11,7 @@ namespace Gj {
 namespace Gui {
 
 constexpr size_t SCENES_COL_NAME = 0;
-constexpr size_t SCENES_COL_DESCRIPTION = 1;
-constexpr size_t SCENES_COL_ID = 2;
+constexpr size_t SCENES_COL_ID = 1;
 
 constexpr auto CURRENT_SCENE_COLOR = Qt::cyan;
 
@@ -32,7 +31,7 @@ public:
 
   QVariant data(const QModelIndex& item, int role) const override;
   Result hydrateState(const AppStatePacket& appStatePacket) override;
-  Result refresh() override;
+  Result refresh(bool hard = false) override;
   Result setHeaders() override;
 
   bool isCurrentScene(const QModelIndex& item) const;

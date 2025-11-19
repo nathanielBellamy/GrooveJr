@@ -2,26 +2,26 @@
 // Created by ns on 6/1/25.
 //
 
-#include "SceneSaveButton.h"
+#include "SceneButton.h"
 
 namespace Gj {
 namespace Gui {
 
-SceneSaveButton::SceneSaveButton(QWidget* parent, QAction* action)
+SceneButton::SceneButton(QWidget* parent, QAction* action, const QString& title)
   : QPushButton(parent)
   , action(action)
   {
   setCursor(Qt::PointingHandCursor);
-  setText("Save");
+  setText(title);
   setStyle();
 }
 
-void SceneSaveButton::setStyle() {
-  setFixedHeight(40);
+void SceneButton::setStyle() {
+  setFixedHeight(60);
   setMinimumWidth(60);
 }
 
-void SceneSaveButton::mousePressEvent(QMouseEvent* event) {
+void SceneButton::mousePressEvent(QMouseEvent* event) {
   action->activate(QAction::Trigger);
 }
 

@@ -70,6 +70,9 @@ struct AudioCore {
                                    // pSTATRB[0] = userSettingFrameId bool
                                    // pSTATRB[1] = newFrameId         sf_count_t
                                    // pSTATRB[2] = newPlaybackSpeed   sf_count_t
+                                   // TODO:
+                                   // pSTATRB[3] = playbackBuffers*   sf_count_t
+
   sf_count_t                       playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{0};
   jack_ringbuffer_t*               playbackSettingsFromAudioThreadRB{nullptr};
                                    // pSFATRB[0] = unused (debug)

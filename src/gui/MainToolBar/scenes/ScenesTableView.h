@@ -13,7 +13,7 @@ namespace Gui {
 
 class ScenesTableView final : public SqlTableView {
   Result setStyle() {
-    setMaximumHeight(60);
+    setMaximumHeight(80);
     return OK;
   }
 

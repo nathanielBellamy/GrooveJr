@@ -23,7 +23,7 @@ QVariant CacheQueryModel::data(const QModelIndex& item, const int role) const {
   return QStandardItemModel::data(item, role);
 }
 
-Result CacheQueryModel::refresh() {
+Result CacheQueryModel::refresh(const bool hard) {
   std::string queryStr =
       " select trk.title, art.name, alb.title, trk.trackNumber, alb.year, g.name, af.filePath, af.id from cache c"
       " join audioFiles af"
@@ -56,7 +56,7 @@ Result CacheQueryModel::refresh() {
   if (filters->filters.at(PLAYLIST).ids.size() > 0)
     queryStr += " and atp.playlistId in " + filters->idSqlArray(PLAYLIST);
 
-  if (queryHasChanged(queryStr.c_str())) {
+  if (hard || queryHasChanged(queryStr.c_str())) {
     emit runQuery(id, QString(queryStr.c_str()));
     setPreviousQuery(queryStr);
   }

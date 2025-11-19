@@ -21,7 +21,7 @@
 #include "../../../messaging/atoms.h"
 
 #include "ScenesTableView.h"
-#include "SceneSaveButton.h"
+#include "SceneButton.h"
 
 namespace Gj {
 namespace Gui {
@@ -35,8 +35,10 @@ class Scenes final : public QWidget {
   QGridLayout grid;
   QLabel title;
   ScenesTableView* tableView = nullptr;
+  QAction sceneNewAction;
+  SceneButton sceneNewButton;
   QAction sceneSaveAction;
-  SceneSaveButton sceneSaveButton;
+  SceneButton sceneSaveButton;
   QAction sceneLoadAction;
 
   void connectActions();

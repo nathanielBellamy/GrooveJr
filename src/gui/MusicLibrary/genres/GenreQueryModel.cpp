@@ -23,7 +23,7 @@ QVariant GenreQueryModel::data(const QModelIndex& item, const int role) const {
   return QStandardItemModel::data(item, role);
 }
 
-Result GenreQueryModel::refresh() {
+Result GenreQueryModel::refresh(const bool hard) {
   std::string queryStr =
     " select g.name, g.id from genres g"
     " left outer join track_to_genres ttg"
@@ -51,7 +51,7 @@ Result GenreQueryModel::refresh() {
     " group by g.id"
     " order by g.name";
 
-  if (queryHasChanged(queryStr.c_str())) {
+  if (hard || queryHasChanged(queryStr.c_str())) {
     emit runQuery(id, QString(queryStr.c_str()));
     setPreviousQuery(queryStr);
   }

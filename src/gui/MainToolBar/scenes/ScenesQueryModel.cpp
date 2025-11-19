@@ -24,12 +24,12 @@ Result ScenesQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
-Result ScenesQueryModel::refresh() {
+Result ScenesQueryModel::refresh(const bool hard) {
   std::string queryStr =
       " select sc.name, sc.id from scenes sc";
 
 
-  if (queryHasChanged(queryStr.c_str())) {
+  if (hard || queryHasChanged(queryStr.c_str())) {
     emit runQuery(id, QString(queryStr.c_str()));
     setPreviousQuery(queryStr);
   }

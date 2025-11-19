@@ -16,7 +16,7 @@ Result AlbumQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
 
-Result AlbumQueryModel::refresh() {
+Result AlbumQueryModel::refresh(const bool hard) {
   std::string queryStr =
     " select alb.title, alb.year, alb.id from albums alb"
     " left outer join artist_to_albums ata"
@@ -44,7 +44,7 @@ Result AlbumQueryModel::refresh() {
     " group by alb.id"
     " order by alb.title, alb.year";
 
-  if (queryHasChanged(queryStr.c_str())) {
+  if (hard || queryHasChanged(queryStr.c_str())) {
     emit runQuery(id, QString(queryStr.c_str()));
     setPreviousQuery(queryStr);
   }
