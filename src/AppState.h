@@ -90,8 +90,12 @@ struct AppState {
     scene.store(val);
   };
 
-  Db::SceneID getSceneId() const {
+  Db::ID getSceneDbId() const {
     return scene.load().id;
+  }
+
+  Db::ID getSceneSceneId() const {
+    return scene.load().sceneId;
   }
 
   Db::Version getSceneVersion() const {

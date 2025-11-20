@@ -149,21 +149,21 @@ void MainWindow::setEffects() {
 
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
-    if (const int sceneId = sceneLoadAction.data().toULongLong(); gAppState->getSceneId() != sceneId) {
+    if (const int sceneDbId = sceneLoadAction.data().toULongLong(); gAppState->getSceneDbId() != sceneDbId) {
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",
-        "Loading sceneId: " + std::to_string(sceneId)
+        "Loading sceneId: " + std::to_string(sceneDbId)
       );
 
-      mixer->loadScene(sceneId);
+      mixer->loadScene(sceneDbId);
       setChannels();
       setEffects();
 
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",
-        "Done loading sceneId: " + std::to_string(sceneId)
+        "Done loading sceneId: " + std::to_string(sceneDbId)
       );
     }
   });

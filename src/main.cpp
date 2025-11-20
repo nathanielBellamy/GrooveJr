@@ -114,10 +114,8 @@ int main(int argc, char *argv[]) {
   Logging::write(
     Info,
     "main",
-    "Loaded gAppState: id = " + std::to_string(gAppState->id) +
-      " audioFramesPerBuffer = " + std::to_string(gAppState->getAudioFramesPerBuffer()) +
-      ", sceneId: " + std::to_string(gAppState->getSceneId())
-    );
+    "Loaded gAppState: " + gAppState->toString()
+  );
 
   // setup Audio
   initVst3PluginContext();

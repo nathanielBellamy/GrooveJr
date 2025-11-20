@@ -74,20 +74,20 @@ int ChannelRepository::save(const ChannelEntity& channel) const {
     return 0;
   }
 
-  sqlite3_bind_int(joinStmt, 1, gAppState->getSceneId());
+  sqlite3_bind_int(joinStmt, 1, gAppState->getSceneDbId());
   sqlite3_bind_int(joinStmt, 2, channelId);
 
   if (sqlite3_step(joinStmt) != SQLITE_DONE) {
     Logging::write(
       Error,
       "Db::ChannelRepository::save",
-      "Failed to join Channel " + channel.name + " id: " + std::to_string(channelId) + " to sceneId: " + std::to_string(gAppState->getSceneId()) + ". Message: " + std::string(sqlite3_errmsg(*db))
+      "Failed to join Channel " + channel.name + " id: " + std::to_string(channelId) + " to sceneDbId: " + std::to_string(gAppState->getSceneDbId()) + ". Message: " + std::string(sqlite3_errmsg(*db))
     );
   } else {
     Logging::write(
       Info,
       "Db::ChannelRepository::save",
-      "Joined Channel " + channel.name + " id: " + std::to_string(channelId) + " to sceneId " + std::to_string(gAppState->getSceneId())
+      "Joined Channel " + channel.name + " id: " + std::to_string(channelId) + " to sceneDbId " + std::to_string(gAppState->getSceneDbId())
     );
   }
 

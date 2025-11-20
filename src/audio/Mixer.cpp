@@ -28,7 +28,7 @@ Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
     "Retrieving effects..."
   );
 
-  loadScene(gAppState->getSceneId());
+  loadScene(gAppState->getSceneDbId());
 
   jackClient->initialize("GrooveJr");
 
@@ -236,14 +236,24 @@ bool Mixer::setGainOnChannel(const int channelIdx, const float gain) const {
   return effectsChannels.at(channelIdx)->setGain(gain);
 }
 
-Result Mixer::loadScene(const Db::ID sceneId) {
+Result Mixer::loadScene(const Db::ID sceneDbId) {
   Logging::write(
     Info,
     "Audio::Mixer::loadScene",
-    "Loading sceneId: " + std::to_string(sceneId)
+    "Loading sceneDbId: " + std::to_string(sceneDbId)
   );
 
-  const Db::Scene scene = dao->sceneRepository.findOrCreate(sceneId);
+  const auto sceneOpt = dao->sceneRepository.find(sceneDbId);
+  if (!sceneOpt) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::loadScene",
+      "Unable to find sceneDbId: " + std::to_string(sceneDbId)
+    );
+    return ERROR;
+  }
+  const auto scene = sceneOpt.value();
+
   const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(scene.id);
   setChannels(channels);
   const std::vector<Db::Effect> effects = dao->sceneRepository.getEffects(scene.id);
@@ -252,7 +262,7 @@ Result Mixer::loadScene(const Db::ID sceneId) {
   Logging::write(
     Info,
     "Audio::Mixer::loadScene",
-    "Loaded scene id: " + std::to_string(scene.id)
+    "Loaded sceneDbId: " + std::to_string(scene.id)
   );
 
   return OK;

@@ -64,7 +64,7 @@ ID AppStateRepository::save() const {
   }
 
   sqlite3_bind_int(stmt, 1, gAppState->getAudioFramesPerBuffer());
-  sqlite3_bind_int(stmt, 2, gAppState->getSceneId());
+  sqlite3_bind_int(stmt, 2, gAppState->getSceneDbId());
   sqlite3_bind_int(stmt, 3, gAppState->getCrossfade());
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {

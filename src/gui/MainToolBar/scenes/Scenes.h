@@ -43,6 +43,7 @@ class Scenes final : public QWidget {
 
   void connectActions();
   void setupGrid();
+  Result setStyle();
 
   public:
     Scenes(

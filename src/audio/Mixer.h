@@ -129,7 +129,7 @@ public:
   int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);
   int setEffects(const std::vector<Db::Effect>& effects) const;
   static Result setFrameId(sf_count_t frameId);
-  Result loadScene(Db::ID sceneId);
+  Result loadScene(Db::ID sceneDbId);
   Db::ID newScene() const;
   Result saveScene() const;
   Result saveChannels() const;

@@ -34,6 +34,12 @@ Scenes::Scenes(
 
   connectActions();
   setupGrid();
+  setStyle();
+}
+
+Result Scenes::setStyle() {
+  setMinimumWidth(200);
+  return OK;
 }
 
 void Scenes::setupGrid() {
