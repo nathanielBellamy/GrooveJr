@@ -47,7 +47,7 @@ AppStateEntity AppStateRepository::get() const {
   return AppStateEntity::base();
 }
 
-int AppStateRepository::save() const {
+ID AppStateRepository::save() const {
   const std::string query = R"sql(
     insert into appState (audioFramesPerBuffer, sceneId, crossfade)
     values (?, ?, ?)
@@ -84,16 +84,13 @@ int AppStateRepository::save() const {
   return sqlite3_last_insert_rowid(*db);
 }
 
-int AppStateRepository::persistAndSet() const {
+Result AppStateRepository::persistAndSet() const {
   try {
     save();
 
     // reload
     const auto appStateEntity = get();
-    const auto sceneOpt = findScene(appStateEntity.sceneId);
-    const Scene scene = sceneOpt
-      ? sceneOpt.value()
-      : Scene::base();
+    const Scene scene = findScene(appStateEntity.sceneId).value_or(Scene::base());
 
     gAppState->setFromEntityAndScene(appStateEntity, scene);
 
@@ -103,18 +100,18 @@ int AppStateRepository::persistAndSet() const {
       "Persisted AppState: " + gAppState->toString()
     );
 
-    return 0;
+    return OK;
   } catch (const std::exception& e) {
     Logging::write(
       Error,
       "Db::AppStateRepository::persistAndSet",
       "Failed to persist AppState: " + std::string(e.what())
     );
-    return 1;
+    return ERROR;
   }
 }
 
-std::optional<Scene> AppStateRepository::findScene(ID sceneId) const {
+std::optional<Scene> AppStateRepository::findScene(const ID id) const {
   const std::string query = R"sql(
     select * from scenes s
     where s.id = ?
@@ -131,7 +128,7 @@ std::optional<Scene> AppStateRepository::findScene(ID sceneId) const {
     return std::nullopt;
   }
 
-  sqlite3_bind_int(stmt, 1, sceneId);
+  sqlite3_bind_int(stmt, 1, id);
 
   if (sqlite3_step(stmt) == SQLITE_ROW)
     return std::optional(Scene::deser(stmt));
@@ -139,7 +136,7 @@ std::optional<Scene> AppStateRepository::findScene(ID sceneId) const {
   Logging::write(
     Warning,
     "Db::SceneRepository::find",
-    "Unable to find sceneId " + std::to_string(sceneId)
+    "Unable to find dbID " + std::to_string(id)
   );
   return std::nullopt;
 }

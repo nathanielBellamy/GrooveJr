@@ -23,9 +23,9 @@ class AppStateRepository {
   public:
     explicit AppStateRepository(sqlite3** db, AppState* gAppState);
     AppStateEntity get() const;
-    int save() const;
-    int persistAndSet() const;
-    std::optional<Scene> findScene(ID sceneId) const;
+    ID save() const;
+    Result persistAndSet() const;
+    std::optional<Scene> findScene(ID id) const;
 
 
 };

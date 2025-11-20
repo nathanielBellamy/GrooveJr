@@ -124,12 +124,9 @@ ID AlbumRepository::getAlbumIdWithArtist(const Album& album, const Artist& artis
   sqlite3_bind_text(stmt, 1, album.title.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_int(stmt, 2, artist.id);
 
-  while (sqlite3_step(stmt) == SQLITE_ROW) {
-    const ID id = sqlite3_column_int(stmt, 0);
-    return id;
-  }
-
-  return 0;
+  return sqlite3_step(stmt) == SQLITE_ROW
+    ? sqlite3_column_int(stmt, 0)
+    : 0;
 }
 
 ID AlbumRepository::saveAll(const std::vector<Album>& album) const {

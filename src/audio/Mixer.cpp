@@ -266,7 +266,7 @@ Db::ID Mixer::newScene() const {
   );
 
   const auto scene = Db::Scene::base();
-  const auto id = dao->sceneRepository.save(scene);
+  const auto id = dao->sceneRepository.create(scene);
 
   Logging::write(
     Info,
@@ -369,17 +369,23 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
   return 0;
 }
 
-int Mixer::saveScene() const {
+Result Mixer::saveScene() const {
   Logging::write(
     Info,
     "Audio::Mixer::saveScene",
     "Saving scene."
   );
+  const auto scene = dao->sceneRepository.update(gAppState->getScene());
+  if (!scene) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::saveScene",
+      "Could not update scene."
+    );
+    return ERROR;
+  }
 
-  auto scene = gAppState->getScene();
-  const int sceneId = dao->sceneRepository.save(scene);
-  scene.id = sceneId;
-  gAppState->setScene(scene);
+  gAppState->setScene(scene.value());
 
   if (const int persistRes = dao->appStateRepository.persistAndSet(); persistRes != 0) {
     Logging::write(
@@ -387,16 +393,26 @@ int Mixer::saveScene() const {
       "Audio::Mixer::saveScene",
       "Failed to persist state: " + std::to_string(persistRes)
     );
-    return persistRes;
+    return ERROR;
   }
 
+  saveChannels();
+
+  return OK;
+}
+
+Result Mixer::saveChannels() const {
+  Result result = OK;
+  const auto scene = gAppState->getScene();
   for (const auto effectsChannel : effectsChannels) {
-    if (!dao->channelRepository.save(effectsChannel->toEntity()))
-        Logging::write(
-          Error,
-          "Audio::Mixer::saveScene",
-          "Unable to save channel: " + std::to_string(effectsChannel->getIndex()) + " to sceneId: " + std::to_string(sceneId)
-        );
+    if (!dao->channelRepository.save(effectsChannel->toEntity())) {
+      Logging::write(
+        Error,
+        "Audio::Mixer::saveScene",
+        "Unable to save channel: " + std::to_string(effectsChannel->getIndex()) + " to sceneId: " + std::to_string(scene.id)
+      );
+      result = ERROR;
+    }
 
     const int effectCount = effectsChannel->effectCount();
     const auto channelIndex = effectsChannel->getIndex();
@@ -420,6 +436,7 @@ int Mixer::saveScene() const {
           "Audio::Mixer::saveScene",
           "Unable to determine stream size for audioHostComponentStateStream"
         );
+        result = WARNING;
       }
 
       int64 audioHostControllerStateSize = 0;
@@ -429,6 +446,7 @@ int Mixer::saveScene() const {
           "Audio::Mixer::saveScene",
           "Unable to determine stream size for audioHostControllerStateStream"
         );
+        result = WARNING;
       }
 
       std::vector<uint8_t> audioHostComponentBuffer (audioHostComponentStateSize);
@@ -477,17 +495,20 @@ int Mixer::saveScene() const {
         editorHostComponentBuffer,
         editorHostControllerBuffer
       );
-      if (!dao->effectRepository.save(dbEffect))
+      if (!dao->effectRepository.save(dbEffect)) {
         Logging::write(
           Error,
           "Audio::Mixer::saveScene",
-          "Unable to save effect: " + dbEffect.filePath + " to sceneId: " + std::to_string(sceneId)
+          "Unable to save effect: " + dbEffect.filePath + " to sceneId: " + std::to_string(scene.id)
         );
+        result = ERROR;
+      }
     }
   }
 
-  return sceneId;
+  return result;
 }
+
 
 Result Mixer::setFrameId(const sf_count_t frameId) {
   Logging::write(

@@ -10,10 +10,12 @@
 namespace Gj {
 namespace Gui {
 
-constexpr size_t SCENES_COL_NAME = 0;
-constexpr size_t SCENES_COL_ID = 1;
+constexpr size_t SCENES_COL_SCENE_ID = 0;
+constexpr size_t SCENES_COL_NAME = 1;
+constexpr size_t SCENES_COL_VERSION = 2;
+constexpr size_t SCENES_COL_ID = 3;
 
-constexpr auto CURRENT_SCENE_COLOR = Qt::cyan;
+constexpr auto CURRENT_SCENE_COLOR = Qt::darkCyan;
 
 class ScenesQueryModel final : public SqlQueryModel {
 

@@ -12,6 +12,8 @@ namespace Gj {
 namespace Db {
 
 typedef uint64_t         ID;
+typedef uint64_t         SceneID;
+typedef uint64_t         Version;
 typedef uint16_t         TrackNumber;
 typedef unsigned int     Year;
 

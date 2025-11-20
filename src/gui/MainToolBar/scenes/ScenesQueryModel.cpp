@@ -26,8 +26,9 @@ Result ScenesQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
 
 Result ScenesQueryModel::refresh(const bool hard) {
   std::string queryStr =
-      " select sc.name, sc.id from scenes sc";
-
+      " select sc.sceneId, sc.name, MAX(sc.version), sc.id from scenes sc"
+      " group by sc.sceneId"
+      " order by sc.sceneId asc";
 
   if (hard || queryHasChanged(queryStr.c_str())) {
     emit runQuery(id, QString(queryStr.c_str()));
@@ -37,7 +38,9 @@ Result ScenesQueryModel::refresh(const bool hard) {
 }
 
 Result ScenesQueryModel::setHeaders() {
-  setHeaderData(SCENES_COL_ID, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(SCENES_COL_ID, Qt::Horizontal, QObject::tr("_Id"));
+  setHeaderData(SCENES_COL_SCENE_ID, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(SCENES_COL_VERSION, Qt::Horizontal, QObject::tr("Version"));
   setHeaderData(SCENES_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
   return OK;
 }

@@ -16,18 +16,19 @@ namespace Gj {
 namespace Db {
 
 struct Scene {
-  ID id;
+  ID id; // db primary key
+  SceneID sceneId;
   AtomicStr name;
   float playbackSpeed = 1.0f;
-  int version = 0;
+  Version version = 0;
 
-  Scene(ID id, const AtomicStr& name, float playbackSpeed, int version);
+  Scene(ID id, SceneID sceneId, const AtomicStr& name, float playbackSpeed, int version);
   Scene(const AtomicStr& name, float playbackSpeed);
   static Scene deser(sqlite3_stmt* stmt);
 
   static Scene base() {
     return {
-      0, "Blank Scene", 1.0f, 0
+      0, 0, "Blank Scene", 1.0f, 0
     };
   }
 };

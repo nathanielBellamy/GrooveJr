@@ -125,13 +125,14 @@ public:
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);
   };
 
-  Result loadScene(Db::ID sceneId);
-  Db::ID newScene() const;
   int deleteChannels();
   int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);
   int setEffects(const std::vector<Db::Effect>& effects) const;
-  int saveScene() const;
   static Result setFrameId(sf_count_t frameId);
+  Result loadScene(Db::ID sceneId);
+  Db::ID newScene() const;
+  Result saveScene() const;
+  Result saveChannels() const;
 };
 
 } // Audio

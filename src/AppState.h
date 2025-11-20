@@ -90,8 +90,12 @@ struct AppState {
     scene.store(val);
   };
 
-  Db::ID getSceneId() const {
+  Db::SceneID getSceneId() const {
     return scene.load().id;
+  }
+
+  Db::Version getSceneVersion() const {
+    return scene.load().version;
   }
 
   sf_count_t getCrossfade() const {
