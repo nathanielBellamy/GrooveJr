@@ -63,12 +63,13 @@ void Scenes::connectActions() {
   });
 
   const auto saveSceneConnection = connect(&sceneSaveAction, &QAction::triggered, [&] {
-    const auto sceneId = mixer->saveScene();
+    const auto sceneDbId = mixer->saveScene();
     Logging::write(
       Info,
       "Gui::Scenes::sceneSaveAction",
-      "Saved scene id: " + std::to_string(sceneId)
+      "Saved scene id: " + std::to_string(sceneDbId)
     );
+    tableView->refresh(true);
   });
 
   const auto loadSceneConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
@@ -79,6 +80,7 @@ void Scenes::connectActions() {
       "Gui::Scenes::sceneSaveAction",
       "Loading scene id: " + std::to_string(sceneId)
     );
+    tableView->refresh(true);
   });
 }
 
