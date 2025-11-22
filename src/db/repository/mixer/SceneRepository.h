@@ -38,7 +38,8 @@ class SceneRepository {
 
     Scene findOrCreateBySceneId(SceneID sceneId) const;
     std::optional<Scene> findBySceneId(SceneID sceneId) const;
-    SceneID nextSceneId() const;
+    std::optional<SceneID> nextSceneId() const;
+    int sceneCount() const;
 };
 
 } // Db

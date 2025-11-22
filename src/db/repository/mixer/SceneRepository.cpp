@@ -37,11 +37,9 @@ std::vector<Scene> SceneRepository::getAll() const {
   return scenes;
 }
 
-SceneID SceneRepository::nextSceneId() const {
+int SceneRepository::sceneCount() const {
   const std::string query = R"sql(
-    select id from scenes
-    order by sceneId desc
-    limit 1
+    select count(*) from scenes
   )sql";
 
   sqlite3_stmt* stmt;
@@ -55,8 +53,38 @@ SceneID SceneRepository::nextSceneId() const {
   }
 
   return (sqlite3_step(stmt) == SQLITE_ROW)
-    ? sqlite3_column_int(stmt, 0) + 1
+    ? sqlite3_column_int(stmt, 0)
     : 0;
+}
+
+std::optional<SceneID> SceneRepository::nextSceneId() const {
+  const std::string query = R"sql(
+    select sceneId from scenes
+    order by sceneId desc
+    limit 1
+  )sql";
+
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::SceneRepository::nextSceneId",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return std::nullopt;
+  }
+
+  if (sqlite3_step(stmt) == SQLITE_ROW)
+    return std::optional(
+      static_cast<SceneID>(
+        sqlite3_column_int(stmt, 0) + 1
+      )
+    );
+
+  if (sceneCount() == 0)
+    return std::optional(1ULL);
+
+  return std::nullopt;
 }
 
 
@@ -76,25 +104,37 @@ ID SceneRepository::create(const Scene& scene) const {
     return 0;
   }
 
-  const SceneID sceneId = scene.sceneId ? scene.sceneId : nextSceneId();
+  SceneID sceneId;
+  if (scene.sceneId) {
+    sceneId = scene.sceneId;
+  } else if (const auto nsid = nextSceneId(); nsid.has_value()) {
+    sceneId = nsid.value();
+  } else {
+    Logging::write(
+      Error,
+      "Db::SceneRepository::create",
+      "Unable to determine nextSceneId."
+    );
+    return 0;
+  }
+
   sqlite3_bind_int(stmt, 1, sceneId);
   sqlite3_bind_int(stmt, 2, scene.version);
   sqlite3_bind_text(stmt, 3, scene.name.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_double(stmt, 4, scene.playbackSpeed);
 
-  if (sqlite3_step(stmt) != SQLITE_DONE) {
+  if (sqlite3_step(stmt) != SQLITE_DONE)
     Logging::write(
       Error,
       "Db::SceneRepository::create",
       "Failed to save Scene " + scene.name + " Message: " + std::string(sqlite3_errmsg(*db))
     );
-  } else {
+  else
     Logging::write(
       Info,
       "Db::SceneRepository::create",
       "Saved " + scene.name
     );
-  }
 
   return static_cast<ID>(sqlite3_last_insert_rowid(*db));
 }

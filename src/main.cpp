@@ -95,12 +95,25 @@ int main(int argc, char *argv[]) {
   Dao = new Db::Dao(gAppState);
   if (const auto appStateEntity = Dao->appStateRepository.get(); appStateEntity.id == 0) {
     // no appState in Db, init one
-    if (Dao->appStateRepository.save() == 0)
+    const Db::SceneID sceneId = Dao->sceneRepository.create(Db::Scene::base());
+    const auto scene = Dao->sceneRepository.find(sceneId);
+    if (!scene) {
+      Logging::write(
+        Error,
+        "main",
+        "Unable to init Scene"
+      );
+      throw std::runtime_error("Unable to init Scene");
+    }
+    gAppState->setScene(scene.value());
+    if (Dao->appStateRepository.save() == 0) {
       Logging::write(
         Error,
         "main",
         "Failed to save initial AppState"
       );
+      throw std::runtime_error("Failed to save initial AppState");
+    }
   }
 
   const auto appStateEntityReloaded = Dao->appStateRepository.get();
