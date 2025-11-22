@@ -40,8 +40,9 @@ class MusicLibraryTableView : public SqlTableView {
     )
     : SqlTableView(parent, actorSystem, dao, gAppState, model)
     , menu(nullptr)
-    , filters(filters)
-    {};
+    , filters(filters) {
+      setEditTriggers(NoEditTriggers);
+    };
 };
 
 } // Gui

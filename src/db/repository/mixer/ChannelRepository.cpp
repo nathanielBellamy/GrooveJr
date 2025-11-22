@@ -47,13 +47,13 @@ int ChannelRepository::save(const ChannelEntity& channel) const {
     Logging::write(
       Error,
       "Db::ChannelRepository::save",
-      "Failed to save Channel " + channel.name + " at index " + std::to_string(channel.channelIndex) + ". Message: " + std::string(sqlite3_errmsg(*db))
+      "Failed to save Channel ID " + std::to_string(channel.id) + " at index " + std::to_string(channel.channelIndex) + ". Message: " + std::string(sqlite3_errmsg(*db))
     );
   } else {
     Logging::write(
       Info,
       "Db::ChannelRepository::save",
-      "Saved Channel " + channel.name + " at index " + std::to_string(channel.channelIndex)
+      "Saved Channel Id" + std::to_string(channel.id) + " at index " + std::to_string(channel.channelIndex)
     );
   }
 
@@ -87,7 +87,7 @@ int ChannelRepository::save(const ChannelEntity& channel) const {
     Logging::write(
       Info,
       "Db::ChannelRepository::save",
-      "Joined Channel " + channel.name + " id: " + std::to_string(channelId) + " to sceneDbId " + std::to_string(gAppState->getSceneDbId())
+      "Joined Channel id: " + std::to_string(channelId) + " to sceneDbId " + std::to_string(gAppState->getSceneDbId())
     );
   }
 

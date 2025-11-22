@@ -12,9 +12,21 @@ namespace Gj {
 namespace Gui {
 
 class ScenesTableView final : public SqlTableView {
+  QAction* sceneLoadAction;
+
   Result setStyle() {
     setMaximumHeight(80);
     return OK;
+  }
+
+  void mouseDoubleClickEvent(QMouseEvent *event) override {
+    if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {
+      const SqlQueryModel* model = getModel();
+      const Db::ID sceneDbId =  model->index(clickedIndex.row(), SCENES_COL_ID).data().toULongLong();
+      sceneLoadAction->setData(sceneDbId);
+      std::cout << " will trig " << sceneDbId << std::endl;
+      sceneLoadAction->trigger();
+    }
   }
 
   public:
@@ -23,7 +35,8 @@ class ScenesTableView final : public SqlTableView {
       actor_system& actorSystem,
       Db::Dao* dao,
       AppState* gAppState,
-      SqlWorkerPool* workerPool
+      SqlWorkerPool* workerPool,
+      QAction* sceneLoadAction
     )
     : SqlTableView(
           parent,
@@ -31,8 +44,9 @@ class ScenesTableView final : public SqlTableView {
           dao,
           gAppState,
           new ScenesQueryModel(parent, gAppState, QString("ScenesQueryModel"), workerPool)
-      ) {
-
+      )
+    , sceneLoadAction(sceneLoadAction)
+    {
       workerPool->connectClient(model);
       setStyle();
       refresh();

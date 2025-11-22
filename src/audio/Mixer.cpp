@@ -253,6 +253,7 @@ Result Mixer::loadScene(const Db::ID sceneDbId) {
     return ERROR;
   }
   const auto scene = sceneOpt.value();
+  gAppState->setScene(scene);
 
   const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(scene.id);
   setChannels(channels);
@@ -406,7 +407,17 @@ Result Mixer::saveScene() const {
     return ERROR;
   }
 
-  saveChannels();
+  if (saveChannels() == ERROR) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::saveScene",
+      "Failed to save channels."
+    );
+    return ERROR;
+  };
+
+  if (saveChannels() == WARNING)
+    return WARNING;
 
   return OK;
 }

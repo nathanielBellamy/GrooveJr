@@ -26,7 +26,14 @@ Scenes::Scenes(
   , sceneLoadAction(sceneLoadAction)
   {
 
-  tableView = new ScenesTableView(this, sys, mixer->dao, gAppState, sqlWorkerPool);
+  tableView = new ScenesTableView(
+    this,
+    sys,
+    mixer->dao,
+    gAppState,
+    sqlWorkerPool,
+    sceneLoadAction
+  );
 
   title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
   title.setText("Scenes");
@@ -38,7 +45,7 @@ Scenes::Scenes(
 }
 
 Result Scenes::setStyle() {
-  setMinimumWidth(200);
+  setMinimumWidth(300);
   return OK;
 }
 
@@ -68,17 +75,6 @@ void Scenes::connectActions() {
       Info,
       "Gui::Scenes::sceneSaveAction",
       "Saved scene id: " + std::to_string(sceneDbId)
-    );
-    tableView->refresh(true);
-  });
-
-  const auto loadSceneConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
-    // TODO
-    const auto sceneId = 0;
-    Logging::write(
-      Info,
-      "Gui::Scenes::sceneSaveAction",
-      "Loading scene id: " + std::to_string(sceneId)
     );
     tableView->refresh(true);
   });

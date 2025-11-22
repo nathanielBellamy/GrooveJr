@@ -72,7 +72,6 @@ Result AudioFileTableView::saveCache() const {
   return OK;
 }
 
-
 void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent *event) {
   if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {
     const SqlQueryModel* model = getModel();
