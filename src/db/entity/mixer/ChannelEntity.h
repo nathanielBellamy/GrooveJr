@@ -5,17 +5,18 @@
 #ifndef CHANNELENTITY_H
 #define CHANNELENTITY_H
 
-#include <string>
+#include <vector>
 
 #include <sqlite3.h>
 #include "../../../types/AtomicStr.h"
+#include "../../Types.h"
 
 namespace Gj {
 namespace Db {
 
 struct ChannelEntity {
-  int id;
-  int channelIndex;
+  ID id;
+  ChannelIndex channelIndex;
   AtomicStr name;
   float gain;
   float mute;
@@ -32,8 +33,8 @@ struct ChannelEntity {
   float panR;
 
   ChannelEntity(
-    int id,
-    int channelIndex,
+    ID id,
+    ChannelIndex channelIndex,
     const AtomicStr& name,
     float gain,
     float mute,
@@ -58,6 +59,7 @@ struct ChannelEntity {
   }
 
   static ChannelEntity deser(sqlite3_stmt* stmt);
+  static std::vector<ChannelEntity> baseChannels();
 };
 
 } // Db

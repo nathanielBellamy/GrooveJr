@@ -15,6 +15,7 @@ typedef uint64_t         ID;
 typedef uint64_t         SceneID;
 typedef uint64_t         Version;
 typedef uint16_t         TrackNumber;
+typedef uint8_t          ChannelIndex;
 typedef unsigned int     Year;
 
 } // Db

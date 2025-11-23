@@ -16,6 +16,7 @@
 #include "../Logging.h"
 #include "../JackClient.h"
 #include "../../types/AtomicStr.h"
+#include "../../db/Types.h"
 
 namespace Gj {
 namespace Audio {
@@ -26,8 +27,8 @@ class EffectsChannel {
   // fx0:inputBuffers->buffersA, fx1:buffersA->buffersB, fx2:buffersB->buffersA, fx3:buffersA->buffersB, ...
   AppState* gAppState;
   std::shared_ptr<JackClient> jackClient;
-  int id { 0 };
-  int index;
+  Db::ID id { 0 };
+  Db::ChannelIndex index;
   AtomicStr name { "Channel" };
   std::vector<Vst3::Plugin*> vst3Plugins;
 
@@ -37,7 +38,7 @@ class EffectsChannel {
     EffectsChannel(
       AppState* gAppState,
       std::shared_ptr<JackClient> jackClient,
-      int index
+      Db::ChannelIndex index
     );
     EffectsChannel(
       AppState* gAppState,

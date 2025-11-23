@@ -14,7 +14,7 @@ using namespace Steinberg;
 EffectsChannel::EffectsChannel(
 	AppState* gAppState,
 	std::shared_ptr<JackClient> jackClient,
-	const int index
+	const Db::ChannelIndex index
 	)
 	: gAppState(gAppState)
 	, jackClient(jackClient)

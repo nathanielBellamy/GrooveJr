@@ -1,9 +1,19 @@
 
 cmake_minimum_required(VERSION 3.29.6)
+set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin")
 project(GrooveJr VERSION 0.0.0)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# detect compilers
+find_package(LLVM)
+if (NOT LLVM_FOUND)
+    message(INFO " \n LLVM NOT found ")
+else()
+    message(INFO " \n LLVM FOUND ")
+endif()
+
 
 message(INFO " Compiling GrooveJr with CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 

@@ -94,7 +94,7 @@ bool Mixer::addEffectsChannel() {
       new Effects::EffectsChannel(
         gAppState,
         jackClient,
-        static_cast<int>(effectsChannels.size())
+        static_cast<Db::ChannelIndex>(effectsChannels.size())
       )
     );
     channelCount++;
@@ -253,10 +253,17 @@ Result Mixer::loadScene(const Db::ID sceneDbId) {
     return ERROR;
   }
   const auto scene = sceneOpt.value();
+  Logging::write(
+    Info,
+    "Audio::Mixer::loadScene",
+    "Loading Scene: " + scene.toStdString()
+  );
   gAppState->setScene(scene);
 
   const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(scene.id);
   setChannels(channels);
+  saveChannels();
+
   const std::vector<Db::Effect> effects = dao->sceneRepository.getEffects(scene.id);
   setEffects(effects);
 
@@ -310,24 +317,22 @@ int Mixer::deleteChannels() {
   return 0;
 }
 
-int Mixer::setChannels(const std::vector<Db::ChannelEntity>& channelEntities) {
+int Mixer::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
   Logging::write(
     Info,
     "Audio::Mixer::setChannels",
-    "Setting channels: " + std::to_string(channelEntities.size())
+    "Setting channels. ChannelCount: " + std::to_string(channelEntities.size())
   );
 
   deleteChannels();
 
-  if (channelEntities.empty()) {
-    addEffectsChannel(); // main
-    addEffectsChannel(); // channel 1
-  } else {
-    std::sort(channelEntities.begin(), channelEntities.end());
-    for (const auto& channelEntity : channelEntities) {
-      addEffectsChannelFromEntity(channelEntity);
-    }
-  }
+  if (channelEntities.empty())
+    for (const auto channel : Db::ChannelEntity::baseChannels())
+      channelEntities.push_back(channel);
+
+  std::sort(channelEntities.begin(), channelEntities.end());
+  for (const auto& channelEntity : channelEntities)
+    addEffectsChannelFromEntity(channelEntity);
 
   Logging::write(
     Info,
@@ -529,7 +534,6 @@ Result Mixer::saveChannels() const {
 
   return result;
 }
-
 
 Result Mixer::setFrameId(const sf_count_t frameId) {
   Logging::write(

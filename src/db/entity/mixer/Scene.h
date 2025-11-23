@@ -31,6 +31,14 @@ struct Scene {
       0, 0, "Blank Scene", 1.0f, 0
     };
   }
+
+  std::string toStdString() const {
+    return std::string(" Scene { ") +
+      "  dbId: " + std::to_string(id) +
+      ", sceneId: " + std::to_string(sceneId) +
+      ", name: " + name +
+      ", playbackSpeed: " + std::to_string(playbackSpeed) + " }";
+  };
 };
 
 } // Db

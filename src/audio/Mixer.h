@@ -126,7 +126,7 @@ public:
   };
 
   int deleteChannels();
-  int setChannels(const std::vector<Db::ChannelEntity>& channelEntities);
+  int setChannels(std::vector<Db::ChannelEntity> channelEntities);
   int setEffects(const std::vector<Db::Effect>& effects) const;
   static Result setFrameId(sf_count_t frameId);
   Result loadScene(Db::ID sceneDbId);

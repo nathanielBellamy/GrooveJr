@@ -8,8 +8,8 @@ namespace Gj {
 namespace Db {
 
 ChannelEntity::ChannelEntity(
-    const int id,
-    const int channelIndex,
+    const ID id,
+    const ChannelIndex channelIndex,
     const AtomicStr& name,
     const float gain,
     const float mute,
@@ -41,8 +41,8 @@ ChannelEntity::ChannelEntity(
     {}
 
 ChannelEntity ChannelEntity::deser(sqlite3_stmt *stmt) {
-  const int id = sqlite3_column_int(stmt, 0);
-  const int channelIndex = sqlite3_column_int(stmt, 1);
+  const ID id = sqlite3_column_int(stmt, 0);
+  const ChannelIndex channelIndex = sqlite3_column_int(stmt, 1);
   const unsigned char* name = sqlite3_column_text(stmt, 2);
   const auto gain = static_cast<float>(sqlite3_column_double(stmt, 3));
   const auto mute = static_cast<float>(sqlite3_column_double(stmt, 4));
@@ -73,6 +73,49 @@ ChannelEntity ChannelEntity::deser(sqlite3_stmt *stmt) {
     soloR,
     panL,
     panR
+  };
+}
+
+std::vector<ChannelEntity> ChannelEntity::baseChannels() {
+  const ChannelEntity baseMain (
+    0,
+    0,
+    AtomicStr("Main"),
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    1.0f,
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f
+  );
+
+  const ChannelEntity baseChannel1 (
+    0,
+    1,
+    AtomicStr("==1=="),
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    1.0f,
+    1.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f
+  );
+
+  return {
+    baseMain,
+    baseChannel1
   };
 }
 
