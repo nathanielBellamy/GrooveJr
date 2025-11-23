@@ -11,10 +11,10 @@ using namespace Steinberg::Vst;
 
 namespace Gj {
 
-Audio::Effects::Vst3::Host::App* PluginContext;
+Audio::Effects::Vst3::Host::App* pluginContext;
 AppState* gAppState;
-Audio::Mixer* Mixer;
-Db::Dao* Dao;
+Audio::Mixer* mixer;
+Db::Dao* dao;
 Audio::AudioCore* audioCore;
 
 void shutdown_handler(const int sig) {
@@ -24,7 +24,7 @@ void shutdown_handler(const int sig) {
     "Caught Signal: " + std::to_string(sig)
   );
 
-  delete Mixer;
+  delete mixer;
   Logging::write(
     Info,
     "shutdown_handler",
@@ -38,16 +38,16 @@ void shutdown_handler(const int sig) {
     "Deleted gAppState"
   );
 
-  PluginContext->terminate();
+  pluginContext->terminate();
   PluginContextFactory::instance().setPluginContext (nullptr);
-  delete PluginContext;
+  delete pluginContext;
   Logging::write(
     Info,
     "shutdown_handler",
     "Deleted PluginContext"
   );
 
-  delete Dao;
+  delete dao;
   Logging::write(
     Info,
     "shutdown_handler",
@@ -68,8 +68,8 @@ void shutdown_handler(const int sig) {
 }
 
 void initVst3PluginContext() {
-    PluginContext = new Audio::Effects::Vst3::Host::App();
-    PluginContextFactory::instance().setPluginContext (PluginContext);
+    pluginContext = new Audio::Effects::Vst3::Host::App();
+    PluginContextFactory::instance().setPluginContext (pluginContext);
 }
 
 extern "C" {
@@ -92,11 +92,11 @@ int main(int argc, char *argv[]) {
 
   // setup Sql
   gAppState = new AppState;
-  Dao = new Db::Dao(gAppState);
-  if (const auto appStateEntity = Dao->appStateRepository.get(); appStateEntity.id == 0) {
+  dao = new Db::Dao(gAppState);
+  if (const auto appStateEntity = dao->appStateRepository.get(); appStateEntity.id == 0) {
     // no appState in Db, init one
-    const Db::SceneID sceneId = Dao->sceneRepository.create(Db::Scene::base());
-    const auto scene = Dao->sceneRepository.find(sceneId);
+    const Db::SceneID sceneId = dao->sceneRepository.create(Db::Scene::base());
+    const auto scene = dao->sceneRepository.find(sceneId);
     if (!scene) {
       Logging::write(
         Error,
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
       throw std::runtime_error("Unable to init Scene");
     }
     gAppState->setScene(scene.value());
-    if (Dao->appStateRepository.save() == 0) {
+    if (dao->appStateRepository.save() == 0) {
       Logging::write(
         Error,
         "main",
@@ -116,13 +116,13 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  const auto appStateEntityReloaded = Dao->appStateRepository.get();
-  const auto scene = Dao->sceneRepository.findOrCreate(appStateEntityReloaded.sceneId);
+  const auto appStateEntityReloaded = dao->appStateRepository.get();
+  const auto scene = dao->sceneRepository.findOrCreate(appStateEntityReloaded.sceneId);
   gAppState->setFromEntityAndScene(
     appStateEntityReloaded,
     scene
   );
-  Dao->appStateRepository.persistAndSet();
+  dao->appStateRepository.persistAndSet();
 
   Logging::write(
     Info,
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
     "Instantiated audioCore"
   );
 
-  Mixer = new Audio::Mixer(gAppState, Dao);
+  mixer = new Audio::Mixer(gAppState, dao);
   Logging::write(
     Info,
     "main",
@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
   auto supervisor = sys.spawn(
     actor_from_state<Act::SupervisorState>,
     gAppState,
-    Mixer,
+    mixer,
     audioCore,
     shutdown_handler
   );

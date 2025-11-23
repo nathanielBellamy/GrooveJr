@@ -24,7 +24,6 @@ class ScenesTableView final : public SqlTableView {
       const SqlQueryModel* model = getModel();
       const Db::ID sceneDbId =  model->index(clickedIndex.row(), SCENES_COL_ID).data().toULongLong();
       sceneLoadAction->setData(sceneDbId);
-      std::cout << " will trig " << sceneDbId << std::endl;
       sceneLoadAction->trigger();
     }
   }

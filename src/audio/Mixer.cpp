@@ -261,8 +261,11 @@ Result Mixer::loadScene(const Db::ID sceneDbId) {
   gAppState->setScene(scene);
 
   const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(scene.id);
+  const bool channelsWasEmpty = channels.empty();
   setChannels(channels);
-  saveChannels();
+
+  if (channelsWasEmpty)
+    saveChannels();
 
   const std::vector<Db::Effect> effects = dao->sceneRepository.getEffects(scene.id);
   setEffects(effects);
@@ -412,17 +415,16 @@ Result Mixer::saveScene() const {
     return ERROR;
   }
 
-  if (saveChannels() == ERROR) {
-    Logging::write(
-      Error,
-      "Audio::Mixer::saveScene",
-      "Failed to save channels."
-    );
-    return ERROR;
-  };
+  if (const auto saveChannelsRes = saveChannels(); saveChannelsRes != OK) {
+    if (saveChannelsRes == ERROR)
+      Logging::write(
+        Error,
+        "Audio::Mixer::saveScene",
+        "Failed to save channels."
+      );
 
-  if (saveChannels() == WARNING)
-    return WARNING;
+    return saveChannelsRes;
+  };
 
   return OK;
 }
@@ -435,7 +437,7 @@ Result Mixer::saveChannels() const {
       Logging::write(
         Error,
         "Audio::Mixer::saveScene",
-        "Unable to save channel: " + std::to_string(effectsChannel->getIndex()) + " to sceneId: " + std::to_string(scene.id)
+        "Unable to save channel: " + std::to_string(effectsChannel->getIndex()) + " to sceneDbId: " + std::to_string(scene.id)
       );
       result = ERROR;
     }
