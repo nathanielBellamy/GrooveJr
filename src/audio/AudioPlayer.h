@@ -168,7 +168,7 @@ struct AudioPlayer {
       audioCore->effectsChannelsSettings[2 * effectsChannelIdx] = effectsChannel->getGain();
       audioCore->effectsChannelsSettings[2 * effectsChannelIdx + 1] = effectsChannel->getPan();
 
-      for (int pluginIdx = 0; pluginIdx < effectsChannel->effectCount(); pluginIdx++) {
+      for (EffectIndex pluginIdx = 0; pluginIdx < effectsChannel->effectCount(); pluginIdx++) {
         const auto plugin = effectsChannel->getPluginAtIdx(pluginIdx);
         audioCore->effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
           [ObjectPtr = plugin->audioHost->audioClient](auto && PH1, auto && PH2) { return ObjectPtr->process(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2)); };
@@ -202,7 +202,7 @@ struct AudioPlayer {
     return 0;
   }
 
-  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const int channelIdx, const int pluginIdx, AudioCore* audioCore) const {
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const ChannelIndex channelIdx, const int pluginIdx, AudioCore* audioCore) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
 
     // NOTE: input buffers will be updated to audioCore->playbackBuffers when pluginIdx = 0 in JackClient::processCallback
@@ -304,7 +304,7 @@ struct AudioPlayer {
 
     // no solos on main
     effectsChannels[0] = mixer->getEffectsChannel(0);
-    for (int i = 1; i < channelCount; i++) {
+    for (ChannelIndex i = 1; i < channelCount; i++) {
       effectsChannels[i] = mixer->getEffectsChannel(i);
       soloVals[i]  = effectsChannels[i]->getSolo();
       soloLVals[i] = effectsChannels[i]->getSoloL();
@@ -314,7 +314,7 @@ struct AudioPlayer {
     }
 
     // update buffer
-    for (int i = 0; i < channelCount; i++) {
+    for (ChannelIndex i = 0; i < channelCount; i++) {
       const auto effectsChannel = effectsChannels[i];
       const bool isMain = i == 0;
       const float gain = effectsChannel->getGain();
@@ -365,6 +365,21 @@ struct AudioPlayer {
         channelCountF
       );
     }
+
+    std::cout << "effectsChannelSettings = "
+      << effectsChannelsSettings[0] << std::endl
+      << effectsChannelsSettings[1] << std::endl
+      << effectsChannelsSettings[2] << std::endl
+      << effectsChannelsSettings[3] << std::endl
+      << effectsChannelsSettings[4] << std::endl
+      << effectsChannelsSettings[5] << std::endl
+      << effectsChannelsSettings[6] << std::endl
+      << effectsChannelsSettings[7] << std::endl
+      << effectsChannelsSettings[8] << std::endl
+      << effectsChannelsSettings[9] << std::endl
+      << effectsChannelsSettings[10] << std::endl
+      << effectsChannelsSettings[11] << std::endl
+      << effectsChannelsSettings[12] << std::endl;
 
     // write to effectsSettings ring buffer
     if (jack_ringbuffer_write_space(audioCore->effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE) {

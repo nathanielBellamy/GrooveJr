@@ -76,7 +76,7 @@ Result CacheQueryModel::setHeaders() {
 }
 
 bool CacheQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
-  const Db::ID id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
+  const ID id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
   return gAppState->getCurrentlyPlaying().audioFile.id == id && !gAppState->queuePlay;
 }
 

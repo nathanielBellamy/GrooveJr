@@ -5,7 +5,7 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include "../../Types.h"
+#include "../../../types/Types.h"
 
 namespace Gj {
 namespace Db {

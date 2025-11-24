@@ -13,7 +13,7 @@
 #include "MusicLibraryRepository.h"
 #include "../../dto/musicLibrary/AlbumWithArtist.h"
 #include "../../entity/musicLibrary/Album.h"
-#include "../../Types.h"
+#include "../../../types/Types.h"
 
 namespace Gj {
 namespace Db {

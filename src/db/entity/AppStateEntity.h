@@ -9,7 +9,7 @@
 #include <sndfile.h>
 #include <jack/jack.h>
 
-#include "../Types.h"
+#include "../../types/Types.h"
 
 namespace Gj {
 namespace Db {

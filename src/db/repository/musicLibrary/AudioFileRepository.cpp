@@ -90,7 +90,7 @@ std::optional<AudioFile> AudioFileRepository::findByFilePath(const AtomicStr& fi
 }
 
 
-std::optional<DecoratedAudioFile> AudioFileRepository::findDecoratedAudioFileById(ID id) const {
+std::optional<DecoratedAudioFile> AudioFileRepository::findDecoratedAudioFileById(const ID id) const {
   const std::string query = R"sql(
     select
       alb.id,

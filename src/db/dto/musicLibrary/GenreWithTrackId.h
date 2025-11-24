@@ -6,7 +6,7 @@
 #define GENREWITHTRACKID_H
 
 #include "../../entity/musicLibrary/Genre.h"
-#include "../../Types.h"
+#include "../../../types/Types.h"
 
 namespace Gj {
 namespace Db {

@@ -13,7 +13,7 @@
 #include <taglib/tag.h>
 
 #include "../db/Dao.h"
-#include "../db/Types.h"
+#include "../types/Types.h"
 #include "../db/dto/musicLibrary/AlbumWithArtist.h"
 #include "../db/dto/musicLibrary/GenreWithTrackId.h"
 #include "../db/dto/musicLibrary/DecoratedAudioFile.h"

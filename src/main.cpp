@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
   dao = new Db::Dao(gAppState);
   if (const auto appStateEntity = dao->appStateRepository.get(); appStateEntity.id == 0) {
     // no appState in Db, init one
-    const Db::SceneID sceneId = dao->sceneRepository.create(Db::Scene::base());
+    const SceneID sceneId = dao->sceneRepository.create(Db::Scene::base());
     const auto scene = dao->sceneRepository.find(sceneId);
     if (!scene) {
       Logging::write(

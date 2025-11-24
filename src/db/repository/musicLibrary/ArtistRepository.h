@@ -10,7 +10,7 @@
 #include "../../../types/AtomicStr.h"
 #include "MusicLibraryRepository.h"
 #include "../../entity/musicLibrary/Artist.h"
-#include "../../Types.h"
+#include "../../../types/Types.h"
 
 namespace Gj {
 namespace Db {

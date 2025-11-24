@@ -16,18 +16,18 @@
 #include "./db/entity/AppStateEntity.h"
 #include "./db/entity/mixer/Scene.h"
 #include "./db/dto/musicLibrary/DecoratedAudioFile.h"
-#include "./db/Types.h"
+#include "types/Types.h"
 #include "types/AtomicStr.h"
 
 namespace Gj {
 
 struct AppStatePacket {
-    Db::ID id;
+    ID id;
     jack_nframes_t audioFramesPerBuffer;
     int playState;
-    Db::ID sceneId;
+    ID sceneId;
     sf_count_t crossfade;
-    Db::ID currentlyPlayingId;
+    ID currentlyPlayingId;
     AtomicStr currentlyPlayingAlbumTitle;
     AtomicStr currentlyPlayingArtistName;
     AtomicStr currentlyPlayingTrackTitle;
@@ -39,18 +39,18 @@ bool inspect(Inspector& f, AppStatePacket& x) {
 }
 
 struct AppState {
-  std::atomic<Db::ID> id;
+  std::atomic<ID> id;
   std::atomic<jack_nframes_t> audioFramesPerBuffer;
   std::atomic<PlayState> playState;
   std::atomic<Db::Scene> scene;
   std::atomic<sf_count_t> crossfade{ 0 };
   std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
   std::atomic<bool> queuePlay = false;
-  std::atomic<Db::TrackNumber> queueIndex = 0;
+  std::atomic<TrackNumber> queueIndex = 0;
 
   AppState();
   AppState(
-    Db::ID id,
+    ID id,
     jack_nframes_t audioFramesPerBuffer,
     PlayState playState,
     const Db::Scene& scene,
@@ -90,15 +90,15 @@ struct AppState {
     scene.store(val);
   };
 
-  Db::ID getSceneDbId() const {
+  ID getSceneDbId() const {
     return scene.load().id;
   }
 
-  Db::ID getSceneSceneId() const {
+  ID getSceneSceneId() const {
     return scene.load().sceneId;
   }
 
-  Db::Version getSceneVersion() const {
+  Version getSceneVersion() const {
     return scene.load().version;
   }
 

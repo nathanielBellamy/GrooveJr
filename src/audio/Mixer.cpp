@@ -94,7 +94,7 @@ bool Mixer::addEffectsChannel() {
       new Effects::EffectsChannel(
         gAppState,
         jackClient,
-        static_cast<Db::ChannelIndex>(effectsChannels.size())
+        static_cast<ChannelIndex>(effectsChannels.size())
       )
     );
     channelCount++;
@@ -131,7 +131,7 @@ bool Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) 
     return true;
 }
 
-bool Mixer::removeEffectsChannel(const int idx) {
+bool Mixer::removeEffectsChannel(const ChannelIndex idx) {
   delete effectsChannels.at(idx);
   effectsChannels.erase(effectsChannels.begin() + idx);
   channelCount--;
@@ -154,7 +154,7 @@ void Mixer::incorporateLatencySamples(const int latencySamples) const {
   gAppState->audioFramesPerBuffer = static_cast<int>(std::pow(2, std::ceil(exponent)));
 }
 
-bool Mixer::addEffectToChannel(const int channelIndex, const std::string& effectPath) const {
+bool Mixer::addEffectToChannel(const ChannelIndex channelIndex, const std::string& effectPath) const {
   Logging::write(
     Info,
     "Audio::Mixer::addEffectToChannel",
@@ -188,26 +188,26 @@ Result Mixer::loadEffectOnChannel(const Db::Effect& effectEntity) const {
   return effectsChannels.at(effectEntity.channelIndex)->loadEffect(effectEntity);
 }
 
-int Mixer::effectsOnChannelCount(const int idx) const {
+int Mixer::effectsOnChannelCount(const ChannelIndex idx) const {
   return effectsChannels.at(idx)->effectCount();
 }
 
-void Mixer::initEditorHostsOnChannel(const int idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
+void Mixer::initEditorHostsOnChannel(const ChannelIndex idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
   return effectsChannels.at(idx)->initEditorHosts(vstWindows);
 }
 
-void Mixer::initEditorHostOnChannel(const int idx, const int newEffectChannel, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+void Mixer::initEditorHostOnChannel(const ChannelIndex idx, const int newEffectChannel, std::shared_ptr<Gui::VstWindow> vstWindow) const {
   return effectsChannels.at(idx)->initEditorHost(newEffectChannel, vstWindow);
 }
 
-void Mixer::terminateEditorHostsOnChannel(const int idx) const {
+void Mixer::terminateEditorHostsOnChannel(const ChannelIndex idx) const {
   Logging::write(
     Info,
     "Audio::Mixer::terminateEditorHostsOnChannel",
     "Terminating editor hosts on channelIndex: " + std::to_string(idx)
   );
 
-  if (idx < effectsChannels.size() && idx >= 0) {
+  if (idx < effectsChannels.size() ) {
     effectsChannels.at(idx)->terminateEditorHosts();
   } else {
     Logging::write(
@@ -224,19 +224,19 @@ void Mixer::terminateEditorHostsOnChannel(const int idx) const {
   );
 }
 
-bool Mixer::replaceEffectOnChannel(const int channelIdx, const int effectIdx, std::string effectPath) const {
+bool Mixer::replaceEffectOnChannel(const ChannelIndex channelIdx, const EffectIndex effectIdx, const std::string& effectPath) const {
   return effectsChannels.at(channelIdx)->addReplaceEffect(effectIdx, effectPath);
 }
 
-bool Mixer::removeEffectFromChannel(const int channelIdx, const int effectIdx) const {
+bool Mixer::removeEffectFromChannel(const ChannelIndex channelIdx, const EffectIndex effectIdx) const {
   return effectsChannels.at(channelIdx)->removeEffect(effectIdx);
 }
 
-bool Mixer::setGainOnChannel(const int channelIdx, const float gain) const {
+bool Mixer::setGainOnChannel(const ChannelIndex channelIdx, const float gain) const {
   return effectsChannels.at(channelIdx)->setGain(gain);
 }
 
-Result Mixer::loadScene(const Db::ID sceneDbId) {
+Result Mixer::loadScene(const ID sceneDbId) {
   Logging::write(
     Info,
     "Audio::Mixer::loadScene",
@@ -279,7 +279,7 @@ Result Mixer::loadScene(const Db::ID sceneDbId) {
   return OK;
 }
 
-Db::ID Mixer::newScene() const {
+ID Mixer::newScene() const {
   Logging::write(
     Info,
     "Audio::Mixer::newScene",
@@ -298,7 +298,7 @@ Db::ID Mixer::newScene() const {
   return id;
 }
 
-int Mixer::deleteChannels() {
+Result Mixer::deleteChannels() {
   Logging::write(
     Info,
     "Audio::Mixer::deleteChannels",
@@ -317,10 +317,10 @@ int Mixer::deleteChannels() {
     "Done deleting channels."
   );
 
-  return 0;
+  return OK;
 }
 
-int Mixer::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
+Result Mixer::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
   Logging::write(
     Info,
     "Audio::Mixer::setChannels",
@@ -343,10 +343,10 @@ int Mixer::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
     "Done setting channels: " + std::to_string(channelEntities.size())
   );
 
-  return 0;
+  return OK;
 }
 
-int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
+Result Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
   Logging::write(
     Info,
     "Audio::Mixer::setEffects",
@@ -385,7 +385,7 @@ int Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
     "Audio::Mixer::setEffects",
     "Done setting effects."
   );
-  return 0;
+  return OK;
 }
 
 Result Mixer::saveScene() const {

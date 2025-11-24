@@ -16,7 +16,7 @@
 #include "../Logging.h"
 #include "../JackClient.h"
 #include "../../types/AtomicStr.h"
-#include "../../db/Types.h"
+#include "../../types/Types.h"
 
 namespace Gj {
 namespace Audio {
@@ -27,8 +27,8 @@ class EffectsChannel {
   // fx0:inputBuffers->buffersA, fx1:buffersA->buffersB, fx2:buffersB->buffersA, fx3:buffersA->buffersB, ...
   AppState* gAppState;
   std::shared_ptr<JackClient> jackClient;
-  Db::ID id { 0 };
-  Db::ChannelIndex index;
+  ID id { 0 };
+  ChannelIndex index;
   AtomicStr name { "Channel" };
   std::vector<Vst3::Plugin*> vst3Plugins;
 
@@ -38,7 +38,7 @@ class EffectsChannel {
     EffectsChannel(
       AppState* gAppState,
       std::shared_ptr<JackClient> jackClient,
-      Db::ChannelIndex index
+      ChannelIndex index
     );
     EffectsChannel(
       AppState* gAppState,
@@ -48,10 +48,10 @@ class EffectsChannel {
     ~EffectsChannel();
 
     [[nodiscard]]
-    int getIndex() const { return index; }
+    ChannelIndex getIndex() const { return index; }
 
     [[nodiscard]]
-    Vst3::Plugin* getPluginAtIdx(const int idx) const {
+    Vst3::Plugin* getPluginAtIdx(const ChannelIndex idx) const {
       return vst3Plugins.at(idx);
     };
 
@@ -211,19 +211,19 @@ class EffectsChannel {
       return true;
     };
 
-    bool addReplaceEffect(int effectIdx, const std::string& effectPath);
+    bool addReplaceEffect(EffectIndex effectIdx, const std::string& effectPath);
     Result loadEffect(const Db::Effect& effectEntity);
     Result setSampleRate(double sampleRate) const;
     Result setBlockSize(jack_nframes_t blockSize) const;
 
-    int effectCount() const;
+    size_t effectCount() const;
     void initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
-    void initEditorHost(int effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
+    void initEditorHost(EffectIndex effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
     void terminateEditorHosts() const;
 
-    bool removeEffect(int effectIdx);
+    bool removeEffect(EffectIndex effectIdx);
 
-    AtomicStr getPluginName(const int pluginIndex) const { return vst3Plugins.at(pluginIndex)->getName(); };
+    AtomicStr getPluginName(const EffectIndex pluginIndex) const { return vst3Plugins.at(pluginIndex)->getName(); };
 
     Db::ChannelEntity toEntity() {
       return {
@@ -249,7 +249,6 @@ class EffectsChannel {
 } // Effects
 } // Audio
 } // Gj
-
 
 
 #endif //EFFECTCHANNEL_H

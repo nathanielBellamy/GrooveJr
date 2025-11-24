@@ -9,16 +9,16 @@
 #include <string>
 
 namespace Gj {
-namespace Db {
 
 typedef uint64_t         ID;
 typedef uint64_t         SceneID;
 typedef uint64_t         Version;
 typedef uint16_t         TrackNumber;
-typedef uint8_t          ChannelIndex;
+typedef size_t           ChannelIndex;
+typedef size_t           EffectIndex;
+typedef size_t           DeckIndex;
 typedef unsigned int     Year;
 
-} // Db
 } // Gj
 
 #endif //TYPES_H

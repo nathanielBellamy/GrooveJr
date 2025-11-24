@@ -66,7 +66,7 @@ QVariant AlbumQueryModel::data(const QModelIndex& item, const int role) const {
 }
 
 bool AlbumQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
-  const Db::ID id = index(item.row(), ALBUM_COL_ID).data().toULongLong();
+  const ID id = index(item.row(), ALBUM_COL_ID).data().toULongLong();
   return gAppState->getCurrentlyPlaying().album.id == id;
 }
 

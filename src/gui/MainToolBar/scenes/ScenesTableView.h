@@ -22,7 +22,7 @@ class ScenesTableView final : public SqlTableView {
   void mouseDoubleClickEvent(QMouseEvent *event) override {
     if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {
       const SqlQueryModel* model = getModel();
-      const Db::ID sceneDbId =  model->index(clickedIndex.row(), SCENES_COL_ID).data().toULongLong();
+      const ID sceneDbId =  model->index(clickedIndex.row(), SCENES_COL_ID).data().toULongLong();
       sceneLoadAction->setData(sceneDbId);
       sceneLoadAction->trigger();
     }

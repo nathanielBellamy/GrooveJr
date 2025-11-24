@@ -16,7 +16,7 @@
 #include "../../entity/mixer/Scene.h"
 #include "../../entity/mixer/Effect.h"
 #include "../../entity/mixer/ChannelEntity.h"
-#include "../../Types.h"
+#include "../../../types/Types.h"
 
 namespace Gj {
 namespace Db {

@@ -38,7 +38,7 @@ class QueueTableView final : public MusicLibraryTableView {
   void mouseDoubleClickEvent(QMouseEvent *event) override {
     if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {
       const SqlQueryModel* model = getModel();
-      const Db::ID id = model->index(clickedIndex.row(), AUDIO_FILE_COL_ID).data().toULongLong();
+      const ID id = model->index(clickedIndex.row(), AUDIO_FILE_COL_ID).data().toULongLong();
 
       if (gAppState->getCurrentlyPlaying().audioFile.id == id && !gAppState->queuePlay)
         return;

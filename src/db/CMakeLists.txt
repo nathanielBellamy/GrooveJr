@@ -16,7 +16,7 @@ add_library(GjDb SHARED
         Dao.cpp
         Logging.h
         Logging.cpp
-        Types.h
+        ../types/Types.h
         dto/musicLibrary/DecoratedAudioFile.h
         dto/musicLibrary/DecoratedAudioFile.cpp
         entity/AppStateEntity.h

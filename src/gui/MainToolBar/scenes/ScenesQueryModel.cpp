@@ -8,7 +8,7 @@ namespace Gj {
 namespace Gui {
 
 bool ScenesQueryModel::isCurrentScene(const QModelIndex& item) const {
-  const Db::ID id = index(item.row(), SCENES_COL_ID).data().toULongLong();
+  const ID id = index(item.row(), SCENES_COL_ID).data().toULongLong();
   return gAppState->getScene().id == id;
 }
 

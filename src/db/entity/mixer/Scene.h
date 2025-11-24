@@ -9,7 +9,7 @@
 
 #include <sqlite3.h>
 
-#include "../../Types.h"
+#include "../../../types/Types.h"
 #include "../../../types/AtomicStr.h"
 
 namespace Gj {

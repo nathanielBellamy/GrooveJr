@@ -7,7 +7,7 @@
 namespace Gj {
 
 AppState::AppState(
-  const Db::ID id,
+  const ID id,
   const jack_nframes_t audioFramesPerBuffer,
   const PlayState playState,
   const Db::Scene& scene,

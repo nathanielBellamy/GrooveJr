@@ -65,7 +65,7 @@ Result GenreQueryModel::setHeaders() {
 }
 
 bool GenreQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
-  const Db::ID id = index(item.row(), GENRE_COL_ID).data().toULongLong();
+  const ID id = index(item.row(), GENRE_COL_ID).data().toULongLong();
   return gAppState->getCurrentlyPlaying().genre.id == id;
 }
 

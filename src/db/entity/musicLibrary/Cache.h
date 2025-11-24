@@ -5,7 +5,7 @@
 #ifndef GJDBCACHE_H
 #define GJDBCACHE_H
 
-#include "../../Types.h"
+#include "../../../types/Types.h"
 
 namespace Gj {
 namespace Db {

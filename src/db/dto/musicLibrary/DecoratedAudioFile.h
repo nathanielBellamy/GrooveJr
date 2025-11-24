@@ -8,7 +8,7 @@
 #include <sndfile.h>
 #include <sqlite3.h>
 
-#include "../../Types.h"
+#include "../../../types/Types.h"
 #include "../../Logging.h"
 #include "../../../enums/AudioCodec.h"
 #include "../../../enums/Result.h"

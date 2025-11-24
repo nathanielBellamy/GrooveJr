@@ -37,7 +37,7 @@ namespace Gui {
     MusicLibraryFilters* filters;
 
     bool isCurrentFilter(const QModelIndex& item, const size_t idCol) const {
-      std::vector<Db::ID> ids = filters->filters.at(type).ids;
+      std::vector<ID> ids = filters->filters.at(type).ids;
       return std::find(
           ids.begin(),
           ids.end(),

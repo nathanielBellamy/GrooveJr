@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "../../enums/Result.h"
-#include "../../db/Types.h"
+#include "../../types/Types.h"
 
 #include "MusicLibraryType.h"
 
@@ -19,7 +19,7 @@ namespace Gui {
 
 struct MusicLibraryFilter {
   MusicLibraryType type = NONE;
-  std::vector<Db::ID> ids {};
+  std::vector<ID> ids {};
 };
 
 struct MusicLibraryFilters {
@@ -33,7 +33,7 @@ struct MusicLibraryFilters {
   };
 
   std::string idSqlArray(const MusicLibraryType type) const {
-    const std::vector<Db::ID> ids = filters.at(type).ids;
+    const std::vector<ID> ids = filters.at(type).ids;
     std::string res = "(";
     for (size_t i = 0; i < ids.size(); ++i) {
       res += std::to_string(ids[i]);

@@ -66,7 +66,7 @@ Result ArtistQueryModel::setHeaders() {
 }
 
 bool ArtistQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
-  const Db::ID id = index(item.row(), ARTIST_COL_ID).data().toULongLong();
+  const ID id = index(item.row(), ARTIST_COL_ID).data().toULongLong();
   return gAppState->getCurrentlyPlaying().artist.id == id;
 }
 

@@ -6,13 +6,13 @@
 #define GJDECKSSTATE_H
 
 #include "../audio/Constants.h"
-#include "../db/Types.h"
+#include "../types/Types.h"
 
 namespace Gj {
 
 struct DecksState {
-  Db::ID audioFileIds[Audio::AUDIO_CORE_DECK_COUNT];
-  int currentDeckIdx;
+  ID audioFileIds[Audio::AUDIO_CORE_DECK_COUNT];
+  DeckIndex currentDeckIdx;
 };
 
 template <class Inspector>

@@ -14,7 +14,7 @@ using namespace Steinberg;
 EffectsChannel::EffectsChannel(
 	AppState* gAppState,
 	std::shared_ptr<JackClient> jackClient,
-	const Db::ChannelIndex index
+	const ChannelIndex index
 	)
 	: gAppState(gAppState)
 	, jackClient(jackClient)
@@ -77,7 +77,7 @@ EffectsChannel::~EffectsChannel() {
 }
 
 // an effectIdx of -1 indicates to push_back
-bool EffectsChannel::addReplaceEffect(const int effectIdx, const std::string& effectPath) {
+bool EffectsChannel::addReplaceEffect(const EffectIndex effectIdx, const std::string& effectPath) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::addReplaceEffect",
@@ -230,8 +230,8 @@ Result EffectsChannel::setBlockSize(const jack_nframes_t blockSize) const {
 }
 
 
-int EffectsChannel::effectCount() const {
-	return static_cast<int>(vst3Plugins.size());
+size_t EffectsChannel::effectCount() const {
+	return vst3Plugins.size();
 }
 
 void EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
@@ -252,7 +252,7 @@ void EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstW
 	}
 }
 
-void EffectsChannel::initEditorHost(const int effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+void EffectsChannel::initEditorHost(const EffectIndex effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
 		vst3Plugins.at(effectIndex)->initEditorHost(vstWindow);
 }
 
@@ -273,7 +273,7 @@ void EffectsChannel::terminateEditorHosts() const {
 	);
 }
 
-bool EffectsChannel::removeEffect(const int effectIdx) {
+bool EffectsChannel::removeEffect(const EffectIndex effectIdx) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::removeEffect",
