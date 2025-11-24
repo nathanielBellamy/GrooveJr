@@ -101,7 +101,7 @@ EffectsChannel::~EffectsChannel() {
   );
 }
 
-void EffectsChannel::hydrateState(const AppStatePacket& appStatePacket, const int newChannelIndex) {
+void EffectsChannel::hydrateState(const AppStatePacket& appStatePacket, const ChannelIndex newChannelIndex) {
   Logging::write(
     Info,
     "Gui::EffectsChannel::hydrateState",
@@ -304,9 +304,8 @@ void EffectsChannel::setEffects() {
   if (channelIndex > mixer->getEffectsChannelsCount())
     return;
 
-  for (int i = 0; i < mixer->getEffectsChannel(channelIndex)->effectCount(); i++) {
+  for (int i = 0; i < mixer->getEffectsChannel(channelIndex)->effectCount(); i++)
     addEffect(i);
-  }
 
   Logging::write(
     Info,
@@ -315,22 +314,24 @@ void EffectsChannel::setEffects() {
   );
 }
 
-void EffectsChannel::addEffect(const int effectIndex) {
+void EffectsChannel::addEffect(const std::optional<EffectIndex> effectIndex) {
+  const EffectIndex newEffectIndex = effectIndex.value_or(
+    mixer->effectsOnChannelCount(channelIndex) - 1
+  );
   Logging::write(
     Info,
     "Gui::EffectsChannel::addEffect",
-    "Adding effect at index: " + std::to_string(effectIndex)
+    "Adding effect at index: " + std::to_string(newEffectIndex)
   );
 
   effectsSlots.addEffectSlot();
-  const int newEffectIndex = effectIndex < 0 ? mixer->effectsOnChannelCount(channelIndex) - 1 : effectIndex;
   const AtomicStr name = mixer->getPluginName(channelIndex, newEffectIndex);
   effectsContainer.addEffect(newEffectIndex, name);
 
   Logging::write(
     Info,
     "Gui::EffectsChannel::addEffect",
-    "Added effect " + name + " at index: " + std::to_string(effectIndex)
+    "Added effect " + name + " at index: " + std::to_string(newEffectIndex)
   );
 }
 
@@ -364,7 +365,7 @@ void EffectsChannel::connectActions() {
           "Unable to add effect " + effectPath + " to channel " + std::to_string(channelIndex)
         );
       } else {
-        addEffect(-1);
+        addEffect(std::nullopt);
 
         appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
         const scoped_actor self{ actorSystem };

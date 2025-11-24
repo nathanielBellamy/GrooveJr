@@ -82,19 +82,19 @@ public:
 
   [[nodiscard]]
   size_t getEffectsChannelsCount() const {
-    return static_cast<int>(effectsChannels.size() - 1);
+    return effectsChannels.size() - 1;
   }
 
   [[nodiscard]]
   size_t getTotalChannelsCount() const {
-    return static_cast<int>(effectsChannels.size());
+    return effectsChannels.size();
   }
 
   bool addEffectsChannel();
   bool addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity);
   bool removeEffectsChannel(ChannelIndex idx);
   [[nodiscard]]
-  int effectsOnChannelCount(ChannelIndex idx) const;
+  size_t effectsOnChannelCount(ChannelIndex idx) const;
 
   bool addEffectToChannel(ChannelIndex channelIndex, const std::string& effectPath) const;
   Result loadEffectOnChannel(const Db::Effect& effectEntity) const;

@@ -6,6 +6,7 @@
 #define EFFECTSCHANNEL_H
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "./vst3/Plugin.h"
@@ -211,7 +212,7 @@ class EffectsChannel {
       return true;
     };
 
-    bool addReplaceEffect(EffectIndex effectIdx, const std::string& effectPath);
+    bool addReplaceEffect(std::optional<EffectIndex> effectIdxOpt, const std::string& effectPath);
     Result loadEffect(const Db::Effect& effectEntity);
     Result setSampleRate(double sampleRate) const;
     Result setBlockSize(jack_nframes_t blockSize) const;

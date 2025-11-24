@@ -168,7 +168,7 @@ bool Mixer::addEffectToChannel(const ChannelIndex channelIndex, const std::strin
     );
     return false;
   }
-  return effectsChannels.at(channelIndex)->addReplaceEffect(-1, effectPath);
+  return effectsChannels.at(channelIndex)->addReplaceEffect(std::nullopt, effectPath);
 }
 
 Result Mixer::loadEffectOnChannel(const Db::Effect& effectEntity) const {
@@ -188,7 +188,7 @@ Result Mixer::loadEffectOnChannel(const Db::Effect& effectEntity) const {
   return effectsChannels.at(effectEntity.channelIndex)->loadEffect(effectEntity);
 }
 
-int Mixer::effectsOnChannelCount(const ChannelIndex idx) const {
+size_t Mixer::effectsOnChannelCount(const ChannelIndex idx) const {
   return effectsChannels.at(idx)->effectCount();
 }
 

@@ -6,6 +6,7 @@
 #define GUIEFFECTSCHANNEL_H
 
 #include <atomic>
+#include <optional>
 
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
@@ -56,7 +57,7 @@ class EffectsChannel final : public QWidget {
       std::atomic<float>* vuPtr
     );
     ~EffectsChannel() override;
-    void hydrateState(const AppStatePacket& appStatePacket, int newChannelIndex);
+    void hydrateState(const AppStatePacket& appStatePacket, ChannelIndex newChannelIndex);
     void updateShowRemoveEffectsChannelButton(bool val);
     void setMute(float val);
     void setMuteL(float val);
@@ -65,8 +66,8 @@ class EffectsChannel final : public QWidget {
     void setSoloL(float val);
     void setSoloR(float val);
     void setEffects();
-    void addEffect(int effectIndex);
-    int channelIndex;
+    void addEffect(std::optional<EffectIndex> effectIndex);
+    ChannelIndex channelIndex;
 
   private:
     actor_system& actorSystem;

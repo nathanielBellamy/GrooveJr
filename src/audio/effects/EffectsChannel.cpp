@@ -77,7 +77,7 @@ EffectsChannel::~EffectsChannel() {
 }
 
 // an effectIdx of -1 indicates to push_back
-bool EffectsChannel::addReplaceEffect(const EffectIndex effectIdx, const std::string& effectPath) {
+bool EffectsChannel::addReplaceEffect(const std::optional<EffectIndex> effectIdxOpt, const std::string& effectPath) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::addReplaceEffect",
@@ -100,6 +100,7 @@ bool EffectsChannel::addReplaceEffect(const EffectIndex effectIdx, const std::st
   // int latencySamples = processor->getLatencySamples();
   // incorporateLatencySamples(latencySamples);
 
+	std::cout << "got processor " << std::endl;
   if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer)) {
 		Logging::write(
 			Warning,
@@ -122,11 +123,11 @@ bool EffectsChannel::addReplaceEffect(const EffectIndex effectIdx, const std::st
     44100.0
   };
   processor->setupProcessing(setup);
-	if (effectIdx < 0) {
+	if (!effectIdxOpt) {
 		vst3Plugins.push_back(effect);
 	} else {
-		delete vst3Plugins.at(effectIdx);
-		vst3Plugins.at(effectIdx) = effect;
+		delete vst3Plugins.at(effectIdxOpt.value());
+		vst3Plugins.at(effectIdxOpt.value()) = effect;
 	}
 
 	Logging::write(

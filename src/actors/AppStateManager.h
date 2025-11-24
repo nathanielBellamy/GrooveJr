@@ -36,11 +36,11 @@ struct AppStateManagerTrait {
     using signatures = type_list<
                                  // Mixer
                                  result<void>(mix_add_effects_channel_a),
-                                 result<void>(int, mix_remove_effects_channel_a),
-                                 result<void>(int, std::string, mix_add_effect_to_channel_a),
-                                 result<void>(int, int, std::string, mix_replace_effect_on_channel_a),
-                                 result<void>(int, int, mix_remove_effect_on_channel_a),
-                                 result<void>(int, float, mix_set_channel_gain_a),
+                                 result<void>(ChannelIndex, mix_remove_effects_channel_a),
+                                 result<void>(ChannelIndex, std::string, mix_add_effect_to_channel_a),
+                                 result<void>(ChannelIndex, EffectIndex, std::string, mix_replace_effect_on_channel_a),
+                                 result<void>(ChannelIndex, EffectIndex, mix_remove_effect_on_channel_a),
+                                 result<void>(ChannelIndex, float, mix_set_channel_gain_a),
 
                                  // Transport control
                                  result<void>(tc_trig_play_a),
@@ -133,7 +133,7 @@ struct AppStateManagerState {
              mixer->addEffectsChannel();
              hydrateStateToDisplay();
            },
-           [this](const int channelIdx, mix_remove_effects_channel_a) {
+           [this](const ChannelIndex channelIdx, mix_remove_effects_channel_a) {
              Logging::write(
                Info,
                "Act::AppStateManager::mix_remove_effects_channel_a",
@@ -142,7 +142,7 @@ struct AppStateManagerState {
              mixer->removeEffectsChannel(channelIdx);
              hydrateStateToDisplay();
            },
-           [this](const int channelIdx, std::string effectPath, mix_add_effect_to_channel_a) {
+           [this](const ChannelIndex channelIdx, std::string effectPath, mix_add_effect_to_channel_a) {
              Logging::write(
                Info,
                "Act::AppStateManager::mix_add_effects_channel_a",
@@ -157,7 +157,7 @@ struct AppStateManagerState {
              // }
              hydrateStateToDisplay();
            },
-           [this](const int channelIdx, const int pluginIdx, std::string effectPath, mix_replace_effect_on_channel_a) {
+           [this](const ChannelIndex channelIdx, const EffectIndex pluginIdx, std::string effectPath, mix_replace_effect_on_channel_a) {
              Logging::write(
                Info,
                "Act::AppStateManager::mix_replace_effect_on_channel_a",
@@ -172,7 +172,7 @@ struct AppStateManagerState {
              }
              hydrateStateToDisplay();
            },
-           [this](const int channelIdx, const int pluginIdx, mix_remove_effect_on_channel_a) {
+           [this](const ChannelIndex channelIdx, const EffectIndex pluginIdx, mix_remove_effect_on_channel_a) {
              Logging::write(
                Info,
                "Act::AppStateManager::mix_remove_effect_on_channel_a",
@@ -187,7 +187,7 @@ struct AppStateManagerState {
              }
              hydrateStateToDisplay();
            },
-           [this](const int channelIdx, const float gain, mix_set_channel_gain_a) {
+           [this](const ChannelIndex channelIdx, const float gain, mix_set_channel_gain_a) {
              if (!mixer->setGainOnChannel(channelIdx, gain)) {
                Logging::write(
                  Error,

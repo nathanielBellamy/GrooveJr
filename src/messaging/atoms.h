@@ -12,6 +12,9 @@ CAF_BEGIN_TYPE_ID_BLOCK(groovejr, first_custom_type_id)
   CAF_ADD_TYPE_ID(groovejr, (Gj::AppStatePacket))
   CAF_ADD_TYPE_ID(groovejr, (Gj::EnvelopeQtPtr))
   CAF_ADD_TYPE_ID(groovejr, (Gj::DecksState))
+  CAF_ADD_TYPE_ID(groovejr, (Gj::ChannelIndex))
+  // CAF_ADD_TYPE_ID(groovejr, (Gj::EffectIndex))
+  // CAF_ADD_TYPE_ID(groovejr, (Gj::DeckIndex))
 
   // atoms
   CAF_ADD_ATOM(groovejr, supervisor_status_a)
