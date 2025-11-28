@@ -36,19 +36,19 @@ class EffectSlot final : public QWidget {
     EffectSlot(QWidget* parent,
                actor_system& actorSystem,
                Audio::Mixer* mixer,
-               int channelIndex,
-               int slotIndex,
+               ChannelIndex channelIndex,
+               EffectIndex effectIndex,
                bool occupied,
                QAction* replaceEffectAction,
                QAction* removeEffectAction);
     ~EffectSlot() override;
-    void hydrateState(const AppStatePacket& appState, int newChannelIndex);
+    void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIndex);
 
   private:
     actor_system& actorSystem;
     Audio::Mixer* mixer;
-    int channelIndex;
-    int slotIndex;
+    ChannelIndex channelIndex;
+    EffectIndex effectIndex;
     bool occupied;
     QGridLayout grid;
     QLabel title;

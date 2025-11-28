@@ -409,7 +409,7 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
   std::fill_n(audioCore->playbackBuffers[0], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
   std::fill_n(audioCore->playbackBuffers[1], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
 
-  for (int j = 0; j < AUDIO_CORE_DECK_COUNT; j++) {
+  for (DeckIndex j = 0; j < AUDIO_CORE_DECK_COUNT; j++) {
     auto& deck = audioCore->decks[j];
     if (!deck.isPlaying())
       continue;
@@ -508,7 +508,6 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   const int32_t nframes32t = static_cast<int32_t>(nframes);
   for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->effectsChannelCount + 1; effectsChannelIdx++) {
     auto [effectCount, processFuncs, buffers] = audioCore->effectsChannelsProcessData[effectsChannelIdx];
-    buffers[0].inputs = static_cast<float**>(audioCore->playbackBuffers);
     for (EffectIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
       buffers[pluginIdx].numSamples = nframes32t;
 
@@ -561,7 +560,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
   const float nframesF = static_cast<float>(nframes);
   for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < MAX_EFFECTS_CHANNELS; effectsChannelIdx++) {
-    const int bufferIndex = 2 * effectsChannelIdx;
+    const ChannelIndex bufferIndex = 2 * effectsChannelIdx;
     audioCore->vu_buffer_in[bufferIndex] = std::sqrt(rmsL[effectsChannelIdx] / nframesF);
     audioCore->vu_buffer_in[bufferIndex + 1] = std::sqrt(rmsR[effectsChannelIdx] / nframesF);
   }

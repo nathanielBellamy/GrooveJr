@@ -4,10 +4,12 @@
 
 #include "VstWindow.h"
 
+#include "../../../../../types/Types.h"
+
 namespace Gj {
 namespace Gui {
 
-VstWindow::VstWindow(QWidget* parent, int channelIndex, int effectIndex, const AtomicStr& name)
+VstWindow::VstWindow(QWidget* parent, ChannelIndex channelIndex, EffectIndex effectIndex, const AtomicStr& name)
   : QWidget(parent)
   , channelIndex(channelIndex)
   , effectIndex(effectIndex)

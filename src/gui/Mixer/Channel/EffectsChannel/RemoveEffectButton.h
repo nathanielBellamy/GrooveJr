@@ -20,12 +20,12 @@ namespace Gui {
 class RemoveEffectButton final : public QPushButton {
 
   public:
-    RemoveEffectButton(QWidget* parent, int channelIndex, int slotIndex, bool occupied, QAction* action);
-    void hydrateState(const AppStatePacket& appState, int newChannelIdx);
+    RemoveEffectButton(QWidget* parent, ChannelIndex channelIndex, EffectIndex effectIndex, bool occupied, QAction* action);
+    void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx);
 
   private:
-    int channelIndex;
-    int slotIndex;
+    ChannelIndex channelIndex;
+    EffectIndex effectIndex;
     bool occupied;
     QAction* removeEffectAction;
     void mousePressEvent(QMouseEvent* event) override;

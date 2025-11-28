@@ -4,10 +4,11 @@
 
 #include "VstWindowSelectButton.h"
 
+
 namespace Gj {
 namespace Gui {
 
-VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const int effectIndex, const AtomicStr& pluginName, QAction* selectAction)
+VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const EffectIndex effectIndex, const AtomicStr& pluginName, QAction* selectAction)
   : QPushButton(pluginName.c_str(), parent)
   , effectIndex(effectIndex)
   , selectAction(selectAction)
@@ -20,7 +21,7 @@ VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const int effectIn
 }
 
 void VstWindowSelectButton::mousePressEvent(QMouseEvent* event) {
-  selectAction->setData(effectIndex);
+  selectAction->setData(static_cast<quint64>(effectIndex));
   selectAction->activate(QAction::Trigger);
 }
 

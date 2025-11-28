@@ -7,10 +7,16 @@
 namespace Gj {
 namespace Gui {
 
-ReplaceEffectButton::ReplaceEffectButton(QWidget *parent, int channelIndex, int slotIndex, bool occupied, QAction* action)
+ReplaceEffectButton::ReplaceEffectButton(
+  QWidget *parent,
+  const ChannelIndex channelIndex,
+  const EffectIndex effectIndex,
+  const bool occupied,
+  QAction* action
+  )
   : QPushButton("", parent)
   , channelIndex(channelIndex)
-  , slotIndex(slotIndex)
+  , effectIndex(effectIndex)
   , occupied(occupied)
   , replaceEffectAction(action) {
   setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_BrowserReload));
@@ -32,7 +38,7 @@ void ReplaceEffectButton::hydrateState(const AppStatePacket &appState, int newCh
 }
 
 void ReplaceEffectButton::mousePressEvent(QMouseEvent* event) {
-  replaceEffectAction->setData(QVariant(slotIndex));
+  replaceEffectAction->setData(static_cast<quint64>(effectIndex));
   replaceEffectAction->activate(QAction::Trigger);
 }
 

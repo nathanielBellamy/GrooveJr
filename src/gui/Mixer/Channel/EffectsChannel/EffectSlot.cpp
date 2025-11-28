@@ -10,8 +10,8 @@ namespace Gui {
 EffectSlot::EffectSlot(QWidget* parent,
                        actor_system& actorSystem,
                        Audio::Mixer* mixer,
-                       const int channelIndex,
-                       const int slotIndex,
+                       const ChannelIndex channelIndex,
+                       const EffectIndex effectIndex,
                        const bool occupied,
                        QAction* replaceEffectAction,
                        QAction* removeEffectAction)
@@ -19,15 +19,15 @@ EffectSlot::EffectSlot(QWidget* parent,
   , actorSystem(actorSystem)
   , mixer(mixer)
   , channelIndex(channelIndex)
-  , slotIndex(slotIndex)
+  , effectIndex(effectIndex)
   , occupied(occupied)
   , grid(this)
   , title(this)
-  , replaceEffectButton(this, channelIndex, slotIndex, occupied, replaceEffectAction)
-  , removeEffectButton(this, channelIndex, slotIndex, occupied, removeEffectAction)
+  , replaceEffectButton(this, channelIndex, effectIndex, occupied, replaceEffectAction)
+  , removeEffectButton(this, channelIndex, effectIndex, occupied, removeEffectAction)
   , pluginName(this)
   {
-  title.setText(QString::number(slotIndex + 1));
+  title.setText(QString::number(effectIndex + 1));
   title.setFont({title.font().family(), 12});
   pluginName.setFont({pluginName.font().family(), 12});
 
@@ -43,9 +43,9 @@ EffectSlot::~EffectSlot() {
   );
 }
 
-void EffectSlot::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
+void EffectSlot::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIndex) {
   channelIndex = newChannelIndex;
-  const auto name = mixer->getEffectsChannels().at(channelIndex)->getPluginAtIdx(slotIndex)->name;
+  const auto name = mixer->getEffectsChannels().at(channelIndex)->getPluginAtIdx(effectIndex)->name;
   pluginName.setText(name.c_str());
 
   if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {

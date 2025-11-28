@@ -14,6 +14,7 @@
 
 #include "../../../../../Logging.h"
 #include "../../../../../types/AtomicStr.h"
+#include "../../../../../types/Types.h"
 
 namespace Gj {
 namespace Gui {
@@ -22,16 +23,15 @@ using namespace Steinberg::Vst::EditorHost;
 
 class VstWindow final : public QWidget, public IWindow {
 
-private:
-	int channelIndex;
-	int effectIndex;
+	ChannelIndex channelIndex;
+	EffectIndex effectIndex;
 	AtomicStr name;
 	QGridLayout grid;
 	void setStyle();
 	void setupGrid();
 
 public:
-  explicit VstWindow(QWidget* parent, int channelIndex, int effectIndex, const AtomicStr& name);
+  explicit VstWindow(QWidget* parent, ChannelIndex channelIndex, EffectIndex effectIndex, const AtomicStr& name);
 	~VstWindow () noexcept override;
 
 	void show () override;

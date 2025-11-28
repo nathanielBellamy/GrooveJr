@@ -52,14 +52,14 @@ class EffectsChannelsContainer final : public QWidget {
       std::atomic<float>* vuPtr
     );
     void hydrateState(const AppStatePacket& appState);
-    void setMute(int channelIdx, float val) const;
-    void setMuteL(int channelIdx, float val) const;
-    void setMuteR(int channelIdx, float val) const;
-    void setSolo(int channelIdx, float val) const;
-    void setSoloL(int channelIdx, float val) const;
-    void setSoloR(int channelIdx, float val) const;
+    void setMute(ChannelIndex channelIdx, float val) const;
+    void setMuteL(ChannelIndex channelIdx, float val) const;
+    void setMuteR(ChannelIndex channelIdx, float val) const;
+    void setSolo(ChannelIndex channelIdx, float val) const;
+    void setSoloL(ChannelIndex channelIdx, float val) const;
+    void setSoloR(ChannelIndex channelIdx, float val) const;
     void addEffectsChannel();
-    void removeEffectsChannel(int channelIdx);
+    void removeEffectsChannel(ChannelIndex channelIdx);
     void clearEffectsChannels();
     void setEffects() const;
     void setChannels();

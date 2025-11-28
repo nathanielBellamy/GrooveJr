@@ -21,13 +21,13 @@ namespace Gui {
 class ReplaceEffectButton final : public QPushButton {
 
   public:
-    ReplaceEffectButton(QWidget* parent, int channelIndex, int slotIndex, bool occupied, QAction* action);
+    ReplaceEffectButton(QWidget* parent, ChannelIndex channelIndex, EffectIndex effectIndex, bool occupied, QAction* action);
     ~ReplaceEffectButton() override;
     void hydrateState(const AppStatePacket& appState, int newChannelIdx);
 
   private:
-    int channelIndex;
-    int slotIndex;
+    ChannelIndex channelIndex;
+    EffectIndex effectIndex;
     bool occupied;
     QAction* replaceEffectAction;
     void mousePressEvent(QMouseEvent* event) override;

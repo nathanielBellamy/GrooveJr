@@ -76,7 +76,7 @@ public:
   }
 
   [[nodiscard]]
-  Effects::EffectsChannel* getEffectsChannel(int index) const {
+  Effects::EffectsChannel* getEffectsChannel(const ChannelIndex index) const {
     return effectsChannels.at(index);
   }
 
@@ -99,7 +99,7 @@ public:
   bool addEffectToChannel(ChannelIndex channelIndex, const std::string& effectPath) const;
   Result loadEffectOnChannel(const Db::Effect& effectEntity) const;
   void initEditorHostsOnChannel(ChannelIndex idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
-  void initEditorHostOnChannel(ChannelIndex idx, int newEffectChannel, std::shared_ptr<Gui::VstWindow> vstWindow) const;
+  void initEditorHostOnChannel(ChannelIndex idx, EffectIndex newEffectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
   void terminateEditorHostsOnChannel(ChannelIndex idx) const;
 
   Result setSampleRate(uint32_t sampleRate) const;

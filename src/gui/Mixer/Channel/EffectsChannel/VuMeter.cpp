@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-VuMeter::VuMeter(QWidget* parent, Audio::Mixer* mixer, std::atomic<float>* vuPtr, const int channelIndex)
+VuMeter::VuMeter(QWidget* parent, Audio::Mixer* mixer, std::atomic<float>* vuPtr, const ChannelIndex channelIndex)
   : QOpenGLWidget(parent)
   , channelIndex(channelIndex)
   , vao(0)

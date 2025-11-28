@@ -49,8 +49,8 @@ struct AudioCore {
   float                            vu_buffer_in[VU_RING_BUFFER_SIZE]{ 0.0f };
   float                            vu_buffer[VU_RING_BUFFER_SIZE]{ 0.0f };
   jack_ringbuffer_t*               vu_ring_buffer{ nullptr };
-  float*                           processBuffers[2]{ nullptr, nullptr };
   float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{ 0.0f };
+  float*                           processBuffers[2]{ nullptr, nullptr };
   float                            playbackBuffersPre[2][MAX_AUDIO_FRAMES_PER_BUFFER]{ 0.0f };
   float*                           playbackBuffers[2]{ nullptr, nullptr };
   float                            playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{ 0.0f };
@@ -78,17 +78,16 @@ struct AudioCore {
                                    // eCS[4k+3] = {factorRR channel k}
   float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{ 0.0f };
   jack_ringbuffer_t*               effectsChannelsSettingsRB{ nullptr };
-  float*                           effectsChannelsWriteOutBuffer;
-  float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{nullptr};
+  float                            effectsChannelsWriteOutBuffer[2 * MAX_AUDIO_FRAMES_PER_BUFFER * MAX_EFFECTS_CHANNELS]{ 0.0f };
+  float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{ nullptr };
 
   AudioCore(AppState* gAppState)
     : gAppState(gAppState)
     , fft_eq_ring_buffer(jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE))
     , vu_ring_buffer(jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS))
-    , effectsChannelsSettingsRB(jack_ringbuffer_create(EffectsSettings_RB_SIZE))
     , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE))
     , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE))
-    , effectsChannelsWriteOutBuffer(new float[2 * MAX_AUDIO_FRAMES_PER_BUFFER * MAX_EFFECTS_CHANNELS]{0.0f})
+    , effectsChannelsSettingsRB(jack_ringbuffer_create(EffectsSettings_RB_SIZE))
     {
     Logging::write(
       Info,
@@ -116,8 +115,6 @@ struct AudioCore {
     jack_ringbuffer_free(effectsChannelsSettingsRB);
     jack_ringbuffer_free(playbackSettingsToAudioThreadRB);
     jack_ringbuffer_free(playbackSettingsFromAudioThreadRB);
-
-    delete[] effectsChannelsWriteOutBuffer;
 
     Logging::write(
       Info,
@@ -261,7 +258,7 @@ struct AudioCore {
       "Audio::AudioCore::addCassetteFromFilePath",
       "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
     );
-    const int nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    const DeckIndex nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
     deckIndex = nextDeckIndex;
     deckIndexNext = nextDeckIndex;
     if (decks[deckIndex].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
@@ -282,7 +279,7 @@ struct AudioCore {
     return OK;
   }
 
-  Result addCassetteFromDecoratedAudioFileAtIdx(const Db::DecoratedAudioFile& decoratedAudioFile, const int deckIndexToSet) {
+  Result addCassetteFromDecoratedAudioFileAtIdx(const Db::DecoratedAudioFile& decoratedAudioFile, const DeckIndex deckIndexToSet) {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromFilePath",
@@ -306,7 +303,7 @@ struct AudioCore {
     return OK;
   }
 
-  Result setChannelCount(float val) {
+  Result setChannelCount(const float val) {
     effectsChannelCount = static_cast<ChannelIndex>(val);
     channelCount = val;
     return OK;
@@ -348,7 +345,7 @@ struct AudioCore {
     return decks[deckIndex];
   }
 
-  float getDeckGain(const int di) {
+  float getDeckGain(const DeckIndex di) const {
     const auto& deck = decks[di];
     const float frameIdF = static_cast<float>(deck.frameId);
     const float framesF = static_cast<float>(deck.frames);
@@ -381,16 +378,16 @@ struct AudioCore {
     return 0.0f;
   }
 
-  Result setPlayStateAllDecks(PlayState playState) {
-    for (int i = 0; i < AUDIO_CORE_DECK_COUNT; i++)
-        decks[i].playState = playState;
+  Result setPlayStateAllDecks(const PlayState playState) {
+    for (DeckIndex i = 0; i < AUDIO_CORE_DECK_COUNT; i++)
+      decks[i].playState = playState;
 
     return OK;
   }
 
-  Result setFrameIdAllDecks(sf_count_t frameId) {
-    for (int i = 0; i < AUDIO_CORE_DECK_COUNT; i++)
-        decks[i].frameId = frameId;
+  Result setFrameIdAllDecks(const sf_count_t frameId) const {
+    for (DeckIndex i = 0; i < AUDIO_CORE_DECK_COUNT; i++)
+      decks[i].frameId = frameId;
 
     return OK;
   }

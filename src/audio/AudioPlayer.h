@@ -140,7 +140,7 @@ struct AudioPlayer {
     );
 
     // populate initial channel settings
-    for (int i = 0; i < mixer->getEffectsChannelsCount() + 1; i++) {
+    for (int i = 0; i < mixer->getTotalChannelsCount(); i++) {
       effectsChannelsSettings[4 * i]     = mixer->getEffectsChannel(i)->getGain();
       effectsChannelsSettings[4 * i + 1] = mixer->getEffectsChannel(i)->getMute();
       effectsChannelsSettings[4 * i + 2] = mixer->getEffectsChannel(i)->getSolo();
@@ -160,7 +160,7 @@ struct AudioPlayer {
     );
 
     audioCore->setChannelCount(
-      static_cast<float>(mixer->getEffectsChannelsCount())
+      static_cast<float>(mixer->getTotalChannelsCount())
     );
     for (const auto ch : mixer->getEffectsChannels()) {
       const auto chIndex = ch->getIndex();
@@ -179,60 +179,44 @@ struct AudioPlayer {
           };
 
         audioCore->effectsChannelsProcessData[chIndex].buffers[pluginIdx] =
-          getPluginBuffers(ch, chIndex, pluginIdx, audioCore);
+          getPluginBuffers(ch, chIndex, pluginIdx);
       }
     }
 
     Logging::write(
       Info,
       "Audio::AudioPlayer::setupAudioCore",
-      "Setup AudioCore Effects processing."
-    );
-
-    Logging::write(
-      Info,
-      "Audio::AudioPlayer::setupAudioCore",
-      "Successfully setup AudioCore."
+      "Setup AudioCore Effects processing. Successfully setup AudioCore."
     );
 
     return 0;
   }
 
-  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const ChannelIndex channelIdx, const EffectIndex pluginIdx, AudioCore* audioCore) const {
-    if (channelIdx == 0) // main
-      return {
-        audioCore->processBuffers,
-        2,
-        audioCore->processBuffers,
-        2,
-        static_cast<int32_t>(gAppState->getAudioFramesPerBuffer())
-      };
-
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const ChannelIndex channelIdx, const EffectIndex pluginIdx) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
 
-    // NOTE: input buffers will be updated to audioCore->playbackBuffers when pluginIdx = 0 in JackClient::processCallback
-    if (const size_t effectsCount = effectsChannel->effectCount(); pluginIdx == effectsCount - 1) {
-      const auto writeOut = const_cast<float**>(audioCore->effectsChannelsWriteOut[channelIdx]);
-      return {
-        audioCore->processBuffers,
-        2,
-        writeOut,
-        2,
-        audioFramesPerBuffer
-      };
-    }
+    // - each channel gets processed into it's effectChannelWriteOut
+    // - the channels are then summed down into the processBuffers
+    // - the main channel then acts upon the processBuffers
+    float** inputBuffers = audioCore->processBuffers;
+    float** outputBuffers = audioCore->processBuffers;
+
+    if (channelIdx > 0 && pluginIdx == 0)
+      inputBuffers = audioCore->playbackBuffers;
+
+    if (const size_t effectsCount = effectsChannel->effectCount(); channelIdx > 0 && pluginIdx == effectsCount - 1)
+      outputBuffers = const_cast<float**>(audioCore->effectsChannelsWriteOut[channelIdx]);
 
     return {
-      audioCore->processBuffers,
+      inputBuffers,
       2,
-      audioCore->processBuffers,
+      outputBuffers,
       2,
       audioFramesPerBuffer
     };
   }
 
   Result updateRingBuffers(const size_t channelCount) {
-    std::cout << "Audio::AudioPlayer::updateRingBuffers: " << channelCount << std::endl;
     // read vu_ring_buffer
     if (jack_ringbuffer_read_space(audioCore->vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
       jack_ringbuffer_read(

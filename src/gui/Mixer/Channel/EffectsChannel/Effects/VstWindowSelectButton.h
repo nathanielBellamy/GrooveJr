@@ -10,17 +10,18 @@
 #include <QPushButton>
 
 #include "../../../../../types/AtomicStr.h"
+#include "../../../../../types/Types.h"
 
 namespace Gj {
 namespace Gui {
 
 class VstWindowSelectButton final : public QPushButton {
-  int effectIndex;
+  EffectIndex effectIndex;
   QAction* selectAction;
   void mousePressEvent(QMouseEvent* event) override;
 
   public:
-    VstWindowSelectButton(QWidget* parent, int effectIndex, const AtomicStr& pluginName, QAction* selectAction);
+    VstWindowSelectButton(QWidget* parent, EffectIndex effectIndex, const AtomicStr& pluginName, QAction* selectAction);
 };
 
 } // Gui

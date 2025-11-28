@@ -7,10 +7,16 @@
 namespace Gj {
 namespace Gui {
 
-RemoveEffectButton::RemoveEffectButton(QWidget *parent, int channelIndex, int slotIndex, bool occupied, QAction* action)
+RemoveEffectButton::RemoveEffectButton(
+  QWidget* parent,
+  const ChannelIndex channelIndex,
+  const EffectIndex effectIndex,
+  const bool occupied,
+  QAction* action
+  )
   : QPushButton("", parent)
   , channelIndex(channelIndex)
-  , slotIndex(slotIndex)
+  , effectIndex(effectIndex)
   , occupied(occupied)
   , removeEffectAction(action) {
   setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
@@ -18,12 +24,12 @@ RemoveEffectButton::RemoveEffectButton(QWidget *parent, int channelIndex, int sl
   setStyle();
 }
 
-void RemoveEffectButton::hydrateState(const AppStatePacket &appState, int newChannelIdx) {
+void RemoveEffectButton::hydrateState(const AppStatePacket &appState, ChannelIndex newChannelIdx) {
   channelIndex = newChannelIdx;
 }
 
 void RemoveEffectButton::mousePressEvent(QMouseEvent* event) {
-  removeEffectAction->setData(QVariant(slotIndex));
+  removeEffectAction->setData(static_cast<quint64>(effectIndex));
   removeEffectAction->activate(QAction::Trigger);
 }
 

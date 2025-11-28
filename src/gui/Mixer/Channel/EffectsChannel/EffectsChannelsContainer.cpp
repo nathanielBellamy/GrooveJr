@@ -90,7 +90,7 @@ void EffectsChannelsContainer::addEffectsChannel() {
     channels.front()->updateShowRemoveEffectsChannelButton(true);
 }
 
-void EffectsChannelsContainer::removeEffectsChannel(const int channelIdx) {
+void EffectsChannelsContainer::removeEffectsChannel(const ChannelIndex channelIdx) {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::removeEffectsChannel",
@@ -266,27 +266,45 @@ void EffectsChannelsContainer::setupChannelsScrollArea() {
   channelsWidget.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 }
 
-void EffectsChannelsContainer::setMute(const int channelIdx, const float val) const {
+void EffectsChannelsContainer::setMute(const ChannelIndex channelIdx, const float val) const {
+  if (!channelIdx)
+    return;
+
   channels.at(channelIdx - 1)->setMute(val);
 }
 
-void EffectsChannelsContainer::setMuteL(const int channelIdx, const float val) const {
+void EffectsChannelsContainer::setMuteL(const ChannelIndex channelIdx, const float val) const {
+  if (!channelIdx)
+    return;
+
   channels.at(channelIdx - 1)->setMuteL(val);
 }
 
-void EffectsChannelsContainer::setMuteR(const int channelIdx, const float val) const {
+void EffectsChannelsContainer::setMuteR(const ChannelIndex channelIdx, const float val) const {
+  if (!channelIdx)
+    return;
+
   channels.at(channelIdx - 1)->setMuteR(val);
 }
 
-void EffectsChannelsContainer::setSolo(const int channelIdx, const float val) const {
+void EffectsChannelsContainer::setSolo(const ChannelIndex channelIdx, const float val) const {
+  if (!channelIdx)
+    return;
+
   channels.at(channelIdx - 1)->setSolo(val);
 }
 
-void EffectsChannelsContainer::setSoloL(const int channelIdx, const float val) const {
+void EffectsChannelsContainer::setSoloL(const ChannelIndex channelIdx, const float val) const {
+  if (!channelIdx)
+    return;
+
   channels.at(channelIdx - 1)->setSoloL(val);
 }
 
-void EffectsChannelsContainer::setSoloR(const int channelIdx, const float val) const {
+void EffectsChannelsContainer::setSoloR(const ChannelIndex channelIdx, const float val) const {
+  if (!channelIdx)
+    return;
+
   channels.at(channelIdx - 1)->setSoloR(val);
 }
 

@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex, QAction* addEffectAction)
+EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, const ChannelIndex channelIndex, QAction* addEffectAction)
   : QWidget(nullptr)
   , mixer(mixer)
   , channelIndex(channelIndex)
@@ -51,7 +51,7 @@ EffectsContainer::~EffectsContainer() {
 
 void EffectsContainer::connectActions() {
   auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
-    const int effectIndex = selectVstWindowAction.data().toInt();
+    const EffectIndex effectIndex = selectVstWindowAction.data().toULongLong();
     vstWindows.at(effectIndex)->activateWindow();
     vstWindows.at(effectIndex)->raise();
     activateWindow();
@@ -104,7 +104,7 @@ void EffectsContainer::showEvent(QShowEvent *event) {
   );
 }
 
-void EffectsContainer::addEffect(const int newEffectIndex, const AtomicStr& pluginName) {
+void EffectsContainer::addEffect(const EffectIndex newEffectIndex, const AtomicStr& pluginName) {
   auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, newEffectIndex, pluginName);
   vstWindows.push_back(std::move(vstWindow));
   vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, newEffectIndex, pluginName, &selectVstWindowAction));

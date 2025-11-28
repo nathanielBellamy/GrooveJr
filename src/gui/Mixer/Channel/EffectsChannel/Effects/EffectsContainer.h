@@ -22,6 +22,7 @@
 #include "../../../../../audio/Mixer.h"
 #include "../../../../../Logging.h"
 #include "../../../../../types/AtomicStr.h"
+#include "../../../../../types/Types.h"
 
 namespace Gj {
 namespace Gui {
@@ -29,13 +30,13 @@ namespace Gui {
 class EffectsContainer final : public QWidget {
 
   public:
-    EffectsContainer(QWidget* parent, Audio::Mixer* mixer, int channelIndex, QAction* addEffectAction);
+    EffectsContainer(QWidget* parent, Audio::Mixer* mixer, ChannelIndex channelIndex, QAction* addEffectAction);
     ~EffectsContainer() override;
-    void addEffect(int newEffectIndex, const AtomicStr& pluginName);
+    void addEffect(EffectIndex newEffectIndex, const AtomicStr& pluginName);
 
   private:
     Audio::Mixer* mixer;
-    int channelIndex;
+    ChannelIndex channelIndex;
     QAction* addEffectAction;
     AddEffectButton addEffectButton;
     QGridLayout grid;

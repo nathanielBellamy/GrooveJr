@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-RemoveEffectsChannelButton::RemoveEffectsChannelButton(QWidget *parent, int channelIndex, QAction* action)
+RemoveEffectsChannelButton::RemoveEffectsChannelButton(QWidget *parent, ChannelIndex channelIndex, QAction* action)
   : QPushButton("", parent)
   , channelIndex(channelIndex)
   , removeEffectsChannelAction(action) {
@@ -25,13 +25,13 @@ RemoveEffectsChannelButton::~RemoveEffectsChannelButton() {
 }
 
 
-void RemoveEffectsChannelButton::hydrateState(const AppStatePacket &appState, const int newChannelIdx) {
+void RemoveEffectsChannelButton::hydrateState(const AppStatePacket &appState, const ChannelIndex newChannelIdx) {
   channelIndex = newChannelIdx;
 }
 
 
 void RemoveEffectsChannelButton::mousePressEvent(QMouseEvent* event) {
-  removeEffectsChannelAction->setData(QVariant(channelIndex));
+  removeEffectsChannelAction->setData(static_cast<quint64>(channelIndex));
   removeEffectsChannelAction->activate(QAction::Trigger);
 }
 
