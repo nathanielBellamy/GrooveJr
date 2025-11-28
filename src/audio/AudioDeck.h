@@ -16,6 +16,7 @@
 #include "../enums/Result.h"
 #include "../enums/PlayState.h"
 #include "../db/dto/musicLibrary/DecoratedAudioFile.h"
+#include "../types/Types.h"
 
 namespace Gj {
 namespace Audio {
@@ -24,7 +25,7 @@ constexpr sf_count_t MIN_FADE_IN = 500;
 constexpr sf_count_t MIN_FADE_OUT = 500;
 
 struct AudioDeck {
-  int                                   deckIndex;
+  DeckIndex                             deckIndex;
   PlayState                             playState = STOP;
   AppState*                             gAppState;
   mutable sf_count_t                    frameId = 0;
@@ -35,7 +36,7 @@ struct AudioDeck {
   Cassette*                             cassette;
   std::optional<Db::DecoratedAudioFile> decoratedAudioFile;
 
-  AudioDeck(const int deckIndex, AppState* gAppState)
+  AudioDeck(const DeckIndex deckIndex, AppState* gAppState)
     : deckIndex(deckIndex)
     , gAppState(gAppState)
     , cassette(new Cassette(gAppState))

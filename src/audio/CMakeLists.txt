@@ -26,7 +26,6 @@ endif()
 
 set (C_LIBS_INCLUDE_FLAGS
         -I${C_LIBS_HOME}/libsndfile/1.2.2/include
-        -I${C_LIBS_HOME}/portaudio/19.7.0/include
         -I${C_LIBS_HOME}/fftw/3.3.10_2/include
 )
 
@@ -42,8 +41,6 @@ set (INCLUDE_FLAGS
 set (LINK_FLAGS
         -L${C_LIBS_HOME}/libsndfile/1.2.2/lib
         -lsndfile
-        -L${C_LIBS_HOME}/portaudio/19.7.0/lib
-        -lportaudio
         -L${VST3SDK_HOME}/build/lib/Release
         -lsdk
         -L${VST3SDK_HOME}/build/lib/Release

@@ -162,28 +162,24 @@ struct AudioPlayer {
     audioCore->setChannelCount(
       static_cast<float>(mixer->getEffectsChannelsCount())
     );
-    for (const auto effectsChannel : mixer->getEffectsChannels()) {
-      const auto effectsChannelIdx = effectsChannel->getIndex();
-      audioCore->effectsChannelsProcessData[effectsChannelIdx].effectCount = effectsChannel->effectCount();
-      audioCore->effectsChannelsSettings[2 * effectsChannelIdx] = effectsChannel->getGain();
-      audioCore->effectsChannelsSettings[2 * effectsChannelIdx + 1] = effectsChannel->getPan();
+    for (const auto ch : mixer->getEffectsChannels()) {
+      const auto chIndex = ch->getIndex();
+      audioCore->effectsChannelsSettings[2 * chIndex] = ch->getGain();
+      audioCore->effectsChannelsSettings[2 * chIndex + 1] = ch->getPan();
 
-      for (EffectIndex pluginIdx = 0; pluginIdx < effectsChannel->effectCount(); pluginIdx++) {
-        const auto plugin = effectsChannel->getPluginAtIdx(pluginIdx);
-        audioCore->effectsChannelsProcessData[effectsChannelIdx].processFuncs[pluginIdx] =
-          [ObjectPtr = plugin->audioHost->audioClient](auto && PH1, auto && PH2) { return ObjectPtr->process(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2)); };
-
-        if (effectsChannelIdx == 0) { // main channel
-          audioCore->effectsChannelsProcessData[0].buffers[pluginIdx] = {
-            audioCore->processBuffers,
-            2,
-            audioCore->processBuffers,
-            2,
-            static_cast<int32_t>(gAppState->getAudioFramesPerBuffer())
+      audioCore->effectsChannelsProcessData[chIndex].effectCount = ch->effectCount();
+      for (EffectIndex pluginIdx = 0; pluginIdx < ch->effectCount(); pluginIdx++) {
+        const auto plugin = ch->getPluginAtIdx(pluginIdx);
+        audioCore->effectsChannelsProcessData[chIndex].processFuncs[pluginIdx] =
+          [audioClient = plugin->audioHost->audioClient](auto && buffers, auto && continuousFrames) {
+            return audioClient->process(
+              std::forward<decltype(buffers)>(buffers),
+              std::forward<decltype(continuousFrames)>(continuousFrames)
+            );
           };
-        } else {
-          audioCore->effectsChannelsProcessData[effectsChannelIdx].buffers[pluginIdx] = getPluginBuffers(effectsChannel, effectsChannelIdx, pluginIdx, audioCore);
-        }
+
+        audioCore->effectsChannelsProcessData[chIndex].buffers[pluginIdx] =
+          getPluginBuffers(ch, chIndex, pluginIdx, audioCore);
       }
     }
 
@@ -202,11 +198,20 @@ struct AudioPlayer {
     return 0;
   }
 
-  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const ChannelIndex channelIdx, const int pluginIdx, AudioCore* audioCore) const {
+  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const ChannelIndex channelIdx, const EffectIndex pluginIdx, AudioCore* audioCore) const {
+    if (channelIdx == 0) // main
+      return {
+        audioCore->processBuffers,
+        2,
+        audioCore->processBuffers,
+        2,
+        static_cast<int32_t>(gAppState->getAudioFramesPerBuffer())
+      };
+
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
 
     // NOTE: input buffers will be updated to audioCore->playbackBuffers when pluginIdx = 0 in JackClient::processCallback
-    if (const int effectsCount = effectsChannel->effectCount(); pluginIdx == effectsCount - 1) {
+    if (const size_t effectsCount = effectsChannel->effectCount(); pluginIdx == effectsCount - 1) {
       const auto writeOut = const_cast<float**>(audioCore->effectsChannelsWriteOut[channelIdx]);
       return {
         audioCore->processBuffers,
@@ -226,7 +231,8 @@ struct AudioPlayer {
     };
   }
 
-  Result updateRingBuffers(const int channelCount) {
+  Result updateRingBuffers(const size_t channelCount) {
+    std::cout << "Audio::AudioPlayer::updateRingBuffers: " << channelCount << std::endl;
     // read vu_ring_buffer
     if (jack_ringbuffer_read_space(audioCore->vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
       jack_ringbuffer_read(
@@ -262,13 +268,12 @@ struct AudioPlayer {
     }
 
     // read playbackSettingsFromAudioThread ring buffer
-    if (jack_ringbuffer_read_space(audioCore->playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
+    if (jack_ringbuffer_read_space(audioCore->playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2)
       jack_ringbuffer_read(
         audioCore->playbackSettingsFromAudioThreadRB,
         reinterpret_cast<char*>(playbackSettingsFromAudioThread),
         PlaybackSettingsFromAudioThread_RB_SIZE
       );
-    }
 
     const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
     mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, currentFrameId);
@@ -366,23 +371,23 @@ struct AudioPlayer {
       );
     }
 
-    std::cout << "effectsChannelSettings = "
-      << effectsChannelsSettings[0] << std::endl
-      << effectsChannelsSettings[1] << std::endl
-      << effectsChannelsSettings[2] << std::endl
-      << effectsChannelsSettings[3] << std::endl
-      << effectsChannelsSettings[4] << std::endl
-      << effectsChannelsSettings[5] << std::endl
-      << effectsChannelsSettings[6] << std::endl
-      << effectsChannelsSettings[7] << std::endl
-      << effectsChannelsSettings[8] << std::endl
-      << effectsChannelsSettings[9] << std::endl
-      << effectsChannelsSettings[10] << std::endl
-      << effectsChannelsSettings[11] << std::endl
-      << effectsChannelsSettings[12] << std::endl;
+    // std::cout << "effectsChannelSettings = "
+    //   << effectsChannelsSettings[0] << std::endl
+    //   << effectsChannelsSettings[1] << std::endl
+    //   << effectsChannelsSettings[2] << std::endl
+    //   << effectsChannelsSettings[3] << std::endl
+    //   << effectsChannelsSettings[4] << std::endl
+    //   << effectsChannelsSettings[5] << std::endl
+    //   << effectsChannelsSettings[6] << std::endl
+    //   << effectsChannelsSettings[7] << std::endl
+    //   << effectsChannelsSettings[8] << std::endl
+    //   << effectsChannelsSettings[9] << std::endl
+    //   << effectsChannelsSettings[10] << std::endl
+    //   << effectsChannelsSettings[11] << std::endl
+    //   << effectsChannelsSettings[12] << std::endl;
 
     // write to effectsSettings ring buffer
-    if (jack_ringbuffer_write_space(audioCore->effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE) {
+    if (jack_ringbuffer_write_space(audioCore->effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE - 2) {
       jack_ringbuffer_write(audioCore->effectsChannelsSettingsRB, reinterpret_cast<char*>(effectsChannelsSettings), EffectsSettings_RB_SIZE);
     }
 
@@ -423,7 +428,7 @@ struct AudioPlayer {
       "Playing"
     );
 
-    const int channelCount = mixer->getEffectsChannelsCount() + 1;
+    const size_t channelCount = mixer->getEffectsChannelsCount() + 1;
 
     createRingBuffers();
 

@@ -48,7 +48,6 @@ set (INCLUDE_FLAGS
         -I${GJ_BASE_DIR}/actor-framework/libcaf_io
         -I${VST3SDK_HOME}
         -I${C_LIBS_HOME}/libsndfile/1.2.2/include
-        -I${C_LIBS_HOME}/portaudio/19.7.0/include
 )
 # utilize vst3sdk cmake modules
 list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")

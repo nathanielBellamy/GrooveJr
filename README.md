@@ -10,7 +10,7 @@
 - taglib
 - sqlite
 - CMake
-- C++ 17
+- C++17
 
 ---
 

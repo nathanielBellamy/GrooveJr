@@ -18,7 +18,7 @@ namespace Effects {
 
 struct EffectsChannelProcessData {
   // NOTE: handles at most 100 effects per channel
-  int effectCount;
+  size_t effectCount;
   std::array<std::function<bool(Steinberg::Vst::IAudioClient::Buffers&, int64_t frames)>, MAX_PLUGINS_PER_CHANNEL> processFuncs{};
   std::array<Steinberg::Vst::IAudioClient::Buffers, MAX_PLUGINS_PER_CHANNEL> buffers{};
 

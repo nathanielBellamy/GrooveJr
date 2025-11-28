@@ -531,7 +531,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   for (int i = 0; i < nframes; i++) {
     float accumL = 0.0f;
     float accumR = 0.0f;
-    for (int effectsChannelIdx = 1; effectsChannelIdx < audioCore->effectsChannelCount + 1; effectsChannelIdx++) {
+    for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->effectsChannelCount + 1; effectsChannelIdx++) {
       const float factorLL = audioCore->effectsChannelsSettings[4 * effectsChannelIdx];
       const float factorLR = audioCore->effectsChannelsSettings[4 * effectsChannelIdx + 1];
       const float factorRL = audioCore->effectsChannelsSettings[4 * effectsChannelIdx + 2];
@@ -583,7 +583,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   const float factorRL = audioCore->effectsChannelsSettings[2];
   const float factorRR = audioCore->effectsChannelsSettings[3];
 
-  for (int chan = 0; chan < 2; chan++) {
+  for (size_t chan = 0; chan < 2; chan++) {
     std::copy(
       std::begin(audioCore->fft_eq_time[chan]) + nframes,
       std::end(audioCore->fft_eq_time[chan]),
