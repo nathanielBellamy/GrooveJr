@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 
 #include <jack/jack.h>
 #include <jack/midiport.h>

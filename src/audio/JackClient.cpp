@@ -530,7 +530,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   float rmsL[MAX_EFFECTS_CHANNELS] = { 0.0f };
   float rmsR[MAX_EFFECTS_CHANNELS] = { 0.0f };
   // sum down
-  for (int i = 0; i < nframes; i++) {
+  for (jack_nframes_t i = 0; i < nframes; i++) {
     float accumL = 0.0f;
     float accumR = 0.0f;
     for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < MAX_EFFECTS_CHANNELS; effectsChannelIdx++) {
@@ -545,10 +545,16 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
         valL = factorLL * audioCore->playbackBuffers[0][i] + factorRL * audioCore->playbackBuffers[1][i];
         valR = factorLR * audioCore->playbackBuffers[0][i] + factorRR * audioCore->playbackBuffers[1][i];
       } else {
-        valL = factorLL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
-                                          factorRL * audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
-        valR = factorLR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i] +
-                                          factorRR * audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+        const auto writeOutValL =
+          std::isnan(audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i])
+            ? 0.0f
+            : audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i];
+        const auto writeOutValR =
+          std::isnan(audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i])
+            ? 0.0f
+            : audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+        valL = factorLL * writeOutValL + factorRL * writeOutValR;
+        valR = factorLR * writeOutValL + factorRR * writeOutValR;
       }
 
       accumL += valL;
@@ -573,10 +579,10 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   for (EffectIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
     buffers[pluginIdx].numSamples = static_cast<int32_t>(nframes);
 
-    // processFuncs[pluginIdx](
-    //   buffers[pluginIdx],
-    //   nframes
-    // );
+    processFuncs[pluginIdx](
+      buffers[pluginIdx],
+      nframes
+    );
   }
 
   // write out processed main channel to audio out
