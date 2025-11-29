@@ -516,6 +516,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
         nframes
       );
     }
+    std::fill_n(audioCore->effectsChannelsWriteOut[effectsChannelIdx][0], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
+    std::fill_n(audioCore->effectsChannelsWriteOut[effectsChannelIdx][1], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
   }
 
   // read channel settings from ringbuffer
@@ -604,9 +606,19 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     // - outputing playbackBuffers directly works great
     // const float valL = audioCore->playbackBuffers[0][i];
     // const float valR = audioCore->playbackBuffers[1][i];
+    const float pbValL =
+      std::isnan(audioCore->processBuffers[0][i])
+        ? 0.0f
+        : audioCore->processBuffers[0][i];
 
-    const float valL = factorLL * audioCore->processBuffers[0][i] + factorRL * audioCore->processBuffers[1][i];
-    const float valR = factorLR * audioCore->processBuffers[0][i] + factorRR * audioCore->processBuffers[1][i];
+    const float pbValR =
+      std::isnan(audioCore->processBuffers[1][i])
+        ? 0.0f
+        : audioCore->processBuffers[1][i];
+
+
+    const float valL = factorLL * pbValL + factorRL * pbValR;
+    const float valR = factorLR * pbValL + factorRR * pbValR;
 
     rmsL[0] += valL * valL;
     rmsR[0] += valR * valR;
