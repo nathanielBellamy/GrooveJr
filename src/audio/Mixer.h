@@ -39,7 +39,6 @@ class JackClient;
 class Mixer {
   AppState* gAppState;
   std::shared_ptr<JackClient> jackClient;
-  float channelCount;
   std::vector<Effects::EffectsChannel*> effectsChannels;
   std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
   std::function<void(jack_ringbuffer_t* eqRingBuffer)> setEqRingBufferFunc;

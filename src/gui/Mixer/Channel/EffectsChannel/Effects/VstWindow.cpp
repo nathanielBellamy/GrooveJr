@@ -9,7 +9,7 @@
 namespace Gj {
 namespace Gui {
 
-VstWindow::VstWindow(QWidget* parent, ChannelIndex channelIndex, EffectIndex effectIndex, const AtomicStr& name)
+VstWindow::VstWindow(QWidget* parent, const ChannelIndex channelIndex, const EffectIndex effectIndex, const AtomicStr& name)
   : QWidget(parent)
   , channelIndex(channelIndex)
   , effectIndex(effectIndex)

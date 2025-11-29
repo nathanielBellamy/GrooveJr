@@ -122,7 +122,7 @@ struct PlaybackState {
                );
              }
 
-             actor replyToActor = actor_cast<actor>(reply_to);
+             const actor replyToActor = actor_cast<actor>(reply_to);
              self->anon_send(
                  replyToActor,
                  actor_cast<strong_actor_ptr>(self),

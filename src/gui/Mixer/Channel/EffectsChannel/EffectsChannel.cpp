@@ -33,11 +33,11 @@ EffectsChannel::EffectsChannel(
   , removeEffectsChannelButton(this, channelIndex, removeEffectsChannelAction)
   , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
   , addEffectButton(this, &addEffectAction)
-  , effectsContainer(nullptr, mixer, channelIndex, &addEffectAction)
   , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Effects"), this)
   , vstSelect(this)
   , replaceEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentRevert), tr("&Replace Effect"), this)
   , removeEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Effect"), this)
+  , effectsContainer(nullptr, mixer, channelIndex, &addEffectAction, &removeEffectAction)
   , grid(this)
   , title(this)
   , gainSlider(Qt::Vertical, this)
@@ -365,7 +365,7 @@ void EffectsChannel::connectActions() {
           "Unable to add effect " + effectPath + " to channel " + std::to_string(channelIndex)
         );
       } else {
-        addEffect(std::nullopt);
+        addEffect(std::optional<EffectIndex>());
 
         appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
         const scoped_actor self{ actorSystem };

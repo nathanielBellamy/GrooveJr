@@ -52,10 +52,9 @@ struct AudioCore {
   float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{ 0.0f };
   float*                           processBuffers[2]{ nullptr, nullptr };
   float                            playbackBuffersPre[2][MAX_AUDIO_FRAMES_PER_BUFFER]{ 0.0f };
-  float*                           playbackBuffers[2]{ nullptr, nullptr };
   float                            playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{ 0.0f };
+  float*                           playbackBuffers[2]{ nullptr, nullptr };
   float                            fftFreqBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{ 0.0f };
-  float                            channelCount;
   sf_count_t                       playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{0};
   jack_ringbuffer_t*               playbackSettingsToAudioThreadRB{ nullptr };
                                    // pSTATRB[0] = userSettingFrameId bool
@@ -143,9 +142,12 @@ struct AudioCore {
     fft_pv_plan_c2r = fftwf_plan_dft_c2r_1d(FFT_PV_FREQ_SIZE, fft_pv_freq_shift, fft_pv_time, FFTW_ESTIMATE);
 
     for (ChannelIndex i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-      effectsChannelsWriteOut[i][0] = effectsChannelsWriteOutBuffer + 2 * i * MAX_AUDIO_FRAMES_PER_BUFFER;
-      effectsChannelsWriteOut[i][1] = effectsChannelsWriteOutBuffer + (2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER;
+      effectsChannelsWriteOut[i][0] = &effectsChannelsWriteOutBuffer[2 * i * MAX_AUDIO_FRAMES_PER_BUFFER];
+      effectsChannelsWriteOut[i][1] = &effectsChannelsWriteOutBuffer[(2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER];
     }
+
+    std::cout << " audio core init  ecwo" << effectsChannelsWriteOut[3][1][40] << std::endl;
+    std::cout << " audio core init pb" << processBuffers[1][101] << std::endl;
 
     Logging::write(
       Info,
@@ -255,7 +257,7 @@ struct AudioCore {
   Result addCassetteFromDecoratedAudioFile(const Db::DecoratedAudioFile& decoratedAudioFile) {
     Logging::write(
       Info,
-      "Audio::AudioCore::addCassetteFromFilePath",
+      "Audio::AudioCore::addCassetteFromDecoratedAudioFile",
       "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
     );
     const DeckIndex nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
@@ -264,7 +266,7 @@ struct AudioCore {
     if (decks[deckIndex].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
       Logging::write(
         Error,
-        "Audio::AudioCore::addCassetteFromFilePath",
+        "Audio::AudioCore::addCassetteFromDecoratedAudioFile",
         "Unable to set Cassette from DecoratedAudioFile. Path: " + decoratedAudioFile.audioFile.filePath
       );
       return ERROR;
@@ -273,7 +275,7 @@ struct AudioCore {
 
     Logging::write(
       Info,
-      "Audio::AudioCore::addCassetteFromFilePath",
+      "Audio::AudioCore::addCassetteFromDecoratedAudioFile",
       "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
     );
     return OK;
@@ -282,13 +284,13 @@ struct AudioCore {
   Result addCassetteFromDecoratedAudioFileAtIdx(const Db::DecoratedAudioFile& decoratedAudioFile, const DeckIndex deckIndexToSet) {
     Logging::write(
       Info,
-      "Audio::AudioCore::addCassetteFromFilePath",
+      "Audio::AudioCore::addCassetteFromDecoratedAudioFileAtIdx",
       "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
     );
     if (decks[deckIndexToSet].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
       Logging::write(
         Error,
-        "Audio::AudioCore::addCassetteFromFilePath",
+        "Audio::AudioCore::addCassetteFromDecoratedAudioFileAtIdx",
         "Unable to set Cassette from DecoratedAudioFile. Path: " + decoratedAudioFile.audioFile.filePath
       );
       return ERROR;
@@ -297,15 +299,14 @@ struct AudioCore {
 
     Logging::write(
       Info,
-      "Audio::AudioCore::addCassetteFromFilePath",
+      "Audio::AudioCore::addCassetteFromDecoratedAudioFileAtIdx",
       "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
     );
     return OK;
   }
 
-  Result setChannelCount(const float val) {
-    effectsChannelCount = static_cast<ChannelIndex>(val);
-    channelCount = val;
+  Result setChannelCount(const ChannelIndex val) {
+    effectsChannelCount = val;
     return OK;
   }
 

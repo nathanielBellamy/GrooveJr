@@ -30,7 +30,13 @@ namespace Gui {
 class EffectsContainer final : public QWidget {
 
   public:
-    EffectsContainer(QWidget* parent, Audio::Mixer* mixer, ChannelIndex channelIndex, QAction* addEffectAction);
+    EffectsContainer(
+      QWidget* parent,
+      Audio::Mixer* mixer,
+      ChannelIndex channelIndex,
+      QAction* addEffectAction,
+      QAction* removeEffectAction
+    );
     ~EffectsContainer() override;
     void addEffect(EffectIndex newEffectIndex, const AtomicStr& pluginName);
 
@@ -39,6 +45,7 @@ class EffectsContainer final : public QWidget {
     ChannelIndex channelIndex;
     QAction* addEffectAction;
     AddEffectButton addEffectButton;
+    QAction* removeEffectAction;
     QGridLayout grid;
     std::vector<std::shared_ptr<VstWindow>> vstWindows {};
     QAction selectVstWindowAction;

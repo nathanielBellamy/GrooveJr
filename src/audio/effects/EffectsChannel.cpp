@@ -100,8 +100,8 @@ bool EffectsChannel::addReplaceEffect(const std::optional<EffectIndex> effectIdx
   // int latencySamples = processor->getLatencySamples();
   // incorporateLatencySamples(latencySamples);
 
-	std::cout << "got processor " << std::endl;
-  if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer)) {
+	const auto gAppStateAudioFramesPerBuffer = static_cast<int32>(gAppState->getAudioFramesPerBuffer());
+  if (!processor->canProcessSampleSize(gAppStateAudioFramesPerBuffer)) {
 		Logging::write(
 			Warning,
 			"Audio::EffectsChannel::addReplaceEffect",
@@ -115,7 +115,7 @@ bool EffectsChannel::addReplaceEffect(const std::optional<EffectIndex> effectIdx
   // Vst::SpeakerArrangement arrangement;
   // processor->getBusArrangement(busDirection, index, arrangement);
 
-  const int32 maxSamplesPerBlock = gAppState->audioFramesPerBuffer;
+  const int32 maxSamplesPerBlock = gAppStateAudioFramesPerBuffer;
   ProcessSetup setup = {
     kRealtime,
     kSample64,

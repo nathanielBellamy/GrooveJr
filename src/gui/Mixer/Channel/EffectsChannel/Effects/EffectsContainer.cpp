@@ -7,12 +7,19 @@
 namespace Gj {
 namespace Gui {
 
-EffectsContainer::EffectsContainer(QWidget* parent, Audio::Mixer* mixer, const ChannelIndex channelIndex, QAction* addEffectAction)
+EffectsContainer::EffectsContainer(
+  QWidget* parent,
+  Audio::Mixer* mixer,
+  const ChannelIndex channelIndex,
+  QAction* addEffectAction,
+  QAction* removeEffectAction
+  )
   : QWidget(nullptr)
   , mixer(mixer)
   , channelIndex(channelIndex)
   , addEffectAction(addEffectAction)
   , addEffectButton(this, addEffectAction)
+  , removeEffectAction(removeEffectAction)
   , grid(this)
   {
 
@@ -50,12 +57,22 @@ EffectsContainer::~EffectsContainer() {
 }
 
 void EffectsContainer::connectActions() {
-  auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
+  const auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
     const EffectIndex effectIndex = selectVstWindowAction.data().toULongLong();
     vstWindows.at(effectIndex)->activateWindow();
     vstWindows.at(effectIndex)->raise();
     activateWindow();
     raise();
+  });
+
+  const auto removeEffectActionConnection = connect(removeEffectAction, &QAction::triggered, [&]() {
+    const EffectIndex effectIndex = selectVstWindowAction.data().toULongLong();
+    vstWindows.at(effectIndex)->hide();
+    vstWindows.erase(vstWindows.begin() + effectIndex);
+    vstWindowSelectButtons.at(effectIndex)->hide();
+    vstWindowSelectButtons.erase(vstWindowSelectButtons.begin() + effectIndex);
+    vstWindowSelectLabels.at(effectIndex)->hide();
+    vstWindowSelectLabels.erase(vstWindowSelectLabels.begin() + effectIndex);
   });
 }
 

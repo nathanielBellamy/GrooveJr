@@ -92,7 +92,7 @@ Plugin::Plugin(const Db::Effect& effectEntity, AppState* gAppState, std::shared_
 	}
 
 	const auto moduleName = module->getName();
-	name = moduleName.substr(0, moduleName.find_last_of('.'));
+	name = AtomicStr(moduleName.substr(0, moduleName.find_last_of('.')));
 
 	const auto& cmdArgs = std::vector { path.std_str() };
 
@@ -183,16 +183,16 @@ Plugin::~Plugin() {
 		"Audio::Plugin::~Plugin",
 		"Destroyed audioHost for Plugin: " + name
 	);
-
-	if (editorHost != nullptr) {
-		delete editorHost;
-
-		Logging::write(
-			Info
-			, "Audio::Plugin::~Plugin",
-			"Destroyed editorHost for Plugin: " + name
-		);
-	}
+	//
+	// if (editorHost != nullptr) {
+	// 	delete editorHost;
+	//
+	// 	Logging::write(
+	// 		Info,
+	// 		"Audio::Plugin::~Plugin",
+	// 		"Destroyed editorHost for Plugin: " + name
+	// 	);
+	// }
 
 	Logging::write(
 		Info,

@@ -12,7 +12,6 @@ using namespace Steinberg;
 Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
   : gAppState(gAppState)
   , jackClient(new JackClient(this))
-  , channelCount(1.0f)
   , dao(dao)
   {
 
@@ -97,7 +96,6 @@ bool Mixer::addEffectsChannel() {
         static_cast<ChannelIndex>(effectsChannels.size())
       )
     );
-    channelCount++;
     return true;
 }
 
@@ -127,14 +125,12 @@ bool Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) 
         channelEntity
       )
     );
-    channelCount++;
     return true;
 }
 
 bool Mixer::removeEffectsChannel(const ChannelIndex idx) {
   delete effectsChannels.at(idx);
   effectsChannels.erase(effectsChannels.begin() + idx);
-  channelCount--;
   return true;
 }
 
@@ -168,7 +164,7 @@ bool Mixer::addEffectToChannel(const ChannelIndex channelIndex, const std::strin
     );
     return false;
   }
-  return effectsChannels.at(channelIndex)->addReplaceEffect(std::nullopt, effectPath);
+  return effectsChannels.at(channelIndex)->addReplaceEffect(std::optional<EffectIndex>(), effectPath);
 }
 
 Result Mixer::loadEffectOnChannel(const Db::Effect& effectEntity) const {
@@ -309,7 +305,6 @@ Result Mixer::deleteChannels() {
     delete effectsChannel;
 
   effectsChannels.clear();
-  channelCount = 0;
 
   Logging::write(
     Info,
@@ -364,7 +359,7 @@ Result Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
   for (const auto& effectsChannelEffects : effectsByChannel) {
     std::sort(effectsChannelEffects.begin(), effectsChannelEffects.end());
     for (const auto& effect : effectsChannelEffects) {
-      if (loadEffectOnChannel(effect)) {
+      if (loadEffectOnChannel(effect) == OK) {
         Logging::write(
           Info,
           "Audio::Mixer::setEffects",

@@ -79,12 +79,12 @@ class EffectsChannel final : public QWidget {
     RemoveEffectsChannelButton removeEffectsChannelButton;
     QAction addEffectAction;
     AddEffectButton addEffectButton;
-    EffectsContainer effectsContainer;
     QAction openEffectsContainer;
     VstSelect vstSelect;
     QUrl vstUrl;
     QAction replaceEffectAction;
     QAction removeEffectAction;
+    EffectsContainer effectsContainer;
     QGridLayout grid;
     QLabel title;
     QSlider gainSlider;

@@ -506,7 +506,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   // process effects channels
   // main channel is effectsChannelIdx 0
   const int32_t nframes32t = static_cast<int32_t>(nframes);
-  for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->effectsChannelCount + 1; effectsChannelIdx++) {
+  for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < MAX_EFFECTS_CHANNELS; effectsChannelIdx++) {
     auto [effectCount, processFuncs, buffers] = audioCore->effectsChannelsProcessData[effectsChannelIdx];
     for (EffectIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
       buffers[pluginIdx].numSamples = nframes32t;
@@ -520,8 +520,11 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
   // read channel settings from ringbuffer
   if (jack_ringbuffer_t* ringBuffer = audioCore->effectsChannelsSettingsRB; jack_ringbuffer_read_space(ringBuffer) >= EffectsSettings_RB_SIZE) {
-    jack_ringbuffer_read(ringBuffer, reinterpret_cast<char *>(audioCore->effectsChannelsSettings),
-                         EffectsSettings_RB_SIZE);
+    jack_ringbuffer_read(
+      ringBuffer,
+      reinterpret_cast<char *>(audioCore->effectsChannelsSettings),
+      EffectsSettings_RB_SIZE
+    );
   }
 
   float rmsL[MAX_EFFECTS_CHANNELS] = { 0.0f };
@@ -530,7 +533,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   for (int i = 0; i < nframes; i++) {
     float accumL = 0.0f;
     float accumR = 0.0f;
-    for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->effectsChannelCount + 1; effectsChannelIdx++) {
+    for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < MAX_EFFECTS_CHANNELS; effectsChannelIdx++) {
       const float factorLL = audioCore->effectsChannelsSettings[4 * effectsChannelIdx];
       const float factorLR = audioCore->effectsChannelsSettings[4 * effectsChannelIdx + 1];
       const float factorRL = audioCore->effectsChannelsSettings[4 * effectsChannelIdx + 2];
@@ -570,10 +573,10 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   for (EffectIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
     buffers[pluginIdx].numSamples = static_cast<int32_t>(nframes);
 
-    processFuncs[pluginIdx](
-      buffers[pluginIdx],
-      nframes
-    );
+    // processFuncs[pluginIdx](
+    //   buffers[pluginIdx],
+    //   nframes
+    // );
   }
 
   // write out processed main channel to audio out

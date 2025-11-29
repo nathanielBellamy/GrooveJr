@@ -140,7 +140,7 @@ struct AudioPlayer {
     );
 
     // populate initial channel settings
-    for (int i = 0; i < mixer->getTotalChannelsCount(); i++) {
+    for (ChannelIndex i = 0; i < mixer->getTotalChannelsCount(); i++) {
       effectsChannelsSettings[4 * i]     = mixer->getEffectsChannel(i)->getGain();
       effectsChannelsSettings[4 * i + 1] = mixer->getEffectsChannel(i)->getMute();
       effectsChannelsSettings[4 * i + 2] = mixer->getEffectsChannel(i)->getSolo();
@@ -159,9 +159,7 @@ struct AudioPlayer {
       "Setting up AudioCore effects processing..."
     );
 
-    audioCore->setChannelCount(
-      static_cast<float>(mixer->getTotalChannelsCount())
-    );
+    audioCore->setChannelCount(mixer->getTotalChannelsCount());
     for (const auto ch : mixer->getEffectsChannels()) {
       const auto chIndex = ch->getIndex();
       audioCore->effectsChannelsSettings[2 * chIndex] = ch->getGain();
@@ -216,7 +214,7 @@ struct AudioPlayer {
     };
   }
 
-  Result updateRingBuffers(const size_t channelCount) {
+  Result updateRingBuffers() {
     // read vu_ring_buffer
     if (jack_ringbuffer_read_space(audioCore->vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
       jack_ringbuffer_read(
@@ -283,6 +281,7 @@ struct AudioPlayer {
       );
     }
 
+    const ChannelIndex channelCount = mixer->getTotalChannelsCount();
     const float channelCountF = static_cast<float>(channelCount);
 
     Effects::EffectsChannel* effectsChannels[MAX_EFFECTS_CHANNELS] {nullptr};
@@ -412,8 +411,6 @@ struct AudioPlayer {
       "Playing"
     );
 
-    const size_t channelCount = mixer->getEffectsChannelsCount() + 1;
-
     createRingBuffers();
 
     audioCore->playState = PLAY;
@@ -423,6 +420,9 @@ struct AudioPlayer {
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj
+      std::cout << "audioplayer run playb " << audioCore->playbackBuffers[0][100] << std::endl;
+      std::cout << "audioplayer run proce " << audioCore->processBuffers[0][100] << std::endl << std::endl;
+      std::cout << "audioplayer run fxcha " << audioCore->effectsChannelsWriteOut[1][0][50] << std::endl << std::endl;
 
       if (audioCore->shouldUpdateDeckIndex()) {
         audioCore->updateDeckIndexToNext();
@@ -435,7 +435,7 @@ struct AudioPlayer {
         );
       }
 
-      updateRingBuffers(channelCount);
+      updateRingBuffers();
 
       if ( audioCore->threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
         // TODO
