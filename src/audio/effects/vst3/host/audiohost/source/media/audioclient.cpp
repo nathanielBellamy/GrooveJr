@@ -346,14 +346,12 @@ bool AudioClient::setBlockSize (int32 value)
 }
 
 //------------------------------------------------------------------------
-bool AudioClient::updateProcessSetup ()
-{
+bool AudioClient::updateProcessSetup() {
 	FUnknownPtr<IAudioProcessor> processor = component;
 	if (!processor)
 		return false;
 
-	if (isProcessing)
-	{
+	if (isProcessing) {
 		if (processor->setProcessing (false) != kResultOk)
 			return false;
 

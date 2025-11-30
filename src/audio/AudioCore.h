@@ -146,9 +146,6 @@ struct AudioCore {
       effectsChannelsWriteOut[i][1] = &effectsChannelsWriteOutBuffer[(2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER];
     }
 
-    std::cout << " audio core init  ecwo" << effectsChannelsWriteOut[3][1][40] << std::endl;
-    std::cout << " audio core init pb" << processBuffers[1][101] << std::endl;
-
     Logging::write(
       Info,
       "Audio::AudioCore::init",

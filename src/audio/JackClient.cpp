@@ -516,8 +516,6 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
         nframes
       );
     }
-    std::fill_n(audioCore->effectsChannelsWriteOut[effectsChannelIdx][0], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
-    std::fill_n(audioCore->effectsChannelsWriteOut[effectsChannelIdx][1], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
   }
 
   // read channel settings from ringbuffer

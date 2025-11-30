@@ -190,25 +190,52 @@ struct AudioPlayer {
     return 0;
   }
 
-  IAudioClient::Buffers getPluginBuffers(const Effects::EffectsChannel* effectsChannel, const ChannelIndex channelIdx, const EffectIndex pluginIdx) const {
+  IAudioClient::Buffers getPluginBuffers(
+    const Effects::EffectsChannel* effectsChannel,
+    const ChannelIndex channelIdx,
+    const EffectIndex pluginIdx
+  ) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
 
     // - each channel gets processed into it's effectChannelWriteOut
     // - the channels are then summed down into the processBuffers
     // - the main channel then acts upon the processBuffers
-    float** inputBuffers = audioCore->processBuffers;
-    float** outputBuffers = audioCore->processBuffers;
 
-    if (channelIdx > 0 && pluginIdx == 0)
-      inputBuffers = audioCore->playbackBuffers;
+    // main channel
+    if (channelIdx == 0)
+      return {
+        audioCore->processBuffers,
+        2,
+        audioCore->processBuffers,
+        2,
+        audioFramesPerBuffer
+      };
 
-    if (const size_t effectsCount = effectsChannel->effectCount(); channelIdx > 0 && pluginIdx == effectsCount - 1)
-      outputBuffers = const_cast<float**>(audioCore->effectsChannelsWriteOut[channelIdx]);
+    // non-main channel from here on
+    if (const auto effectCount = effectsChannel->effectCount(); pluginIdx == effectCount - 1) {
+      const auto writeOut = const_cast<float**>(audioCore->effectsChannelsWriteOut[channelIdx]);
+      if (effectCount == 1)
+        return {
+          audioCore->playbackBuffers,
+          2,
+          writeOut,
+          2,
+          audioFramesPerBuffer
+        };
+
+      return {
+        audioCore->processBuffers,
+        2,
+        writeOut,
+        2,
+        audioFramesPerBuffer
+      };
+    }
 
     return {
-      inputBuffers,
+      audioCore->processBuffers,
       2,
-      outputBuffers,
+      audioCore->processBuffers,
       2,
       audioFramesPerBuffer
     };
@@ -420,9 +447,9 @@ struct AudioPlayer {
       // here is our chance to pull data out of the application
       // and
       // make it accessible to our running audio callback through the audioCore obj
-      std::cout << "audioplayer run playb " << audioCore->playbackBuffers[0][100] << std::endl;
-      std::cout << "audioplayer run proce " << audioCore->processBuffers[0][100] << std::endl << std::endl;
-      std::cout << "audioplayer run fxcha " << audioCore->effectsChannelsWriteOut[1][0][50] << std::endl << std::endl;
+      // std::cout << "audioplayer run playb " << audioCore->playbackBuffers[0][100] << std::endl;
+      // std::cout << "audioplayer run proce " << audioCore->processBuffers[0][100] << std::endl << std::endl;
+      // std::cout << "audioplayer run fxcha " << audioCore->effectsChannelsWriteOut[1][0][50] << std::endl << std::endl;
 
       if (audioCore->shouldUpdateDeckIndex()) {
         audioCore->updateDeckIndexToNext();

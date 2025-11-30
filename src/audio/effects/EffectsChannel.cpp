@@ -115,11 +115,10 @@ bool EffectsChannel::addReplaceEffect(const std::optional<EffectIndex> effectIdx
   // Vst::SpeakerArrangement arrangement;
   // processor->getBusArrangement(busDirection, index, arrangement);
 
-  const int32 maxSamplesPerBlock = gAppStateAudioFramesPerBuffer;
   ProcessSetup setup = {
     kRealtime,
     kSample64,
-    maxSamplesPerBlock,
+    MAX_AUDIO_FRAMES_PER_BUFFER,
     44100.0
   };
   processor->setupProcessing(setup);
@@ -172,11 +171,10 @@ Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
   // Vst::SpeakerArrangement arrangement;
   // processor->getBusArrangement(busDirection, index, arrangement);
 
-  const int32 maxSamplesPerBlock = gAppState->audioFramesPerBuffer;
   ProcessSetup setup = {
     kRealtime,
     kSample64,
-    maxSamplesPerBlock,
+    MAX_AUDIO_FRAMES_PER_BUFFER,
     44100.0
   };
   processor->setupProcessing(setup);

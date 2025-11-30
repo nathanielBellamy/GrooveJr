@@ -93,7 +93,7 @@ bool Mixer::addEffectsChannel() {
       new Effects::EffectsChannel(
         gAppState,
         jackClient,
-        static_cast<ChannelIndex>(effectsChannels.size())
+        effectsChannels.size()
       )
     );
     return true;

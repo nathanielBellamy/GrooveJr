@@ -38,15 +38,6 @@ void shutdown_handler(const int sig) {
     "Deleted gAppState"
   );
 
-  pluginContext->terminate();
-  PluginContextFactory::instance().setPluginContext (nullptr);
-  delete pluginContext;
-  Logging::write(
-    Info,
-    "shutdown_handler",
-    "Deleted PluginContext"
-  );
-
   delete dao;
   Logging::write(
     Info,
@@ -59,6 +50,16 @@ void shutdown_handler(const int sig) {
     "shutdown_handler",
     "Done Freeing Resources"
   );
+
+  pluginContext->terminate();
+  PluginContextFactory::instance().setPluginContext (nullptr);
+  delete pluginContext;
+  Logging::write(
+    Info,
+    "shutdown_handler",
+    "Deleted PluginContext"
+  );
+
   Logging::write(
     Info,
     "shutdown_handler",
@@ -67,9 +68,14 @@ void shutdown_handler(const int sig) {
   exit(sig);
 }
 
-void initVst3PluginContext() {
+Result initVst3PluginContext() {
+  try {
     pluginContext = new Audio::Effects::Vst3::Host::App();
     PluginContextFactory::instance().setPluginContext (pluginContext);
+    return OK;
+  } catch (...) {
+    return ERROR;
+  }
 }
 
 extern "C" {
@@ -89,6 +95,21 @@ int main(int argc, char *argv[]) {
     "main",
     "== GrooveJr =="
   );
+
+  if (initVst3PluginContext() == OK) {
+    Logging::write(
+      Info,
+      "main",
+      "Instantiated VST3 PluginContext"
+    );
+  } else {
+    Logging::write(
+      Error,
+      "main::initVst3PluginContext",
+      "Failed to initialize Vst3PluginContext"
+    );
+    return 1;
+  }
 
   // setup Sql
   gAppState = new AppState;
@@ -128,14 +149,6 @@ int main(int argc, char *argv[]) {
     Info,
     "main",
     "Loaded gAppState: " + gAppState->toString()
-  );
-
-  // setup Audio
-  initVst3PluginContext();
-  Logging::write(
-    Info,
-    "main",
-    "Instantiated vst3PluginContext"
   );
 
   audioCore = new Audio::AudioCore(gAppState);
