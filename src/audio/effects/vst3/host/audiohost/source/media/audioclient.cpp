@@ -367,10 +367,8 @@ bool AudioClient::updateProcessSetup() {
 	if (component->setActive (true) != kResultOk)
 		return false;
 
-	processor->setProcessing (true); // != kResultOk
-	/*
-if (processor->setProcessing(true) != kResultOk)
-return false;*/
+	if (processor->setProcessing(true) != kResultOk)
+		return false;
 
 	isProcessing = true;
 	return isProcessing;

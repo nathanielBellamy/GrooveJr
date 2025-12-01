@@ -46,7 +46,7 @@ class EffectsChannel final : public QWidget {
       QWidget* parent,
       actor_system& actorSystem,
       Audio::Mixer* mixer,
-      int channelIndex,
+      ChannelIndex channelIndex,
       QAction* removeEffectsChannelAction,
       QAction* muteChannelAction,
       QAction* muteLChannelAction,

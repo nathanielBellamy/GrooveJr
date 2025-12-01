@@ -113,8 +113,17 @@ struct AudioPlayer {
     Logging::write(
       Info,
       "Audio::AudioPlayer::setupAudioCore",
-      "Setting up AudioCore"
+      "Setting up AudioCore for threadId: " + std::to_string(threadId)
     );
+
+    if (threadId != ThreadStatics::getThreadId()) {
+      Logging::write(
+        Warning,
+        "Audio::AudioPlayer::setupAudioCore",
+        "Attempted to create duplicate AudioThread and thus duplicate AudioCore with ThreadID: " + std::to_string(threadId)
+      );
+      return 1;
+    }
 
     // update plugin effects with info about audio to be processed
     // if (mixer->setSampleRate(sfInfo.samplerate) != OK) {
@@ -129,9 +138,6 @@ struct AudioPlayer {
 
     audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
     audioCore->crossfade = gAppState->getCrossfade();
-
-    // audioCore->inputBuffers[0] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[0];
-    // audioCore->inputBuffers[1] = audioCore->decks[audioCore->deckIndex].cassette->inputBuffers[1];
 
     Logging::write(
       Info,
@@ -202,7 +208,8 @@ struct AudioPlayer {
     // - the main channel then acts upon the processBuffers
 
     // main channel
-    if (channelIdx == 0)
+    if (channelIdx == 0) {
+      // main channel acts on process buffer
       return {
         audioCore->processBuffers,
         2,
@@ -210,19 +217,36 @@ struct AudioPlayer {
         2,
         audioFramesPerBuffer
       };
+    }
 
     // non-main channel from here on
-    if (const auto effectCount = effectsChannel->effectCount(); pluginIdx == effectCount - 1) {
-      const auto writeOut = const_cast<float**>(audioCore->effectsChannelsWriteOut[channelIdx]);
-      if (effectCount == 1)
-        return {
-          audioCore->playbackBuffers,
-          2,
-          writeOut,
-          2,
-          audioFramesPerBuffer
-        };
+    const auto effectCount = effectsChannel->effectCount();
+    const auto writeOut = const_cast<float**>(audioCore->effectsChannelsWriteOut[channelIdx]);
+    if (effectCount == 1) {
+      // single effect on non-main channel so goes from playbackBuffers to writeout
+      return {
+        audioCore->playbackBuffers,
+        2,
+        writeOut,
+        2,
+        audioFramesPerBuffer
+      };
+    }
 
+    // multiple plugins
+    if (pluginIdx == 0) {
+      // first plugin of multiple plugins so goes from playback to process" << std::endl;
+      return {
+        audioCore->playbackBuffers,
+        2,
+        audioCore->processBuffers,
+        2,
+        audioFramesPerBuffer
+      };
+    }
+
+    if (pluginIdx == effectCount - 1) {
+      // last plugin of multiple so goes from process to writeout"
       return {
         audioCore->processBuffers,
         2,
@@ -232,6 +256,7 @@ struct AudioPlayer {
       };
     }
 
+    // non-first and non-last plugin of multiple plugins so goes from process to process
     return {
       audioCore->processBuffers,
       2,
@@ -381,20 +406,11 @@ struct AudioPlayer {
       );
     }
 
-    // std::cout << "effectsChannelSettings = "
-    //   << effectsChannelsSettings[0] << std::endl
-    //   << effectsChannelsSettings[1] << std::endl
-    //   << effectsChannelsSettings[2] << std::endl
-    //   << effectsChannelsSettings[3] << std::endl
-    //   << effectsChannelsSettings[4] << std::endl
-    //   << effectsChannelsSettings[5] << std::endl
-    //   << effectsChannelsSettings[6] << std::endl
-    //   << effectsChannelsSettings[7] << std::endl
-    //   << effectsChannelsSettings[8] << std::endl
-    //   << effectsChannelsSettings[9] << std::endl
-    //   << effectsChannelsSettings[10] << std::endl
-    //   << effectsChannelsSettings[11] << std::endl
-    //   << effectsChannelsSettings[12] << std::endl;
+    // std::cout << "effectsChannelSettings chan 1= " << std::endl
+    // << "factor LL" << effectsChannelsSettings[4] << std::endl
+    // << "factor LR" << effectsChannelsSettings[5] << std::endl
+    // << "factor RL" << effectsChannelsSettings[6] << std::endl
+    // << "factor RR" << effectsChannelsSettings[7] << std::endl;
 
     // write to effectsSettings ring buffer
     if (jack_ringbuffer_write_space(audioCore->effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE - 2) {

@@ -12,7 +12,7 @@ EffectsChannel::EffectsChannel(
   QWidget* parent,
   actor_system& actorSystem,
   Audio::Mixer* mixer,
-  const int channelIndex,
+  const ChannelIndex channelIndex,
   QAction* removeEffectsChannelAction,
   QAction* muteChannelAction,
   QAction* muteLChannelAction,

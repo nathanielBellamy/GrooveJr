@@ -90,9 +90,9 @@ public:
     return effectsChannels.size();
   }
 
-  bool addEffectsChannel();
-  bool addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity);
-  bool removeEffectsChannel(ChannelIndex idx);
+  Result addEffectsChannel();
+  Result addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity);
+  Result removeEffectsChannel(ChannelIndex idx);
   [[nodiscard]]
   size_t effectsOnChannelCount(ChannelIndex idx) const;
 

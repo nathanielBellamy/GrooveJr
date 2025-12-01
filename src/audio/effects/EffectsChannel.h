@@ -60,7 +60,7 @@ class EffectsChannel {
       return channel.gain.load();
     };
 
-    bool setGain(float gain) {
+    bool setGain(const float gain) {
       channel.gain.store(gain);
       return true;
     };

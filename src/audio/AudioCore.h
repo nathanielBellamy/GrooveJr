@@ -1,6 +1,7 @@
 #ifndef GJAUDIOAUDIODATA_H
 #define GJAUDIOAUDIODATA_H
 
+#include <algorithm>
 #include <atomic>
 
 #include <fftw3.h>
@@ -386,6 +387,14 @@ struct AudioCore {
   Result setFrameIdAllDecks(const sf_count_t frameId) const {
     for (DeckIndex i = 0; i < AUDIO_CORE_DECK_COUNT; i++)
       decks[i].frameId = frameId;
+
+    return OK;
+  }
+
+  Result clearBuffers() {
+    std::fill_n(effectsChannelsWriteOutBuffer, 2 * MAX_EFFECTS_CHANNELS * MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
+    std::fill_n(playbackBuffersBuffer, 2 * MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
+    std::fill_n(processBuffersBuffer, 2 * MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
 
     return OK;
   }

@@ -88,7 +88,7 @@ Mixer::~Mixer() {
   );
 }
 
-bool Mixer::addEffectsChannel() {
+Result Mixer::addEffectsChannel() {
     effectsChannels.push_back(
       new Effects::EffectsChannel(
         gAppState,
@@ -96,10 +96,10 @@ bool Mixer::addEffectsChannel() {
         effectsChannels.size()
       )
     );
-    return true;
+    return OK;
 }
 
-Result Mixer::setAudioFramesPerBuffer(jack_nframes_t framesPerBuffer) const {
+Result Mixer::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) const {
   bool warning = false;
   gAppState->setAudioFramesPerBuffer(framesPerBuffer);
   for (const auto channel : effectsChannels) {
@@ -117,21 +117,24 @@ Result Mixer::setAudioFramesPerBuffer(jack_nframes_t framesPerBuffer) const {
 }
 
 
-bool Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) {
-    effectsChannels.push_back(
-      new Effects::EffectsChannel(
-        gAppState,
-        jackClient,
-        channelEntity
-      )
+Result Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) {
+  while (getTotalChannelsCount() < channelEntity.channelIndex + 1)
+    addEffectsChannel();
+
+  delete effectsChannels.at(channelEntity.channelIndex);
+  effectsChannels.at(channelEntity.channelIndex) =
+    new Effects::EffectsChannel(
+      gAppState,
+      jackClient,
+      channelEntity
     );
-    return true;
+  return OK;
 }
 
-bool Mixer::removeEffectsChannel(const ChannelIndex idx) {
+Result Mixer::removeEffectsChannel(const ChannelIndex idx) {
   delete effectsChannels.at(idx);
   effectsChannels.erase(effectsChannels.begin() + idx);
-  return true;
+  return OK;
 }
 
 Result Mixer::setSampleRate(const uint32_t sampleRate) const {

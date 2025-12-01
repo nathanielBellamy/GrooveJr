@@ -470,8 +470,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     jack_port_get_buffer(outPortR, nframes)
   );
 
-  // retrieve AudioCore
   const auto audioCore = static_cast<AudioCore*>(arg);
+  audioCore->clearBuffers();
 
   // read playbackSettingsToAudioThreadRingBuffer
   if (jack_ringbuffer_read_space(audioCore->playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE - 2) {
