@@ -37,7 +37,7 @@ class EffectSlot final : public QWidget {
                actor_system& actorSystem,
                Audio::Mixer* mixer,
                ChannelIndex channelIndex,
-               EffectIndex effectIndex,
+               PluginIndex effectIndex,
                bool occupied,
                QAction* replaceEffectAction,
                QAction* removeEffectAction);
@@ -48,7 +48,7 @@ class EffectSlot final : public QWidget {
     actor_system& actorSystem;
     Audio::Mixer* mixer;
     ChannelIndex channelIndex;
-    EffectIndex effectIndex;
+    PluginIndex effectIndex;
     bool occupied;
     QGridLayout grid;
     QLabel title;

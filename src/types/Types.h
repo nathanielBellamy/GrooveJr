@@ -15,7 +15,7 @@ typedef uint64_t         SceneID;
 typedef uint64_t         Version;
 typedef uint16_t         TrackNumber;
 typedef size_t           ChannelIndex;
-typedef size_t           EffectIndex;
+typedef size_t           PluginIndex;
 typedef size_t           DeckIndex;
 typedef unsigned int     Year;
 

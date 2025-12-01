@@ -172,7 +172,7 @@ struct AudioPlayer {
       audioCore->effectsChannelsSettings[2 * chIndex + 1] = ch->getPan();
 
       audioCore->effectsChannelsProcessData[chIndex].effectCount = ch->effectCount();
-      for (EffectIndex pluginIdx = 0; pluginIdx < ch->effectCount(); pluginIdx++) {
+      for (PluginIndex pluginIdx = 0; pluginIdx < ch->effectCount(); pluginIdx++) {
         const auto plugin = ch->getPluginAtIdx(pluginIdx);
         audioCore->effectsChannelsProcessData[chIndex].processFuncs[pluginIdx] =
           [audioClient = plugin->audioHost->audioClient](auto && buffers, auto && continuousFrames) {
@@ -199,7 +199,7 @@ struct AudioPlayer {
   IAudioClient::Buffers getPluginBuffers(
     const Effects::EffectsChannel* effectsChannel,
     const ChannelIndex channelIdx,
-    const EffectIndex pluginIdx
+    const PluginIndex pluginIdx
   ) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
 
@@ -309,6 +309,7 @@ struct AudioPlayer {
         PlaybackSettingsFromAudioThread_RB_SIZE
       );
 
+    // std::cout << " nframes " << playbackSettingsFromAudioThread[0] << std::endl;
     const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
     mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, currentFrameId);
 

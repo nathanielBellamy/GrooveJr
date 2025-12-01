@@ -99,13 +99,13 @@ public:
   bool addEffectToChannel(ChannelIndex channelIndex, const std::string& effectPath) const;
   Result loadEffectOnChannel(const Db::Effect& effectEntity) const;
   void initEditorHostsOnChannel(ChannelIndex idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
-  void initEditorHostOnChannel(ChannelIndex idx, EffectIndex newEffectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
+  void initEditorHostOnChannel(ChannelIndex idx, PluginIndex newEffectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
   void terminateEditorHostsOnChannel(ChannelIndex idx) const;
 
   Result setSampleRate(uint32_t sampleRate) const;
 
-  bool replaceEffectOnChannel(ChannelIndex channelIdx, EffectIndex effectIdx, const std::string& effectPath) const;
-  bool removeEffectFromChannel(ChannelIndex channelIdx, EffectIndex effectIdx) const;
+  bool replaceEffectOnChannel(ChannelIndex channelIdx, PluginIndex effectIdx, const std::string& effectPath) const;
+  bool removeEffectFromChannel(ChannelIndex channelIdx, PluginIndex effectIdx) const;
 
   int getAudioFramesPerBuffer() const { return gAppState->audioFramesPerBuffer; };
   Result setAudioFramesPerBuffer(jack_nframes_t framesPerBuffer) const;
@@ -121,7 +121,7 @@ public:
   void setSetVuRingBufferFunc(std::function<void(jack_ringbuffer_t* vuRingBuffer)> func) { setVuRingBufferFunc = func; };
   std::function<void(jack_ringbuffer_t* vuRingBuffer)> getSetVuRingBufferFunc() { return setVuRingBufferFunc; };
 
-  AtomicStr getPluginName(const ChannelIndex channelIdx, const EffectIndex pluginIndex) const {
+  AtomicStr getPluginName(const ChannelIndex channelIdx, const PluginIndex pluginIndex) const {
     return effectsChannels.at(channelIdx)->getPluginName(pluginIndex);
   };
 

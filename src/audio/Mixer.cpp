@@ -167,7 +167,7 @@ bool Mixer::addEffectToChannel(const ChannelIndex channelIndex, const std::strin
     );
     return false;
   }
-  return effectsChannels.at(channelIndex)->addReplaceEffect(std::optional<EffectIndex>(), effectPath);
+  return effectsChannels.at(channelIndex)->addReplaceEffect(std::optional<PluginIndex>(), effectPath);
 }
 
 Result Mixer::loadEffectOnChannel(const Db::Effect& effectEntity) const {
@@ -223,11 +223,11 @@ void Mixer::terminateEditorHostsOnChannel(const ChannelIndex idx) const {
   );
 }
 
-bool Mixer::replaceEffectOnChannel(const ChannelIndex channelIdx, const EffectIndex effectIdx, const std::string& effectPath) const {
+bool Mixer::replaceEffectOnChannel(const ChannelIndex channelIdx, const PluginIndex effectIdx, const std::string& effectPath) const {
   return effectsChannels.at(channelIdx)->addReplaceEffect(effectIdx, effectPath);
 }
 
-bool Mixer::removeEffectFromChannel(const ChannelIndex channelIdx, const EffectIndex effectIdx) const {
+bool Mixer::removeEffectFromChannel(const ChannelIndex channelIdx, const PluginIndex effectIdx) const {
   return effectsChannels.at(channelIdx)->removeEffect(effectIdx);
 }
 

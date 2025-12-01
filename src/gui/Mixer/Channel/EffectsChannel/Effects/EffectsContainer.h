@@ -38,7 +38,7 @@ class EffectsContainer final : public QWidget {
       QAction* removeEffectAction
     );
     ~EffectsContainer() override;
-    void addEffect(EffectIndex newEffectIndex, const AtomicStr& pluginName);
+    void addEffect(PluginIndex newEffectIndex, const AtomicStr& pluginName);
 
   private:
     Audio::Mixer* mixer;

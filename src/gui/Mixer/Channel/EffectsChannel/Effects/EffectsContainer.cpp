@@ -58,7 +58,7 @@ EffectsContainer::~EffectsContainer() {
 
 void EffectsContainer::connectActions() {
   const auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
-    const EffectIndex effectIndex = selectVstWindowAction.data().toULongLong();
+    const PluginIndex effectIndex = selectVstWindowAction.data().toULongLong();
     vstWindows.at(effectIndex)->activateWindow();
     vstWindows.at(effectIndex)->raise();
     activateWindow();
@@ -66,7 +66,7 @@ void EffectsContainer::connectActions() {
   });
 
   const auto removeEffectActionConnection = connect(removeEffectAction, &QAction::triggered, [&]() {
-    const EffectIndex effectIndex = selectVstWindowAction.data().toULongLong();
+    const PluginIndex effectIndex = selectVstWindowAction.data().toULongLong();
     vstWindows.at(effectIndex)->hide();
     vstWindows.erase(vstWindows.begin() + effectIndex);
     vstWindowSelectButtons.at(effectIndex)->hide();
@@ -121,7 +121,7 @@ void EffectsContainer::showEvent(QShowEvent *event) {
   );
 }
 
-void EffectsContainer::addEffect(const EffectIndex newEffectIndex, const AtomicStr& pluginName) {
+void EffectsContainer::addEffect(const PluginIndex newEffectIndex, const AtomicStr& pluginName) {
   auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, newEffectIndex, pluginName);
   vstWindows.push_back(std::move(vstWindow));
   vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, newEffectIndex, pluginName, &selectVstWindowAction));

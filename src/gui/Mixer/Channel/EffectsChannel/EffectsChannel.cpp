@@ -314,8 +314,8 @@ void EffectsChannel::setEffects() {
   );
 }
 
-void EffectsChannel::addEffect(const std::optional<EffectIndex> effectIndex) {
-  const EffectIndex newEffectIndex = effectIndex.value_or(
+void EffectsChannel::addEffect(const std::optional<PluginIndex> effectIndex) {
+  const PluginIndex newEffectIndex = effectIndex.value_or(
     mixer->effectsOnChannelCount(channelIndex) - 1
   );
   Logging::write(
@@ -365,7 +365,7 @@ void EffectsChannel::connectActions() {
           "Unable to add effect " + effectPath + " to channel " + std::to_string(channelIndex)
         );
       } else {
-        addEffect(std::optional<EffectIndex>());
+        addEffect(std::optional<PluginIndex>());
 
         appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
         const scoped_actor self{ actorSystem };
@@ -380,7 +380,7 @@ void EffectsChannel::connectActions() {
   });
 
   auto replaceEffectConnection = connect(&replaceEffectAction, &QAction::triggered, [&]() {
-    const EffectIndex pluginIdx = replaceEffectAction.data().toULongLong();
+    const PluginIndex pluginIdx = replaceEffectAction.data().toULongLong();
     if (vstSelect.exec() == QDialog::Accepted) {
       const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
@@ -403,7 +403,7 @@ void EffectsChannel::connectActions() {
   });
 
   auto removeEffectConnection = connect(&removeEffectAction, &QAction::triggered, [&]() {
-    const EffectIndex pluginIdx = removeEffectAction.data().toULongLong();
+    const PluginIndex pluginIdx = removeEffectAction.data().toULongLong();
     Logging::write(
       Info,
       "Gui::EffectsChannel::removeEffectAction",

@@ -212,19 +212,19 @@ class EffectsChannel {
       return true;
     };
 
-    bool addReplaceEffect(std::optional<EffectIndex> effectIdxOpt, const std::string& effectPath);
+    bool addReplaceEffect(std::optional<PluginIndex> effectIdxOpt, const std::string& effectPath);
     Result loadEffect(const Db::Effect& effectEntity);
     Result setSampleRate(double sampleRate) const;
     Result setBlockSize(jack_nframes_t blockSize) const;
 
     size_t effectCount() const;
     void initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
-    void initEditorHost(EffectIndex effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
+    void initEditorHost(PluginIndex effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
     void terminateEditorHosts() const;
 
-    bool removeEffect(EffectIndex effectIdx);
+    bool removeEffect(PluginIndex effectIdx);
 
-    AtomicStr getPluginName(const EffectIndex pluginIndex) const { return vst3Plugins.at(pluginIndex)->getName(); };
+    AtomicStr getPluginName(const PluginIndex pluginIndex) const { return vst3Plugins.at(pluginIndex)->getName(); };
 
     Db::ChannelEntity toEntity() {
       return {

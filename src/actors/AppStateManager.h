@@ -38,8 +38,8 @@ struct AppStateManagerTrait {
                                  result<void>(mix_add_effects_channel_a),
                                  result<void>(ChannelIndex, mix_remove_effects_channel_a),
                                  result<void>(ChannelIndex, std::string, mix_add_effect_to_channel_a),
-                                 result<void>(ChannelIndex, EffectIndex, std::string, mix_replace_effect_on_channel_a),
-                                 result<void>(ChannelIndex, EffectIndex, mix_remove_effect_on_channel_a),
+                                 result<void>(ChannelIndex, PluginIndex, std::string, mix_replace_effect_on_channel_a),
+                                 result<void>(ChannelIndex, PluginIndex, mix_remove_effect_on_channel_a),
                                  result<void>(ChannelIndex, float, mix_set_channel_gain_a),
 
                                  // Transport control
@@ -157,7 +157,7 @@ struct AppStateManagerState {
              // }
              hydrateStateToDisplay();
            },
-           [this](const ChannelIndex channelIdx, const EffectIndex pluginIdx, std::string effectPath, mix_replace_effect_on_channel_a) {
+           [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, std::string effectPath, mix_replace_effect_on_channel_a) {
              Logging::write(
                Info,
                "Act::AppStateManager::mix_replace_effect_on_channel_a",
@@ -172,7 +172,7 @@ struct AppStateManagerState {
              }
              hydrateStateToDisplay();
            },
-           [this](const ChannelIndex channelIdx, const EffectIndex pluginIdx, mix_remove_effect_on_channel_a) {
+           [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, mix_remove_effect_on_channel_a) {
              Logging::write(
                Info,
                "Act::AppStateManager::mix_remove_effect_on_channel_a",

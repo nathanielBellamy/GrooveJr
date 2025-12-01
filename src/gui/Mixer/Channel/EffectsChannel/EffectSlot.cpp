@@ -11,7 +11,7 @@ EffectSlot::EffectSlot(QWidget* parent,
                        actor_system& actorSystem,
                        Audio::Mixer* mixer,
                        const ChannelIndex channelIndex,
-                       const EffectIndex effectIndex,
+                       const PluginIndex effectIndex,
                        const bool occupied,
                        QAction* replaceEffectAction,
                        QAction* removeEffectAction)

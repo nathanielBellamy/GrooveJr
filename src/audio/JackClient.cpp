@@ -406,8 +406,8 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
     }
   }
 
-  std::fill_n(audioCore->playbackBuffers[0], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
-  std::fill_n(audioCore->playbackBuffers[1], MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
+  std::fill_n(audioCore->playbackBuffers[0], AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
+  std::fill_n(audioCore->playbackBuffers[1], AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
 
   for (DeckIndex j = 0; j < AUDIO_CORE_DECK_COUNT; j++) {
     auto& deck = audioCore->decks[j];
@@ -485,7 +485,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   if (audioCore->playbackSettingsToAudioThread[0] == 1) // user set frame Id
     audioCore->currentDeck().frameId = audioCore->playbackSettingsToAudioThread[1];
 
-  audioCore->playbackSettingsFromAudioThread[0] = 0; // debug value
+  audioCore->playbackSettingsFromAudioThread[0] = nframes; // debug value
   audioCore->playbackSettingsFromAudioThread[1] = audioCore->currentDeck().frameId;
 
   // write to playbackSettingsFromAudioThread ring buffer
@@ -508,7 +508,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   const int32_t nframes32t = static_cast<int32_t>(nframes);
   for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < MAX_EFFECTS_CHANNELS; effectsChannelIdx++) {
     auto [effectCount, processFuncs, buffers] = audioCore->effectsChannelsProcessData[effectsChannelIdx];
-    for (EffectIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
+    for (PluginIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
       buffers[pluginIdx].numSamples = nframes32t;
 
       processFuncs[pluginIdx](
@@ -576,7 +576,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
   // process summed down mix through main effects
   auto [effectCount, processFuncs, buffers] = audioCore->effectsChannelsProcessData[0];
-  for (EffectIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
+  for (PluginIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
     buffers[pluginIdx].numSamples = static_cast<int32_t>(nframes);
 
     processFuncs[pluginIdx](

@@ -77,7 +77,7 @@ EffectsChannel::~EffectsChannel() {
 }
 
 // an effectIdx of -1 indicates to push_back
-bool EffectsChannel::addReplaceEffect(const std::optional<EffectIndex> effectIdxOpt, const std::string& effectPath) {
+bool EffectsChannel::addReplaceEffect(const std::optional<PluginIndex> effectIdxOpt, const std::string& effectPath) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::addReplaceEffect",
@@ -118,7 +118,7 @@ bool EffectsChannel::addReplaceEffect(const std::optional<EffectIndex> effectIdx
   ProcessSetup setup = {
     kRealtime,
     kSample64,
-    MAX_AUDIO_FRAMES_PER_BUFFER,
+    AUDIO_FRAMES_PER_BUFFER_MAX,
     44100.0
   };
   processor->setupProcessing(setup);
@@ -174,7 +174,7 @@ Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
   ProcessSetup setup = {
     kRealtime,
     kSample64,
-    MAX_AUDIO_FRAMES_PER_BUFFER,
+    AUDIO_FRAMES_PER_BUFFER_MAX,
     44100.0
   };
   processor->setupProcessing(setup);
@@ -251,7 +251,7 @@ void EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstW
 	}
 }
 
-void EffectsChannel::initEditorHost(const EffectIndex effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+void EffectsChannel::initEditorHost(const PluginIndex effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
 		vst3Plugins.at(effectIndex)->initEditorHost(vstWindow);
 }
 
@@ -272,7 +272,7 @@ void EffectsChannel::terminateEditorHosts() const {
 	);
 }
 
-bool EffectsChannel::removeEffect(const EffectIndex effectIdx) {
+bool EffectsChannel::removeEffect(const PluginIndex effectIdx) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::removeEffect",

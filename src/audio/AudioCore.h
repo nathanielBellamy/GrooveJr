@@ -50,12 +50,12 @@ struct AudioCore {
   float                            vu_buffer_in[VU_RING_BUFFER_SIZE]{ 0.0f };
   float                            vu_buffer[VU_RING_BUFFER_SIZE]{ 0.0f };
   jack_ringbuffer_t*               vu_ring_buffer{ nullptr };
-  float                            processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{ 0.0f };
+  float                            processBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{ 0.0f };
   float*                           processBuffers[2]{ nullptr, nullptr };
-  float                            playbackBuffersPre[2][MAX_AUDIO_FRAMES_PER_BUFFER]{ 0.0f };
-  float                            playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{ 0.0f };
+  float                            playbackBuffersPre[2][AUDIO_FRAMES_PER_BUFFER_MAX]{ 0.0f };
+  float                            playbackBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{ 0.0f };
   float*                           playbackBuffers[2]{ nullptr, nullptr };
-  float                            fftFreqBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER * 2]{ 0.0f };
+  float                            fftFreqBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{ 0.0f };
   sf_count_t                       playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{0};
   jack_ringbuffer_t*               playbackSettingsToAudioThreadRB{ nullptr };
                                    // pSTATRB[0] = userSettingFrameId bool
@@ -78,7 +78,7 @@ struct AudioCore {
                                    // eCS[4k+3] = {factorRR channel k}
   float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{ 0.0f };
   jack_ringbuffer_t*               effectsChannelsSettingsRB{ nullptr };
-  float                            effectsChannelsWriteOutBuffer[2 * MAX_AUDIO_FRAMES_PER_BUFFER * MAX_EFFECTS_CHANNELS]{ 0.0f };
+  float                            effectsChannelsWriteOutBuffer[2 * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_EFFECTS_CHANNELS]{ 0.0f };
   float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{ nullptr };
 
   AudioCore(AppState* gAppState)
@@ -131,10 +131,10 @@ struct AudioCore {
     );
 
     processBuffers[0] = &processBuffersBuffer[0];
-    processBuffers[1] = &processBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
+    processBuffers[1] = &processBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX];
 
     playbackBuffers[0] = &playbackBuffersBuffer[0];
-    playbackBuffers[1] = &playbackBuffersBuffer[MAX_AUDIO_FRAMES_PER_BUFFER];
+    playbackBuffers[1] = &playbackBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX];
 
     fft_eq_0_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[0], fft_eq_freq[0], FFTW_ESTIMATE);
     fft_eq_1_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[1], fft_eq_freq[1], FFTW_ESTIMATE);
@@ -143,8 +143,8 @@ struct AudioCore {
     fft_pv_plan_c2r = fftwf_plan_dft_c2r_1d(FFT_PV_FREQ_SIZE, fft_pv_freq_shift, fft_pv_time, FFTW_ESTIMATE);
 
     for (ChannelIndex i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-      effectsChannelsWriteOut[i][0] = &effectsChannelsWriteOutBuffer[2 * i * MAX_AUDIO_FRAMES_PER_BUFFER];
-      effectsChannelsWriteOut[i][1] = &effectsChannelsWriteOutBuffer[(2 * i + 1) * MAX_AUDIO_FRAMES_PER_BUFFER];
+      effectsChannelsWriteOut[i][0] = &effectsChannelsWriteOutBuffer[2 * i * AUDIO_FRAMES_PER_BUFFER_MAX];
+      effectsChannelsWriteOut[i][1] = &effectsChannelsWriteOutBuffer[(2 * i + 1) * AUDIO_FRAMES_PER_BUFFER_MAX];
     }
 
     Logging::write(
@@ -392,9 +392,9 @@ struct AudioCore {
   }
 
   Result clearBuffers() {
-    std::fill_n(effectsChannelsWriteOutBuffer, 2 * MAX_EFFECTS_CHANNELS * MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
-    std::fill_n(playbackBuffersBuffer, 2 * MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
-    std::fill_n(processBuffersBuffer, 2 * MAX_AUDIO_FRAMES_PER_BUFFER, 0.0f);
+    std::fill_n(effectsChannelsWriteOutBuffer, 2 * MAX_EFFECTS_CHANNELS * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
+    std::fill_n(playbackBuffersBuffer, 2 * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
+    std::fill_n(processBuffersBuffer, 2 * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
 
     return OK;
   }

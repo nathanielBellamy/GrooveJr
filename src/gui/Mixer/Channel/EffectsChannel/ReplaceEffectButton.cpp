@@ -10,7 +10,7 @@ namespace Gui {
 ReplaceEffectButton::ReplaceEffectButton(
   QWidget *parent,
   const ChannelIndex channelIndex,
-  const EffectIndex effectIndex,
+  const PluginIndex effectIndex,
   const bool occupied,
   QAction* action
   )

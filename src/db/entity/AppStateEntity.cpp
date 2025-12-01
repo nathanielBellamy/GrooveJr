@@ -38,7 +38,7 @@ AppStateEntity AppStateEntity::deser(sqlite3_stmt* stmt) {
 
 AppStateEntity AppStateEntity::base() {
   return {
-    0, 256, 0, 10000, 0
+    0, Audio::AUDIO_FRAMES_PER_BUFFER_DEFAULT, 0, 10000, 0
   };
 }
 

@@ -104,7 +104,7 @@ Plugin::Plugin(const Db::Effect& effectEntity, AppState* gAppState, std::shared_
 		audioHost->setModule(module);
 		audioHost->init(cmdArgs);
 
-		const auto audioHostComponentState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+		const auto audioHostComponentState = std::make_unique<ResizableMemoryIBStream>();
 		int audioHostComponentStateBytes = effectEntity.audioHostComponentStateBlob.size();
 		int audioHostComponentStateBytesWritten = 0;
 

@@ -24,14 +24,14 @@ using namespace Steinberg::Vst::EditorHost;
 class VstWindow final : public QWidget, public IWindow {
 
 	ChannelIndex channelIndex;
-	EffectIndex effectIndex;
+	PluginIndex effectIndex;
 	AtomicStr name;
 	QGridLayout grid;
 	void setStyle();
 	void setupGrid();
 
 public:
-  explicit VstWindow(QWidget* parent, ChannelIndex channelIndex, EffectIndex effectIndex, const AtomicStr& name);
+  explicit VstWindow(QWidget* parent, ChannelIndex channelIndex, PluginIndex effectIndex, const AtomicStr& name);
 	~VstWindow () noexcept override;
 
 	void show () override;

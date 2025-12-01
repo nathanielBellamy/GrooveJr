@@ -10,6 +10,7 @@
 #include <jack/jack.h>
 
 #include "../../types/Types.h"
+#include "../../audio/Constants.h"
 
 namespace Gj {
 namespace Db {

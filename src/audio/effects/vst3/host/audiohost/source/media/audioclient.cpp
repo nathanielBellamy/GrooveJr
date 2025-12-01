@@ -48,6 +48,8 @@
 #include <cassert>
 #include <limits>
 
+#include "../../../../../../Constants.h"
+
 //------------------------------------------------------------------------
 namespace Steinberg {
 namespace Vst {
@@ -93,9 +95,11 @@ static MidiCCMapping initMidiCtrlerAssignment (IComponent* component, IMidiMappi
 }
 
 //------------------------------------------------------------------------
-static void assignBusBuffers (const IAudioClient::Buffers& buffers, HostProcessData& processData,
-                              bool unassign = false)
-{
+static void assignBusBuffers (
+	const IAudioClient::Buffers& buffers,
+	HostProcessData& processData,
+	bool unassign = false
+){
 	// Set outputs
 	auto bufferIndex = 0;
 	for (auto busIndex = 0; busIndex < processData.numOutputs; busIndex++)
@@ -359,7 +363,7 @@ bool AudioClient::updateProcessSetup() {
 			return false;
 	}
 
-	ProcessSetup setup {kRealtime, kSample32, blockSize, sampleRate};
+	ProcessSetup setup {kRealtime, kSample32, Gj::Audio::AUDIO_FRAMES_PER_BUFFER_MAX, sampleRate};
 
 	if (processor->setupProcessing (setup) != kResultOk)
 		return false;

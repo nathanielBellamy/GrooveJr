@@ -5,6 +5,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <sndfile.h>
+
 namespace Gj {
 namespace Audio {
 
@@ -14,7 +16,8 @@ namespace Audio {
   constexpr unsigned int MAX_EFFECTS_CHANNELS = 50;
   constexpr unsigned int VU_RING_BUFFER_SIZE  = 2 * MAX_EFFECTS_CHANNELS;
   constexpr unsigned int MAX_PLUGINS_PER_CHANNEL = 50;
-  constexpr unsigned int MAX_AUDIO_FRAMES_PER_BUFFER = 1024;
+  constexpr unsigned int AUDIO_FRAMES_PER_BUFFER_MAX = 2048;
+  constexpr unsigned int AUDIO_FRAMES_PER_BUFFER_DEFAULT = 256;
   constexpr unsigned int FFT_EQ_TIME_SIZE = 1024;
   constexpr unsigned int FFT_EQ_FREQ_SIZE = 513;
   constexpr size_t FFT_EQ_RING_BUFFER_SIZE = 2 * FFT_EQ_FREQ_SIZE * sizeof(float);
