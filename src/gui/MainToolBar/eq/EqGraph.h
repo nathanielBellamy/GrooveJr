@@ -49,7 +49,7 @@ class EqGraph final : public QOpenGLWidget, protected QOpenGLFunctions {
 
   private:
     bool running = false;
-    int h = 75;
+    int h = 126;
     int w = Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM;
     int maxBarH = 30;
     float maxBarHf = 30.0f;

@@ -485,7 +485,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   if (audioCore->playbackSettingsToAudioThread[0] == 1) // user set frame Id
     audioCore->currentDeck().frameId = audioCore->playbackSettingsToAudioThread[1];
 
-  audioCore->playbackSettingsFromAudioThread[0] = nframes; // debug value
+  audioCore->playbackSettingsFromAudioThread[0] = 0; // debug value
   audioCore->playbackSettingsFromAudioThread[1] = audioCore->currentDeck().frameId;
 
   // write to playbackSettingsFromAudioThread ring buffer
@@ -506,7 +506,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   // process effects channels
   // main channel is effectsChannelIdx 0
   const int32_t nframes32t = static_cast<int32_t>(nframes);
-  for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < MAX_EFFECTS_CHANNELS; effectsChannelIdx++) {
+  for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->channelCount; effectsChannelIdx++) {
     auto [effectCount, processFuncs, buffers] = audioCore->effectsChannelsProcessData[effectsChannelIdx];
     for (PluginIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
       buffers[pluginIdx].numSamples = nframes32t;
@@ -533,7 +533,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   for (jack_nframes_t i = 0; i < nframes; i++) {
     float accumL = 0.0f;
     float accumR = 0.0f;
-    for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < MAX_EFFECTS_CHANNELS; effectsChannelIdx++) {
+    for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->channelCount; effectsChannelIdx++) {
       const float factorLL = audioCore->effectsChannelsSettings[4 * effectsChannelIdx];
       const float factorLR = audioCore->effectsChannelsSettings[4 * effectsChannelIdx + 1];
       const float factorRL = audioCore->effectsChannelsSettings[4 * effectsChannelIdx + 2];
@@ -568,7 +568,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   }
 
   const float nframesF = static_cast<float>(nframes);
-  for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < MAX_EFFECTS_CHANNELS; effectsChannelIdx++) {
+  for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->channelCount; effectsChannelIdx++) {
     const ChannelIndex bufferIndex = 2 * effectsChannelIdx;
     audioCore->vu_buffer_in[bufferIndex] = std::sqrt(rmsL[effectsChannelIdx] / nframesF);
     audioCore->vu_buffer_in[bufferIndex + 1] = std::sqrt(rmsR[effectsChannelIdx] / nframesF);

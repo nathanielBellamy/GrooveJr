@@ -31,7 +31,6 @@ struct AudioCore {
   DeckIndex                        deckIndex = 0;
   DeckIndex                        deckIndexNext = 0;
   sf_count_t                       frameAdvance;
-  std::atomic<PlayState>           playState = STOP;
   float                            fft_eq_time[2][FFT_EQ_TIME_SIZE]{ 0.0 };
   fftwf_complex                    fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
   float                            fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{ 0.0f };
@@ -70,7 +69,7 @@ struct AudioCore {
                                    // pSFATRB[1] = frameId sf_count_t
   std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
-  size_t                           effectsChannelCount;
+  size_t                           channelCount;
   std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
                                    // eCS[4k]   = {factorLL channel k}
                                    // eCS[4k+1] = {factorLR channel k}
@@ -304,7 +303,7 @@ struct AudioCore {
   }
 
   Result setChannelCount(const ChannelIndex val) {
-    effectsChannelCount = val;
+    channelCount = val;
     return OK;
   }
 

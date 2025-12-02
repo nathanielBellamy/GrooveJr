@@ -309,7 +309,7 @@ struct AudioPlayer {
         PlaybackSettingsFromAudioThread_RB_SIZE
       );
 
-    // std::cout << " nframes " << playbackSettingsFromAudioThread[0] << std::endl;
+    // std::cout << " debug " << playbackSettingsFromAudioThread[0] << std::endl;
     const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
     mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, currentFrameId);
 
@@ -407,12 +407,6 @@ struct AudioPlayer {
       );
     }
 
-    // std::cout << "effectsChannelSettings chan 1= " << std::endl
-    // << "factor LL" << effectsChannelsSettings[4] << std::endl
-    // << "factor LR" << effectsChannelsSettings[5] << std::endl
-    // << "factor RL" << effectsChannelsSettings[6] << std::endl
-    // << "factor RR" << effectsChannelsSettings[7] << std::endl;
-
     // write to effectsSettings ring buffer
     if (jack_ringbuffer_write_space(audioCore->effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE - 2) {
       jack_ringbuffer_write(audioCore->effectsChannelsSettingsRB, reinterpret_cast<char*>(effectsChannelsSettings), EffectsSettings_RB_SIZE);
@@ -457,13 +451,9 @@ struct AudioPlayer {
 
     createRingBuffers();
 
-    audioCore->playState = PLAY;
     audioCore->decks[audioCore->deckIndex].playState = PLAY;
 
     while( continueRun() ) {
-      // here is our chance to pull data out of the application
-      // and
-      // make it accessible to our running audio callback through the audioCore obj
       // std::cout << "audioplayer run playb " << audioCore->playbackBuffers[0][100] << std::endl;
       // std::cout << "audioplayer run proce " << audioCore->processBuffers[0][100] << std::endl << std::endl;
       // std::cout << "audioplayer run fxcha " << audioCore->effectsChannelsWriteOut[1][0][50] << std::endl << std::endl;
@@ -484,7 +474,6 @@ struct AudioPlayer {
       if ( audioCore->threadId != ThreadStatics::getThreadId() ) { // fadeout, break + cleanup
         // TODO
       } else {
-        audioCore->playState = ThreadStatics::getPlayState();
         ThreadStatics::setFrameId( audioCore->currentDeck().frameId );
       }
 
@@ -498,10 +487,11 @@ struct AudioPlayer {
     );
 
     if ( audioCore->threadId == ThreadStatics::getThreadId() ) { // current audio thread has reached natural end of file
-      if (audioCore->playState == PLAY)
-          ThreadStatics::setPlayState(STOP);
-      else
-          ThreadStatics::setPlayState(audioCore->playState);
+      // TODO:
+      // if (audioCore->playState == PLAY)
+      //     ThreadStatics::setPlayState(STOP);
+      // else
+      //     ThreadStatics::setPlayState(audioCore->playState);
     }
 
     if (jackClientIsActive) {
