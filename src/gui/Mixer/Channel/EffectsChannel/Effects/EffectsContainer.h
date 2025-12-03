@@ -43,9 +43,9 @@ class EffectsContainer final : public QWidget {
   private:
     Audio::Mixer* mixer;
     ChannelIndex channelIndex;
-    QAction* addEffectAction;
-    AddEffectButton addEffectButton;
-    QAction* removeEffectAction;
+    QAction* addPluginAction;
+    AddEffectButton addPluginButton;
+    QAction* removePluginAction;
     QGridLayout grid;
     std::vector<std::shared_ptr<VstWindow>> vstWindows {};
     QAction selectVstWindowAction;

@@ -17,9 +17,9 @@ EffectsContainer::EffectsContainer(
   : QWidget(nullptr)
   , mixer(mixer)
   , channelIndex(channelIndex)
-  , addEffectAction(addEffectAction)
-  , addEffectButton(this, addEffectAction)
-  , removeEffectAction(removeEffectAction)
+  , addPluginAction(addEffectAction)
+  , addPluginButton(this, addEffectAction)
+  , removePluginAction(removeEffectAction)
   , grid(this)
   {
 
@@ -65,14 +65,14 @@ void EffectsContainer::connectActions() {
     raise();
   });
 
-  const auto removeEffectActionConnection = connect(removeEffectAction, &QAction::triggered, [&]() {
-    const PluginIndex effectIndex = selectVstWindowAction.data().toULongLong();
-    vstWindows.at(effectIndex)->hide();
-    vstWindows.erase(vstWindows.begin() + effectIndex);
-    vstWindowSelectButtons.at(effectIndex)->hide();
-    vstWindowSelectButtons.erase(vstWindowSelectButtons.begin() + effectIndex);
-    vstWindowSelectLabels.at(effectIndex)->hide();
-    vstWindowSelectLabels.erase(vstWindowSelectLabels.begin() + effectIndex);
+  const auto removeEffectActionConnection = connect(removePluginAction, &QAction::triggered, [&]() {
+    const PluginIndex pluginIndex = removePluginAction->data().toULongLong();
+    vstWindows.at(pluginIndex)->hide();
+    vstWindows.erase(vstWindows.begin() + pluginIndex);
+    vstWindowSelectButtons.at(pluginIndex)->hide();
+    vstWindowSelectButtons.erase(vstWindowSelectButtons.begin() + pluginIndex);
+    vstWindowSelectLabels.at(pluginIndex)->hide();
+    vstWindowSelectLabels.erase(vstWindowSelectLabels.begin() + pluginIndex);
   });
 }
 
@@ -95,7 +95,7 @@ void EffectsContainer::setupGrid() {
     j++;
   }
   grid.setRowMinimumHeight(j, 50);
-  grid.addWidget(&addEffectButton, j, 0, 1, -1);
+  grid.addWidget(&addPluginButton, j, 0, 1, -1);
 
   setLayout(&grid);
 }

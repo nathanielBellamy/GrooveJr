@@ -10,15 +10,15 @@ namespace Gui {
 RemoveEffectButton::RemoveEffectButton(
   QWidget* parent,
   const ChannelIndex channelIndex,
-  const PluginIndex effectIndex,
+  const PluginIndex pluginIndex,
   const bool occupied,
   QAction* action
   )
   : QPushButton("", parent)
   , channelIndex(channelIndex)
-  , effectIndex(effectIndex)
+  , pluginIndex(pluginIndex)
   , occupied(occupied)
-  , removeEffectAction(action) {
+  , removePluginAction(action) {
   setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
   setCursor(Qt::PointingHandCursor);
   setStyle();
@@ -29,8 +29,8 @@ void RemoveEffectButton::hydrateState(const AppStatePacket &appState, ChannelInd
 }
 
 void RemoveEffectButton::mousePressEvent(QMouseEvent* event) {
-  removeEffectAction->setData(static_cast<quint64>(effectIndex));
-  removeEffectAction->activate(QAction::Trigger);
+  removePluginAction->setData(static_cast<quint64>(pluginIndex));
+  removePluginAction->activate(QAction::Trigger);
 }
 
 void RemoveEffectButton::setStyle() {

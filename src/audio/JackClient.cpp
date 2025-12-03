@@ -406,9 +406,6 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
     }
   }
 
-  std::fill_n(audioCore->playbackBuffers[0], AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
-  std::fill_n(audioCore->playbackBuffers[1], AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
-
   for (DeckIndex j = 0; j < AUDIO_CORE_DECK_COUNT; j++) {
     auto& deck = audioCore->decks[j];
     if (!deck.isPlaying())
