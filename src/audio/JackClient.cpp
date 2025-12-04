@@ -482,7 +482,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   if (audioCore->playbackSettingsToAudioThread[0] == 1) // user set frame Id
     audioCore->currentDeck().frameId = audioCore->playbackSettingsToAudioThread[1];
 
-  audioCore->playbackSettingsFromAudioThread[0] = 0; // debug value
+  // audioCore->playbackSettingsFromAudioThread[0] = 0; // DEBUG VALUE FROM AUDIO THREAD
   audioCore->playbackSettingsFromAudioThread[1] = audioCore->currentDeck().frameId;
 
   // write to playbackSettingsFromAudioThread ring buffer
@@ -512,6 +512,10 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
         buffers[pluginIdx],
         nframes
       );
+
+      if (effectsChannelIdx == 1 && pluginIdx == 0) {
+        audioCore->playbackSettingsFromAudioThread[0] = static_cast<sf_count_t>(100.0f * audioCore->effectsChannelsWriteOut[1][0][0]); // debug value
+      }
     }
   }
 

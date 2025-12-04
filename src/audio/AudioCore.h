@@ -129,11 +129,7 @@ struct AudioCore {
       "Initializing AudioCore"
     );
 
-    processBuffers[0] = &processBuffersBuffer[0];
-    processBuffers[1] = &processBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX];
-
-    playbackBuffers[0] = &playbackBuffersBuffer[0];
-    playbackBuffers[1] = &playbackBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX];
+    setBufferRefs();
 
     fft_eq_0_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[0], fft_eq_freq[0], FFTW_ESTIMATE);
     fft_eq_1_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[1], fft_eq_freq[1], FFTW_ESTIMATE);
@@ -141,16 +137,26 @@ struct AudioCore {
     fft_pv_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_PV_TIME_SIZE, fft_pv_time, fft_pv_freq, FFTW_ESTIMATE);
     fft_pv_plan_c2r = fftwf_plan_dft_c2r_1d(FFT_PV_FREQ_SIZE, fft_pv_freq_shift, fft_pv_time, FFTW_ESTIMATE);
 
-    for (ChannelIndex i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-      effectsChannelsWriteOut[i][0] = &effectsChannelsWriteOutBuffer[2 * i * AUDIO_FRAMES_PER_BUFFER_MAX];
-      effectsChannelsWriteOut[i][1] = &effectsChannelsWriteOutBuffer[(2 * i + 1) * AUDIO_FRAMES_PER_BUFFER_MAX];
-    }
-
     Logging::write(
       Info,
       "Audio::AudioCore::init",
       "Initialized AudioCore"
     );
+
+    return OK;
+  }
+
+  Result setBufferRefs() {
+    processBuffers[0] = &processBuffersBuffer[0];
+    processBuffers[1] = &processBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX];
+
+    playbackBuffers[0] = &playbackBuffersBuffer[0];
+    playbackBuffers[1] = &playbackBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX];
+
+    for (ChannelIndex i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
+      effectsChannelsWriteOut[i][0] = &effectsChannelsWriteOutBuffer[2 * i * AUDIO_FRAMES_PER_BUFFER_MAX];
+      effectsChannelsWriteOut[i][1] = &effectsChannelsWriteOutBuffer[(2 * i + 1) * AUDIO_FRAMES_PER_BUFFER_MAX];
+    }
 
     return OK;
   }

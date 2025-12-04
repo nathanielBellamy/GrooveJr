@@ -45,6 +45,13 @@ void shutdown_handler(const int sig) {
     "Deleted Dao"
   );
 
+  delete audioCore;
+  Logging::write(
+    Info,
+    "shutdown_handler",
+    "Deleted AudioCore"
+  );
+
   Logging::write(
     Info,
     "shutdown_handler",
@@ -171,7 +178,6 @@ int main(int argc, char *argv[]) {
   actor_system_config cfg;
   actor_system sys{cfg};
 
-  // init supervisor
   auto supervisor = sys.spawn(
     actor_from_state<Act::SupervisorState>,
     gAppState,

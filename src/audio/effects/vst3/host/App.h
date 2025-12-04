@@ -23,30 +23,28 @@ namespace Audio {
 namespace Effects {
 namespace Vst3 {
 namespace Host {
-
 using namespace Steinberg;
 using namespace Steinberg::Vst;
 
-class App : public IHostApplication
-{
-	public:
-		App ();
-		virtual ~App () noexcept {FUNKNOWN_DTOR}
+class App : public IHostApplication {
+public:
+  App();
 
-		tresult terminate();
+  virtual ~App() noexcept { FUNKNOWN_DTOR}
 
-		//--- IHostApplication ---------------
-		tresult PLUGIN_API getName (String128 name) override;
-		tresult PLUGIN_API createInstance (TUID cid, TUID _iid, void** obj) override;
+  tresult terminate();
 
-		DECLARE_FUNKNOWN_METHODS
+  //--- IHostApplication ---------------
+  tresult PLUGIN_API getName(String128 name) override;
 
-		PlugInterfaceSupport* getPlugInterfaceSupport () const { return mPlugInterfaceSupport; }
+  tresult PLUGIN_API createInstance(TUID cid, TUID _iid, void **obj) override;
 
-	private:
-		IPtr<PlugInterfaceSupport> mPlugInterfaceSupport;
+  DECLARE_FUNKNOWN_METHODS
+  PlugInterfaceSupport *getPlugInterfaceSupport() const { return mPlugInterfaceSupport; }
+
+private:
+  IPtr<PlugInterfaceSupport> mPlugInterfaceSupport;
 };
-
 } // Host
 } // Vst3
 } // Effects

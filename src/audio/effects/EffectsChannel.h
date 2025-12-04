@@ -48,6 +48,17 @@ class EffectsChannel {
     );
     ~EffectsChannel();
 
+    Result setupProcessing() const {
+      Result res = OK;
+
+      for (const auto& plugin : vst3Plugins) {
+        if (plugin->setupProcessing() != OK)
+          res = ERROR;
+      }
+
+      return res;
+    }
+
     [[nodiscard]]
     ChannelIndex getIndex() const { return index; }
 

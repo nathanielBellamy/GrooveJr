@@ -37,13 +37,17 @@
 
 #pragma once
 
+#include <iostream>
+#include <array>
+
 #include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 #include "public.sdk/samples/vst-hosting/audiohost/source/media/iparameterclient.h"
 #include "public.sdk/source/vst/hosting/eventlist.h"
 #include "public.sdk/source/vst/hosting/parameterchanges.h"
 #include "public.sdk/source/vst/hosting/processdata.h"
 #include "pluginterfaces/vst/ivstaudioprocessor.h"
-#include <array>
+
+#include "../../../../../../Constants.h"
 
 //------------------------------------------------------------------------
 namespace Steinberg {
@@ -72,6 +76,8 @@ public:
 //--------------------------------------------------------------------
 	using Name = std::string;
 
+	static float SILENCE_BUFFER[Gj::Audio::AUDIO_FRAMES_PER_BUFFER_MAX];
+
 	AudioClient ();
 	~AudioClient () override;
 
@@ -84,6 +90,14 @@ public:
 	bool process (Buffers& buffers, int64_t continousFrames) override;
 	bool setSamplerate (SampleRate value) override;
 	bool setBlockSize (int32 value) override;
+	bool setupProcessing() const {
+		const FUnknownPtr<IAudioProcessor> processor = component;
+		if (!processor)
+			return false;
+		ProcessSetup setup {kRealtime, kSample32, Gj::Audio::AUDIO_FRAMES_PER_BUFFER_MAX, sampleRate};
+
+		return processor->setupProcessing (setup) == kResultOk;
+	};
 	IAudioClient::IOSetup getIOSetup () const override;
 
 	// IMidiClient
@@ -92,9 +106,7 @@ public:
 
 	// IParameterClient
 	void setParameter (ParamID id, ParamValue value, int32 sampleOffset) override;
-
 	MidiCCMapping getMidiCCMapping ();
-
 	bool initialize (const Name& name, IComponent* component, IMidiMapping* midiMapping, IMediaServerPtr jackClient);
 
 //--------------------------------------------------------------------
@@ -105,14 +117,14 @@ private:
 	void initProcessData ();
 	void initProcessContext ();
 	bool updateProcessSetup ();
-	void preprocess (Buffers& buffers, int64_t continousFrames);
+	void preprocess (const Buffers& buffers, int64_t continousFrames);
 	void postprocess (Buffers& buffers);
 	bool isPortInRange (int32 port, int32 channel) const;
 	bool processVstEvent (const IMidiClient::Event& event, int32 port);
 	bool processParamChange (const IMidiClient::Event& event, int32 port);
 
 	SampleRate sampleRate = 0;
-	int32 blockSize = 0;
+	int32 blockSize = Gj::Audio::AUDIO_FRAMES_PER_BUFFER_DEFAULT;
 	HostProcessData processData;
 	ProcessContext processContext;
 	EventList eventList;

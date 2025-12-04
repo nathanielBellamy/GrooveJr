@@ -51,6 +51,9 @@ struct AudioPlayer {
     , gAppState(gAppState)
     , jackClient(mixer->getGjJackClient())
     {
+
+    audioCore->clearBuffers();
+
     if (jackClient == nullptr) {
       Logging::write(
         Error,
@@ -126,13 +129,13 @@ struct AudioPlayer {
     }
 
     // update plugin effects with info about audio to be processed
-    // if (mixer->setSampleRate(sfInfo.samplerate) != OK) {
-    //   Logging::write(
-    //     Warning,
-    //     "Audio::AudioPlayer::setupAudioCore",
-    //     "Unable to set sample rate: " + std::to_string(sfInfo.samplerate)
-    //   );
-    // }
+    const SF_INFO sfInfo = audioCore->currentDeck().decoratedAudioFile->audioFile.sfInfo;
+    if (mixer->setSampleRate(sfInfo.samplerate) != OK)
+      Logging::write(
+        Warning,
+        "Audio::AudioPlayer::setupAudioCore",
+        "Unable to set sample rate: " + std::to_string(sfInfo.samplerate)
+      );
 
     ThreadStatics::setFrames(audioCore->currentDeck().frames);
 
@@ -309,7 +312,7 @@ struct AudioPlayer {
         PlaybackSettingsFromAudioThread_RB_SIZE
       );
 
-    // std::cout << " debug " << playbackSettingsFromAudioThread[0] << std::endl;
+    // std::cout << " DEBUG VALUE FROM AUDIO THREAD " << playbackSettingsFromAudioThread[0] << std::endl;
     const sf_count_t currentFrameId = playbackSettingsFromAudioThread[1];
     mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, currentFrameId);
 

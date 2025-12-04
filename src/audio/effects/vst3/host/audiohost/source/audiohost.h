@@ -71,6 +71,9 @@ public:
 	OPtr<IEditController> editController;
 	AudioClientPtr audioClient;
 	int channelCount = {2}; // TODO: access info from libsndfile
+	bool setupProcessing() {
+		return audioClient->setupProcessing();
+	}
 
 	void getState(IBStream* componentState, IBStream* controllerState) const {
 		component->getState(componentState);

@@ -59,6 +59,17 @@ public:
     return jackClient;
   };
 
+  Result setupProcessing() const {
+    Result res = OK;
+
+    for (auto& effectsChannel : effectsChannels) {
+      if (effectsChannel->setupProcessing() != OK)
+        res = ERROR;
+    }
+
+    return res;
+  }
+
   Result setPlaybackSpeed(const int newPlaybackSpeed) const {
     auto scene = gAppState->scene.load();
     scene.playbackSpeed = static_cast<float>(newPlaybackSpeed) / 100.0f;
