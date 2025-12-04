@@ -103,21 +103,6 @@ int main(int argc, char *argv[]) {
     "== GrooveJr =="
   );
 
-  if (initVst3PluginContext() == OK) {
-    Logging::write(
-      Info,
-      "main",
-      "Instantiated VST3 PluginContext"
-    );
-  } else {
-    Logging::write(
-      Error,
-      "main::initVst3PluginContext",
-      "Failed to initialize Vst3PluginContext"
-    );
-    return 1;
-  }
-
   // setup Sql
   gAppState = new AppState;
   dao = new Db::Dao(gAppState);
@@ -157,6 +142,21 @@ int main(int argc, char *argv[]) {
     "main",
     "Loaded gAppState: " + gAppState->toString()
   );
+
+  if (initVst3PluginContext() == OK) {
+    Logging::write(
+      Info,
+      "main",
+      "Instantiated VST3 PluginContext"
+    );
+  } else {
+    Logging::write(
+      Error,
+      "main::initVst3PluginContext",
+      "Failed to initialize Vst3PluginContext"
+    );
+    return 1;
+  }
 
   audioCore = new Audio::AudioCore(gAppState);
   Logging::write(

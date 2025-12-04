@@ -425,8 +425,13 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
       playbackPosTrunc = std::trunc(playbackPos);
       idx = static_cast<int>(playbackPosTrunc);
       const float frac = playbackPos - playbackPosTrunc;
-      audioCore->playbackBuffers[0][i] += ((1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1]) * deck.gain;
-      audioCore->playbackBuffers[1][i] += ((1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1]) * deck.gain;
+      const auto valL = ((1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1]) * deck.gain;
+      const auto valR = ((1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1]) * deck.gain;
+      // if (std::isnan(valL) || std::isnan(valR)) {
+      //   audioCore->playbackSettingsFromAudioThread[0] = 7777777; // DEBUG
+      // }
+      audioCore->playbackBuffers[0][i] += std::isnan(valL) ? 0.0f : valL;
+      audioCore->playbackBuffers[1][i] += std::isnan(valR) ? 0.0f : valR;
       playbackPos += playbackSpeedF;
     }
 
@@ -504,18 +509,14 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   // main channel is effectsChannelIdx 0
   const int32_t nframes32t = static_cast<int32_t>(nframes);
   for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->channelCount; effectsChannelIdx++) {
-    auto [effectCount, processFuncs, buffers] = audioCore->effectsChannelsProcessData[effectsChannelIdx];
-    for (PluginIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
+    auto [pluginCount, processFuncs, buffers] = audioCore->effectsChannelsProcessData[effectsChannelIdx];
+    for (PluginIndex pluginIdx = 0; pluginIdx < pluginCount; pluginIdx++) {
       buffers[pluginIdx].numSamples = nframes32t;
 
       processFuncs[pluginIdx](
         buffers[pluginIdx],
         nframes
       );
-
-      if (effectsChannelIdx == 1 && pluginIdx == 0) {
-        audioCore->playbackSettingsFromAudioThread[0] = static_cast<sf_count_t>(100.0f * audioCore->effectsChannelsWriteOut[1][0][0]); // debug value
-      }
     }
   }
 
@@ -542,7 +543,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
       float valL = 0.0f;
       float valR = 0.0f;
-      if (audioCore->effectsChannelsProcessData[effectsChannelIdx].effectCount == 0) {
+      if (audioCore->effectsChannelsProcessData[effectsChannelIdx].pluginCount == 0) {
         valL = factorLL * audioCore->playbackBuffers[0][i] + factorRL * audioCore->playbackBuffers[1][i];
         valR = factorLR * audioCore->playbackBuffers[0][i] + factorRR * audioCore->playbackBuffers[1][i];
       } else {

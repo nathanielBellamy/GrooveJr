@@ -228,7 +228,7 @@ class EffectsChannel {
     Result setSampleRate(double sampleRate) const;
     Result setBlockSize(jack_nframes_t blockSize) const;
 
-    size_t effectCount() const;
+    PluginIndex pluginCount() const;
     void initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
     void initEditorHost(PluginIndex effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
     void terminateEditorHosts() const;

@@ -188,7 +188,7 @@ Result Mixer::loadEffectOnChannel(const Db::Effect& effectEntity) const {
 }
 
 size_t Mixer::effectsOnChannelCount(const ChannelIndex idx) const {
-  return effectsChannels.at(idx)->effectCount();
+  return effectsChannels.at(idx)->pluginCount();
 }
 
 void Mixer::initEditorHostsOnChannel(const ChannelIndex idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
@@ -440,7 +440,7 @@ Result Mixer::saveChannels() const {
       result = ERROR;
     }
 
-    const int effectCount = effectsChannel->effectCount();
+    const int effectCount = effectsChannel->pluginCount();
     const auto channelIndex = effectsChannel->getIndex();
     for (int i = 0; i < effectCount; i++) {
       const auto plugin = effectsChannel->getPluginAtIdx(i);

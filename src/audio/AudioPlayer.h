@@ -174,8 +174,8 @@ struct AudioPlayer {
       audioCore->effectsChannelsSettings[2 * chIndex] = ch->getGain();
       audioCore->effectsChannelsSettings[2 * chIndex + 1] = ch->getPan();
 
-      audioCore->effectsChannelsProcessData[chIndex].effectCount = ch->effectCount();
-      for (PluginIndex pluginIdx = 0; pluginIdx < ch->effectCount(); pluginIdx++) {
+      audioCore->effectsChannelsProcessData[chIndex].pluginCount = ch->pluginCount();
+      for (PluginIndex pluginIdx = 0; pluginIdx < ch->pluginCount(); pluginIdx++) {
         const auto plugin = ch->getPluginAtIdx(pluginIdx);
         audioCore->effectsChannelsProcessData[chIndex].processFuncs[pluginIdx] =
           [audioClient = plugin->audioHost->audioClient](auto && buffers, auto && continuousFrames) {
@@ -186,7 +186,7 @@ struct AudioPlayer {
           };
 
         audioCore->effectsChannelsProcessData[chIndex].buffers[pluginIdx] =
-          getPluginBuffers(ch, chIndex, pluginIdx);
+          getPluginBuffers(ch, pluginIdx);
       }
     }
 
@@ -201,7 +201,6 @@ struct AudioPlayer {
 
   IAudioClient::Buffers getPluginBuffers(
     const Effects::EffectsChannel* effectsChannel,
-    const ChannelIndex channelIdx,
     const PluginIndex pluginIdx
   ) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
@@ -210,9 +209,8 @@ struct AudioPlayer {
     // - the channels are then summed down into the processBuffers
     // - the main channel then acts upon the processBuffers
 
-    // main channel
-    if (channelIdx == 0) {
-      // main channel acts on process buffer
+    if (effectsChannel->getIndex() == 0) // main
+      // all plugins on main operate on process
       return {
         audioCore->processBuffers,
         2,
@@ -220,11 +218,10 @@ struct AudioPlayer {
         2,
         audioFramesPerBuffer
       };
-    }
 
     // non-main channel from here on
-    const auto effectCount = effectsChannel->effectCount();
-    const auto writeOut = const_cast<float**>(audioCore->effectsChannelsWriteOut[channelIdx]);
+    const auto effectCount = effectsChannel->pluginCount();
+    const auto writeOut = const_cast<float**>(audioCore->effectsChannelsWriteOut[effectsChannel->getIndex()]);
     if (effectCount == 1) {
       // single effect on non-main channel so goes from playbackBuffers to writeout
       return {
@@ -338,6 +335,14 @@ struct AudioPlayer {
     }
 
     const ChannelIndex channelCount = mixer->getTotalChannelsCount();
+    if (channelCount < 2) {
+      Logging::write(
+        Error,
+        "Audio::AudioPlayer::updateRingBuffers()",
+        "Too few channels."
+      );
+      return ERROR;
+    }
     const float channelCountF = static_cast<float>(channelCount);
 
     Effects::EffectsChannel* effectsChannels[MAX_EFFECTS_CHANNELS] {nullptr};

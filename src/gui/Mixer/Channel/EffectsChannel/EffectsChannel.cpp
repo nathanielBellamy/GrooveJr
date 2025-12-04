@@ -304,8 +304,8 @@ void EffectsChannel::setEffects() {
   if (channelIndex > mixer->getEffectsChannelsCount())
     return;
 
-  for (int i = 0; i < mixer->getEffectsChannel(channelIndex)->effectCount(); i++)
-    addEffect(i);
+  for (PluginIndex i = 0; i < mixer->getEffectsChannel(channelIndex)->pluginCount(); i++)
+    addEffect(std::optional(i));
 
   Logging::write(
     Info,

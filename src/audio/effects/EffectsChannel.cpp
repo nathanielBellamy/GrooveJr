@@ -229,7 +229,7 @@ Result EffectsChannel::setBlockSize(const jack_nframes_t blockSize) const {
 }
 
 
-size_t EffectsChannel::effectCount() const {
+PluginIndex EffectsChannel::pluginCount() const {
 	return vst3Plugins.size();
 }
 
