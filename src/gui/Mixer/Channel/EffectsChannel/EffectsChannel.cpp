@@ -31,13 +31,13 @@ EffectsChannel::EffectsChannel(
   , vuMeter(this, mixer, vuPtr, channelIndex)
   , removeEffectsChannelAction(removeEffectsChannelAction)
   , removeEffectsChannelButton(this, channelIndex, removeEffectsChannelAction)
-  , addEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
-  , addEffectButton(this, &addEffectAction)
+  , addPluginAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
+  , addPluginButton(this, &addPluginAction)
   , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Effects"), this)
   , vstSelect(this)
-  , replaceEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentRevert), tr("&Replace Effect"), this)
-  , removeEffectAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Effect"), this)
-  , effectsContainer(nullptr, mixer, channelIndex, &addEffectAction, &removeEffectAction)
+  , replacePluginAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentRevert), tr("&Replace Effect"), this)
+  , removePluginAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Effect"), this)
+  , effectsContainer(nullptr, mixer, channelIndex, &addPluginAction, &removePluginAction)
   , grid(this)
   , title(this)
   , gainSlider(Qt::Vertical, this)
@@ -53,7 +53,7 @@ EffectsChannel::EffectsChannel(
   , panRSlider(Qt::Horizontal, this)
   , panRLabel("PanR", this)
   , effectsSlotsScrollArea(this)
-  , effectsSlots(this, actorSystem, mixer, channelIndex, &replaceEffectAction, &removeEffectAction)
+  , effectsSlots(this, actorSystem, mixer, channelIndex, &replacePluginAction, &removePluginAction)
   , muteSoloContainer(
     this, mixer, channelIndex, &openEffectsContainer,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
@@ -112,10 +112,10 @@ void EffectsChannel::hydrateState(const AppStatePacket& appStatePacket, const Ch
 
   if (appStatePacket.playState == PLAY || appStatePacket.playState == FF || appStatePacket.playState == RW) {
     removeEffectsChannelButton.setEnabled(false);
-    addEffectButton.setEnabled(false);
+    addPluginButton.setEnabled(false);
   } else {
     removeEffectsChannelButton.setEnabled(true);
-    addEffectButton.setEnabled(true);
+    addPluginButton.setEnabled(true);
   }
 
   if (channelIndex > 0)
@@ -160,7 +160,7 @@ void EffectsChannel::setupGrid() {
   grid.addWidget(&gainRSlider, 1, 3, 3, 1);
   grid.addWidget(&gainRLabel, 4, 3, 1, 1);
   grid.addWidget(&effectsSlotsScrollArea, 1, 4, 1, 1);
-  grid.addWidget(&addEffectButton, 1, 5, 1, 1);
+  grid.addWidget(&addPluginButton, 1, 5, 1, 1);
   // grid.addWidget(&panSlider, 2, 3, 1, 1);
   // grid.addWidget(&panLabel, 2, 4, 1, 1);
   grid.addWidget(&panLSlider, 2, 4, 1, 1);
@@ -316,7 +316,7 @@ void EffectsChannel::setEffects() {
 
 void EffectsChannel::addEffect(const std::optional<PluginIndex> effectIndex) {
   const PluginIndex newEffectIndex = effectIndex.value_or(
-    mixer->effectsOnChannelCount(channelIndex) - 1
+    mixer->pluginsOnChannelCount(channelIndex) - 1
   );
   Logging::write(
     Info,
@@ -349,19 +349,19 @@ void EffectsChannel::connectActions() {
     vstUrl = url;
   });
 
-  auto addEffectConnection = connect(&addEffectAction, &QAction::triggered, [&]() {
+  auto addPluginConnection = connect(&addPluginAction, &QAction::triggered, [&]() {
     if (vstSelect.exec() == QDialog::Accepted) {
       const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
         Info,
-        "Gui::EffectsChannel::addEffectAction",
+        "Gui::EffectsChannel::addPluginAction",
         "Adding effect: " + effectPath + " to channel " + std::to_string(channelIndex)
       );
 
-      if (!mixer->addEffectToChannel(channelIndex, effectPath)) {
+      if (!mixer->addPluginToChannel(channelIndex, effectPath)) {
         Logging::write(
           Error,
-          "Gui::EffectsChannel::addEffectAction",
+          "Gui::EffectsChannel::addPluginAction",
           "Unable to add effect " + effectPath + " to channel " + std::to_string(channelIndex)
         );
       } else {
@@ -373,19 +373,19 @@ void EffectsChannel::connectActions() {
             actor_cast<actor>(appStateManagerPtr),
             channelIndex,
             effectPath,
-            mix_add_effect_to_channel_a_v
+            mix_add_plugin_to_channel_a_v
         );
       }
     }
   });
 
-  auto replaceEffectConnection = connect(&replaceEffectAction, &QAction::triggered, [&]() {
-    const PluginIndex pluginIdx = replaceEffectAction.data().toULongLong();
+  auto replacePluginConnection = connect(&replacePluginAction, &QAction::triggered, [&]() {
+    const PluginIndex pluginIdx = replacePluginAction.data().toULongLong();
     if (vstSelect.exec() == QDialog::Accepted) {
       const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
         Info,
-        "Gui::EffectsChannel::replaceEffectAction",
+        "Gui::EffectsChannel::replacePluginAction",
         "Replacing effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) + " with " + effectPath
       );
 
@@ -397,16 +397,16 @@ void EffectsChannel::connectActions() {
           channelIndex,
           pluginIdx,
           effectPath,
-          mix_replace_effect_on_channel_a_v
+          mix_replace_plugin_on_channel_a_v
       );
     }
   });
 
-  auto removeEffectConnection = connect(&removeEffectAction, &QAction::triggered, [&]() {
-    const PluginIndex pluginIdx = removeEffectAction.data().toULongLong();
+  auto removeEffectConnection = connect(&removePluginAction, &QAction::triggered, [&]() {
+    const PluginIndex pluginIdx = removePluginAction.data().toULongLong();
     Logging::write(
       Info,
-      "Gui::EffectsChannel::removeEffectAction",
+      "Gui::EffectsChannel::removePluginAction",
       "Removing effect: " + std::to_string(pluginIdx) + " from channel " + std::to_string(channelIndex)
     );
 
@@ -417,7 +417,7 @@ void EffectsChannel::connectActions() {
         actor_cast<actor>(appStateManagerPtr),
         channelIndex,
         pluginIdx,
-        mix_remove_effect_on_channel_a_v
+        mix_remove_plugin_on_channel_a_v
     );
     effectsSlots.removeEffectSlot();
   });

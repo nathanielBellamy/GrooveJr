@@ -11,20 +11,20 @@
 
 #include "../../Logging.h"
 #include "../../../AppState.h"
-#include "../../entity/mixer/Effect.h"
+#include "../../entity/mixer/Plugin.h"
 
 namespace Gj {
 namespace Db {
 
-class EffectRepository {
+class PluginRepository {
   sqlite3** db;
   AppState* gAppState;
 
   public:
-    explicit EffectRepository(sqlite3** db, AppState* gAppState);
-    std::vector<Effect> getAll() const;
-    int save(const Effect& effect) const;
-    std::vector<Effect> getBySceneId(int sceneId) const;
+    explicit PluginRepository(sqlite3** db, AppState* gAppState);
+    std::vector<Plugin> getAll() const;
+    int save(const Plugin& plugin) const;
+    std::vector<Plugin> getBySceneId(int sceneId) const;
 };
 
 } // Db

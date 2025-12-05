@@ -77,13 +77,13 @@ class EffectsChannel final : public QWidget {
     VuMeter vuMeter;
     QAction* removeEffectsChannelAction;
     RemoveEffectsChannelButton removeEffectsChannelButton;
-    QAction addEffectAction;
-    AddEffectButton addEffectButton;
+    QAction addPluginAction;
+    AddPluginButton addPluginButton;
     QAction openEffectsContainer;
     VstSelect vstSelect;
     QUrl vstUrl;
-    QAction replaceEffectAction;
-    QAction removeEffectAction;
+    QAction replacePluginAction;
+    QAction removePluginAction;
     EffectsContainer effectsContainer;
     QGridLayout grid;
     QLabel title;

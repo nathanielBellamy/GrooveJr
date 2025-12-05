@@ -17,7 +17,6 @@ SceneButton::SceneButton(QWidget* parent, QAction* action, const QString& title)
 }
 
 void SceneButton::setStyle() {
-  setFixedHeight(60);
   setMinimumWidth(60);
 }
 

@@ -14,7 +14,7 @@
 #include "../../../AppState.h"
 
 #include "../../entity/mixer/Scene.h"
-#include "../../entity/mixer/Effect.h"
+#include "../../entity/mixer/Plugin.h"
 #include "../../entity/mixer/ChannelEntity.h"
 #include "../../../types/Types.h"
 
@@ -30,8 +30,8 @@ class SceneRepository {
     std::vector<Scene> getAll() const;
     ID create(const Scene& scene) const;
     std::optional<Scene> update(Scene scene) const;
-    std::vector<ChannelEntity> getChannels(int sceneId) const;
-    std::vector<Effect> getEffects(int sceneId) const;
+    std::vector<ChannelEntity> getChannels(ID sceneId) const;
+    std::vector<Plugin> getPlugins(ID sceneId) const;
 
     Scene findOrCreate(ID dbId) const;
     std::optional<Scene> find(ID dbId) const;

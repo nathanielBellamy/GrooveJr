@@ -2,8 +2,8 @@
 // Created by ns on 4/29/25.
 //
 
-#ifndef ADDEFFECTSLOTBUTTON_H
-#define ADDEFFECTSLOTBUTTON_H
+#ifndef ADDPLUGINBUTTON_H
+#define ADDPLUGINBUTTON_H
 
 #include <QAction>
 #include <QPushButton>
@@ -14,12 +14,12 @@
 namespace Gj {
 namespace Gui {
 
-class AddEffectButton final : public QPushButton {
+class AddPluginButton final : public QPushButton {
   public:
-    AddEffectButton(QWidget* parent, QAction* addEffectAction);
+    AddPluginButton(QWidget* parent, QAction* addEffectAction);
 
   private:
-    QAction* addEffectAction;
+    QAction* addPluginAction;
     void setStyle();
     void mousePressEvent(QMouseEvent* event) override;
 };
@@ -28,5 +28,4 @@ class AddEffectButton final : public QPushButton {
 } // Gj
 
 
-
-#endif //ADDEFFECTSLOTBUTTON_H
+#endif //ADDPLUGINBUTTON_H

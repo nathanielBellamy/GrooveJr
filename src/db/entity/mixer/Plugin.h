@@ -12,55 +12,56 @@
 
 #include "../../Logging.h"
 #include "../../../types/AtomicStr.h"
+#include "../../../types/Types.h"
 
 namespace Gj {
 namespace Db {
 
-struct Effect {
-  int id = 0;
-  AtomicStr filePath;
+struct Plugin {
+  ID id = 0;
+  PluginPath filePath;
   AtomicStr format;
   AtomicStr name;
-  int channelIndex;
-  int effectIndex;
-  int version;
+  ChannelIndex channelIndex;
+  PluginIndex pluginIndex;
+  Version version;
   std::vector<uint8_t> audioHostComponentStateBlob;
   std::vector<uint8_t> audioHostControllerStateBlob;
   std::vector<uint8_t> editorHostComponentStateBlob;
   std::vector<uint8_t> editorHostControllerStateBlob;
 
-  bool operator=(const Effect& rhs) const {
+  bool operator=(const Plugin& rhs) const {
     return id == rhs.id;
   }
-  bool operator<(const Effect& rhs) const {
-    return effectIndex < rhs.effectIndex;
+  bool operator<(const Plugin& rhs) const {
+    return pluginIndex < rhs.pluginIndex;
   }
 
-  Effect(
-    int id,
+  Plugin(
+    ID id,
     const AtomicStr& filePath,
     const AtomicStr& format,
     const AtomicStr& name,
-    int channelIndex,
-    int effectIndex,
+    ChannelIndex channelIndex,
+    PluginIndex effectIndex,
     std::vector<uint8_t> audioHostComponentStateBlob,
     std::vector<uint8_t> audioHostControllerStateBlob,
     std::vector<uint8_t> editorHostComponentStateBlob,
     std::vector<uint8_t> editorHostControllerStateBlob
   );
 
-  explicit Effect(
+  explicit Plugin(
     const AtomicStr& filePath,
     const AtomicStr& format,
     const AtomicStr& name,
-    int channelIndex,
-    int effectIndex,
+    ChannelIndex channelIndex,
+    PluginIndex pluginIdx,
     std::vector<uint8_t> audioHostComponentStateBlob,
     std::vector<uint8_t> audioHostControllerStateBlob,
     std::vector<uint8_t> editorHostComponentStateBlob,
     std::vector<uint8_t> editorHostControllerStateBlob
   );
-  static Effect deser(sqlite3_stmt* stmt);
+  static Plugin deser(sqlite3_stmt* stmt);
 };
 
 } // Db

@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <string>
 
+#include "./AtomicStr.h"
+
 namespace Gj {
 
 typedef uint64_t         ID;
@@ -16,6 +18,7 @@ typedef uint64_t         Version;
 typedef uint16_t         TrackNumber;
 typedef size_t           ChannelIndex;
 typedef size_t           PluginIndex;
+typedef AtomicStr        PluginPath;
 typedef size_t           DeckIndex;
 typedef unsigned int     Year;
 

@@ -37,9 +37,9 @@ struct AppStateManagerTrait {
                                  // Mixer
                                  result<void>(mix_add_effects_channel_a),
                                  result<void>(ChannelIndex, mix_remove_effects_channel_a),
-                                 result<void>(ChannelIndex, std::string, mix_add_effect_to_channel_a),
-                                 result<void>(ChannelIndex, PluginIndex, std::string, mix_replace_effect_on_channel_a),
-                                 result<void>(ChannelIndex, PluginIndex, mix_remove_effect_on_channel_a),
+                                 result<void>(ChannelIndex, PluginPath, mix_add_plugin_to_channel_a),
+                                 result<void>(ChannelIndex, PluginIndex, PluginPath, mix_replace_plugin_on_channel_a),
+                                 result<void>(ChannelIndex, PluginIndex, mix_remove_plugin_on_channel_a),
                                  result<void>(ChannelIndex, float, mix_set_channel_gain_a),
 
                                  // Transport control
@@ -104,8 +104,8 @@ struct AppStateManagerState {
         : self(self)
         , gAppState(gAppState)
         , mixer(mixer)
-        , dao(dao)
         , audioCore(audioCore)
+        , dao(dao)
         {
            self->link_to(supervisor);
            self->system().registry().put(APP_STATE_MANAGER, actor_cast<strong_actor_ptr>(self));
@@ -142,11 +142,11 @@ struct AppStateManagerState {
              mixer->removeEffectsChannel(channelIdx);
              hydrateStateToDisplay();
            },
-           [this](const ChannelIndex channelIdx, std::string effectPath, mix_add_effect_to_channel_a) {
+           [this](const ChannelIndex channelIdx, PluginPath pluginPath, mix_add_plugin_to_channel_a) {
              Logging::write(
                Info,
-               "Act::AppStateManager::mix_add_effects_channel_a",
-               "Adding Effect " + effectPath + " on channel " + std::to_string(channelIdx)
+               "Act::AppStateManager::mix_add_plugin_to_channel_a",
+               "Adding Effect " + pluginPath + " on channel " + std::to_string(channelIdx)
              );
              // if (!mixer->addEffectToChannel(channelIdx, effectPath)) {
              //   Logging::write(
@@ -157,41 +157,41 @@ struct AppStateManagerState {
              // }
              hydrateStateToDisplay();
            },
-           [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, std::string effectPath, mix_replace_effect_on_channel_a) {
+           [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, PluginPath pluginPath, mix_replace_plugin_on_channel_a) {
              Logging::write(
                Info,
-               "Act::AppStateManager::mix_replace_effect_on_channel_a",
-               "Replacing effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx) + " with " + effectPath
+               "Act::AppStateManager::mix_replace_plugin_on_channel_a",
+               "Replacing effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx) + " with " + pluginPath
              );
-             if (!mixer->replaceEffectOnChannel(channelIdx, pluginIdx, effectPath)) {
+             if (mixer->replacePluginOnChannel(channelIdx, pluginIdx, pluginPath) != OK) {
                Logging::write(
                  Error,
-                 "Act::AppStateManager::mix_replace_effect_on_channel_a",
-                 "Unable to add replace effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx) + " with " + effectPath
+                 "Act::AppStateManager::mix_replace_plugin_on_channel_a",
+                 "Unable to add replace effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx) + " with " + pluginPath
                );
              }
              hydrateStateToDisplay();
            },
-           [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, mix_remove_effect_on_channel_a) {
+           [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, mix_remove_plugin_on_channel_a) {
              Logging::write(
                Info,
-               "Act::AppStateManager::mix_remove_effect_on_channel_a",
+               "Act::AppStateManager::mix_remove_plugin_on_channel_a",
                "Removing effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx)
              );
-             if (!mixer->removeEffectFromChannel(channelIdx, pluginIdx)) {
+             if (mixer->removePluginFromChannel(channelIdx, pluginIdx) != OK) {
                Logging::write(
                  Error,
-                 "Act::AppStateManager::mix_remove_effect_on_channel_a",
+                 "Act::AppStateManager::mix_remove_plugin_on_channel_a",
                  "Unable to add remove effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx)
                );
              }
              hydrateStateToDisplay();
            },
            [this](const ChannelIndex channelIdx, const float gain, mix_set_channel_gain_a) {
-             if (!mixer->setGainOnChannel(channelIdx, gain)) {
+             if (mixer->setGainOnChannel(channelIdx, gain) != OK) {
                Logging::write(
                  Error,
-                 "Act::AppStateManager::mix_remove_effect_on_channel_a",
+                 "Act::AppStateManager::mix_set_channel_gain_a",
                  "Unable to set gain of " + std::to_string(gain) + " on channel " + std::to_string(channelIdx)
                );
              }

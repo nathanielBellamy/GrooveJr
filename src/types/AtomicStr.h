@@ -46,6 +46,12 @@ inline std::string operator+(const AtomicStr& lhs, const std::string& rhs) {
   return lhs.std_str() + rhs;
 }
 
+template <class Inspector>
+bool inspect(Inspector& f, AtomicStr& x) {
+    return f.object(x).fields(
+      f.field("value", x.value)
+    );
 }
 
+}
 #endif //ATOMICSTR_H

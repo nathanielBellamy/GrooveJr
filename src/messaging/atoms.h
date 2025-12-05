@@ -15,6 +15,7 @@ CAF_BEGIN_TYPE_ID_BLOCK(groovejr, first_custom_type_id)
   CAF_ADD_TYPE_ID(groovejr, (Gj::ChannelIndex))
   // CAF_ADD_TYPE_ID(groovejr, (Gj::EffectIndex))
   // CAF_ADD_TYPE_ID(groovejr, (Gj::DeckIndex))
+  CAF_ADD_TYPE_ID(groovejr, (Gj::PluginPath))
 
   // atoms
   CAF_ADD_ATOM(groovejr, supervisor_status_a)
@@ -26,9 +27,9 @@ CAF_BEGIN_TYPE_ID_BLOCK(groovejr, first_custom_type_id)
   // Mixer
   CAF_ADD_ATOM(groovejr, mix_add_effects_channel_a)
   CAF_ADD_ATOM(groovejr, mix_remove_effects_channel_a)
-  CAF_ADD_ATOM(groovejr, mix_add_effect_to_channel_a)
-  CAF_ADD_ATOM(groovejr, mix_replace_effect_on_channel_a)
-  CAF_ADD_ATOM(groovejr, mix_remove_effect_on_channel_a)
+  CAF_ADD_ATOM(groovejr, mix_add_plugin_to_channel_a)
+  CAF_ADD_ATOM(groovejr, mix_replace_plugin_on_channel_a)
+  CAF_ADD_ATOM(groovejr, mix_remove_plugin_on_channel_a)
 
   CAF_ADD_ATOM(groovejr, mix_set_channel_gain_a)
 

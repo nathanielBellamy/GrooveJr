@@ -66,9 +66,9 @@ Plugin::Plugin(const AtomicStr& path, AppState* gAppState, std::shared_ptr<JackC
 	);
 }
 
-Plugin::Plugin(const Db::Effect& effectEntity, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
+Plugin::Plugin(const Db::Plugin& pluginEntity, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
 	: gAppState(gAppState)
-	, path(effectEntity.filePath)
+	, path(pluginEntity.filePath)
 	{
 
 	Logging::write(
@@ -105,21 +105,21 @@ Plugin::Plugin(const Db::Effect& effectEntity, AppState* gAppState, std::shared_
 		audioHost->init(cmdArgs);
 
 		const auto audioHostComponentState = std::make_unique<ResizableMemoryIBStream>();
-		int audioHostComponentStateBytes = effectEntity.audioHostComponentStateBlob.size();
+		int audioHostComponentStateBytes = pluginEntity.audioHostComponentStateBlob.size();
 		int audioHostComponentStateBytesWritten = 0;
 
 		audioHostComponentState->write(
-			const_cast<void*>(static_cast<const void*>(effectEntity.audioHostComponentStateBlob.data())),
+			const_cast<void*>(static_cast<const void*>(pluginEntity.audioHostComponentStateBlob.data())),
 			audioHostComponentStateBytes,
 			&audioHostComponentStateBytesWritten
 		);
 
 		const auto audioHostControllerState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
-		int audioHostControllerStateBytes = effectEntity.audioHostControllerStateBlob.size();
+		int audioHostControllerStateBytes = pluginEntity.audioHostControllerStateBlob.size();
 		int audioHostControllerStateBytesWritten = 0;
 
 		audioHostControllerState->write(
-			const_cast<void*>(static_cast<const void*>(effectEntity.audioHostControllerStateBlob.data())),
+			const_cast<void*>(static_cast<const void*>(pluginEntity.audioHostControllerStateBlob.data())),
 			audioHostControllerStateBytes,
 			&audioHostControllerStateBytesWritten
 		);
@@ -136,21 +136,21 @@ Plugin::Plugin(const Db::Effect& effectEntity, AppState* gAppState, std::shared_
 		}
 
 		editorHostComponentStateStream = std::make_unique<Steinberg::ResizableMemoryIBStream>();
-		int editorHostComponentStateBytes = effectEntity.audioHostComponentStateBlob.size();
+		int editorHostComponentStateBytes = pluginEntity.audioHostComponentStateBlob.size();
 		int editorHostComponentStateBytesWritten = 0;
 
 		editorHostComponentStateStream->write(
-			const_cast<void*>(static_cast<const void*>(effectEntity.editorHostComponentStateBlob.data())),
+			const_cast<void*>(static_cast<const void*>(pluginEntity.editorHostComponentStateBlob.data())),
 			editorHostComponentStateBytes,
 			&editorHostComponentStateBytesWritten
 		);
 
 		editorHostControllerStateStream = std::make_unique<Steinberg::ResizableMemoryIBStream>();
-		int editorHostControllerStateBytes = effectEntity.audioHostControllerStateBlob.size();
+		int editorHostControllerStateBytes = pluginEntity.audioHostControllerStateBlob.size();
 		int editorHostControllerStateBytesWritten = 0;
 
 		editorHostControllerStateStream->write(
-			const_cast<void*>(static_cast<const void*>(effectEntity.editorHostControllerStateBlob.data())),
+			const_cast<void*>(static_cast<const void*>(pluginEntity.editorHostControllerStateBlob.data())),
 			editorHostControllerStateBytes,
 			&editorHostControllerStateBytesWritten
 		);

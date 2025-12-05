@@ -55,7 +55,7 @@ struct EffectsManagerState {
 
              try {
                strong_actor_ptr appStateManager = self->system().registry().get(APP_STATE_MANAGER);
-               if (mixer->addEffectToChannel(channel, path.substr(7))) {
+               if (mixer->addPluginToChannel(channel, path.substr(7))) {
                  // mixer->showEditor(channel, index);
                  Logging::write(
                    Info,

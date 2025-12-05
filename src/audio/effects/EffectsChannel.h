@@ -13,7 +13,7 @@
 #include "../Channel.h"
 #include "../../AppState.h"
 #include "../../enums/Result.h"
-#include "../../db/entity/mixer/Effect.h"
+#include "../../db/entity/mixer/Plugin.h"
 #include "../Logging.h"
 #include "../JackClient.h"
 #include "../../types/AtomicStr.h"
@@ -223,17 +223,17 @@ class EffectsChannel {
       return true;
     };
 
-    bool addReplaceEffect(std::optional<PluginIndex> effectIdxOpt, const std::string& effectPath);
-    Result loadEffect(const Db::Effect& effectEntity);
+    Result addReplacePlugin(std::optional<PluginIndex> effectIdxOpt, const PluginPath& pluginPath);
+    Result loadPlugin(const Db::Plugin& pluginEntity);
     Result setSampleRate(double sampleRate) const;
     Result setBlockSize(jack_nframes_t blockSize) const;
 
     PluginIndex pluginCount() const;
     void initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
-    void initEditorHost(PluginIndex effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
+    void initEditorHost(PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
     void terminateEditorHosts() const;
 
-    bool removeEffect(PluginIndex effectIdx);
+    Result removePlugin(PluginIndex pluginIdx);
 
     AtomicStr getPluginName(const PluginIndex pluginIndex) const { return vst3Plugins.at(pluginIndex)->getName(); };
 

@@ -2,18 +2,18 @@
 // Created by ns on 5/26/25.
 //
 
-#include "Effect.h"
+#include "Plugin.h"
 
 namespace Gj {
 namespace Db {
 
-Effect::Effect(
-    const int id,
+Plugin::Plugin(
+    const ID id,
     const AtomicStr& filePath,
     const AtomicStr& format,
     const AtomicStr& name,
-    const int channelIndex,
-    const int effectIndex,
+    const ChannelIndex channelIndex,
+    const PluginIndex pluginIndex,
     std::vector<uint8_t> audioHostComponentStateBlob,
     std::vector<uint8_t> audioHostControllerStateBlob,
     std::vector<uint8_t> editorHostComponentStateBlob,
@@ -24,19 +24,19 @@ Effect::Effect(
   , format(format)
   , name(name)
   , channelIndex(channelIndex)
-  , effectIndex(effectIndex)
+  , pluginIndex(pluginIndex)
   , audioHostComponentStateBlob(audioHostComponentStateBlob)
   , audioHostControllerStateBlob(audioHostControllerStateBlob)
   , editorHostComponentStateBlob(editorHostComponentStateBlob)
   , editorHostControllerStateBlob(editorHostControllerStateBlob)
   {}
 
-Effect::Effect(
+Plugin::Plugin(
     const AtomicStr& filePath,
     const AtomicStr& format,
     const AtomicStr& name,
-    const int channelIndex,
-    const int effectIndex,
+    const ChannelIndex channelIndex,
+    const PluginIndex pluginIdx,
     std::vector<uint8_t> audioHostComponentStateBlob,
     std::vector<uint8_t> audioHostControllerStateBlob,
     std::vector<uint8_t> editorHostComponentStateBlob,
@@ -46,26 +46,26 @@ Effect::Effect(
   , format(format)
   , name(name)
   , channelIndex(channelIndex)
-  , effectIndex(effectIndex)
+  , pluginIndex(pluginIdx)
   , audioHostComponentStateBlob(audioHostComponentStateBlob)
   , audioHostControllerStateBlob(audioHostControllerStateBlob)
   , editorHostComponentStateBlob(editorHostComponentStateBlob)
   , editorHostControllerStateBlob(editorHostControllerStateBlob)
   {}
 
-Effect Effect::deser(sqlite3_stmt *stmt) {
+Plugin Plugin::deser(sqlite3_stmt *stmt) {
   Logging::write(
     Info,
     "Db::Effect::deser",
     "Deserializing effect"
   );
 
-  const int id = sqlite3_column_int(stmt, 0);
+  const ID id = sqlite3_column_int(stmt, 0);
   const unsigned char* filePath = sqlite3_column_text(stmt, 1);
   const unsigned char* format = sqlite3_column_text(stmt, 2);
   const unsigned char* name = sqlite3_column_text(stmt, 3);
-  const int channelIndex = sqlite3_column_int(stmt, 4);
-  const int effectIndex = sqlite3_column_int(stmt, 5);
+  const ChannelIndex channelIndex = sqlite3_column_int(stmt, 4);
+  const PluginIndex pluginIndex = sqlite3_column_int(stmt, 5);
   const int audioHostComponentStateBlobSize = sqlite3_column_bytes(stmt, 6);
   const void* audioHostComponentStateBlobRaw = sqlite3_column_blob(stmt, 6);
   const int audioHostControllerStateBlobSize = sqlite3_column_bytes(stmt, 7);
@@ -126,7 +126,7 @@ Effect Effect::deser(sqlite3_stmt *stmt) {
     AtomicStr(reinterpret_cast<const char*>(format)),
     AtomicStr(reinterpret_cast<const char*>(name)),
     channelIndex,
-    effectIndex,
+    pluginIndex,
     audioHostComponentStateBlobDeser,
     audioHostControllerStateBlobDeser,
     editorHostComponentStateBlobDeser,

@@ -18,7 +18,7 @@
 #include "../../../../Color.h"
 #include "VstWindow.h"
 #include "VstWindowSelectButton.h"
-#include "../AddEffectButton.h"
+#include "../AddPluginButton.h"
 #include "../../../../../audio/Mixer.h"
 #include "../../../../../Logging.h"
 #include "../../../../../types/AtomicStr.h"
@@ -44,7 +44,7 @@ class EffectsContainer final : public QWidget {
     Audio::Mixer* mixer;
     ChannelIndex channelIndex;
     QAction* addPluginAction;
-    AddEffectButton addPluginButton;
+    AddPluginButton addPluginButton;
     QAction* removePluginAction;
     QGridLayout grid;
     std::vector<std::shared_ptr<VstWindow>> vstWindows {};

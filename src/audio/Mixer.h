@@ -22,7 +22,7 @@
 #include "../Logging.h"
 #include "../db/Dao.h"
 #include "../db/entity/mixer/ChannelEntity.h"
-#include "../db/entity/mixer/Effect.h"
+#include "../db/entity/mixer/Plugin.h"
 #include "../db/entity/mixer/Scene.h"
 // #include "JackClient.h"
 #include "./effects/EffectsChannel.h"
@@ -92,12 +92,12 @@ public:
   }
 
   [[nodiscard]]
-  size_t getEffectsChannelsCount() const {
+  ChannelIndex getEffectsChannelsCount() const {
     return effectsChannels.size() - 1;
   }
 
   [[nodiscard]]
-  size_t getTotalChannelsCount() const {
+  ChannelIndex getTotalChannelsCount() const {
     return effectsChannels.size();
   }
 
@@ -105,23 +105,23 @@ public:
   Result addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity);
   Result removeEffectsChannel(ChannelIndex idx);
   [[nodiscard]]
-  size_t effectsOnChannelCount(ChannelIndex idx) const;
+  PluginIndex pluginsOnChannelCount(ChannelIndex idx) const;
 
-  bool addEffectToChannel(ChannelIndex channelIndex, const std::string& effectPath) const;
-  Result loadEffectOnChannel(const Db::Effect& effectEntity) const;
+  Result addPluginToChannel(ChannelIndex channelIndex, const PluginPath& pluginPath) const;
+  Result loadPluginOnChannel(const Db::Plugin& plugin) const;
   void initEditorHostsOnChannel(ChannelIndex idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
-  void initEditorHostOnChannel(ChannelIndex idx, PluginIndex newEffectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
+  void initEditorHostOnChannel(ChannelIndex idx, PluginIndex newPluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
   void terminateEditorHostsOnChannel(ChannelIndex idx) const;
 
   Result setSampleRate(uint32_t sampleRate) const;
 
-  bool replaceEffectOnChannel(ChannelIndex channelIdx, PluginIndex effectIdx, const std::string& effectPath) const;
-  bool removeEffectFromChannel(ChannelIndex channelIdx, PluginIndex effectIdx) const;
+  Result replacePluginOnChannel(ChannelIndex channelIdx, PluginIndex pluginIdx, const PluginPath& pluginPath) const;
+  Result removePluginFromChannel(ChannelIndex channelIdx, PluginIndex pluginIdx) const;
 
-  int getAudioFramesPerBuffer() const { return gAppState->audioFramesPerBuffer; };
+  jack_nframes_t getAudioFramesPerBuffer() const { return gAppState->getAudioFramesPerBuffer(); };
   Result setAudioFramesPerBuffer(jack_nframes_t framesPerBuffer) const;
 
-  bool setGainOnChannel(ChannelIndex channelIdx, float gain) const;
+  Result setGainOnChannel(ChannelIndex channelIdx, float gain) const;
 
   void setUpdateProgressBarFunc(std::function<void(sf_count_t, sf_count_t)> func) { updateProgressBarFunc = func; };
   std::function<void(sf_count_t, sf_count_t)> getUpdateProgressBarFunc() { return updateProgressBarFunc; };
@@ -138,7 +138,7 @@ public:
 
   Result deleteChannels();
   Result setChannels(std::vector<Db::ChannelEntity> channelEntities);
-  Result setEffects(const std::vector<Db::Effect>& effects) const;
+  Result setPlugins(const std::vector<Db::Plugin>& plugins) const;
   static Result setFrameId(sf_count_t frameId);
   Result loadScene(ID sceneDbId);
   ID newScene() const;

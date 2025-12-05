@@ -153,41 +153,43 @@ void Mixer::incorporateLatencySamples(const int latencySamples) const {
   gAppState->audioFramesPerBuffer = static_cast<int>(std::pow(2, std::ceil(exponent)));
 }
 
-bool Mixer::addEffectToChannel(const ChannelIndex channelIndex, const std::string& effectPath) const {
+Result Mixer::addPluginToChannel(const ChannelIndex channelIndex, const PluginPath& pluginPath) const {
   Logging::write(
     Info,
-    "Audio::Mixer::addEffectToChannel",
-    "Adding effect " + effectPath + " to channel " + std::to_string(channelIndex)
+    "Audio::Mixer::addPluginToChannel",
+    "Adding plugin " + pluginPath + " to channel " + std::to_string(channelIndex)
   );
+
   if (effectsChannels.at(channelIndex) == nullptr) {
     Logging::write(
       Error,
-      "Audio::Mixer::addEffectToChannel",
+      "Audio::Mixer::addPluginToChannel",
       "No channel found at idx: " + std::to_string(channelIndex)
-    );
-    return false;
-  }
-  return effectsChannels.at(channelIndex)->addReplaceEffect(std::optional<PluginIndex>(), effectPath);
-}
-
-Result Mixer::loadEffectOnChannel(const Db::Effect& effectEntity) const {
-  Logging::write(
-    Info,
-    "Audio::Mixer::loadEffectOnChannel",
-    "Adding effect " + effectEntity.filePath + " to channel " + std::to_string(effectEntity.channelIndex)
-  );
-  if (effectsChannels.at(effectEntity.channelIndex) == nullptr) {
-    Logging::write(
-      Error,
-      "Audio::Mixer::addEffectToChannel",
-      "No channel found at idx: " + std::to_string(effectEntity.channelIndex)
     );
     return ERROR;
   }
-  return effectsChannels.at(effectEntity.channelIndex)->loadEffect(effectEntity);
+
+  return effectsChannels.at(channelIndex)->addReplacePlugin(std::optional<PluginIndex>(), pluginPath);
 }
 
-size_t Mixer::effectsOnChannelCount(const ChannelIndex idx) const {
+Result Mixer::loadPluginOnChannel(const Db::Plugin& plugin) const {
+  Logging::write(
+    Info,
+    "Audio::Mixer::loadPluginOnChannel",
+    "Adding plugin " + plugin.filePath + " to channel " + std::to_string(plugin.channelIndex)
+  );
+  if (effectsChannels.at(plugin.channelIndex) == nullptr) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::loadPluginOnChannel",
+      "No channel found at idx: " + std::to_string(plugin.channelIndex)
+    );
+    return ERROR;
+  }
+  return effectsChannels.at(plugin.channelIndex)->loadPlugin(plugin);
+}
+
+PluginIndex Mixer::pluginsOnChannelCount(const ChannelIndex idx) const {
   return effectsChannels.at(idx)->pluginCount();
 }
 
@@ -195,8 +197,8 @@ void Mixer::initEditorHostsOnChannel(const ChannelIndex idx, std::vector<std::sh
   return effectsChannels.at(idx)->initEditorHosts(vstWindows);
 }
 
-void Mixer::initEditorHostOnChannel(const ChannelIndex idx, const ChannelIndex newEffectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
-  return effectsChannels.at(idx)->initEditorHost(newEffectIndex, vstWindow);
+void Mixer::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex newPluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+  return effectsChannels.at(idx)->initEditorHost(newPluginIndex, vstWindow);
 }
 
 void Mixer::terminateEditorHostsOnChannel(const ChannelIndex idx) const {
@@ -223,16 +225,16 @@ void Mixer::terminateEditorHostsOnChannel(const ChannelIndex idx) const {
   );
 }
 
-bool Mixer::replaceEffectOnChannel(const ChannelIndex channelIdx, const PluginIndex effectIdx, const std::string& effectPath) const {
-  return effectsChannels.at(channelIdx)->addReplaceEffect(effectIdx, effectPath);
+Result Mixer::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx, const PluginPath& pluginPath) const {
+  return effectsChannels.at(channelIdx)->addReplacePlugin(pluginIdx, pluginPath);
 }
 
-bool Mixer::removeEffectFromChannel(const ChannelIndex channelIdx, const PluginIndex effectIdx) const {
-  return effectsChannels.at(channelIdx)->removeEffect(effectIdx);
+Result Mixer::removePluginFromChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx) const {
+  return effectsChannels.at(channelIdx)->removePlugin(pluginIdx);
 }
 
-bool Mixer::setGainOnChannel(const ChannelIndex channelIdx, const float gain) const {
-  return effectsChannels.at(channelIdx)->setGain(gain);
+Result Mixer::setGainOnChannel(const ChannelIndex channelIdx, const float gain) const {
+  return effectsChannels.at(channelIdx)->setGain(gain) ? OK : ERROR;
 }
 
 Result Mixer::loadScene(const ID sceneDbId) {
@@ -266,8 +268,8 @@ Result Mixer::loadScene(const ID sceneDbId) {
   if (channelsWasEmpty)
     saveChannels();
 
-  const std::vector<Db::Effect> effects = dao->sceneRepository.getEffects(scene.id);
-  setEffects(effects);
+  const std::vector<Db::Plugin> effects = dao->sceneRepository.getPlugins(scene.id);
+  setPlugins(effects);
 
   Logging::write(
     Info,
@@ -344,35 +346,35 @@ Result Mixer::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
   return OK;
 }
 
-Result Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
+Result Mixer::setPlugins(const std::vector<Db::Plugin>& plugins) const {
   Logging::write(
     Info,
-    "Audio::Mixer::setEffects",
-    "Setting effects."
+    "Audio::Mixer::setPlugins",
+    "Setting plugins."
   );
 
-  std::vector<std::vector<Db::Effect>> effectsByChannel;
-  for (const auto& effect : effects) {
-    while (effectsByChannel.size() <= effect.channelIndex)
-      effectsByChannel.emplace_back();
+  std::vector<std::vector<Db::Plugin>> pluginsByChannel;
+  for (const auto& plugin : plugins) {
+    while (pluginsByChannel.size() <= plugin.channelIndex)
+      pluginsByChannel.emplace_back();
 
-    effectsByChannel.at(effect.channelIndex).push_back(effect);
+    pluginsByChannel.at(plugin.channelIndex).push_back(plugin);
   }
 
-  for (const auto& effectsChannelEffects : effectsByChannel) {
-    std::sort(effectsChannelEffects.begin(), effectsChannelEffects.end());
-    for (const auto& effect : effectsChannelEffects) {
-      if (loadEffectOnChannel(effect) == OK) {
+  for (const auto& effectsChannelPlugins : pluginsByChannel) {
+    std::sort(effectsChannelPlugins.begin(), effectsChannelPlugins.end());
+    for (const auto& plugin : effectsChannelPlugins) {
+      if (loadPluginOnChannel(plugin) == OK) {
         Logging::write(
           Info,
-          "Audio::Mixer::setEffects",
-          "Loaded effect " + effect.name + " on channel " + std::to_string(effect.channelIndex)
+          "Audio::Mixer::setPlugins",
+          "Loaded plugin " + plugin.name + " on channel " + std::to_string(plugin.channelIndex)
         );
       } else {
         Logging::write(
           Error,
-          "Audio::Mixer::setEffects",
-          "Could not add effect: " + effect.filePath + " to channel " + std::to_string(effect.channelIndex)
+          "Audio::Mixer::setPlugins",
+          "Could not add plugin: " + plugin.filePath + " to channel " + std::to_string(plugin.channelIndex)
         );
       }
     }
@@ -380,8 +382,8 @@ Result Mixer::setEffects(const std::vector<Db::Effect> &effects) const {
 
   Logging::write(
     Info,
-    "Audio::Mixer::setEffects",
-    "Done setting effects."
+    "Audio::Mixer::setPlugins",
+    "Done setting plugins."
   );
   return OK;
 }
@@ -510,7 +512,7 @@ Result Mixer::saveChannels() const {
       //   }
       // }
 
-      const auto dbEffect = Db::Effect(
+      const auto dbPlugin = Db::Plugin(
         plugin->path,
         "vst3",
         plugin->name,
@@ -521,11 +523,11 @@ Result Mixer::saveChannels() const {
         editorHostComponentBuffer,
         editorHostControllerBuffer
       );
-      if (!dao->effectRepository.save(dbEffect)) {
+      if (!dao->pluginRepository.save(dbPlugin)) {
         Logging::write(
           Error,
           "Audio::Mixer::saveScene",
-          "Unable to save effect: " + dbEffect.filePath + " to sceneId: " + std::to_string(scene.id)
+          "Unable to save plugin: " + dbPlugin.filePath + " to sceneId: " + std::to_string(scene.id)
         );
         result = ERROR;
       }

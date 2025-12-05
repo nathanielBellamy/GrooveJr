@@ -162,7 +162,7 @@ std::optional<Scene> SceneRepository::update(Scene scene) const {
   return std::optional(scene);
 }
 
-std::vector<ChannelEntity> SceneRepository::getChannels(const int sceneId) const {
+std::vector<ChannelEntity> SceneRepository::getChannels(const ID sceneId) const {
   std::vector<ChannelEntity> channels;
   const std::string query = R"sql(
     select * from channels c
@@ -191,33 +191,33 @@ std::vector<ChannelEntity> SceneRepository::getChannels(const int sceneId) const
   return channels;
 }
 
-std::vector<Effect> SceneRepository::getEffects(const int sceneId) const {
-  std::vector<Effect> effects;
+std::vector<Plugin> SceneRepository::getPlugins(const ID sceneId) const {
+  std::vector<Plugin> plugins;
   const std::string query = R"sql(
-    select * from effects e
-    right join scene_to_effects ste
-    on ste.effectId = e.id
-    where ste.sceneId = ?;
+    select * from plugins p
+    right join scene_to_plugins stp
+    on ste.pluginId = p.id
+    where stp.sceneId = ?;
   )sql";
 
   sqlite3_stmt* stmt;
   if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     Logging::write(
       Error,
-      "Db::SceneRepository::getEffects",
+      "Db::SceneRepository::getPlugins",
       "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
     );
-    return effects;
+    return plugins;
   }
 
   sqlite3_bind_int(stmt, 1, sceneId);
 
   while (sqlite3_step(stmt) == SQLITE_ROW) {
-    const auto effect = Effect::deser(stmt);
-    effects.push_back(effect);
+    const auto plugin = Plugin::deser(stmt);
+    plugins.push_back(plugin);
   }
 
-  return effects;
+  return plugins;
 }
 
 std::optional<Scene> SceneRepository::find(const ID dbId) const {

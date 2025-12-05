@@ -14,7 +14,7 @@
 
 #include "../../../Logging.h"
 #include "../../../AppState.h"
-#include "../../../db/entity/mixer/Effect.h"
+#include "../../../db/entity/mixer/Plugin.h"
 #include "../../../enums/Result.h"
 #include "../../JackClient.h"
 #include "./host/audiohost/source/audiohost.h"
@@ -30,24 +30,24 @@ namespace Vst3 {
 using namespace Steinberg;
 
 struct Plugin {
-  AppState *gAppState;
+  AppState* gAppState;
   AtomicStr name;
   AtomicStr path;
   VST3::Hosting::Module::Ptr module;
-  AudioHost::App *audioHost;
-  EditorHost::App *editorHost;
+  AudioHost::App* audioHost;
+  EditorHost::App* editorHost;
   std::unique_ptr<ResizableMemoryIBStream> editorHostComponentStateStream;
   std::unique_ptr<ResizableMemoryIBStream> editorHostControllerStateStream;
 
   Plugin(
-    const AtomicStr &path,
-    AppState *gAppState,
+    const AtomicStr& path,
+    AppState* gAppState,
     std::shared_ptr<JackClient> jackClient
   );
 
   Plugin(
-    const Db::Effect &effectEntity,
-    AppState *gAppState,
+    const Db::Plugin& pluginEntity,
+    AppState* gAppState,
     std::shared_ptr<JackClient> jackClient
   );
 

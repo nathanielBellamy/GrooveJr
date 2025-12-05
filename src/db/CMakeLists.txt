@@ -23,8 +23,8 @@ add_library(GjDb SHARED
         entity/AppStateEntity.cpp
         entity/mixer/ChannelEntity.h
         entity/mixer/ChannelEntity.cpp
-        entity/mixer/Effect.h
-        entity/mixer/Effect.cpp
+        entity/mixer/Plugin.h
+        entity/mixer/Plugin.cpp
         entity/mixer/Scene.h
         entity/mixer/Scene.cpp
         entity/musicLibrary/Album.h
@@ -45,8 +45,8 @@ add_library(GjDb SHARED
         repository/AppStateRepository.cpp
         repository/mixer/ChannelRepository.h
         repository/mixer/ChannelRepository.cpp
-        repository/mixer/EffectRepository.h
-        repository/mixer/EffectRepository.cpp
+        repository/mixer/PluginRepository.h
+        repository/mixer/PluginRepository.cpp
         repository/mixer/SceneRepository.h
         repository/mixer/SceneRepository.cpp
         repository/musicLibrary/AlbumRepository.h

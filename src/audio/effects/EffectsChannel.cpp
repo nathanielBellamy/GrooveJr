@@ -76,27 +76,26 @@ EffectsChannel::~EffectsChannel() {
   );
 }
 
-// an effectIdx of -1 indicates to push_back
-bool EffectsChannel::addReplaceEffect(const std::optional<PluginIndex> effectIdxOpt, const std::string& effectPath) {
+Result EffectsChannel::addReplacePlugin(const std::optional<PluginIndex> effectIdxOpt, const PluginPath& pluginPath) {
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::addReplaceEffect",
-		"Adding effect: " + effectPath + " to channel " + std::to_string(index)
+		"Audio::EffectsChannel::addReplacePlugin",
+		"Adding effect: " + pluginPath + " to channel " + std::to_string(index)
 	);
 
-	const auto effect = new Vst3::Plugin (
-  		effectPath,
+	const auto plugin = new Vst3::Plugin (
+  		pluginPath,
   		gAppState,
   		jackClient
   	);
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::addReplaceEffect",
-		"Instantiated plugin " + effect->path + " for channel " + std::to_string(index)
+		"Audio::EffectsChannel::addReplacePlugin",
+		"Instantiated plugin " + plugin->path + " for channel " + std::to_string(index)
 	);
 
-  const FUnknownPtr<IAudioProcessor> processor = effect->getProcesser();
+  const FUnknownPtr<IAudioProcessor> processor = plugin->getProcesser();
   // int latencySamples = processor->getLatencySamples();
   // incorporateLatencySamples(latencySamples);
 
@@ -104,10 +103,10 @@ bool EffectsChannel::addReplaceEffect(const std::optional<PluginIndex> effectIdx
   if (!processor->canProcessSampleSize(gAppStateAudioFramesPerBuffer)) {
 		Logging::write(
 			Warning,
-			"Audio::EffectsChannel::addReplaceEffect",
-			"Processor for " + effectPath + " on channel " + std::to_string(index) + " cannot process sample size " + std::to_string(gAppState->audioFramesPerBuffer)
+			"Audio::EffectsChannel::addReplacePlugin",
+			"Processor for " + pluginPath + " on channel " + std::to_string(index) + " cannot process sample size " + std::to_string(gAppState->audioFramesPerBuffer)
 		);
-  	return false;
+  	return WARNING;
   }
 
   // Vst::BusDirection busDirection;
@@ -123,45 +122,45 @@ bool EffectsChannel::addReplaceEffect(const std::optional<PluginIndex> effectIdx
   };
   processor->setupProcessing(setup);
 	if (!effectIdxOpt) {
-		vst3Plugins.push_back(effect);
+		vst3Plugins.push_back(plugin);
 	} else {
 		delete vst3Plugins.at(effectIdxOpt.value());
-		vst3Plugins.at(effectIdxOpt.value()) = effect;
+		vst3Plugins.at(effectIdxOpt.value()) = plugin;
 	}
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::addReplaceEffect",
-		"Effect " + effectPath + " added on channel " + std::to_string(index)
+		"Audio::EffectsChannel::addReplacePlugin",
+		"Plugin " + pluginPath + " added on channel " + std::to_string(index)
 	);
 
-	return true;
+	return OK;
 }
 
-Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
+Result EffectsChannel::loadPlugin(const Db::Plugin& pluginEntity) {
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::loadEffect",
-		"Adding effect: " + effectEntity.filePath + " to channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectEntity.effectIndex)
+		"Audio::EffectsChannel::loadPlugin",
+		"Adding effect: " + pluginEntity.filePath + " to channel " + std::to_string(index) + " at effectIndex " + std::to_string(pluginEntity.pluginIndex)
 	);
 
-	const auto effect = new Vst3::Plugin(effectEntity, gAppState, jackClient);
+	const auto effect = new Vst3::Plugin(pluginEntity, gAppState, jackClient);
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::loadEffect",
-		"Instantiated plugin " + effect->name + " on channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectEntity.effectIndex)
+		"Audio::EffectsChannel::loadPlugin",
+		"Instantiated plugin " + effect->name + " on channel " + std::to_string(index) + " at effectIndex " + std::to_string(pluginEntity.pluginIndex)
 	);
 
   const FUnknownPtr<IAudioProcessor> processor = effect->getProcesser();
   // int latencySamples = processor->getLatencySamples();
   // incorporateLatencySamples(latencySamples);
 
-  if (!processor->canProcessSampleSize(gAppState->audioFramesPerBuffer)) {
+  if (!processor->canProcessSampleSize(gAppState->getAudioFramesPerBuffer())) {
 		Logging::write(
 			Warning,
-			"Audio::EffectsChannel::loadEffect",
-			"Processor for " + effectEntity.filePath + " on channel " + std::to_string(index) + " cannot process sample size " + std::to_string(gAppState->audioFramesPerBuffer)
+			"Audio::EffectsChannel::loadPlugin",
+			"Processor for " + pluginEntity.filePath + " on channel " + std::to_string(index) + " cannot process sample size " + std::to_string(gAppState->audioFramesPerBuffer)
 		);
   	return ERROR;
   }
@@ -179,17 +178,17 @@ Result EffectsChannel::loadEffect(const Db::Effect& effectEntity) {
   };
   processor->setupProcessing(setup);
 
-	if (vst3Plugins.empty() || effectEntity.effectIndex > vst3Plugins.size() - 1) {
+	if (vst3Plugins.empty() || pluginEntity.pluginIndex > vst3Plugins.size() - 1) {
 		vst3Plugins.push_back(effect);
 	} else {
-		delete vst3Plugins.at(effectEntity.effectIndex);
-		vst3Plugins.at(effectEntity.effectIndex) = effect;
+		delete vst3Plugins.at(pluginEntity.pluginIndex);
+		vst3Plugins.at(pluginEntity.pluginIndex) = effect;
 	}
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::loadEffect",
-		"Effect " + effect->path + " added on channel " + std::to_string(index) + " at effectIndex " + std::to_string(effectEntity.effectIndex)
+		"Audio::EffectsChannel::loadPlugin",
+		"Effect " + effect->path + " added on channel " + std::to_string(index) + " at effectIndex " + std::to_string(pluginEntity.pluginIndex)
 	);
 
 	return OK;
@@ -251,8 +250,8 @@ void EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstW
 	}
 }
 
-void EffectsChannel::initEditorHost(const PluginIndex effectIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
-		vst3Plugins.at(effectIndex)->initEditorHost(vstWindow);
+void EffectsChannel::initEditorHost(const PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+		vst3Plugins.at(pluginIndex)->initEditorHost(vstWindow);
 }
 
 void EffectsChannel::terminateEditorHosts() const {
@@ -272,18 +271,19 @@ void EffectsChannel::terminateEditorHosts() const {
 	);
 }
 
-bool EffectsChannel::removeEffect(const PluginIndex effectIdx) {
+Result EffectsChannel::removePlugin(const PluginIndex pluginIdx) {
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::removeEffect",
-		"Removing effect " + std::to_string(effectIdx) + " from channel " + std::to_string(index)
+		"Audio::EffectsChannel::removePlugin",
+		"Removing plugin " + std::to_string(pluginIdx) + " from channel " + std::to_string(index)
 	);
 
-	if (effectIdx < vst3Plugins.size()) {
-		delete vst3Plugins.at(effectIdx);
-		vst3Plugins.erase(vst3Plugins.begin() + effectIdx);
+	if (pluginIdx < vst3Plugins.size()) {
+		delete vst3Plugins.at(pluginIdx);
+		vst3Plugins.erase(vst3Plugins.begin() + pluginIdx);
 	}
-	return true;
+
+	return OK;
 }
 
 } // Effects

@@ -12,7 +12,7 @@ Dao::Dao(AppState* gAppState)
   , gAppState(gAppState)
   , appStateRepository(&db, gAppState)
   , channelRepository(&db, gAppState)
-  , effectRepository(&db, gAppState)
+  , pluginRepository(&db, gAppState)
   , sceneRepository(&db, gAppState)
   , albumRepository(&db, gAppState)
   , artistRepository(&db, gAppState)
@@ -34,9 +34,9 @@ Dao::Dao(AppState* gAppState)
       // insertTestData();
       // const auto resAppState = appStateRepository.get();
       // const auto resTrack = trackRepository.getAll();
-      // const auto resEffect = effectRepository.getAll();
+      // const auto resPlugin = pluginRepository.getAll();
       // const auto resScene = sceneRepository.getAll();
-      // const auto resSceneEffects = sceneRepository.getEffects(0);
+      // const auto resSceneEffects = sceneRepository.getPlugins(0);
     }
   }
 }
@@ -118,13 +118,13 @@ int Dao::initSchema() const {
       foreign key (channelId) references channels(id) on delete cascade
     );
 
-    create table if not exists effects (
+    create table if not exists plugins (
       id integer primary key autoincrement,
       filePath text not null,
       format text not null,
       name text not null,
       channelIndex integer not null,
-      effectIndex integer not null,
+      pluginIndex integer not null,
       audioHostComponentState blob,
       audioHostControllerState blob,
       editorHostComponentState blob,
@@ -132,20 +132,20 @@ int Dao::initSchema() const {
       createdAt datetime default current_timestamp
     );
 
-    create table if not exists channel_to_effects (
+    create table if not exists channel_to_plugins (
       channelId integer not null,
-      effectId integer not null,
+      pluginId integer not null,
       primary key (channelId, effectId),
       foreign key (channelId) references channels(id) on delete cascade,
-      foreign key (effectId) references effects(id) on delete cascade
+      foreign key (pluginId) references plugins(id) on delete cascade
     );
 
-    create table if not exists scene_to_effects (
+    create table if not exists scene_to_plugins (
       sceneId integer not null,
-      effectId integer not null,
+      pluginId integer not null,
       primary key (sceneId, effectId),
       foreign key (sceneId) references scenes(id) on delete cascade,
-      foreign key (effectId) references effects(id) on delete cascade
+      foreign key (pluginId) references plugins(id) on delete cascade
     );
 
     -- music library

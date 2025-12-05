@@ -15,7 +15,7 @@
 
 #include "../../../../Logging.h"
 #include "../../../../AppState.h"
-#include "AddEffectButton.h"
+#include "AddPluginButton.h"
 #include "EffectSlot.h"
 #include "../../../../audio/Mixer.h"
 

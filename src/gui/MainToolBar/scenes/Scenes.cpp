@@ -50,6 +50,8 @@ Result Scenes::setStyle() {
 }
 
 void Scenes::setupGrid() {
+  grid.setRowStretch(0, 1);
+  grid.setRowStretch(1, 10);
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.addWidget(&sceneNewButton, 0, 2, 1, 1);
   grid.addWidget(&sceneSaveButton, 0, 3, 1, 1);
