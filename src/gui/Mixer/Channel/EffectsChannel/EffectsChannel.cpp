@@ -305,7 +305,7 @@ void EffectsChannel::setEffects() {
     return;
 
   for (PluginIndex i = 0; i < mixer->getEffectsChannel(channelIndex)->pluginCount(); i++)
-    addEffect(std::optional(i));
+    addPlugin(std::optional(i));
 
   Logging::write(
     Info,
@@ -314,24 +314,24 @@ void EffectsChannel::setEffects() {
   );
 }
 
-void EffectsChannel::addEffect(const std::optional<PluginIndex> effectIndex) {
-  const PluginIndex newEffectIndex = effectIndex.value_or(
+void EffectsChannel::addPlugin(const std::optional<PluginIndex> pluginIndex) {
+  const PluginIndex newPluginIndex = pluginIndex.value_or(
     mixer->pluginsOnChannelCount(channelIndex) - 1
   );
   Logging::write(
     Info,
-    "Gui::EffectsChannel::addEffect",
-    "Adding effect at index: " + std::to_string(newEffectIndex)
+    "Gui::EffectsChannel::addPlugin",
+    "Adding plugin at index: " + std::to_string(newPluginIndex)
   );
 
   effectsSlots.addEffectSlot();
-  const AtomicStr name = mixer->getPluginName(channelIndex, newEffectIndex);
-  effectsContainer.addEffect(newEffectIndex, name);
+  const AtomicStr name = mixer->getPluginName(channelIndex, newPluginIndex);
+  effectsContainer.addEffect(newPluginIndex, name);
 
   Logging::write(
     Info,
-    "Gui::EffectsChannel::addEffect",
-    "Added effect " + name + " at index: " + std::to_string(newEffectIndex)
+    "Gui::EffectsChannel::addPlugin",
+    "Added plugin " + name + " at index: " + std::to_string(newPluginIndex)
   );
 }
 
@@ -351,28 +351,29 @@ void EffectsChannel::connectActions() {
 
   auto addPluginConnection = connect(&addPluginAction, &QAction::triggered, [&]() {
     if (vstSelect.exec() == QDialog::Accepted) {
-      const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
+      const PluginPath pluginPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
         Info,
         "Gui::EffectsChannel::addPluginAction",
-        "Adding effect: " + effectPath + " to channel " + std::to_string(channelIndex)
+        "Adding effect: " + pluginPath + " to channel " + std::to_string(channelIndex)
       );
 
-      if (!mixer->addPluginToChannel(channelIndex, effectPath)) {
+      if (const auto result = mixer->addPluginToChannel(channelIndex, pluginPath); result != OK) {
+        const LogSeverityLevel severity = result == ERROR ? Error : Warning;
         Logging::write(
-          Error,
+          severity,
           "Gui::EffectsChannel::addPluginAction",
-          "Unable to add effect " + effectPath + " to channel " + std::to_string(channelIndex)
+          "Unable to add effect " + pluginPath + " to channel " + std::to_string(channelIndex)
         );
       } else {
-        addEffect(std::optional<PluginIndex>());
+        addPlugin(std::optional<PluginIndex>());
 
         appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
         const scoped_actor self{ actorSystem };
         self->anon_send(
             actor_cast<actor>(appStateManagerPtr),
             channelIndex,
-            effectPath,
+            pluginPath,
             mix_add_plugin_to_channel_a_v
         );
       }

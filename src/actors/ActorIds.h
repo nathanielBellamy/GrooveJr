@@ -12,7 +12,6 @@ namespace Act {
       APP_STATE_MANAGER,
       AUDIO_THREAD,
       DISPLAY,
-      EFFECTS_MANAGER,
       PLAYBACK,
       SUPERVISOR,
       MUSIC_LIBRARY_MANAGER

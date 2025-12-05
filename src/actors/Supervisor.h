@@ -18,7 +18,6 @@
 #include "../messaging/atoms.h"
 #include "./AppStateManager.h"
 #include "./Display.h"
-#include "./EffectsManager.h"
 #include "./Playback.h"
 #include "./MusicLibraryManager.h"
 
@@ -40,7 +39,6 @@ using Supervisor = typed_actor<SupervisorTrait>;
   // TODO: actor formatting
 struct SupervisorState {
   strong_actor_ptr playbackActorPtr;
-  strong_actor_ptr effectsManagerPtr;
   strong_actor_ptr appStateManagerPtr;
   strong_actor_ptr musicLibraryManagerPtr;
   strong_actor_ptr displayPtr;
@@ -65,9 +63,6 @@ struct SupervisorState {
       audioCore
     );
     playbackActorPtr = actor_cast<strong_actor_ptr>(playback);
-
-    auto effectsManager = self->system().spawn(actor_from_state<EffectsManagerState>, actor_cast<strong_actor_ptr>(self), mixer);
-    effectsManagerPtr = actor_cast<strong_actor_ptr>(effectsManager);
 
     auto appStateManager = self->system().spawn(
       actor_from_state<AppStateManagerState>,

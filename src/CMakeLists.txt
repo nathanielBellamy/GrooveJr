@@ -89,7 +89,6 @@ add_executable(GrooveJr
         actors/AppStateManager.h
         actors/AudioThread.h
         actors/Display.h
-        actors/EffectsManager.h
         actors/MusicLibraryManager.h
         actors/Playback.h
         actors/Supervisor.h

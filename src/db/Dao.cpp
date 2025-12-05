@@ -135,7 +135,7 @@ int Dao::initSchema() const {
     create table if not exists channel_to_plugins (
       channelId integer not null,
       pluginId integer not null,
-      primary key (channelId, effectId),
+      primary key (channelId, pluginId),
       foreign key (channelId) references channels(id) on delete cascade,
       foreign key (pluginId) references plugins(id) on delete cascade
     );
@@ -143,7 +143,7 @@ int Dao::initSchema() const {
     create table if not exists scene_to_plugins (
       sceneId integer not null,
       pluginId integer not null,
-      primary key (sceneId, effectId),
+      primary key (sceneId, pluginId),
       foreign key (sceneId) references scenes(id) on delete cascade,
       foreign key (pluginId) references plugins(id) on delete cascade
     );

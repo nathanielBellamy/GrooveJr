@@ -66,7 +66,7 @@ class EffectsChannel final : public QWidget {
     void setSoloL(float val);
     void setSoloR(float val);
     void setEffects();
-    void addEffect(std::optional<PluginIndex> effectIndex);
+    void addPlugin(std::optional<PluginIndex> pluginIndex);
     ChannelIndex channelIndex;
 
   private:
