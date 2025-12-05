@@ -107,7 +107,7 @@ struct AudioDeck {
   }
 
   bool isPlaying() const {
-    return playState == PLAY;
+    return hasValidCassetteLoaded() && playState == PLAY;
   }
 };
 

@@ -406,12 +406,11 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
     }
   }
 
-  for (DeckIndex j = 0; j < AUDIO_CORE_DECK_COUNT; j++) {
-    auto& deck = audioCore->decks[j];
+  for (auto& deck : audioCore->decks) {
     if (!deck.isPlaying())
       continue;
 
-    deck.gain = audioCore->getDeckGain(j);
+    deck.gain = audioCore->getDeckGain(deck.deckIndex);
 
     // playbackSpeed
     const float* processHeadL = deck.inputBuffers[0] + deck.frameId; //  &audioCore->playbackBuffersPre[0][0];
@@ -427,20 +426,16 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
       const float frac = playbackPos - playbackPosTrunc;
       const auto valL = ((1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1]) * deck.gain;
       const auto valR = ((1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1]) * deck.gain;
-      // if (std::isnan(valL) || std::isnan(valR)) {
-      //   audioCore->playbackSettingsFromAudioThread[0] = 7777777; // DEBUG
-      // }
       audioCore->playbackBuffers[0][i] += std::isnan(valL) ? 0.0f : valL;
       audioCore->playbackBuffers[1][i] += std::isnan(valR) ? 0.0f : valR;
       playbackPos += playbackSpeedF;
     }
 
     audioCore->frameAdvance = idx;
-    // deck.frameAdvance = idx;
     deck.frameId += idx;
   }
 
-  const auto& currentDeck = audioCore->decks[audioCore->deckIndex];
+  const auto& currentDeck = audioCore->currentDeck();
   const DeckIndex nextDeckIndex = (audioCore->deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
   const DeckIndex prevDeckIndex = (audioCore->deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT;
   if (playbackSpeed > 0) {
