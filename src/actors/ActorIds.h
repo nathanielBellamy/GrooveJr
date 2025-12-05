@@ -7,16 +7,14 @@
 
 namespace Gj {
 namespace Act {
-
-    enum ActorIds {
-      APP_STATE_MANAGER,
-      AUDIO_THREAD,
-      DISPLAY,
-      PLAYBACK,
-      SUPERVISOR,
-      MUSIC_LIBRARY_MANAGER
-    };
-
+enum ActorIds {
+  APP_STATE_MANAGER,
+  AUDIO_THREAD,
+  DISPLAY,
+  PLAYBACK,
+  SUPERVISOR,
+  MUSIC_LIBRARY_MANAGER
+};
 }
 }
 

@@ -22,42 +22,39 @@ using namespace caf;
 
 namespace Gj {
 namespace Act {
-
 struct DisplayTrait {
-
-    using signatures = type_list<
-                                  result<void>(strong_actor_ptr, hydrate_display_a),
-                                  result<void>(strong_actor_ptr, AppStatePacket, current_state_a)
-                                >;
+  using signatures = type_list<
+    result<void>(strong_actor_ptr, hydrate_display_a),
+    result<void>(strong_actor_ptr, AppStatePacket, current_state_a)
+  >;
 };
 
 using Display = typed_actor<DisplayTrait>;
 
 struct DisplayState {
   Display::pointer self;
-  QApplication* qtApp;
-  Gui::MainWindow* mainWindow;
-  Gui::Hydrater hydrater {};
+  QApplication *qtApp;
+  Gui::MainWindow *mainWindow;
+  Gui::Hydrater hydrater{};
   strong_actor_ptr guiThreadPtr;
 
   DisplayState(
     Display::pointer self,
     strong_actor_ptr supervisor,
-    Audio::Mixer* mixer,
-    AppState* gAppState,
-    void (*shutdown_handler) (int)
-    )
-    : self(self)
-    {
-      self->link_to(supervisor);
-      self->system().registry().put(DISPLAY, actor_cast<strong_actor_ptr>(self));
+    Audio::Mixer *mixer,
+    AppState *gAppState,
+    void (*shutdown_handler)(int)
+  )
+  : self(self) {
+    self->link_to(supervisor);
+    self->system().registry().put(DISPLAY, actor_cast<strong_actor_ptr>(self));
 
-      mainWindow = new Gui::MainWindow { self->system(), mixer, gAppState, shutdown_handler };
-      mainWindow->connectHydrater(hydrater);
-      mainWindow->show();
-      mainWindow->setChannels();
-      mainWindow->setEffects();
-    }
+    mainWindow = new Gui::MainWindow{self->system(), mixer, gAppState, shutdown_handler};
+    mainWindow->connectHydrater(hydrater);
+    mainWindow->show();
+    mainWindow->setChannels();
+    mainWindow->setEffects();
+  }
 
   ~DisplayState() {
     delete mainWindow;
@@ -65,7 +62,7 @@ struct DisplayState {
       Info,
       "Act::Display::~Display()",
       "Destroyed Display"
-     );
+    );
   }
 
   Display::behavior_type make_behavior() {
@@ -99,7 +96,6 @@ struct DisplayState {
     };
   };
 };
-
 } // Act
 } // Gj
 

@@ -29,14 +29,13 @@ using namespace caf;
 
 namespace Gj {
 namespace Act {
-
 struct SupervisorTrait {
-    using signatures = type_list<result<void>(strong_actor_ptr, supervisor_status_a)>;
+  using signatures = type_list<result<void>(strong_actor_ptr, supervisor_status_a)>;
 };
 
 using Supervisor = typed_actor<SupervisorTrait>;
 
-  // TODO: actor formatting
+// TODO: actor formatting
 struct SupervisorState {
   strong_actor_ptr playbackActorPtr;
   strong_actor_ptr appStateManagerPtr;
@@ -46,14 +45,12 @@ struct SupervisorState {
 
   SupervisorState(
     Supervisor::pointer self,
-    AppState* gAppState,
-    Audio::Mixer* mixer,
-    Audio::AudioCore* audioCore,
+    AppState *gAppState,
+    Audio::Mixer *mixer,
+    Audio::AudioCore *audioCore,
     void (*shutdown_handler)(int)
-    )
-    : self(self)
-    {
-
+  )
+  : self(self) {
     self->system().registry().put(SUPERVISOR, actor_cast<strong_actor_ptr>(self));
     auto playback = self->system().spawn(
       actor_from_state<PlaybackState>,
@@ -77,7 +74,7 @@ struct SupervisorState {
     constexpr int arg = 0;
     int argc = arg;
     char *argv[0] = {};
-    auto qtApp = new QApplication {argc, argv};
+    auto qtApp = new QApplication{argc, argv};
     auto display = self->system().spawn(
       actor_from_state<DisplayState>,
       actor_cast<strong_actor_ptr>(self),
@@ -110,19 +107,18 @@ struct SupervisorState {
     qtApp->exec();
   }
 
-   Supervisor::behavior_type make_behavior() {
-     return {
-         [this](strong_actor_ptr replyToPtr, supervisor_status_a) {
-           Logging::write(
-             Info,
-             "Act::Supervisor::supervisor_status_a",
-             "Supervisor running"
-            );
-         },
-     };
-   };
+  Supervisor::behavior_type make_behavior() {
+    return {
+      [this](strong_actor_ptr replyToPtr, supervisor_status_a) {
+        Logging::write(
+          Info,
+          "Act::Supervisor::supervisor_status_a",
+          "Supervisor running"
+        );
+      },
+    };
+  };
 };
-
 } // Act
 } // Gj
 

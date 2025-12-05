@@ -27,73 +27,66 @@ using namespace caf;
 
 namespace Gj {
 namespace Act {
-
 struct AudioThreadTrait {
-
-    using signatures = type_list<
-                                  result<void>(audio_thread_init_a)
-                                >;
-
+  using signatures = type_list<
+    result<void>(audio_thread_init_a)
+  >;
 };
 
 using AudioThread = typed_actor<AudioThreadTrait>;
 
 struct AudioThreadState {
+  static long id;
 
-     static long id;
+  AudioThread::pointer self;
+  AppState *gAppState;
+  Audio::Mixer *mixer;
+  Audio::AudioCore *audioCore;
 
-     AudioThread::pointer self;
-     AppState* gAppState;
-     Audio::Mixer* mixer;
-     Audio::AudioCore* audioCore;
+  AudioThreadState(
+    AudioThread::pointer self,
+    strong_actor_ptr supervisor,
+    AppState *gAppState,
+    Audio::Mixer *mixer,
+    Audio::AudioCore *audioCore
+  ) : self(self)
+      , gAppState(gAppState)
+      , mixer(mixer)
+      , audioCore(audioCore) {
+    self->link_to(supervisor);
+  }
 
-     AudioThreadState(
-       AudioThread::pointer self,
-       strong_actor_ptr supervisor,
-       AppState* gAppState,
-       Audio::Mixer* mixer,
-       Audio::AudioCore* audioCore
-    ) :
-         self(self)
-       , gAppState(gAppState)
-       , mixer(mixer)
-       , audioCore(audioCore)
-       {
-           self->link_to(supervisor);
-       }
-
-     AudioThread::behavior_type make_behavior() {
-       return {
-           [this](audio_thread_init_a) {
-             Logging::write(
-               Info,
-               "Act::AudioThread::audio_thread_init_a",
-               "Instantiating AudioPlayer"
-             );
-             try {
-               if (Audio::AudioPlayer audioPlayer (self->system(), audioCore, mixer, gAppState); audioPlayer.run() == ERROR)
-                 Logging::write(
-                   Error,
-                   "Act::AudioThread::audio_thread_init_a",
-                   "An error occurred during playback."
-                 );
-             } catch (std::runtime_error& e) {
-               Logging::write(
-                 Error,
-                 "Act::AudioThread::audio_thread_init_a",
-                 "Error creating AudioPlayer or during AudioPlayer::run: " + std::string(e.what())
-               );
-             }
-             Logging::write(
-               Info,
-               "Act::AudioThread::audio_thread_init_a",
-               "AudioPlayer run complete."
-             );
-           },
-       };
-     };
+  AudioThread::behavior_type make_behavior() {
+    return {
+      [this](audio_thread_init_a) {
+        Logging::write(
+          Info,
+          "Act::AudioThread::audio_thread_init_a",
+          "Instantiating AudioPlayer"
+        );
+        try {
+          if (Audio::AudioPlayer audioPlayer(self->system(), audioCore, mixer, gAppState); audioPlayer.run() == ERROR)
+            Logging::write(
+              Error,
+              "Act::AudioThread::audio_thread_init_a",
+              "An error occurred during playback."
+            );
+        } catch (std::runtime_error &e) {
+          Logging::write(
+            Error,
+            "Act::AudioThread::audio_thread_init_a",
+            "Error creating AudioPlayer or during AudioPlayer::run: " + std::string(e.what())
+          );
+        }
+        Logging::write(
+          Info,
+          "Act::AudioThread::audio_thread_init_a",
+          "AudioPlayer run complete."
+        );
+      },
+    };
+  };
 };
-
 } // Act
 } // Gj
 
