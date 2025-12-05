@@ -7,22 +7,21 @@
 
 namespace Gj {
 namespace Gui {
-
 EffectsChannel::EffectsChannel(
-  QWidget* parent,
-  actor_system& actorSystem,
-  Audio::Mixer* mixer,
+  QWidget *parent,
+  actor_system &actorSystem,
+  Audio::Mixer *mixer,
   const ChannelIndex channelIndex,
-  QAction* removeEffectsChannelAction,
-  QAction* muteChannelAction,
-  QAction* muteLChannelAction,
-  QAction* muteRChannelAction,
-  QAction* soloChannelAction,
-  QAction* soloLChannelAction,
-  QAction* soloRChannelAction,
-  std::atomic<float>* vuPtr
-  )
-  : QWidget(parent)
+  QAction *removeEffectsChannelAction,
+  QAction *muteChannelAction,
+  QAction *muteLChannelAction,
+  QAction *muteRChannelAction,
+  QAction *soloChannelAction,
+  QAction *soloLChannelAction,
+  QAction *soloRChannelAction,
+  std::atomic<float> *vuPtr
+)
+: QWidget(parent)
   , channelIndex(channelIndex)
   , actorSystem(actorSystem)
   , appStateManagerPtr(actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER))
@@ -58,8 +57,7 @@ EffectsChannel::EffectsChannel(
     this, mixer, channelIndex, &openEffectsContainer,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction
-  )
-  {
+  ) {
   if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
     // can't remove main, must have at least one non-main effects channel
     removeEffectsChannelButton.show();
@@ -75,7 +73,7 @@ EffectsChannel::EffectsChannel(
   connectActions();
   setupTitle();
 
-  const auto& channel = mixer->getEffectsChannel(channelIndex)->channel;
+  const auto &channel = mixer->getEffectsChannel(channelIndex)->channel;
 
   setupGainSlider(channel.gain.load());
   setupGainLSlider(channel.gainL.load());
@@ -101,7 +99,7 @@ EffectsChannel::~EffectsChannel() {
   );
 }
 
-void EffectsChannel::hydrateState(const AppStatePacket& appStatePacket, const ChannelIndex newChannelIndex) {
+void EffectsChannel::hydrateState(const AppStatePacket &appStatePacket, const ChannelIndex newChannelIndex) {
   Logging::write(
     Info,
     "Gui::EffectsChannel::hydrateState",
@@ -203,6 +201,7 @@ void EffectsChannel::setupTitle() {
 }
 
 constexpr float gainFactor = 2.0f;
+
 void EffectsChannel::setupGainSlider(const float gain) {
   gainSlider.setMinimum(0);
   gainSlider.setMaximum(127);
@@ -340,7 +339,7 @@ void EffectsChannel::connectActions() {
     effectsContainer.show();
   });
 
-  auto vstSelectConnection = connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl& url) {
+  auto vstSelectConnection = connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl &url) {
     Logging::write(
       Info,
       "Gui::EffectsChannel::vstSelect",
@@ -369,12 +368,12 @@ void EffectsChannel::connectActions() {
         addPlugin(std::optional<PluginIndex>());
 
         appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-        const scoped_actor self{ actorSystem };
+        const scoped_actor self{actorSystem};
         self->anon_send(
-            actor_cast<actor>(appStateManagerPtr),
-            channelIndex,
-            pluginPath,
-            mix_add_plugin_to_channel_a_v
+          actor_cast<actor>(appStateManagerPtr),
+          channelIndex,
+          pluginPath,
+          mix_add_plugin_to_channel_a_v
         );
       }
     }
@@ -383,42 +382,58 @@ void EffectsChannel::connectActions() {
   auto replacePluginConnection = connect(&replacePluginAction, &QAction::triggered, [&]() {
     const PluginIndex pluginIdx = replacePluginAction.data().toULongLong();
     if (vstSelect.exec() == QDialog::Accepted) {
-      const auto effectPath = vstUrl.toDisplayString().toStdString().substr(7);
+      const auto pluginPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
         Info,
         "Gui::EffectsChannel::replacePluginAction",
-        "Replacing effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) + " with " + effectPath
+        "Replacing effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) + " with " +
+        pluginPath
       );
 
-      appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+      if (mixer->replacePluginOnChannel(channelIndex, pluginIdx, pluginPath) != OK) {
+        Logging::write(
+          Error,
+          "Gui::EffectsChannel::replacePluginAction",
+          "Unable to add replace plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) +
+          " with " + pluginPath
+        );
+      }
 
-      const scoped_actor self{ actorSystem };
+      appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+      const scoped_actor self{actorSystem};
       self->anon_send(
-          actor_cast<actor>(appStateManagerPtr),
-          channelIndex,
-          pluginIdx,
-          effectPath,
-          mix_replace_plugin_on_channel_a_v
+        actor_cast<actor>(appStateManagerPtr),
+        channelIndex,
+        pluginIdx,
+        pluginPath,
+        mix_replace_plugin_on_channel_a_v
       );
     }
   });
 
-  auto removeEffectConnection = connect(&removePluginAction, &QAction::triggered, [&]() {
+  auto removePluginConnection = connect(&removePluginAction, &QAction::triggered, [&]() {
     const PluginIndex pluginIdx = removePluginAction.data().toULongLong();
     Logging::write(
       Info,
       "Gui::EffectsChannel::removePluginAction",
-      "Removing effect: " + std::to_string(pluginIdx) + " from channel " + std::to_string(channelIndex)
+      "Removing plugin: " + std::to_string(pluginIdx) + " from channel " + std::to_string(channelIndex)
     );
 
-    appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (mixer->removePluginFromChannel(channelIndex, pluginIdx) != OK) {
+      Logging::write(
+        Error,
+        "Gui::EffectsChannel::removePluginAction",
+        "Unable to remove plugin" + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex)
+      );
+    }
 
-    const scoped_actor self{ actorSystem };
+    appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    const scoped_actor self{actorSystem};
     self->anon_send(
-        actor_cast<actor>(appStateManagerPtr),
-        channelIndex,
-        pluginIdx,
-        mix_remove_plugin_on_channel_a_v
+      actor_cast<actor>(appStateManagerPtr),
+      channelIndex,
+      pluginIdx,
+      mix_remove_plugin_on_channel_a_v
     );
     effectsSlots.removeEffectSlot();
   });
@@ -447,6 +462,5 @@ void EffectsChannel::setSoloL(const float val) {
 void EffectsChannel::setSoloR(const float val) {
   muteSoloContainer.setSoloR(val);
 }
-
 } // Gui
 } // Gj
