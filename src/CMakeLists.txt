@@ -3,16 +3,16 @@ cmake_minimum_required(VERSION 3.29.6)
 set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin")
 project(GrooveJr VERSION 0.0.0)
 
-set (CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # detect compilers
 find_package(LLVM)
 if (NOT LLVM_FOUND)
     message(INFO " \n LLVM NOT found ")
-else()
+else ()
     message(INFO " \n LLVM FOUND ")
-endif()
+endif ()
 
 
 message(INFO " Compiling GrooveJr with CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
@@ -20,17 +20,17 @@ message(INFO " Compiling GrooveJr with CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPIL
 # TODO: detect OS and set
 # - for linux: -shared
 # - for macOS: -dynamicLib
-set (OS_LIB_FLAG "-dynamicLib")
+set(OS_LIB_FLAG "-dynamicLib")
 
 # TODO: detect OS and set
 # - for linux:
 # - for macO_sonoma: /opt/homebrew/Cellar
 # NOTE:
 #  - on MacOS it may be helpful to use `brew info jack` to view home directory
-set (C_LIBS_HOME "/opt/homebrew/Cellar")
+set(C_LIBS_HOME "/opt/homebrew/Cellar")
 
-set (GJ_BASE_DIR "/Users/ns/code/")
-set (VST3SDK_HOME "${GJ_BASE_DIR}/vst3sdk")
+set(GJ_BASE_DIR "/Users/ns/code/")
+set(VST3SDK_HOME "${GJ_BASE_DIR}/vst3sdk")
 
 # logging
 find_package(Boost REQUIRED COMPONENTS log_setup log)
@@ -40,24 +40,24 @@ list(APPEND CMAKE_PREFIX_PATH "${GJ_BASE_DIR}/qt6-build/qtbase/lib/cmake")
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGLWidgets gui)
 if (Qt6_FOUND)
     message(INFO " --Qt6--FOUND--")
-endif()
+endif ()
 
 qt_standard_project_setup()
-set (INCLUDE_FLAGS
+set(INCLUDE_FLAGS
         -I${GJ_BASE_DIR}/actor-framework/libcaf_core
         -I${GJ_BASE_DIR}/actor-framework/libcaf_io
         -I${VST3SDK_HOME}
         -I${C_LIBS_HOME}/libsndfile/1.2.2/include
 )
 # utilize vst3sdk cmake modules
-list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
 
 # setup CAF
-set (CAF_ROOT
+set(CAF_ROOT
         ${GJ_BASE_DIR}/actor-framework/build
 )
-find_package (CAF
+find_package(CAF
         REQUIRED)
 
 # setup SQLite
@@ -65,13 +65,13 @@ find_package(SQLite3 REQUIRED)
 
 # setup local libraries
 add_subdirectory(
-    ${GJ_BASE_DIR}/GrooveJr/src/audio
+        ${GJ_BASE_DIR}/GrooveJr/src/audio
 )
 add_subdirectory(
-    ${GJ_BASE_DIR}/GrooveJr/src/gui
+        ${GJ_BASE_DIR}/GrooveJr/src/gui
 )
 add_subdirectory(
-     ${GJ_BASE_DIR}/GrooveJr/src/db
+        ${GJ_BASE_DIR}/GrooveJr/src/db
 )
 add_subdirectory(
         ${GJ_BASE_DIR}/GrooveJr/src/scanner

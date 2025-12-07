@@ -45,9 +45,9 @@ struct SupervisorState {
 
   SupervisorState(
     Supervisor::pointer self,
-    AppState *gAppState,
-    Audio::Mixer *mixer,
-    Audio::AudioCore *audioCore,
+    AppState* gAppState,
+    Audio::Mixer* mixer,
+    Audio::AudioCore* audioCore,
     void (*shutdown_handler)(int)
   )
   : self(self) {
@@ -73,7 +73,7 @@ struct SupervisorState {
 
     constexpr int arg = 0;
     int argc = arg;
-    char *argv[0] = {};
+    char* argv[0] = {};
     auto qtApp = new QApplication{argc, argv};
     auto display = self->system().spawn(
       actor_from_state<DisplayState>,

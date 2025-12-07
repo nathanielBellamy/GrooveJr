@@ -1,16 +1,16 @@
 
-list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
 include(SMTG_FindJack)
 
 find_package(Boost REQUIRED COMPONENTS log_setup log)
 
-if(${LIBJACK_FOUND})
+if (${LIBJACK_FOUND})
     set(audiohost_sources
-        "${VST3SDK_HOME}/public.sdk/samples/vst-hosting/editorhost/source/platform/iapplication.h"
-        "${VST3SDK_HOME}/public.sdk/source/vst/hosting/module.h"
-        "${VST3SDK_HOME}/public.sdk/source/vst/hosting/plugprovider.h"
-        "${VST3SDK_HOME}/public.sdk/source/vst/hosting/plugprovider.cpp"
+            "${VST3SDK_HOME}/public.sdk/samples/vst-hosting/editorhost/source/platform/iapplication.h"
+            "${VST3SDK_HOME}/public.sdk/source/vst/hosting/module.h"
+            "${VST3SDK_HOME}/public.sdk/source/vst/hosting/plugprovider.h"
+            "${VST3SDK_HOME}/public.sdk/source/vst/hosting/plugprovider.cpp"
             source/audiohost.cpp
             source/audiohost.h
             source/media/audioclient.cpp
@@ -25,20 +25,20 @@ if(${LIBJACK_FOUND})
 
     # TODO: debug detect platform
     # if(SMTG_MAC)
-        set(audiohost_sources
+    set(audiohost_sources
             ${audiohost_sources}
             "${VST3SDK_HOME}/public.sdk/source/vst/hosting/module_mac.mm"
-        )
-         set_source_files_properties(
+    )
+    set_source_files_properties(
             "${VST3SDK_HOME}/public.sdk/source/vst/hosting/module_mac.mm" PROPERTIES
             COMPILE_FLAGS "-fobjc-arc"
-        )
-       set(audiohost_PLATFORM_LIBS "-framework CoreFoundation")
-        get_filename_component(InfoPlistFile "resource/Info.plist" ABSOLUTE)
-        set(APP_PROPERTIES
+    )
+    set(audiohost_PLATFORM_LIBS "-framework CoreFoundation")
+    get_filename_component(InfoPlistFile "resource/Info.plist" ABSOLUTE)
+    set(APP_PROPERTIES
             MACOSX_BUNDLE TRUE
             MACOSX_BUNDLE_INFO_PLIST ${InfoPlistFile}
-        )
+    )
     # elseif(SMTG_LINUX)
     #    set(audiohost_sources
     #        ${audiohost_sources}
@@ -63,18 +63,18 @@ if(${LIBJACK_FOUND})
     set(target audiohost)
 
     add_library(${target} SHARED ${audiohost_sources})
-#     set_target_properties(${target} PROPERTIES ${SDK_IDE_HOSTING_EXAMPLES_FOLDER} "${VST3SDK_HOME}/build/public.sdk/CMakeFiles/sdk_hosting.dir")
+    #     set_target_properties(${target} PROPERTIES ${SDK_IDE_HOSTING_EXAMPLES_FOLDER} "${VST3SDK_HOME}/build/public.sdk/CMakeFiles/sdk_hosting.dir")
     target_include_directories(${target}
-        PRIVATE
+            PRIVATE
             ${VST3SDK_HOME}
             -I${VST3SDK_HOME}/public.sdk/source/vst/utility)
     target_compile_features(${target}
-        PUBLIC
+            PUBLIC
             cxx_std_17
     )
 
     target_link_libraries(${target}
-        PRIVATE
+            PRIVATE
             -L${VST3SDK_HOME}/build/lib/Release
             -lsdk
             -L${VST3SDK_HOME}/build/lib/Release
@@ -90,15 +90,15 @@ if(${LIBJACK_FOUND})
             ${Boost_LIBRARIES}
     )
     target_include_directories(${target}
-        PRIVATE
+            PRIVATE
             ${LIBJACK_INCLUDE_DIR}
     )
     if (APP_PROPERTIES)
         set_target_properties(${target}
-            PROPERTIES
+                PROPERTIES
                 ${APP_PROPERTIES}
         )
-    endif(APP_PROPERTIES)
-else()
+    endif (APP_PROPERTIES)
+else ()
     message(STATUS "[SMTG] LIBJACK_FOUND is not set.")
-endif(${LIBJACK_FOUND})
+endif (${LIBJACK_FOUND})

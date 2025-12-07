@@ -54,7 +54,7 @@ namespace Steinberg {
 namespace Vst {
 //------------------------------------------------------------------------
 // From Vst2Wrapper
-static MidiCCMapping initMidiCtrlerAssignment(IComponent *component, IMidiMapping *midiMapping) {
+static MidiCCMapping initMidiCtrlerAssignment(IComponent* component, IMidiMapping* midiMapping) {
   MidiCCMapping midiCCMapping{};
 
   if (!midiMapping || !component)
@@ -87,15 +87,15 @@ static MidiCCMapping initMidiCtrlerAssignment(IComponent *component, IMidiMappin
 
 //------------------------------------------------------------------------
 static void assignBusBuffers(
-  const IAudioClient::Buffers &buffers,
-  HostProcessData &processData,
+  const IAudioClient::Buffers& buffers,
+  HostProcessData& processData,
   bool unassign = false
 ) {
   //
   // ----------- OUTPUTS (plugin outputs) -----------
   //
   for (int bus = 0; bus < processData.numOutputs; ++bus) {
-    auto &busInfo = processData.outputs[bus];
+    auto& busInfo = processData.outputs[bus];
     int pluginChannels = busInfo.numChannels;
 
     // Start with all channels marked silent and pointing to silenceBuffer32
@@ -104,7 +104,7 @@ static void assignBusBuffers(
                              : 0;
 
     for (int ch = 0; ch < pluginChannels; ++ch) {
-      float *ptr = AudioClient::SILENCE_BUFFER;
+      float* ptr = AudioClient::SILENCE_BUFFER;
 
       if (!unassign && bus == 0 && ch < buffers.numOutputs) {
         // Only bus 0 receives host outputs
@@ -120,7 +120,7 @@ static void assignBusBuffers(
   // ----------- INPUTS (plugin inputs) -----------
   //
   for (int bus = 0; bus < processData.numInputs; ++bus) {
-    auto &busInfo = processData.inputs[bus];
+    auto& busInfo = processData.inputs[bus];
     int pluginChannels = busInfo.numChannels;
 
     // Mark all silent initially
@@ -129,7 +129,7 @@ static void assignBusBuffers(
                              : 0;
 
     for (int ch = 0; ch < pluginChannels; ++ch) {
-      float *ptr = AudioClient::SILENCE_BUFFER;
+      float* ptr = AudioClient::SILENCE_BUFFER;
 
       if (!unassign && bus == 0 && ch < buffers.numInputs) {
         // Only bus 0 gets host input buffers
@@ -182,7 +182,7 @@ static void assignBusBuffers(
 }
 
 //------------------------------------------------------------------------
-static void unassignBusBuffers(const IAudioClient::Buffers &buffers, HostProcessData &processData) {
+static void unassignBusBuffers(const IAudioClient::Buffers& buffers, HostProcessData& processData) {
   assignBusBuffers(buffers, processData, true);
 }
 
@@ -200,8 +200,8 @@ AudioClient::~AudioClient() {
 }
 
 //------------------------------------------------------------------------
-AudioClientPtr AudioClient::create(const Name &name, IComponent *component,
-                                   IMidiMapping *midiMapping, IMediaServerPtr jackClient) {
+AudioClientPtr AudioClient::create(const Name& name, IComponent* component,
+                                   IMidiMapping* midiMapping, IMediaServerPtr jackClient) {
   auto newProcessor = std::make_shared<AudioClient>();
   newProcessor->initialize(name, component, midiMapping, jackClient);
   return newProcessor;
@@ -221,7 +221,7 @@ void AudioClient::initProcessContext() {
 // }
 
 //------------------------------------------------------------------------
-bool AudioClient::initialize(const Name &name, IComponent *_component, IMidiMapping *midiMapping,
+bool AudioClient::initialize(const Name& name, IComponent* _component, IMidiMapping* midiMapping,
                              IMediaServerPtr jackClient) {
   component = _component;
   if (!component)
@@ -329,7 +329,7 @@ void AudioClient::preprocess(const Buffers& buffers, int64_t continousFrames) {
 }
 
 //------------------------------------------------------------------------
-bool AudioClient::process(Buffers &buffers, int64_t continousFrames) {
+bool AudioClient::process(Buffers& buffers, int64_t continousFrames) {
   const FUnknownPtr<IAudioProcessor> processor = component;
   if (!processor || !isProcessing)
     return false;
@@ -346,7 +346,7 @@ bool AudioClient::process(Buffers &buffers, int64_t continousFrames) {
 }
 
 //------------------------------------------------------------------------
-void AudioClient::postprocess(Buffers &buffers) {
+void AudioClient::postprocess(Buffers& buffers) {
   eventList.clear();
   inputParameterChanges.clearQueue();
   unassignBusBuffers(buffers, processData);
@@ -411,7 +411,7 @@ bool AudioClient::isPortInRange(int32 port, int32 channel) const {
 }
 
 //------------------------------------------------------------------------
-bool AudioClient::processVstEvent(const IMidiClient::Event &event, int32 port) {
+bool AudioClient::processVstEvent(const IMidiClient::Event& event, int32 port) {
   auto vstEvent = midiToEvent(event.type, event.channel, event.data0, event.data1);
   if (vstEvent) {
     vstEvent->busIndex = port;
@@ -426,7 +426,7 @@ bool AudioClient::processVstEvent(const IMidiClient::Event &event, int32 port) {
 }
 
 //------------------------------------------------------------------------
-bool AudioClient::processParamChange(const IMidiClient::Event &event, int32 port) {
+bool AudioClient::processParamChange(const IMidiClient::Event& event, int32 port) {
   auto paramMapping = [port, this](int32 channel, MidiData data1) -> ParamID {
     if (!isPortInRange(port, channel))
       return kNoParamId;
@@ -438,7 +438,7 @@ bool AudioClient::processParamChange(const IMidiClient::Event &event, int32 port
       midiToParameter(event.type, event.channel, event.data0, event.data1, paramMapping);
   if (paramChange) {
     int32 index = 0;
-    IParamValueQueue *queue =
+    IParamValueQueue* queue =
         inputParameterChanges.addParameterData((*paramChange).first, index);
     if (queue) {
       if (queue->addPoint(static_cast<int32>(event.timestamp), (*paramChange).second,
@@ -454,7 +454,7 @@ bool AudioClient::processParamChange(const IMidiClient::Event &event, int32 port
 }
 
 //------------------------------------------------------------------------
-bool AudioClient::onEvent(const IMidiClient::Event &event, int32_t port) {
+bool AudioClient::onEvent(const IMidiClient::Event& event, int32_t port) {
   // Try to create Event first.
   if (processVstEvent(event, port))
     return true;

@@ -12,24 +12,22 @@
 
 namespace Gj {
 namespace Db {
-
 struct Genre {
   ID id;
   AtomicStr name;
 
   explicit Genre(const AtomicStr& name)
-      : id(0)
-      , name(name)
-      {};
+  : id(0)
+    , name(name) {
+  };
 
   Genre(const ID id, const AtomicStr& name)
-      : id(id)
-      , name(name)
-      {};
+  : id(id)
+    , name(name) {
+  };
 
   static Genre deser(sqlite3_stmt* stmt);
 };
-
 } // Db
 } // Gj
 

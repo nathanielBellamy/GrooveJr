@@ -67,10 +67,10 @@ using AppStateManager = typed_actor<AppStateManagerTrait>;
 
 struct AppStateManagerState {
   AppStateManager::pointer self;
-  AppState *gAppState;
-  Audio::Mixer *mixer;
-  Audio::AudioCore *audioCore;
-  Db::Dao *dao;
+  AppState* gAppState;
+  Audio::Mixer* mixer;
+  Audio::AudioCore* audioCore;
+  Db::Dao* dao;
   strong_actor_ptr playback;
   strong_actor_ptr display;
 
@@ -93,10 +93,10 @@ struct AppStateManagerState {
   AppStateManagerState(
     AppStateManager::pointer self,
     strong_actor_ptr supervisor,
-    AppState *gAppState,
-    Audio::Mixer *mixer,
-    Db::Dao *dao,
-    Audio::AudioCore *audioCore
+    AppState* gAppState,
+    Audio::Mixer* mixer,
+    Db::Dao* dao,
+    Audio::AudioCore* audioCore
   )
   : self(self)
     , gAppState(gAppState)

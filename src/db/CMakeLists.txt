@@ -68,10 +68,10 @@ add_library(GjDb SHARED
 )
 
 target_link_libraries(GjDb
-  PUBLIC
-  Boost::log
-  ${Boost_LIBRARIES}
-  SQLite::SQLite3
-  -L${C_LIBS_HOME}/libsndfile/1.2.2/lib
-  -lsndfile
+        PUBLIC
+        Boost::log
+        ${Boost_LIBRARIES}
+        SQLite::SQLite3
+        -L${C_LIBS_HOME}/libsndfile/1.2.2/lib
+        -lsndfile
 )

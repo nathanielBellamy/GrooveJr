@@ -6,42 +6,39 @@
 
 namespace Gj {
 namespace Scanner {
-
-  namespace fs = std::filesystem;
+namespace fs = std::filesystem;
 
 // TODO
 Scanner::Scanner(Db::Dao* dao)
-  : dao(dao)
-  {
-
+: dao(dao) {
   Logging::write(
-      Info,
-      "Scanner::Scanner::Scanner()",
-      "Instantiated Scanner"
+    Info,
+    "Scanner::Scanner::Scanner()",
+    "Instantiated Scanner"
   );
 }
 
 Result Scanner::scanDirectoryRecursive(const std::string& dirPath) const {
   Logging::write(
-      Info,
-      "Scanner::Scanner::runScan()",
-      "Scanning dirPath: " + dirPath
+    Info,
+    "Scanner::Scanner::runScan()",
+    "Scanning dirPath: " + dirPath
   );
 
   if (!fs::exists(dirPath)) {
     Logging::write(
-        Info,
-        "Scanner::Scanner::runScan()",
-        "Directory does not exist: " + dirPath
+      Info,
+      "Scanner::Scanner::runScan()",
+      "Directory does not exist: " + dirPath
     );
     return ERROR;
   }
 
-  Db::Playlist playlist ("Grooves With Moves");
+  Db::Playlist playlist("Grooves With Moves");
   dao->playlistRepository.save(playlist);
   dao->playlistRepository.save(playlist);
 
-  for (const auto& entry : fs::directory_iterator(dirPath)) {
+  for (const auto& entry: fs::directory_iterator(dirPath)) {
     if (fs::is_directory(entry.status())) {
       // recurse into subdirectory
       scanDirectoryRecursive(entry.path());
@@ -61,53 +58,52 @@ Result Scanner::scanDirectoryRecursive(const std::string& dirPath) const {
         continue;
 
       TagLib::FileRef file(
-          entry.path().string().c_str(),
-          true,
-          TagLib::AudioProperties::Accurate
+        entry.path().string().c_str(),
+        true,
+        TagLib::AudioProperties::Accurate
       );
 
       if (file.isNull() || !file.tag()) {
         Logging::write(
-            Error,
-            "Scanner::Scanner::runScan()",
-            "Failed to read file."
+          Error,
+          "Scanner::Scanner::runScan()",
+          "Failed to read file."
         );
         continue;
       }
 
       TagLib::Tag* tag = file.tag();
 
-      Db::Artist artist (tag->artist().to8Bit());
+      Db::Artist artist(tag->artist().to8Bit());
       artist.id = dao->artistRepository.save(artist);
 
-      Db::Album album (tag->album().to8Bit(), tag->year());
-      Db::AlbumWithArtist albumWithArtist {
+      Db::Album album(tag->album().to8Bit(), tag->year());
+      Db::AlbumWithArtist albumWithArtist{
         album,
         artist
       };
       album.id = dao->albumRepository.save(albumWithArtist);
 
-      Db::Track track (album.id, tag->title().to8Bit(), tag->track());
+      Db::Track track(album.id, tag->title().to8Bit(), tag->track());
       track.id = dao->trackRepository.save(track);
       dao->trackRepository.join(track, artist);
 
-      Db::AudioFile audioFile (track.id, entry.path().string().c_str());
+      Db::AudioFile audioFile(track.id, entry.path().string().c_str());
       audioFile.id = dao->audioFileRepository.save(audioFile);
 
-      Db::Genre genre (tag->genre().to8Bit());
-      Db::GenreWithTrackId genreWithTrackId { genre, track.id };
+      Db::Genre genre(tag->genre().to8Bit());
+      Db::GenreWithTrackId genreWithTrackId{genre, track.id};
       dao->genreRepository.save(genreWithTrackId);
     }
   }
 
   Logging::write(
-      Info,
-      "Scanner::Scanner::runScan()",
-      "Done Scanning dirPath: " + dirPath
+    Info,
+    "Scanner::Scanner::runScan()",
+    "Done Scanning dirPath: " + dirPath
   );
 
   return OK;
 }
-
 } // Scn
 } // Gj

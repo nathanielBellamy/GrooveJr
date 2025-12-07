@@ -2,8 +2,8 @@
 find_package(Boost REQUIRED COMPONENTS log_setup log)
 
 set(editorhost_sources
-    ${VST3SDK_HOME}/public.sdk/source/vst/hosting/plugprovider.cpp
-    ${VST3SDK_HOME}/public.sdk/source/vst/hosting/plugprovider.h
+        ${VST3SDK_HOME}/public.sdk/source/vst/hosting/plugprovider.cpp
+        ${VST3SDK_HOME}/public.sdk/source/vst/hosting/plugprovider.h
         source/editorhost.cpp
         source/editorhost.h
         source/ComponentHandler.cpp
@@ -18,27 +18,27 @@ set(editorhost_sources
 )
 
 #    if(SMTG_MAC)
-    set(editorhost_sources
+set(editorhost_sources
         "${editorhost_sources}"
-            source/platform/mac/platform.mm
-            source/platform/mac/window.h
-            source/platform/mac/window.mm
+        source/platform/mac/platform.mm
+        source/platform/mac/window.h
+        source/platform/mac/window.mm
         "${VST3SDK_HOME}/public.sdk/source/vst/hosting/module_mac.mm"
-    )
-    set_source_files_properties(
-            source/platform/mac/window.mm
-            source/platform/mac/platform.mm
+)
+set_source_files_properties(
+        source/platform/mac/window.mm
+        source/platform/mac/platform.mm
         "${VST3SDK_HOME}/public.sdk/source/vst/hosting/module_mac.mm" PROPERTIES
         COMPILE_FLAGS "-fobjc-arc"
-    )
-    set(editorhost_PLATFORM_LIBS
+)
+set(editorhost_PLATFORM_LIBS
         "-framework Cocoa"
-    )
-    get_filename_component(InfoPlistFile "resource/Info.plist" ABSOLUTE)
-    set(APP_PROPERTIES
+)
+get_filename_component(InfoPlistFile "resource/Info.plist" ABSOLUTE)
+set(APP_PROPERTIES
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST ${InfoPlistFile}
-    )
+)
 #    elseif(SMTG_LINUX)
 #        find_package(X11 REQUIRED)
 #        find_package(PkgConfig REQUIRED)
@@ -88,27 +88,27 @@ set(target editorhost)
 add_library(${target} STATIC ${editorhost_sources})
 set_target_properties(${target} PROPERTIES SDK_IDE_HOSTING_EXAMPLES_FOLDER "${VST3SDK_HOME}/public.sdk/source/vst/hosting")
 target_compile_features(${target}
-    PUBLIC
+        PUBLIC
         cxx_std_17
 )
 target_compile_options(${target} PRIVATE -I${VST3SDK_HOME})
 target_link_libraries(${target}
-    PRIVATE
-#            sdk_hosting
+        PRIVATE
+        #            sdk_hosting
         sdk_common
         ${editorhost_PLATFORM_LIBS}
 )
 target_link_libraries(${target}
-    PUBLIC
-    "-framework CoreFoundation" # macOS
-    "-framework Foundation"     #  and Objective C
-    Boost::log
-    ${Boost_LIBRARIES}
+        PUBLIC
+        "-framework CoreFoundation" # macOS
+        "-framework Foundation"     #  and Objective C
+        Boost::log
+        ${Boost_LIBRARIES}
 )
 smtg_target_setup_universal_binary(${target})
 if (APP_PROPERTIES)
     set_target_properties(${target}
-        PROPERTIES
+            PROPERTIES
             ${APP_PROPERTIES}
     )
-endif(APP_PROPERTIES)
+endif (APP_PROPERTIES)

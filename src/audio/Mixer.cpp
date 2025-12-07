@@ -6,15 +6,12 @@
 
 namespace Gj {
 namespace Audio {
-
 using namespace Steinberg;
 
 Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
-  : gAppState(gAppState)
+: gAppState(gAppState)
   , jackClient(new JackClient(this))
-  , dao(dao)
-  {
-
+  , dao(dao) {
   Logging::write(
     Info,
     "Audio::Mixer::Mixer()",
@@ -89,20 +86,20 @@ Mixer::~Mixer() {
 }
 
 Result Mixer::addEffectsChannel() {
-    effectsChannels.push_back(
-      new Effects::EffectsChannel(
-        gAppState,
-        jackClient,
-        effectsChannels.size()
-      )
-    );
-    return OK;
+  effectsChannels.push_back(
+    new Effects::EffectsChannel(
+      gAppState,
+      jackClient,
+      effectsChannels.size()
+    )
+  );
+  return OK;
 }
 
 Result Mixer::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) const {
   bool warning = false;
   gAppState->setAudioFramesPerBuffer(framesPerBuffer);
-  for (const auto channel : effectsChannels) {
+  for (const auto channel: effectsChannels) {
     if (channel->setBlockSize(framesPerBuffer) != OK) {
       Logging::write(
         Warning,
@@ -123,11 +120,11 @@ Result Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity
 
   delete effectsChannels.at(channelEntity.channelIndex);
   effectsChannels.at(channelEntity.channelIndex) =
-    new Effects::EffectsChannel(
-      gAppState,
-      jackClient,
-      channelEntity
-    );
+      new Effects::EffectsChannel(
+        gAppState,
+        jackClient,
+        channelEntity
+      );
   return OK;
 }
 
@@ -139,7 +136,7 @@ Result Mixer::removeEffectsChannel(const ChannelIndex idx) {
 
 Result Mixer::setSampleRate(const uint32_t sampleRate) const {
   const auto sampleRateD = static_cast<double>(sampleRate);
-  for (const auto effectsChannel : effectsChannels) {
+  for (const auto effectsChannel: effectsChannels) {
     effectsChannel->setSampleRate(sampleRateD);
   }
   return OK;
@@ -193,11 +190,13 @@ PluginIndex Mixer::pluginsOnChannelCount(const ChannelIndex idx) const {
   return effectsChannels.at(idx)->pluginCount();
 }
 
-void Mixer::initEditorHostsOnChannel(const ChannelIndex idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const {
+void Mixer::initEditorHostsOnChannel(const ChannelIndex idx,
+                                     std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) const {
   return effectsChannels.at(idx)->initEditorHosts(vstWindows);
 }
 
-void Mixer::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex newPluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+void Mixer::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex newPluginIndex,
+                                    std::shared_ptr<Gui::VstWindow> vstWindow) const {
   return effectsChannels.at(idx)->initEditorHost(newPluginIndex, vstWindow);
 }
 
@@ -208,13 +207,14 @@ void Mixer::terminateEditorHostsOnChannel(const ChannelIndex idx) const {
     "Terminating editor hosts on channelIndex: " + std::to_string(idx)
   );
 
-  if (idx < effectsChannels.size() ) {
+  if (idx < effectsChannels.size()) {
     effectsChannels.at(idx)->terminateEditorHosts();
   } else {
     Logging::write(
       Error,
       "Audio::Mixer::terminateEditorHostsOnChannel",
-      "Attempting to terminate editor host on out of range channelIndex: " + std::to_string(idx) + " channelCount: " + std::to_string(effectsChannels.size())
+      "Attempting to terminate editor host on out of range channelIndex: " + std::to_string(idx) + " channelCount: " +
+      std::to_string(effectsChannels.size())
     );
   }
 
@@ -225,7 +225,8 @@ void Mixer::terminateEditorHostsOnChannel(const ChannelIndex idx) const {
   );
 }
 
-Result Mixer::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx, const PluginPath& pluginPath) const {
+Result Mixer::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx,
+                                     const PluginPath& pluginPath) const {
   return effectsChannels.at(channelIdx)->addReplacePlugin(pluginIdx, pluginPath);
 }
 
@@ -306,7 +307,7 @@ Result Mixer::deleteChannels() {
     "Deleting channels."
   );
 
-  for (const auto effectsChannel : effectsChannels)
+  for (const auto effectsChannel: effectsChannels)
     delete effectsChannel;
 
   effectsChannels.clear();
@@ -330,11 +331,11 @@ Result Mixer::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
   deleteChannels();
 
   if (channelEntities.empty())
-    for (const auto channel : Db::ChannelEntity::baseChannels())
+    for (const auto channel: Db::ChannelEntity::baseChannels())
       channelEntities.push_back(channel);
 
   std::sort(channelEntities.begin(), channelEntities.end());
-  for (const auto& channelEntity : channelEntities)
+  for (const auto& channelEntity: channelEntities)
     addEffectsChannelFromEntity(channelEntity);
 
   Logging::write(
@@ -353,17 +354,17 @@ Result Mixer::setPlugins(const std::vector<Db::Plugin>& plugins) const {
     "Setting plugins."
   );
 
-  std::vector<std::vector<Db::Plugin>> pluginsByChannel;
-  for (const auto& plugin : plugins) {
+  std::vector<std::vector<Db::Plugin> > pluginsByChannel;
+  for (const auto& plugin: plugins) {
     while (pluginsByChannel.size() <= plugin.channelIndex)
       pluginsByChannel.emplace_back();
 
     pluginsByChannel.at(plugin.channelIndex).push_back(plugin);
   }
 
-  for (const auto& effectsChannelPlugins : pluginsByChannel) {
+  for (const auto& effectsChannelPlugins: pluginsByChannel) {
     std::sort(effectsChannelPlugins.begin(), effectsChannelPlugins.end());
-    for (const auto& plugin : effectsChannelPlugins) {
+    for (const auto& plugin: effectsChannelPlugins) {
       if (loadPluginOnChannel(plugin) == OK) {
         Logging::write(
           Info,
@@ -432,12 +433,13 @@ Result Mixer::saveScene() const {
 Result Mixer::saveChannels() const {
   Result result = OK;
   const auto scene = gAppState->getScene();
-  for (const auto effectsChannel : effectsChannels) {
+  for (const auto effectsChannel: effectsChannels) {
     if (!dao->channelRepository.save(effectsChannel->toEntity())) {
       Logging::write(
         Error,
         "Audio::Mixer::saveScene",
-        "Unable to save channel: " + std::to_string(effectsChannel->getIndex()) + " to sceneDbId: " + std::to_string(scene.id)
+        "Unable to save channel: " + std::to_string(effectsChannel->getIndex()) + " to sceneDbId: " +
+        std::to_string(scene.id)
       );
       result = ERROR;
     }
@@ -468,7 +470,8 @@ Result Mixer::saveChannels() const {
       }
 
       int64 audioHostControllerStateSize = 0;
-      if (Effects::Vst3::Util::getStreamSize(audioHostControllerStateStream.get(), &audioHostControllerStateSize) != OK) {
+      if (Effects::Vst3::Util::getStreamSize(audioHostControllerStateStream.get(), &audioHostControllerStateSize) !=
+          OK) {
         Logging::write(
           Error,
           "Audio::Mixer::saveScene",
@@ -477,8 +480,8 @@ Result Mixer::saveChannels() const {
         result = WARNING;
       }
 
-      std::vector<uint8_t> audioHostComponentBuffer (audioHostComponentStateSize);
-      std::vector<uint8_t> audioHostControllerBuffer (audioHostControllerStateSize);
+      std::vector<uint8_t> audioHostComponentBuffer(audioHostComponentStateSize);
+      std::vector<uint8_t> audioHostControllerBuffer(audioHostControllerStateSize);
 
       if (audioHostComponentStateSize > 0) {
         int32 audioHostComponentNumBytesRead = 0;
@@ -549,6 +552,5 @@ Result Mixer::setFrameId(const sf_count_t frameId) {
 
   return OK;
 }
-
 } // Audio
 } // Gj

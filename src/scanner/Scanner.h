@@ -29,17 +29,14 @@
 
 namespace Gj {
 namespace Scanner {
-
 class Scanner final {
-
   Db::Dao* dao;
 
-  public:
-    Scanner(Db::Dao* dao);
+public:
+  Scanner(Db::Dao* dao);
 
-    Result scanDirectoryRecursive(const std::string& dirPath) const;
+  Result scanDirectoryRecursive(const std::string& dirPath) const;
 };
-
 } // Sc
 } // Gj
 

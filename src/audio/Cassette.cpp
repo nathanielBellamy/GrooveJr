@@ -2,13 +2,10 @@
 
 namespace Gj {
 namespace Audio {
-
 Cassette::Cassette(AppState* gAppState, const char* filePath)
-  : gAppState(gAppState)
+: gAppState(gAppState)
   , filePath(filePath)
-  , sfInfo()
-  {
-
+  , sfInfo() {
   if (const int initRes = init(); initRes > 0) {
     Logging::write(
       Error,
@@ -28,11 +25,9 @@ Cassette::Cassette(AppState* gAppState, const char* filePath)
 }
 
 Cassette::Cassette(AppState* gAppState)
-  : filePath("BLANK")
+: filePath("BLANK")
   , gAppState(gAppState)
-  , sfInfo()
-  {
-
+  , sfInfo() {
   Logging::write(
     Info,
     "Audio::Cassette::Cassette(gAppState)",
@@ -117,23 +112,24 @@ int Cassette::init() {
   // Allocate memory for data
   buffer = new float[sfInfo.frames * sfInfo.channels];
   if (!buffer) {
-      Logging::write(
-        Error,
-        "Audio::Cassette::init",
-        "Cannot allocate memory for raw audio buffer"
-      );
+    Logging::write(
+      Error,
+      "Audio::Cassette::init",
+      "Cannot allocate memory for raw audio buffer"
+    );
     return 2;
   }
 
   // Read the audio data into buffer
-  if (const auto readCount = sf_read_float(file, buffer, sfInfo.frames * sfInfo.channels); readCount != sfInfo.frames * sfInfo.channels) {
+  if (const auto readCount = sf_read_float(file, buffer, sfInfo.frames * sfInfo.channels);
+    readCount != sfInfo.frames * sfInfo.channels) {
     Logging::write(
       Error,
       "Audio::Cassette::init",
       "Unable to read file: " + std::string(filePath) +
-              " readcount: " + std::to_string(readCount) +
-              " channels: " + std::to_string(sfInfo.channels) +
-              " frames: " + std::to_string(sfInfo.frames)
+      " readcount: " + std::to_string(readCount) +
+      " channels: " + std::to_string(sfInfo.channels) +
+      " frames: " + std::to_string(sfInfo.frames)
     );
     return 3;
   }
@@ -235,9 +231,9 @@ Result Cassette::deleteBuffers() const {
     delete[] inputBuffer;
   } catch (...) {
     Logging::write(
-        Error,
-        "Audio::Cassette::freeBuffers",
-        "Unable to delete Cassette buffers"
+      Error,
+      "Audio::Cassette::freeBuffers",
+      "Unable to delete Cassette buffers"
     );
     return ERROR;
   }
@@ -250,6 +246,5 @@ Result Cassette::deleteBuffers() const {
 
   return OK;
 }
-
 } // Audio
 } // Gj

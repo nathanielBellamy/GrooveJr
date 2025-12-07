@@ -7,9 +7,9 @@
 cmake_minimum_required(VERSION 3.29.6)
 project(GjAudio VERSION 0.0.0)
 
-set (CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
 # utilize vst3sdk cmake modules
-list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
 include(SMTG_FindJack)
 
@@ -20,25 +20,25 @@ find_package(Boost REQUIRED COMPONENTS log_setup log)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
 # jack audio
-if(NOT ${LIBJACK_FOUND})
+if (NOT ${LIBJACK_FOUND})
     message(INFO " --GjAudio--LIBJACK--NOT--FOUND--")
-endif()
+endif ()
 
-set (C_LIBS_INCLUDE_FLAGS
+set(C_LIBS_INCLUDE_FLAGS
         -I${C_LIBS_HOME}/libsndfile/1.2.2/include
         -I${C_LIBS_HOME}/fftw/3.3.10_2/include
 )
 
-set (CXX_LIBS_INCLUDE_FLAGS
+set(CXX_LIBS_INCLUDE_FLAGS
         -I${VST3SDK_HOME}
 )
 
-set (INCLUDE_FLAGS
+set(INCLUDE_FLAGS
         ${C_LIBS_INCLUDE_FLAGS}
         ${CXX_LIBS_INCLUDE_FLAGS}
 )
 
-set (LINK_FLAGS
+set(LINK_FLAGS
         -L${C_LIBS_HOME}/libsndfile/1.2.2/lib
         -lsndfile
         -L${VST3SDK_HOME}/build/lib/Release
@@ -56,10 +56,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${VST3SDK_HOME}/cmake/modules)
 add_subdirectory(effects/vst3/host)
 
 # make caf available
-set (CAF_ROOT
+set(CAF_ROOT
         /Users/ns/code/actor-framework/build
 )
-find_package (CAF
+find_package(CAF
         REQUIRED)
 
 # compile library
@@ -100,19 +100,19 @@ set(LINK_LIBRARIES
 )
 
 if (SMTG_MAC)
-    set (LINK_LIBRARIES "${LINK_LIBRARIES}
+    set(LINK_LIBRARIES "${LINK_LIBRARIES}
     -framework CoreFoundation
     -framework Foundation"
     )
 endif (SMTG_MAC)
 target_link_libraries(GjAudio PUBLIC
-    ${LINK_LIBRARIES}
-    Boost::log
-    ${Boost_LIBRARIES}
-    Qt6::Core
-    Qt6::Widgets
-    ${LIBJACK_LIBRARY}
-    GjDb
+        ${LINK_LIBRARIES}
+        Boost::log
+        ${Boost_LIBRARIES}
+        Qt6::Core
+        Qt6::Widgets
+        ${LIBJACK_LIBRARY}
+        GjDb
 )
 target_include_directories(GjAudio
         PRIVATE

@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.29.6)
 project(vst3host)
 set(VST3SDK_HOME "${GJ_BASE_DIR}/vst3sdk")
-list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
 include(SMTG_UniversalBinary)
 add_subdirectory(audiohost)

@@ -6,14 +6,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(LLVM_INSTALL_DIR /opt/homebrew/opt/llvm)
 
-list (APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
 include(SMTG_FindJack)
 
 # jack audio
-if(NOT ${LIBJACK_FOUND})
+if (NOT ${LIBJACK_FOUND})
     message(INFO " --GjGui--LIBJACK--NOT--FOUND--")
-endif()
+endif ()
 
 # logging
 find_package(Boost REQUIRED COMPONENTS log_setup log)
@@ -21,10 +21,10 @@ find_package(Boost REQUIRED COMPONENTS log_setup log)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Sql)
 qt_standard_project_setup()
 
-set (CAF_ROOT
+set(CAF_ROOT
         ${GJ_BASE_DIR}/actor-framework/build
 )
-find_package (CAF
+find_package(CAF
         REQUIRED)
 
 qt_add_library(GjGui STATIC
