@@ -44,23 +44,24 @@
 
 //------------------------------------------------------------------------
 namespace Steinberg {
-  namespace Vst {
-    static constexpr int kJackSuccess = 0;
-    static constexpr int kJackError = 1;
-  } // Vst
+namespace Vst {
+static constexpr int kJackSuccess = 0;
+
+static constexpr int kJackError = 1;
+} // Vst
 } // Steinberg
 
 namespace Gj {
 namespace Audio {
+jack_port_t* outPortL;
 
-jack_port_t *outPortL;
-jack_port_t *outPortR;
+jack_port_t* outPortR;
 
 using namespace Steinberg;
 
 JackClient::JackClient(Mixer* mixer)
-  : mixer(mixer)
-  {}
+: mixer(mixer) {
+}
 
 //------------------------------------------------------------------------
 JackClient::~JackClient() {
@@ -137,7 +138,7 @@ Result JackClient::activate(AudioCore* audioCore) const {
   return OK;
 }
 
-  Result JackClient::deactivate() const {
+Result JackClient::deactivate() const {
   if (const auto jackDeactivateStatus = jack_deactivate(jackClient); jackDeactivateStatus != 0) {
     Logging::write(
       Error,
@@ -178,7 +179,8 @@ Result JackClient::setCallbacks(AudioCore* audioCore) const {
   }
 
   bool warning = false;
-  if (const auto success = jack_set_buffer_size_callback(jackClient, &JackClient::setBufferSizeCallback, mixer); success != kJackSuccess) {
+  if (const auto success = jack_set_buffer_size_callback(jackClient, &JackClient::setBufferSizeCallback, mixer);
+    success != kJackSuccess) {
     Logging::write(
       Warning,
       "Audio::JackClient::setCallbacks",
@@ -187,7 +189,8 @@ Result JackClient::setCallbacks(AudioCore* audioCore) const {
     warning = true;
   }
 
-  if (const auto success = jack_set_sample_rate_callback(jackClient, &JackClient::setSampleRateCallback, mixer); success != kJackSuccess) {
+  if (const auto success = jack_set_sample_rate_callback(jackClient, &JackClient::setSampleRateCallback, mixer);
+    success != kJackSuccess) {
     Logging::write(
       Warning,
       "Audio::JackClient::setCallbacks",
@@ -196,7 +199,8 @@ Result JackClient::setCallbacks(AudioCore* audioCore) const {
     warning = true;
   }
 
-  if (const auto success = jack_set_xrun_callback(jackClient, &JackClient::xRunCallback, mixer); success != kJackSuccess) {
+  if (const auto success = jack_set_xrun_callback(jackClient, &JackClient::xRunCallback, mixer);
+    success != kJackSuccess) {
     Logging::write(
       Warning,
       "Audio::JackClient::setCallbacks",
@@ -329,7 +333,8 @@ float JackClient::princArg(const float phaseIn) {
 
 // plabackSpeed in [-2.0, 2.0]
 int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
-  if constexpr (false) { // TODO: fix phase-tracking in phase vocoder
+  if constexpr (false) {
+    // TODO: fix phase-tracking in phase vocoder
     const int hopAnalysis = FFT_PV_HOP_ANALYSIS;
     const float hopAnalysisF = FFT_PV_HOP_ANALYSISF;
     const int fftSize = FFT_PV_TIME_SIZE;
@@ -406,15 +411,16 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
     }
   }
 
-  for (auto& deck : audioCore->decks) {
+  for (auto& deck: audioCore->decks) {
     if (!deck.isPlaying())
       continue;
 
     deck.gain = audioCore->getDeckGain(deck.deckIndex);
 
     // playbackSpeed
-    const float* processHeadL = deck.inputBuffers[0] + deck.frameId; //  &audioCore->playbackBuffersPre[0][0];
-    const float* processHeadR = deck.inputBuffers[1] + deck.frameId; // &audioCore->playbackBuffersPre[1][0];
+    // todo: playbackBuffersPre
+    const float* processHeadL = deck.inputBuffers[BfrIdx::AudCh::LEFT] + deck.frameId;
+    const float* processHeadR = deck.inputBuffers[BfrIdx::AudCh::RIGHT] + deck.frameId;
 
     const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
     float playbackPos = 0.0f;
@@ -424,10 +430,10 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
       playbackPosTrunc = std::trunc(playbackPos);
       idx = static_cast<int>(playbackPosTrunc);
       const float frac = playbackPos - playbackPosTrunc;
-      const auto valL = ((1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx+1]) * deck.gain;
-      const auto valR = ((1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx+1]) * deck.gain;
-      audioCore->playbackBuffers[0][i] += std::isnan(valL) ? 0.0f : valL;
-      audioCore->playbackBuffers[1][i] += std::isnan(valR) ? 0.0f : valR;
+      const auto valL = ((1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx + 1]) * deck.gain;
+      const auto valR = ((1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx + 1]) * deck.gain;
+      audioCore->playbackBuffers[BfrIdx::AudCh::LEFT][i] += std::isnan(valL) ? 0.0f : valL;
+      audioCore->playbackBuffers[BfrIdx::AudCh::RIGHT][i] += std::isnan(valR) ? 0.0f : valR;
       playbackPos += playbackSpeedF;
     }
 
@@ -458,12 +464,12 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
 // jack process callback
 // do not allocate/free memory within this method
 // as it may be called at system-interrupt level
-int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
+int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   // get port buffers
-  auto *outL = static_cast<jack_default_audio_sample_t *>(
+  auto* outL = static_cast<jack_default_audio_sample_t*>(
     jack_port_get_buffer(outPortL, nframes)
   );
-  auto *outR = static_cast<jack_default_audio_sample_t *>(
+  auto* outR = static_cast<jack_default_audio_sample_t*>(
     jack_port_get_buffer(outPortR, nframes)
   );
 
@@ -471,32 +477,34 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   audioCore->clearBuffers();
 
   // read playbackSettingsToAudioThreadRingBuffer
-  if (jack_ringbuffer_read_space(audioCore->playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE - 2) {
+  if (jack_ringbuffer_read_space(audioCore->playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE -
+      2) {
     jack_ringbuffer_read(
       audioCore->playbackSettingsToAudioThreadRB,
-      reinterpret_cast<char *>(audioCore->playbackSettingsToAudioThread),
+      reinterpret_cast<char*>(audioCore->playbackSettingsToAudioThread),
       PlaybackSettingsToAudioThread_RB_SIZE
     );
   }
 
-  if (audioCore->playbackSettingsToAudioThread[0] == 1) // user set frame Id
-    audioCore->currentDeck().frameId = audioCore->playbackSettingsToAudioThread[1];
+  if (audioCore->playbackSettingsToAudioThread[BfrIdx::PSTAT::USER_SETTING_FRAME_ID_FLAG] == 1) // user set frame Id
+    audioCore->currentDeck().frameId = audioCore->playbackSettingsToAudioThread[BfrIdx::PSTAT::NEW_FRAME_ID];
 
-  // audioCore->playbackSettingsFromAudioThread[0] = 0; // DEBUG VALUE FROM AUDIO THREAD
-  audioCore->playbackSettingsFromAudioThread[1] = audioCore->currentDeck().frameId;
+  audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::DEBUG_VALUE] = 0;
+  audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::CURRENT_FRAME_ID] = audioCore->currentDeck().frameId;
 
   // write to playbackSettingsFromAudioThread ring buffer
-  if (jack_ringbuffer_write_space(audioCore->playbackSettingsFromAudioThreadRB) > PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
+  if (jack_ringbuffer_write_space(audioCore->playbackSettingsFromAudioThreadRB) >
+      PlaybackSettingsFromAudioThread_RB_SIZE - 2) {
     jack_ringbuffer_write(
       audioCore->playbackSettingsFromAudioThreadRB,
-      reinterpret_cast<char *>(audioCore->playbackSettingsFromAudioThread),
+      reinterpret_cast<char*>(audioCore->playbackSettingsFromAudioThread),
       PlaybackSettingsFromAudioThread_RB_SIZE
     );
   }
 
   audioCore->fillPlaybackBuffer(
     audioCore,
-    audioCore->playbackSettingsToAudioThread[2],
+    audioCore->playbackSettingsToAudioThread[BfrIdx::PSTAT::PLAYBACK_SPEED],
     nframes
   );
 
@@ -516,40 +524,43 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   }
 
   // read channel settings from ringbuffer
-  if (jack_ringbuffer_t* ringBuffer = audioCore->effectsChannelsSettingsRB; jack_ringbuffer_read_space(ringBuffer) >= EffectsSettings_RB_SIZE) {
+  if (jack_ringbuffer_t* ringBuffer = audioCore->effectsChannelsSettingsRB;
+    jack_ringbuffer_read_space(ringBuffer) >= EffectsSettings_RB_SIZE) {
     jack_ringbuffer_read(
       ringBuffer,
-      reinterpret_cast<char *>(audioCore->effectsChannelsSettings),
+      reinterpret_cast<char*>(audioCore->effectsChannelsSettings),
       EffectsSettings_RB_SIZE
     );
   }
 
-  float rmsL[MAX_EFFECTS_CHANNELS] = { 0.0f };
-  float rmsR[MAX_EFFECTS_CHANNELS] = { 0.0f };
+  float rmsL[MAX_EFFECTS_CHANNELS] = {0.0f};
+  float rmsR[MAX_EFFECTS_CHANNELS] = {0.0f};
   // sum down
   for (jack_nframes_t i = 0; i < nframes; i++) {
     float accumL = 0.0f;
     float accumR = 0.0f;
-    for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->channelCount; effectsChannelIdx++) {
-      const float factorLL = audioCore->effectsChannelsSettings[4 * effectsChannelIdx];
-      const float factorLR = audioCore->effectsChannelsSettings[4 * effectsChannelIdx + 1];
-      const float factorRL = audioCore->effectsChannelsSettings[4 * effectsChannelIdx + 2];
-      const float factorRR = audioCore->effectsChannelsSettings[4 * effectsChannelIdx + 3];
+    for (ChannelIndex channelIndex = 1; channelIndex < audioCore->channelCount; channelIndex++) {
+      const float factorLL = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorLL(channelIndex)];
+      const float factorLR = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorLR(channelIndex)];
+      const float factorRL = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorRL(channelIndex)];
+      const float factorRR = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorRR(channelIndex)];
 
       float valL = 0.0f;
       float valR = 0.0f;
-      if (audioCore->effectsChannelsProcessData[effectsChannelIdx].pluginCount == 0) {
-        valL = factorLL * audioCore->playbackBuffers[0][i] + factorRL * audioCore->playbackBuffers[1][i];
-        valR = factorLR * audioCore->playbackBuffers[0][i] + factorRR * audioCore->playbackBuffers[1][i];
+      if (audioCore->effectsChannelsProcessData[channelIndex].pluginCount == 0) {
+        valL = factorLL * audioCore->playbackBuffers[BfrIdx::AudCh::LEFT][i]
+               + factorRL * audioCore->playbackBuffers[BfrIdx::AudCh::RIGHT][i];
+        valR = factorLR * audioCore->playbackBuffers[BfrIdx::AudCh::LEFT][i]
+               + factorRR * audioCore->playbackBuffers[BfrIdx::AudCh::RIGHT][i];
       } else {
         const auto writeOutValL =
-          std::isnan(audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i])
-            ? 0.0f
-            : audioCore->effectsChannelsWriteOut[effectsChannelIdx][0][i];
+            std::isnan(audioCore->effectsChannelsWriteOut[channelIndex][BfrIdx::AudCh::LEFT][i])
+              ? 0.0f
+              : audioCore->effectsChannelsWriteOut[channelIndex][BfrIdx::AudCh::LEFT][i];
         const auto writeOutValR =
-          std::isnan(audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i])
-            ? 0.0f
-            : audioCore->effectsChannelsWriteOut[effectsChannelIdx][1][i];
+            std::isnan(audioCore->effectsChannelsWriteOut[channelIndex][BfrIdx::AudCh::RIGHT][i])
+              ? 0.0f
+              : audioCore->effectsChannelsWriteOut[channelIndex][BfrIdx::AudCh::RIGHT][i];
         valL = factorLL * writeOutValL + factorRL * writeOutValR;
         valR = factorLR * writeOutValL + factorRR * writeOutValR;
       }
@@ -557,18 +568,17 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
       accumL += valL;
       accumR += valR;
 
-      rmsL[effectsChannelIdx] += valL * valL;
-      rmsR[effectsChannelIdx] += valR * valR;
+      rmsL[channelIndex] += valL * valL;
+      rmsR[channelIndex] += valR * valR;
     }
-    audioCore->processBuffers[0][i] = accumL;
-    audioCore->processBuffers[1][i] = accumR;
+    audioCore->processBuffers[BfrIdx::AudCh::LEFT][i] = accumL;
+    audioCore->processBuffers[BfrIdx::AudCh::RIGHT][i] = accumR;
   }
 
   const float nframesF = static_cast<float>(nframes);
-  for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->channelCount; effectsChannelIdx++) {
-    const ChannelIndex bufferIndex = 2 * effectsChannelIdx;
-    audioCore->vu_buffer_in[bufferIndex] = std::sqrt(rmsL[effectsChannelIdx] / nframesF);
-    audioCore->vu_buffer_in[bufferIndex + 1] = std::sqrt(rmsR[effectsChannelIdx] / nframesF);
+  for (ChannelIndex chIdx = 1; chIdx < audioCore->channelCount; chIdx++) {
+    audioCore->vu_buffer_in[BfrIdx::VU::left(chIdx)] = std::sqrt(rmsL[chIdx] / nframesF);
+    audioCore->vu_buffer_in[BfrIdx::VU::right(chIdx)] = std::sqrt(rmsR[chIdx] / nframesF);
   }
 
   // process summed down mix through main effects
@@ -583,10 +593,10 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   }
 
   // write out processed main channel to audio out
-  const float factorLL = audioCore->effectsChannelsSettings[0];
-  const float factorLR = audioCore->effectsChannelsSettings[1];
-  const float factorRL = audioCore->effectsChannelsSettings[2];
-  const float factorRR = audioCore->effectsChannelsSettings[3];
+  const float factorLL = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorLL(0)];
+  const float factorLR = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorLR(0)];
+  const float factorRL = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorRL(0)];
+  const float factorRR = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorRR(0)];
 
   for (size_t chan = 0; chan < 2; chan++) {
     std::copy(
@@ -596,20 +606,16 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     );
   }
 
-  for (int i = 0; i < nframes; i++) {
-    // TODO: debug playbackBuffers -> final processBuffers
-    // - outputing playbackBuffers directly works great
-    // const float valL = audioCore->playbackBuffers[0][i];
-    // const float valR = audioCore->playbackBuffers[1][i];
+  for (jack_nframes_t i = 0; i < nframes; i++) {
     const float pbValL =
-      std::isnan(audioCore->processBuffers[0][i])
-        ? 0.0f
-        : audioCore->processBuffers[0][i];
+        std::isnan(audioCore->processBuffers[BfrIdx::AudCh::LEFT][i])
+          ? 0.0f
+          : audioCore->processBuffers[BfrIdx::AudCh::LEFT][i];
 
     const float pbValR =
-      std::isnan(audioCore->processBuffers[1][i])
-        ? 0.0f
-        : audioCore->processBuffers[1][i];
+        std::isnan(audioCore->processBuffers[BfrIdx::AudCh::RIGHT][i])
+          ? 0.0f
+          : audioCore->processBuffers[BfrIdx::AudCh::RIGHT][i];
 
 
     const float valL = factorLL * pbValL + factorRL * pbValR;
@@ -618,15 +624,15 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
     rmsL[0] += valL * valL;
     rmsR[0] += valR * valR;
 
-    audioCore->fft_eq_time[0][FFT_EQ_TIME_SIZE - nframes + i] = valL;
-    audioCore->fft_eq_time[1][FFT_EQ_TIME_SIZE - nframes + i] = valR;
+    audioCore->fft_eq_time[BfrIdx::AudCh::LEFT][FFT_EQ_TIME_SIZE - nframes + i] = valL;
+    audioCore->fft_eq_time[BfrIdx::AudCh::RIGHT][FFT_EQ_TIME_SIZE - nframes + i] = valR;
 
     outL[i] = valL;
     outR[i] = valR;
   }
 
-  audioCore->vu_buffer_in[0] = std::sqrt(rmsL[0] / nframesF);
-  audioCore->vu_buffer_in[1] = std::sqrt(rmsR[0] / nframesF);
+  audioCore->vu_buffer_in[BfrIdx::VU::left(0)] = std::sqrt(rmsL[0] / nframesF);
+  audioCore->vu_buffer_in[BfrIdx::VU::right(0)] = std::sqrt(rmsR[0] / nframesF);
 
   if (jack_ringbuffer_write_space(audioCore->vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
     jack_ringbuffer_write(
@@ -638,20 +644,24 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
 
   fftwf_execute_dft_r2c(
     audioCore->fft_eq_0_plan_r2c,
-    audioCore->fft_eq_time[0],
-    audioCore->fft_eq_freq[0]
+    audioCore->fft_eq_time[BfrIdx::AudCh::LEFT],
+    audioCore->fft_eq_freq[BfrIdx::AudCh::LEFT]
   );
 
   fftwf_execute_dft_r2c(
     audioCore->fft_eq_1_plan_r2c,
-    audioCore->fft_eq_time[1],
-    audioCore->fft_eq_freq[1]
+    audioCore->fft_eq_time[BfrIdx::AudCh::RIGHT],
+    audioCore->fft_eq_freq[BfrIdx::AudCh::RIGHT]
   );
 
   // compute + write magnitudes to ring buffer
   for (int i = 0; i < FFT_EQ_FREQ_SIZE; i++) {
-    audioCore->fft_eq_write_out_buffer[2 * i] = std::hypot(audioCore->fft_eq_freq[0][i][0], audioCore->fft_eq_freq[0][i][1]);
-    audioCore->fft_eq_write_out_buffer[2 * i + 1] = std::hypot(audioCore->fft_eq_freq[1][i][0], audioCore->fft_eq_freq[1][i][1]);
+    audioCore->fft_eq_write_out_buffer[BfrIdx::FFT::left(i)] = std::hypot(
+      audioCore->fft_eq_freq[BfrIdx::AudCh::LEFT][i][0],
+      audioCore->fft_eq_freq[BfrIdx::AudCh::LEFT][i][1]);
+    audioCore->fft_eq_write_out_buffer[BfrIdx::FFT::right(i)] = std::hypot(
+      audioCore->fft_eq_freq[BfrIdx::AudCh::RIGHT][i][0],
+      audioCore->fft_eq_freq[BfrIdx::AudCh::RIGHT][i][1]);
   }
 
   if (jack_ringbuffer_write_space(audioCore->fft_eq_ring_buffer) > FFT_EQ_RING_BUFFER_SIZE - 2) {
@@ -665,14 +675,14 @@ int JackClient::processCallback(jack_nframes_t nframes, void *arg) {
   return kJackSuccess;
 }
 
-int JackClient::setSampleRateCallback(jack_nframes_t nframes, void *arg) {
+int JackClient::setSampleRateCallback(jack_nframes_t nframes, void* arg) {
   if (const auto* mixer = static_cast<Mixer*>(arg); mixer->setSampleRate(nframes) != OK)
     return kJackError;
 
   return kJackSuccess;
 }
 
-int JackClient::setBufferSizeCallback(jack_nframes_t nframes, void *arg) {
+int JackClient::setBufferSizeCallback(jack_nframes_t nframes, void* arg) {
   if (const auto* mixer = static_cast<Mixer*>(arg); mixer->setAudioFramesPerBuffer(nframes) != OK)
     return kJackError;
 
@@ -686,7 +696,7 @@ int JackClient::xRunCallback(void* arg) {
 
 bool JackClient::registerMidiPorts(IMidiClient* processor) {
   const auto ioSetup = processor->getMidiIOSetup();
-  for (const auto &input: ioSetup.inputs)
+  for (const auto& input: ioSetup.inputs)
     addMidiInputPort(input);
 
   return true;
@@ -711,7 +721,7 @@ int JackClient::processMidi(jack_nframes_t nframes) {
   for (int32_t portIndex = 0, count = static_cast<int32_t>(midiInputPorts.size());
        portIndex < count; ++portIndex) {
     auto midiInputPort = midiInputPorts.at(portIndex);
-    auto *portBuffer = jack_port_get_buffer(midiInputPort, nframes);
+    auto* portBuffer = jack_port_get_buffer(midiInputPort, nframes);
     if (!portBuffer)
       continue;
 
@@ -782,7 +792,7 @@ bool JackClient::registerAudioClient(IAudioClient* client) {
   return registerClient("GrooveJr");
 }
 
-bool JackClient::registerMidiClient(IMidiClient *client) {
+bool JackClient::registerMidiClient(IMidiClient* client) {
   if (midiClient)
     return false;
 
@@ -800,7 +810,7 @@ bool JackClient::registerMidiClient(IMidiClient *client) {
 }
 
 //------------------------------------------------------------------------
-bool JackClient::autoConnectMidiPorts(jack_client_t *client) {
+bool JackClient::autoConnectMidiPorts(jack_client_t* client) {
   int portIndex = 1;
 
   //! Connect MIDI Inputs
@@ -808,7 +818,7 @@ bool JackClient::autoConnectMidiPorts(jack_client_t *client) {
   if (!ports)
     return false;
 
-  for (auto &port: midiInputPorts) {
+  for (auto& port: midiInputPorts) {
     if (!ports[portIndex])
       break;
 
@@ -821,6 +831,5 @@ bool JackClient::autoConnectMidiPorts(jack_client_t *client) {
   jack_free(ports);
   return true;
 }
-
 } // Audio
 } // Gj
