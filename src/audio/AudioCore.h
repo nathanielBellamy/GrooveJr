@@ -22,72 +22,63 @@
 
 namespace Gj {
 namespace Audio {
+constexpr size_t EffectsChannelsProcessData_RB_SIZE = MAX_EFFECTS_CHANNELS * sizeof(Effects::EffectsChannelProcessData);
 
 struct AudioCore {
-  long                             threadId;
-  AppState*                        gAppState;
-  sf_count_t                       crossfade = 0;
-  AudioDeck                        decks[AUDIO_CORE_DECK_COUNT]{ AudioDeck(0, gAppState), AudioDeck(1, gAppState), AudioDeck(2, gAppState) };
-  DeckIndex                        deckIndex = 0;
-  DeckIndex                        deckIndexNext = 0;
-  sf_count_t                       frameAdvance;
-  float                            fft_eq_time[2][FFT_EQ_TIME_SIZE]{ 0.0 };
-  fftwf_complex                    fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
-  float                            fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{ 0.0f };
-  fftwf_plan                       fft_eq_0_plan_r2c;
-  fftwf_plan                       fft_eq_1_plan_r2c;
-  jack_ringbuffer_t*               fft_eq_ring_buffer{nullptr};
-  float                            fft_pv_time[FFT_PV_TIME_SIZE]{};
-  float                            fft_pv_ola_buffer[2][FFT_PV_OLA_BUFFER_SIZE]{ 0.0f };
-  fftwf_complex                    fft_pv_freq[FFT_PV_FREQ_SIZE]{};
-  fftwf_complex                    fft_pv_freq_shift[FFT_PV_FREQ_SIZE]{ 0.0f };
-  float                            fft_pv_phase_sum[2][FFT_PV_FREQ_SIZE]{ 0.0f };
-  float                            fft_pv_phase_prev[2][FFT_PV_FREQ_SIZE]{ 0.0f };
-  float                            fft_pv_phase_prev_init[2][FFT_PV_FREQ_SIZE]{ 0.0f };
-  fftwf_plan                       fft_pv_plan_r2c;
-  fftwf_plan                       fft_pv_plan_c2r;
-  float                            vu_buffer_in[VU_RING_BUFFER_SIZE]{ 0.0f };
-  float                            vu_buffer[VU_RING_BUFFER_SIZE]{ 0.0f };
-  jack_ringbuffer_t*               vu_ring_buffer{ nullptr };
-  float                            processBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{ 0.0f };
-  float*                           processBuffers[2]{ nullptr, nullptr };
-  float                            playbackBuffersPre[2][AUDIO_FRAMES_PER_BUFFER_MAX]{ 0.0f };
-  float                            playbackBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{ 0.0f };
-  float*                           playbackBuffers[2]{ nullptr, nullptr };
-  float                            fftFreqBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{ 0.0f };
-  sf_count_t                       playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{0};
-  jack_ringbuffer_t*               playbackSettingsToAudioThreadRB{ nullptr };
-                                   // pSTATRB[0] = userSettingFrameId bool
-                                   // pSTATRB[1] = newFrameId         sf_count_t
-                                   // pSTATRB[2] = newPlaybackSpeed   sf_count_t
-                                   // TODO:
-                                   // pSTATRB[3] = playbackBuffers*   sf_count_t
+  long threadId;
+  AppState* gAppState;
+  sf_count_t crossfade = 0;
+  AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0, gAppState), AudioDeck(1, gAppState), AudioDeck(2, gAppState)};
+  DeckIndex deckIndex = 0;
+  DeckIndex deckIndexNext = 0;
+  sf_count_t frameAdvance;
+  float fft_eq_time[2][FFT_EQ_TIME_SIZE]{0.0};
+  fftwf_complex fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
+  float fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{0.0f};
+  fftwf_plan fft_eq_0_plan_r2c;
+  fftwf_plan fft_eq_1_plan_r2c;
+  jack_ringbuffer_t* fft_eq_ring_buffer{nullptr};
+  float fft_pv_time[FFT_PV_TIME_SIZE]{};
+  float fft_pv_ola_buffer[2][FFT_PV_OLA_BUFFER_SIZE]{0.0f};
+  fftwf_complex fft_pv_freq[FFT_PV_FREQ_SIZE]{};
+  fftwf_complex fft_pv_freq_shift[FFT_PV_FREQ_SIZE]{0.0f};
+  float fft_pv_phase_sum[2][FFT_PV_FREQ_SIZE]{0.0f};
+  float fft_pv_phase_prev[2][FFT_PV_FREQ_SIZE]{0.0f};
+  float fft_pv_phase_prev_init[2][FFT_PV_FREQ_SIZE]{0.0f};
+  fftwf_plan fft_pv_plan_r2c;
+  fftwf_plan fft_pv_plan_c2r;
+  float vu_buffer_in[VU_RING_BUFFER_SIZE]{0.0f};
+  float vu_buffer[VU_RING_BUFFER_SIZE]{0.0f};
+  jack_ringbuffer_t* vu_ring_buffer{nullptr};
+  float processBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{0.0f};
+  float* processBuffers[2]{nullptr, nullptr};
+  float playbackBuffersPre[2][AUDIO_FRAMES_PER_BUFFER_MAX]{0.0f};
+  float playbackBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{0.0f};
+  float* playbackBuffers[2]{nullptr, nullptr};
+  float fftFreqBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{0.0f};
+  sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{0};
+  jack_ringbuffer_t* playbackSettingsToAudioThreadRB{nullptr};
 
-  sf_count_t                       playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{0};
-  jack_ringbuffer_t*               playbackSettingsFromAudioThreadRB{nullptr};
-                                   // pSFATRB[0] = unused (debug)
-                                   // pSFATRB[1] = frameId sf_count_t
+  sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{0};
+  jack_ringbuffer_t* playbackSettingsFromAudioThreadRB{nullptr};
   std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
-  size_t                           channelCount;
+  size_t channelCount;
+  jack_ringbuffer_t* effectsChannelsProcessDataRB{};
   std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
-                                   // eCS[4k]   = {factorLL channel k}
-                                   // eCS[4k+1] = {factorLR channel k}
-                                   // eCS[4k+2] = {factorRL channel k}
-                                   // eCS[4k+3] = {factorRR channel k}
-  float                            effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{ 0.0f };
-  jack_ringbuffer_t*               effectsChannelsSettingsRB{ nullptr };
-  float                            effectsChannelsWriteOutBuffer[2 * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_EFFECTS_CHANNELS]{ 0.0f };
-  float*                           effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{ nullptr };
+  float effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{0.0f};
+  jack_ringbuffer_t* effectsChannelsSettingsRB{nullptr};
+  float effectsChannelsWriteOutBuffer[2 * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_EFFECTS_CHANNELS]{0.0f};
+  float* effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{nullptr};
 
   AudioCore(AppState* gAppState)
-    : gAppState(gAppState)
+  : gAppState(gAppState)
     , fft_eq_ring_buffer(jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE))
     , vu_ring_buffer(jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS))
     , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE))
     , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE))
     , effectsChannelsSettingsRB(jack_ringbuffer_create(EffectsSettings_RB_SIZE))
-    {
+    , effectsChannelsProcessDataRB(jack_ringbuffer_create(EffectsChannelsProcessData_RB_SIZE)) {
     Logging::write(
       Info,
       "Audio::AudioCore::AudioCore()",
@@ -175,8 +166,7 @@ struct AudioCore {
     const float panL,
     const float panR,
     const float channelCount
-    ) {
-
+  ) {
     // const float panVal = pan <= 0.0f ? 1.0f : 1.0f - pan;
     const float panLVal = (1.0f - panL) / 2.0f;
     const float soloVal = solo == 1.0f
@@ -199,8 +189,7 @@ struct AudioCore {
     const float panL,
     const float panR,
     const float channelCount
-    ) {
-
+  ) {
     // const float panVal = panL >= 0.0f ? pan : 0.0;
     const float panLVal = (1.0f + panL) / 2.0f;
     const float soloVal = solo == 1.0f
@@ -223,8 +212,7 @@ struct AudioCore {
     const float panL,
     const float panR,
     const float channelCount
-    ) {
-
+  ) {
     // const float panVal = pan <= 0.0f ? -pan : 0.0f;
     const float panRVal = (1.0f - panR) / 2.0f;
     const float soloVal = solo == 1.0f
@@ -247,8 +235,7 @@ struct AudioCore {
     const float panL,
     const float panR,
     const float channelCount
-    ) {
-
+  ) {
     // const float panVal = pan >= 0.0f ? 1.0f : 1.0f + pan;
     const float panRVal = (1.0f + panR) / 2.0f;
     const float soloVal = solo == 1.0f
@@ -261,7 +248,8 @@ struct AudioCore {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromDecoratedAudioFile",
-      "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
+      "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
+      filePath
     );
     const DeckIndex nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
     deckIndex = nextDeckIndex;
@@ -279,16 +267,19 @@ struct AudioCore {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromDecoratedAudioFile",
-      "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
+      "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
+      filePath
     );
     return OK;
   }
 
-  Result addCassetteFromDecoratedAudioFileAtIdx(const Db::DecoratedAudioFile& decoratedAudioFile, const DeckIndex deckIndexToSet) {
+  Result addCassetteFromDecoratedAudioFileAtIdx(const Db::DecoratedAudioFile& decoratedAudioFile,
+                                                const DeckIndex deckIndexToSet) {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromDecoratedAudioFileAtIdx",
-      "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
+      "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
+      filePath
     );
     if (decks[deckIndexToSet].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
       Logging::write(
@@ -303,7 +294,8 @@ struct AudioCore {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromDecoratedAudioFileAtIdx",
-      "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.filePath
+      "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
+      filePath
     );
     return OK;
   }
@@ -404,7 +396,6 @@ struct AudioCore {
     return OK;
   }
 };
-
 } // Audio
 } // Gj
 

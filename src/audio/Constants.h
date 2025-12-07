@@ -2,10 +2,14 @@
 // Created by ns on 4/19/25.
 //
 
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef GJAUDIOCONSTANTS_H
+#define GJAUDIOCONSTANTS_H
 
 #include <sndfile.h>
+#include <array>
+#include <functional>
+#include <sndfile.hh>
+#include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 
 namespace Gj {
 namespace Audio {
@@ -38,4 +42,4 @@ constexpr size_t PlaybackSettingsFromAudioThread_RB_SIZE = sizeof(sf_count_t) * 
 } // Audio
 } // Gj
 
-#endif //CONSTANTS_H
+#endif //GJAUDIOCONSTANTS_H

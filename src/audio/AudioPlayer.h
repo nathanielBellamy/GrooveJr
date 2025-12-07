@@ -5,6 +5,7 @@
 #ifndef AUDIOPLAYER_H
 #define AUDIOPLAYER_H
 
+#include <array>
 #include <memory>
 #include <thread>
 #include <chrono>
@@ -53,6 +54,8 @@ struct AudioPlayer {
   float vu_buffer[VU_RING_BUFFER_SIZE]{};
 
   jack_ringbuffer_t* vu_ring_buffer_out;
+
+  std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
 
   AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer* mixer, AppState* gAppState)
   : threadId(ThreadStatics::incrThreadId())
@@ -302,6 +305,12 @@ struct AudioPlayer {
         reinterpret_cast<char*>(playbackSettingsFromAudioThread),
         PlaybackSettingsFromAudioThread_RB_SIZE
       );
+
+    // TODO:
+    // - update effectsChannelsProcessData write to audioCore->effectsChannelsSettingsProcessDataRB
+    // - read audioCore->effectsChannelsProcessDataRB into audioCore->effectsChannelsProcessData
+    // - process
+    // - remove disabling of channel/plugin add/remove buttons during playback
 
     // std::cout << " DEBUG VALUE FROM AUDIO THREAD " << playbackSettingsFromAudioThread[BfrIdx::PSFAT::DEBUG_VALUE] << std::endl;
     const sf_count_t currentFrameId = playbackSettingsFromAudioThread[BfrIdx::PSFAT::CURRENT_FRAME_ID];
