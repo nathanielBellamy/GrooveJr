@@ -55,7 +55,7 @@ struct AudioPlayer {
 
   jack_ringbuffer_t* vu_ring_buffer_out;
 
-  std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
+  Effects::EffectsChannelProcessData effectsChannelsProcessData[MAX_EFFECTS_CHANNELS]{};
 
   AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer* mixer, AppState* gAppState)
   : threadId(ThreadStatics::incrThreadId())
@@ -172,9 +172,12 @@ struct AudioPlayer {
 
       audioCore->effectsChannelsProcessData[chIndex].pluginCount = ch->pluginCount();
       for (PluginIndex pluginIdx = 0; pluginIdx < ch->pluginCount(); pluginIdx++) {
-        const auto plugin = ch->getPluginAtIdx(pluginIdx);
+        const auto pluginOpt = ch->getPluginAtIdx(pluginIdx);
+        if (!pluginOpt.has_value())
+          continue;
+
         audioCore->effectsChannelsProcessData[chIndex].processFuncs[pluginIdx] =
-            [audioClient = plugin->audioHost->audioClient](auto&& buffers, auto&& continuousFrames) {
+            [audioClient = pluginOpt.value()->audioHost->audioClient](auto&& buffers, auto&& continuousFrames) {
               return audioClient->process(
                 std::forward<decltype(buffers)>(buffers),
                 std::forward<decltype(continuousFrames)>(continuousFrames)
@@ -311,6 +314,21 @@ struct AudioPlayer {
     // - read audioCore->effectsChannelsProcessDataRB into audioCore->effectsChannelsProcessData
     // - process
     // - remove disabling of channel/plugin add/remove buttons during playback
+
+    // - ok so we need the mixer to know when the audiothread is done with the func ref
+    // - so we need:
+    // -   mixer->requestProcessChange()
+    // -   audioThread sets flag saying, ok don't need that/those process func/s anymore
+    // -   mixer->executeProcessChange()
+    // -   mixer sets flag saying processing is good to go
+    // -   audioThread re-instates processing
+    // updateProcessDataRingBuffer()
+    if (jack_ringbuffer_write_space(audioCore->effectsChannelsProcessDataRB) > EffectsChannelsProcessData_RB_SIZE - 2)
+      jack_ringbuffer_write(
+        audioCore->effectsChannelsProcessDataRB,
+        reinterpret_cast<char*>(effectsChannelsProcessData),
+        EffectsChannelsProcessData_RB_SIZE
+      );
 
     // std::cout << " DEBUG VALUE FROM AUDIO THREAD " << playbackSettingsFromAudioThread[BfrIdx::PSFAT::DEBUG_VALUE] << std::endl;
     const sf_count_t currentFrameId = playbackSettingsFromAudioThread[BfrIdx::PSFAT::CURRENT_FRAME_ID];

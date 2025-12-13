@@ -2,12 +2,11 @@
 // Created by ns on 3/8/25.
 //
 
-#include "EffectSlot.h"
+#include "PluginSlot.h"
 
 namespace Gj {
 namespace Gui {
-
-EffectSlot::EffectSlot(QWidget* parent,
+PluginSlot::PluginSlot(QWidget* parent,
                        actor_system& actorSystem,
                        Audio::Mixer* mixer,
                        const ChannelIndex channelIndex,
@@ -15,18 +14,17 @@ EffectSlot::EffectSlot(QWidget* parent,
                        const bool occupied,
                        QAction* replaceEffectAction,
                        QAction* removeEffectAction)
-  : QWidget(parent)
+: QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , channelIndex(channelIndex)
-  , effectIndex(effectIndex)
+  , pluginIndex(effectIndex)
   , occupied(occupied)
   , grid(this)
   , title(this)
   , replaceEffectButton(this, channelIndex, effectIndex, occupied, replaceEffectAction)
   , removeEffectButton(this, channelIndex, effectIndex, occupied, removeEffectAction)
-  , pluginName(this)
-  {
+  , pluginName(this) {
   title.setText(QString::number(effectIndex + 1));
   title.setFont({title.font().family(), 12});
   pluginName.setFont({pluginName.font().family(), 12});
@@ -35,7 +33,7 @@ EffectSlot::EffectSlot(QWidget* parent,
   setupGrid();
 }
 
-EffectSlot::~EffectSlot() {
+PluginSlot::~PluginSlot() {
   Logging::write(
     Info,
     "Gui::EffectSlot::~EffectSlot",
@@ -43,10 +41,11 @@ EffectSlot::~EffectSlot() {
   );
 }
 
-void EffectSlot::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIndex) {
+void PluginSlot::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIndex) {
   channelIndex = newChannelIndex;
-  const auto name = mixer->getEffectsChannels().at(channelIndex)->getPluginAtIdx(effectIndex)->name;
-  pluginName.setText(name.c_str());
+  const auto plugin = mixer->getEffectsChannels().at(channelIndex)->getPluginAtIdx(pluginIndex);
+  if (!plugin) return;
+  pluginName.setText(plugin.value()->name.c_str());
 
   if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
     replaceEffectButton.setEnabled(false);
@@ -59,14 +58,14 @@ void EffectSlot::hydrateState(const AppStatePacket& appState, const ChannelIndex
   update();
 }
 
-void EffectSlot::setStyle() {
+void PluginSlot::setStyle() {
   setFixedSize(QSize(150, 70));
   setStyleSheet(
     ("border: 2px solid white; background-color: " + Color::toHex(GjC::LIGHT_200) + "; ").data()
   );
 }
 
-void EffectSlot::setupGrid() {
+void PluginSlot::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, 1);
   grid.addWidget(&replaceEffectButton, 0, 2, 1, 1);
   grid.addWidget(&removeEffectButton, 0, 3, 1, 1);
@@ -78,6 +77,5 @@ void EffectSlot::setupGrid() {
   grid.setVerticalSpacing(4);
   grid.setHorizontalSpacing(4);
 }
-
 } // Gui
 } // Gj

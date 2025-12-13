@@ -5,11 +5,8 @@
 #ifndef GJAUDIOCONSTANTS_H
 #define GJAUDIOCONSTANTS_H
 
+#include <stddef.h>
 #include <sndfile.h>
-#include <array>
-#include <functional>
-#include <sndfile.hh>
-#include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
 
 namespace Gj {
 namespace Audio {

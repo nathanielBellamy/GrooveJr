@@ -17,10 +17,10 @@
 namespace Gj {
 namespace Gui {
 
-class RemoveEffectButton final : public QPushButton {
+class RemovePluginButton final : public QPushButton {
 
   public:
-    RemoveEffectButton(QWidget* parent, ChannelIndex channelIndex, PluginIndex pluginIndex, bool occupied, QAction* action);
+    RemovePluginButton(QWidget* parent, ChannelIndex channelIndex, PluginIndex pluginIndex, bool occupied, QAction* action);
     void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx);
 
   private:

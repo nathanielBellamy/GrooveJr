@@ -16,7 +16,7 @@
 #include "../../../../Logging.h"
 #include "../../../../AppState.h"
 #include "AddPluginButton.h"
-#include "EffectSlot.h"
+#include "PluginSlot.h"
 #include "../../../../audio/Mixer.h"
 
 using namespace caf;
@@ -24,10 +24,10 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 
-class EffectsSlots final : public QWidget {
+class PluginSlots final : public QWidget {
 
   public:
-    EffectsSlots(
+    PluginSlots(
       QWidget* parent,
       actor_system& actorSystem,
       Audio::Mixer* mixer,
@@ -35,7 +35,7 @@ class EffectsSlots final : public QWidget {
       QAction* replaceEffectAction,
       QAction* removeEffectAction
     );
-    ~EffectsSlots() override;
+    ~PluginSlots() override;
     void addEffectSlot();
     void removeEffectSlot();
     void hydrateState(const AppStatePacket& appState, int newChannelIndex);
@@ -46,7 +46,7 @@ class EffectsSlots final : public QWidget {
     Audio::Mixer* mixer;
     int channelIndex;
     QGridLayout grid;
-    std::vector<std::unique_ptr<EffectSlot>> effectsSlots {};
+    std::vector<std::unique_ptr<PluginSlot>> effectsSlots {};
     QAction* replaceEffectAction;
     QAction* removeEffectAction;
     void setupGrid();

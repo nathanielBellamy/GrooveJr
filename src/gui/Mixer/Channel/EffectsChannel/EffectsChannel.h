@@ -24,7 +24,7 @@
 
 #include "../../../../audio/Mixer.h"
 #include "../../../../audio/Math.h"
-#include "EffectsSlots.h"
+#include "PluginSlots.h"
 #include "MuteSoloContainer.h"
 #include "RemoveEffectsChannelButton.h"
 #include "VuMeter.h"
@@ -100,7 +100,7 @@ class EffectsChannel final : public QWidget {
     QSlider panRSlider;
     QLabel  panRLabel;
     QScrollArea effectsSlotsScrollArea;
-    EffectsSlots effectsSlots;
+    PluginSlots effectsSlots;
     MuteSoloContainer muteSoloContainer;
     void setStyle();
     void setupGrid();

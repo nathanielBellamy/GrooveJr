@@ -68,20 +68,20 @@ qt_add_library(GjGui STATIC
         Mixer/Channel/EffectsChannel/RemoveEffectsChannelButton.cpp
         Mixer/Channel/EffectsChannel/AddPluginButton.h
         Mixer/Channel/EffectsChannel/AddPluginButton.cpp
-        Mixer/Channel/EffectsChannel/RemoveEffectButton.h
-        Mixer/Channel/EffectsChannel/RemoveEffectButton.cpp
-        Mixer/Channel/EffectsChannel/ReplaceEffectButton.h
-        Mixer/Channel/EffectsChannel/ReplaceEffectButton.cpp
+        Mixer/Channel/EffectsChannel/RemovePluginButton.h
+        Mixer/Channel/EffectsChannel/RemovePluginButton.cpp
+        Mixer/Channel/EffectsChannel/ReplacePluginButton.h
+        Mixer/Channel/EffectsChannel/ReplacePluginButton.cpp
         Mixer/Channel/EffectsChannel/EffectsButton.h
         Mixer/Channel/EffectsChannel/EffectsButton.cpp
         Mixer/Channel/EffectsChannel/EffectsChannelsContainer.h
         Mixer/Channel/EffectsChannel/EffectsChannelsContainer.cpp
         Mixer/Channel/EffectsChannel/EffectsChannel.h
         Mixer/Channel/EffectsChannel/EffectsChannel.cpp
-        Mixer/Channel/EffectsChannel/EffectSlot.h
-        Mixer/Channel/EffectsChannel/EffectSlot.cpp
-        Mixer/Channel/EffectsChannel/EffectsSlots.h
-        Mixer/Channel/EffectsChannel/EffectsSlots.cpp
+        Mixer/Channel/EffectsChannel/PluginSlot.h
+        Mixer/Channel/EffectsChannel/PluginSlot.cpp
+        Mixer/Channel/EffectsChannel/PluginSlots.h
+        Mixer/Channel/EffectsChannel/PluginSlots.cpp
         Mixer/Channel/EffectsChannel/MuteSoloContainer.h
         Mixer/Channel/EffectsChannel/MuteSoloContainer.cpp
         Mixer/Channel/EffectsChannel/VuMeter.h

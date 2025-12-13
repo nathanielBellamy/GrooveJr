@@ -444,15 +444,15 @@ Result Mixer::saveChannels() const {
       result = ERROR;
     }
 
-    const int effectCount = effectsChannel->pluginCount();
     const auto channelIndex = effectsChannel->getIndex();
-    for (int i = 0; i < effectCount; i++) {
+    for (PluginIndex i = 0; i < MAX_PLUGINS_PER_CHANNEL; i++) {
       const auto plugin = effectsChannel->getPluginAtIdx(i);
+      if (!plugin) continue;
       const auto audioHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
       const auto audioHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
       const auto editorHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
       const auto editorHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
-      plugin->getState(
+      plugin.value()->getState(
         audioHostComponentStateStream.get(),
         audioHostControllerStateStream.get(),
         editorHostComponentStateStream.get(),
@@ -516,9 +516,9 @@ Result Mixer::saveChannels() const {
       // }
 
       const auto dbPlugin = Db::Plugin(
-        plugin->path,
+        plugin.value()->path,
         "vst3",
-        plugin->name,
+        plugin.value()->name,
         channelIndex,
         i,
         audioHostComponentBuffer,

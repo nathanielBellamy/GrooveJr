@@ -2,12 +2,12 @@
 // Created by ns on 3/8/25.
 //
 
-#include "EffectsSlots.h"
+#include "PluginSlots.h"
 
 namespace Gj {
 namespace Gui {
 
-EffectsSlots::EffectsSlots(QWidget* parent,
+PluginSlots::PluginSlots(QWidget* parent,
                            actor_system& actorSystem,
                            Audio::Mixer* mixer,
                            const int channelIndex,
@@ -24,7 +24,7 @@ EffectsSlots::EffectsSlots(QWidget* parent,
   setupGrid();
 }
 
-EffectsSlots::~EffectsSlots() {
+PluginSlots::~PluginSlots() {
   Logging::write(
     Info,
     "Gui::EffectsSlots::~EffectsSlots",
@@ -40,15 +40,15 @@ EffectsSlots::~EffectsSlots() {
   );
 }
 
-void EffectsSlots::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
+void PluginSlots::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
   channelIndex = newChannelIndex;
 
   for (const auto& effectSlot : effectsSlots)
     effectSlot->hydrateState(appState, channelIndex);
 }
 
-void EffectsSlots::addEffectSlot() {
-  auto slot = std::make_unique<EffectSlot>(
+void PluginSlots::addEffectSlot() {
+  auto slot = std::make_unique<PluginSlot>(
     this,
     actorSystem,
     mixer,
@@ -63,13 +63,13 @@ void EffectsSlots::addEffectSlot() {
   update();
 }
 
-void EffectsSlots::removeEffectSlot() {
+void PluginSlots::removeEffectSlot() {
   effectsSlots.pop_back();
   setupGrid();
   update();
 }
 
-void EffectsSlots::setupGrid() {
+void PluginSlots::setupGrid() {
   grid.setVerticalSpacing(4);
 
   int row = 0;
@@ -79,7 +79,7 @@ void EffectsSlots::setupGrid() {
   }
 }
 
-void EffectsSlots::reset() {
+void PluginSlots::reset() {
   Logging::write(
     Info,
     "Gui::EffectsSlots::reset",
