@@ -190,8 +190,8 @@ PluginIndex Mixer::pluginsOnChannelCount(const ChannelIndex idx) const {
   return effectsChannels.at(idx)->pluginCount();
 }
 
-void Mixer::initEditorHostsOnChannel(const ChannelIndex idx,
-                                     std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) const {
+Result Mixer::initEditorHostsOnChannel(const ChannelIndex idx,
+                                       std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) const {
   return effectsChannels.at(idx)->initEditorHosts(vstWindows);
 }
 

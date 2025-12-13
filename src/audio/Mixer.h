@@ -32,7 +32,6 @@
 
 namespace Gj {
 namespace Audio {
-
 // forward decl
 class JackClient;
 
@@ -51,7 +50,9 @@ class Mixer {
 
 public:
   Db::Dao* dao;
+
   explicit Mixer(AppState*, Db::Dao*);
+
   ~Mixer();
 
   [[nodiscard]]
@@ -62,7 +63,7 @@ public:
   Result setupProcessing() const {
     Result res = OK;
 
-    for (auto& effectsChannel : effectsChannels) {
+    for (auto& effectsChannel: effectsChannels) {
       if (effectsChannel->setupProcessing() != OK)
         res = ERROR;
     }
@@ -102,34 +103,49 @@ public:
   }
 
   Result addEffectsChannel();
+
   Result addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity);
+
   Result removeEffectsChannel(ChannelIndex idx);
+
   [[nodiscard]]
   PluginIndex pluginsOnChannelCount(ChannelIndex idx) const;
 
   Result addPluginToChannel(ChannelIndex channelIndex, const PluginPath& pluginPath) const;
+
   Result loadPluginOnChannel(const Db::Plugin& plugin) const;
-  void initEditorHostsOnChannel(ChannelIndex idx, std::vector<std::shared_ptr<Gui::VstWindow>>& vstWindows) const;
-  void initEditorHostOnChannel(ChannelIndex idx, PluginIndex newPluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
+
+  Result initEditorHostsOnChannel(ChannelIndex idx, std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) const;
+
+  void initEditorHostOnChannel(ChannelIndex idx, PluginIndex newPluginIndex,
+                               std::shared_ptr<Gui::VstWindow> vstWindow) const;
+
   void terminateEditorHostsOnChannel(ChannelIndex idx) const;
 
   Result setSampleRate(uint32_t sampleRate) const;
 
   Result replacePluginOnChannel(ChannelIndex channelIdx, PluginIndex pluginIdx, const PluginPath& pluginPath) const;
+
   Result removePluginFromChannel(ChannelIndex channelIdx, PluginIndex pluginIdx) const;
 
   jack_nframes_t getAudioFramesPerBuffer() const { return gAppState->getAudioFramesPerBuffer(); };
+
   Result setAudioFramesPerBuffer(jack_nframes_t framesPerBuffer) const;
 
   Result setGainOnChannel(ChannelIndex channelIdx, float gain) const;
 
   void setUpdateProgressBarFunc(std::function<void(sf_count_t, sf_count_t)> func) { updateProgressBarFunc = func; };
+
   std::function<void(sf_count_t, sf_count_t)> getUpdateProgressBarFunc() { return updateProgressBarFunc; };
 
-  void setSetEqRingBufferFunc(std::function<void(jack_ringbuffer_t* eqRingBuffer)> func) { setEqRingBufferFunc = func; };
+  void setSetEqRingBufferFunc(std::function<void(jack_ringbuffer_t* eqRingBuffer)> func) { setEqRingBufferFunc = func; }
+  ;
+
   std::function<void(jack_ringbuffer_t* eqRingBuffer)> getSetEqRingBufferFunc() { return setEqRingBufferFunc; };
 
-  void setSetVuRingBufferFunc(std::function<void(jack_ringbuffer_t* vuRingBuffer)> func) { setVuRingBufferFunc = func; };
+  void setSetVuRingBufferFunc(std::function<void(jack_ringbuffer_t* vuRingBuffer)> func) { setVuRingBufferFunc = func; }
+  ;
+
   std::function<void(jack_ringbuffer_t* vuRingBuffer)> getSetVuRingBufferFunc() { return setVuRingBufferFunc; };
 
   AtomicStr getPluginName(const ChannelIndex channelIdx, const PluginIndex pluginIndex) const {
@@ -137,15 +153,21 @@ public:
   };
 
   Result deleteChannels();
+
   Result setChannels(std::vector<Db::ChannelEntity> channelEntities);
+
   Result setPlugins(const std::vector<Db::Plugin>& plugins) const;
+
   static Result setFrameId(sf_count_t frameId);
+
   Result loadScene(ID sceneDbId);
+
   ID newScene() const;
+
   Result saveScene() const;
+
   Result saveChannels() const;
 };
-
 } // Audio
 } // Gj
 

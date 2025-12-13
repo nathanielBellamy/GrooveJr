@@ -235,17 +235,17 @@ public:
 
   Result loadPlugin(const Db::Plugin& pluginEntity);
 
-  Result setSampleRate(double sampleRate) const;
+  Result setSampleRate(double sampleRate);
 
-  Result setBlockSize(jack_nframes_t blockSize) const;
+  Result setBlockSize(jack_nframes_t blockSize);
 
   PluginIndex pluginCount() const;
 
-  void initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) const;
+  Result initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows);
 
   void initEditorHost(PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
 
-  void terminateEditorHosts() const;
+  void terminateEditorHosts();
 
   Result removePlugin(PluginIndex pluginIdx);
 
@@ -255,6 +255,44 @@ public:
       return AtomicStr(" - ");
     return plugin.value()->getName();
   };
+
+  // Result forEachPlugin(void (*lambda)(Vst3::Plugin*, PluginIndex)) {
+  //   for (PluginIndex pluginIndex = 0; pluginIndex < MAX_PLUGINS_PER_CHANNEL; pluginIndex++) {
+  //     if (!plugins[pluginIndex])
+  //       continue;
+  //     try {
+  //       lambda(plugins[pluginIndex].value(), pluginIndex);
+  //     } catch (...) {
+  //       Logging::write(
+  //         Error,
+  //         "Audio::Effects::EffectsChannel::forEachPlugin",
+  //         "Error during lambda function for pluginIdx: " + std::to_string(pluginIndex)
+  //       );
+  //     }
+  //   }
+  // }
+
+  template<typename F>
+  Result forEachPlugin(F&& func) {
+    bool warning = false;
+    for (PluginIndex pluginIndex = 0; pluginIndex < MAX_PLUGINS_PER_CHANNEL; ++pluginIndex) {
+      if (!plugins[pluginIndex])
+        continue;
+
+      try {
+        func(plugins[pluginIndex].value(), pluginIndex);
+      } catch (...) {
+        Logging::write(
+          Error,
+          "Audio::Effects::EffectsChannel::forEachPlugin",
+          "Error during lambda function for pluginIdx: " +
+          std::to_string(pluginIndex)
+        );
+        warning = true;
+      }
+    }
+    return warning ? WARNING : OK;
+  }
 
   Db::ChannelEntity toEntity() {
     return {

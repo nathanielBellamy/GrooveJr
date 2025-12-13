@@ -6,23 +6,20 @@
 
 namespace Gj {
 namespace Gui {
-
 EffectsContainer::EffectsContainer(
   QWidget* parent,
   Audio::Mixer* mixer,
   const ChannelIndex channelIndex,
   QAction* addEffectAction,
   QAction* removeEffectAction
-  )
-  : QWidget(nullptr)
+)
+: QWidget(nullptr)
   , mixer(mixer)
   , channelIndex(channelIndex)
   , addPluginAction(addEffectAction)
   , addPluginButton(this, addEffectAction)
   , removePluginAction(removeEffectAction)
-  , grid(this)
-  {
-
+  , grid(this) {
   if (channelIndex == 0) {
     setWindowTitle("Main Channel Effects");
   } else {
@@ -46,7 +43,7 @@ EffectsContainer::~EffectsContainer() {
   clearButtonsAndLabels();
   if (isVisible())
     mixer->terminateEditorHostsOnChannel(channelIndex);
-  for (const auto& vstWindow : vstWindows)
+  for (const auto& vstWindow: vstWindows)
     vstWindow->close();
 
   Logging::write(
@@ -100,7 +97,7 @@ void EffectsContainer::setupGrid() {
   setLayout(&grid);
 }
 
-void EffectsContainer::showEvent(QShowEvent *event) {
+void EffectsContainer::showEvent(QShowEvent* event) {
   Logging::write(
     Info,
     "EffectsContainer::initVstWindows()",
@@ -108,8 +105,14 @@ void EffectsContainer::showEvent(QShowEvent *event) {
   );
 
   setupGrid();
-  mixer->initEditorHostsOnChannel(channelIndex, vstWindows);
-  for (auto&& vstWindow : vstWindows) {
+  if (mixer->initEditorHostsOnChannel(channelIndex, vstWindows) != OK)
+    Logging::write(
+      Warning,
+      "Gui::EffectsContainer::showEvent",
+      "An Error or Warning Occurred while initializing EditorHosts"
+    );
+
+  for (auto&& vstWindow: vstWindows) {
     vstWindow->activateWindow();
     vstWindow->raise();
     vstWindow->show();
@@ -139,21 +142,20 @@ void EffectsContainer::addEffect(const PluginIndex newEffectIndex, const AtomicS
 }
 
 void EffectsContainer::clearButtonsAndLabels() {
-  for (const auto button : vstWindowSelectButtons)
+  for (const auto button: vstWindowSelectButtons)
     delete button;
 
   vstWindowSelectButtons.clear();
 
-  for (const auto label : vstWindowSelectLabels)
+  for (const auto label: vstWindowSelectLabels)
     delete label;
   vstWindowSelectLabels.clear();
 }
 
-void EffectsContainer::hideEvent(QHideEvent *event) {
+void EffectsContainer::hideEvent(QHideEvent* event) {
   mixer->terminateEditorHostsOnChannel(channelIndex);
-  for (auto vstWindow : vstWindows)
+  for (auto vstWindow: vstWindows)
     vstWindow->close();
 }
-
 } // Gui
 } // Gj
