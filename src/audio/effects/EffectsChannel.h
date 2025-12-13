@@ -229,7 +229,7 @@ public:
     return true;
   };
 
-  std::optional<PluginIndex> firstOpenPluginIndex() const; // todo
+  std::optional<PluginIndex> firstOpenPluginIndex() const;
 
   Result addReplacePlugin(std::optional<PluginIndex> effectIdxOpt, const PluginPath& pluginPath);
 
@@ -243,9 +243,9 @@ public:
 
   Result initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows);
 
-  void initEditorHost(PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
+  Result initEditorHost(PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
 
-  void terminateEditorHosts();
+  Result terminateEditorHosts();
 
   Result removePlugin(PluginIndex pluginIdx);
 
@@ -255,22 +255,6 @@ public:
       return AtomicStr(" - ");
     return plugin.value()->getName();
   };
-
-  // Result forEachPlugin(void (*lambda)(Vst3::Plugin*, PluginIndex)) {
-  //   for (PluginIndex pluginIndex = 0; pluginIndex < MAX_PLUGINS_PER_CHANNEL; pluginIndex++) {
-  //     if (!plugins[pluginIndex])
-  //       continue;
-  //     try {
-  //       lambda(plugins[pluginIndex].value(), pluginIndex);
-  //     } catch (...) {
-  //       Logging::write(
-  //         Error,
-  //         "Audio::Effects::EffectsChannel::forEachPlugin",
-  //         "Error during lambda function for pluginIdx: " + std::to_string(pluginIndex)
-  //       );
-  //     }
-  //   }
-  // }
 
   template<typename F>
   Result forEachPlugin(F&& func) {

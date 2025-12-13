@@ -85,41 +85,59 @@ Mixer::~Mixer() {
   );
 }
 
+std::optional<PluginIndex> Mixer::firstOpenChannelIndex() const {
+  for (ChannelIndex i = 0; i < MAX_EFFECTS_CHANNELS; ++i) {
+    if (!effectsChannels[i])
+      return std::optional(i);
+  }
+  return std::nullopt;
+}
+
 Result Mixer::addEffectsChannel() {
-  effectsChannels.push_back(
-    new Effects::EffectsChannel(
-      gAppState,
-      jackClient,
-      effectsChannels.size()
-    )
-  );
+  const auto firstOpenIndex = firstOpenChannelIndex();
+  if (!firstOpenIndex) {
+    Logging::write(
+      Warning,
+      "Audio::Mixer::addEffectsChannel",
+      "Attempting to add too many channels."
+    );
+    return WARNING;
+  }
+
+  effectsChannels[firstOpenIndex.value()] =
+      new Effects::EffectsChannel(
+        gAppState,
+        jackClient,
+        firstOpenIndex.value()
+      );
   return OK;
 }
 
-Result Mixer::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) const {
+Result Mixer::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) {
   bool warning = false;
   gAppState->setAudioFramesPerBuffer(framesPerBuffer);
-  for (const auto channel: effectsChannels) {
-    if (channel->setBlockSize(framesPerBuffer) != OK) {
-      Logging::write(
-        Warning,
-        "Audio::Mixer::setAudioFramesPerBuffer",
-        "Failed to set audio frames per buffer on channel " + std::to_string(channel->getIndex())
-      );
-      warning = true;
-    }
-  }
 
-  return warning ? WARNING : OK;
+  const auto setRes = forEachChannel(
+    [this, &framesPerBuffer, &warning](Effects::EffectsChannel* channel, ChannelIndex index) {
+      if (channel->setBlockSize(framesPerBuffer) != OK) {
+        Logging::write(
+          Warning,
+          "Audio::Mixer::setAudioFramesPerBuffer",
+          "Failed to set audio frames per buffer on channel " + std::to_string(index)
+        );
+        warning = true;
+      }
+    });
+
+  return warning || setRes != OK
+           ? WARNING
+           : OK;
 }
 
 
 Result Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) {
-  while (getTotalChannelsCount() < channelEntity.channelIndex + 1)
-    addEffectsChannel();
-
-  delete effectsChannels.at(channelEntity.channelIndex);
-  effectsChannels.at(channelEntity.channelIndex) =
+  delete effectsChannels[channelEntity.channelIndex].value_or(nullptr);
+  effectsChannels[channelEntity.channelIndex] =
       new Effects::EffectsChannel(
         gAppState,
         jackClient,
@@ -129,17 +147,16 @@ Result Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity
 }
 
 Result Mixer::removeEffectsChannel(const ChannelIndex idx) {
-  delete effectsChannels.at(idx);
-  effectsChannels.erase(effectsChannels.begin() + idx);
+  delete effectsChannels[idx].value_or(nullptr);
   return OK;
 }
 
-Result Mixer::setSampleRate(const uint32_t sampleRate) const {
+Result Mixer::setSampleRate(const uint32_t sampleRate) {
   const auto sampleRateD = static_cast<double>(sampleRate);
-  for (const auto effectsChannel: effectsChannels) {
-    effectsChannel->setSampleRate(sampleRateD);
-  }
-  return OK;
+  return forEachChannel(
+    [this, &sampleRateD](Effects::EffectsChannel* channel, ChannelIndex) {
+      channel->setSampleRate(sampleRateD);
+    });
 }
 
 void Mixer::incorporateLatencySamples(const int latencySamples) const {
@@ -150,14 +167,14 @@ void Mixer::incorporateLatencySamples(const int latencySamples) const {
   gAppState->audioFramesPerBuffer = static_cast<int>(std::pow(2, std::ceil(exponent)));
 }
 
-Result Mixer::addPluginToChannel(const ChannelIndex channelIndex, const PluginPath& pluginPath) const {
+Result Mixer::addPluginToChannel(const ChannelIndex channelIndex, const PluginPath& pluginPath) {
   Logging::write(
     Info,
     "Audio::Mixer::addPluginToChannel",
     "Adding plugin " + pluginPath + " to channel " + std::to_string(channelIndex)
   );
 
-  if (effectsChannels.at(channelIndex) == nullptr) {
+  if (!indexHasValidChannel(channelIndex)) {
     Logging::write(
       Error,
       "Audio::Mixer::addPluginToChannel",
@@ -166,16 +183,16 @@ Result Mixer::addPluginToChannel(const ChannelIndex channelIndex, const PluginPa
     return ERROR;
   }
 
-  return effectsChannels.at(channelIndex)->addReplacePlugin(std::optional<PluginIndex>(), pluginPath);
+  return effectsChannels[channelIndex].value()->addReplacePlugin(std::optional<PluginIndex>(), pluginPath);
 }
 
-Result Mixer::loadPluginOnChannel(const Db::Plugin& plugin) const {
+Result Mixer::loadPluginOnChannel(const Db::Plugin& plugin) {
   Logging::write(
     Info,
     "Audio::Mixer::loadPluginOnChannel",
     "Adding plugin " + plugin.filePath + " to channel " + std::to_string(plugin.channelIndex)
   );
-  if (effectsChannels.at(plugin.channelIndex) == nullptr) {
+  if (!indexHasValidChannel(plugin.channelIndex)) {
     Logging::write(
       Error,
       "Audio::Mixer::loadPluginOnChannel",
@@ -183,59 +200,110 @@ Result Mixer::loadPluginOnChannel(const Db::Plugin& plugin) const {
     );
     return ERROR;
   }
-  return effectsChannels.at(plugin.channelIndex)->loadPlugin(plugin);
+  return effectsChannels[plugin.channelIndex].value()->loadPlugin(plugin);
 }
 
-PluginIndex Mixer::pluginsOnChannelCount(const ChannelIndex idx) const {
-  return effectsChannels.at(idx)->pluginCount();
+PluginIndex Mixer::pluginsOnChannelCount(const ChannelIndex idx) {
+  if (!indexHasValidChannel(idx)) {
+    Logging::write(
+      Warning,
+      "Audio::Mixer::pluginsOnChannelCount",
+      "Attempting to get plugin count on empty channel " + std::to_string(idx)
+    );
+    return 0;
+  }
+  return effectsChannels[idx].value()->pluginCount();
 }
 
 Result Mixer::initEditorHostsOnChannel(const ChannelIndex idx,
-                                       std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) const {
-  return effectsChannels.at(idx)->initEditorHosts(vstWindows);
+                                       std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) {
+  if (!indexHasValidChannel(idx)) {
+    Logging::write(
+      Warning,
+      "Audio::Mixer::initEditorHostsOnChannel",
+      "Attempting to init Editorhost on ChannelIndex: " + std::to_string(idx) + " but no channel is not valid."
+    );
+    return WARNING;
+  }
+  return effectsChannels[idx].value()->initEditorHosts(vstWindows);
 }
 
-void Mixer::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex newPluginIndex,
-                                    std::shared_ptr<Gui::VstWindow> vstWindow) const {
-  return effectsChannels.at(idx)->initEditorHost(newPluginIndex, vstWindow);
+Result Mixer::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex newPluginIndex,
+                                      std::shared_ptr<Gui::VstWindow> vstWindow) {
+  if (!indexHasValidChannel(idx)) {
+    Logging::write(
+      Warning,
+      "Audio::Mixer::initEditorHostOnChannel",
+      "Attempting to init Editorhost on ChannelIndex " + std::to_string(idx) + " but no channel is not valid."
+    );
+    return WARNING;
+  }
+  return effectsChannels[idx].value()->initEditorHost(newPluginIndex, vstWindow);
 }
 
-void Mixer::terminateEditorHostsOnChannel(const ChannelIndex idx) const {
+Result Mixer::terminateEditorHostsOnChannel(const ChannelIndex idx) {
   Logging::write(
     Info,
     "Audio::Mixer::terminateEditorHostsOnChannel",
     "Terminating editor hosts on channelIndex: " + std::to_string(idx)
   );
 
-  if (idx < effectsChannels.size()) {
-    effectsChannels.at(idx)->terminateEditorHosts();
-  } else {
+  if (!indexHasValidChannel(idx)) {
     Logging::write(
       Error,
       "Audio::Mixer::terminateEditorHostsOnChannel",
       "Attempting to terminate editor host on out of range channelIndex: " + std::to_string(idx) + " channelCount: " +
-      std::to_string(effectsChannels.size())
+      std::to_string(getTotalChannelsCount())
     );
+    return WARNING;
   }
 
-  Logging::write(
-    Info,
-    "Audio::Mixer::terminateEditorHostsOnChannel",
-    "Done terminating editor hosts on channelIndex: " + std::to_string(idx)
-  );
+  return effectsChannels[idx].value()->terminateEditorHosts();
 }
 
 Result Mixer::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx,
-                                     const PluginPath& pluginPath) const {
-  return effectsChannels.at(channelIdx)->addReplacePlugin(pluginIdx, pluginPath);
+                                     const PluginPath& pluginPath) {
+  if (!indexHasValidChannel(channelIdx)) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::terminateEditorHostsOnChannel",
+      "Attempting to replace plugin on channelIndex: " + std::to_string(channelIdx) +
+      " but no valid channel found. channelCount: " +
+      std::to_string(getTotalChannelsCount())
+    );
+    return WARNING;
+  }
+  return effectsChannels[channelIdx].value()->addReplacePlugin(pluginIdx, pluginPath);
 }
 
-Result Mixer::removePluginFromChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx) const {
-  return effectsChannels.at(channelIdx)->removePlugin(pluginIdx);
+Result Mixer::removePluginFromChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx) {
+  if (!indexHasValidChannel(channelIdx)) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::terminateEditorHostsOnChannel",
+      "Attempting to remove plugin on channelIndex: " + std::to_string(channelIdx) +
+      " but no valid channel found. channelCount: " +
+      std::to_string(getTotalChannelsCount())
+    );
+    return WARNING;
+  }
+
+  return effectsChannels[channelIdx].value()->removePlugin(pluginIdx);
 }
 
-Result Mixer::setGainOnChannel(const ChannelIndex channelIdx, const float gain) const {
-  return effectsChannels.at(channelIdx)->setGain(gain) ? OK : ERROR;
+Result Mixer::setGainOnChannel(const ChannelIndex channelIdx, const float gain) {
+  if (!indexHasValidChannel(channelIdx)) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::setGainOnChannel",
+      "Attempting to set gain on channelIndex: " + std::to_string(channelIdx) +
+      " but no valid channel found. channelCount: " +
+      std::to_string(getTotalChannelsCount())
+    );
+    return WARNING;
+  }
+
+  return effectsChannels[channelIdx].value()->setGain(gain) ? OK : ERROR;
 }
 
 Result Mixer::loadScene(const ID sceneDbId) {
@@ -307,10 +375,17 @@ Result Mixer::deleteChannels() {
     "Deleting channels."
   );
 
-  for (const auto effectsChannel: effectsChannels)
-    delete effectsChannel;
+  const auto delRes = forEachChannel([this](Effects::EffectsChannel* channel, const ChannelIndex channelIdx) {
+    delete channel;
+    effectsChannels[channelIdx].reset();
+  });
 
-  effectsChannels.clear();
+  if (delRes != OK)
+    Logging::write(
+      Warning,
+      "Audio::Mixer::deleteChannels",
+      "A Warning or Error Occurred while deleting channels."
+    );
 
   Logging::write(
     Info,
@@ -318,7 +393,7 @@ Result Mixer::deleteChannels() {
     "Done deleting channels."
   );
 
-  return OK;
+  return delRes == OK ? OK : WARNING;
 }
 
 Result Mixer::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
@@ -347,7 +422,7 @@ Result Mixer::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
   return OK;
 }
 
-Result Mixer::setPlugins(const std::vector<Db::Plugin>& plugins) const {
+Result Mixer::setPlugins(const std::vector<Db::Plugin>& plugins) {
   Logging::write(
     Info,
     "Audio::Mixer::setPlugins",
@@ -389,7 +464,7 @@ Result Mixer::setPlugins(const std::vector<Db::Plugin>& plugins) const {
   return OK;
 }
 
-Result Mixer::saveScene() const {
+Result Mixer::saveScene() {
   Logging::write(
     Info,
     "Audio::Mixer::saveScene",
@@ -430,112 +505,116 @@ Result Mixer::saveScene() const {
   return OK;
 }
 
-Result Mixer::saveChannels() const {
+Result Mixer::saveChannels() {
   Result result = OK;
   const auto scene = gAppState->getScene();
-  for (const auto effectsChannel: effectsChannels) {
-    if (!dao->channelRepository.save(effectsChannel->toEntity())) {
-      Logging::write(
-        Error,
-        "Audio::Mixer::saveScene",
-        "Unable to save channel: " + std::to_string(effectsChannel->getIndex()) + " to sceneDbId: " +
-        std::to_string(scene.id)
-      );
-      result = ERROR;
-    }
-
-    const auto channelIndex = effectsChannel->getIndex();
-    for (PluginIndex i = 0; i < MAX_PLUGINS_PER_CHANNEL; i++) {
-      const auto plugin = effectsChannel->getPluginAtIdx(i);
-      if (!plugin) continue;
-      const auto audioHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
-      const auto audioHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
-      const auto editorHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
-      const auto editorHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
-      plugin.value()->getState(
-        audioHostComponentStateStream.get(),
-        audioHostControllerStateStream.get(),
-        editorHostComponentStateStream.get(),
-        editorHostControllerStateStream.get()
-      );
-
-      int64 audioHostComponentStateSize = 0;
-      if (Effects::Vst3::Util::getStreamSize(audioHostComponentStateStream.get(), &audioHostComponentStateSize) != OK) {
+  // for (const auto effectsChannel: effectsChannels) {
+  const auto saveRes = forEachChannel(
+    [this, &scene, &result](Effects::EffectsChannel* channel, ChannelIndex channelIndex) {
+      if (!dao->channelRepository.save(channel->toEntity())) {
         Logging::write(
           Error,
           "Audio::Mixer::saveScene",
-          "Unable to determine stream size for audioHostComponentStateStream"
-        );
-        result = WARNING;
-      }
-
-      int64 audioHostControllerStateSize = 0;
-      if (Effects::Vst3::Util::getStreamSize(audioHostControllerStateStream.get(), &audioHostControllerStateSize) !=
-          OK) {
-        Logging::write(
-          Error,
-          "Audio::Mixer::saveScene",
-          "Unable to determine stream size for audioHostControllerStateStream"
-        );
-        result = WARNING;
-      }
-
-      std::vector<uint8_t> audioHostComponentBuffer(audioHostComponentStateSize);
-      std::vector<uint8_t> audioHostControllerBuffer(audioHostControllerStateSize);
-
-      if (audioHostComponentStateSize > 0) {
-        int32 audioHostComponentNumBytesRead = 0;
-        audioHostComponentStateStream->read(
-          audioHostComponentBuffer.data(),
-          static_cast<int32>(audioHostComponentStateSize),
-          &audioHostComponentNumBytesRead
-        );
-      }
-
-      if (audioHostControllerStateSize > 0) {
-        int32 audioHostControllerNumBytesRead = 0;
-        audioHostControllerStateStream->read(
-          audioHostControllerBuffer.data(),
-          static_cast<int32>(audioHostControllerStateSize),
-          &audioHostControllerNumBytesRead
-        );
-      }
-
-      // TODO: debugged. do we need editorhost state? editorhost seems to get state from audiohost
-      const std::vector<uint8_t> editorHostComponentBuffer(0);
-      const std::vector<uint8_t> editorHostControllerBuffer(0);
-      // if (plugin->editorHost != nullptr) {
-      //   if (const auto populateRes = plugin->populateEditorHostStateBuffers(editorHostComponentBuffer, editorHostControllerBuffer);
-      //       populateRes != OK) {
-      //     Logging::write(
-      //       Error,
-      //       "Audio::Mixer::saveScene",
-      //       "Unable to populate editorHost buffers and thus unable to persist Plugin: " + plugin->name + " Status: " + std::to_string(populateRes)
-      //     );
-      //   }
-      // }
-
-      const auto dbPlugin = Db::Plugin(
-        plugin.value()->path,
-        "vst3",
-        plugin.value()->name,
-        channelIndex,
-        i,
-        audioHostComponentBuffer,
-        audioHostControllerBuffer,
-        editorHostComponentBuffer,
-        editorHostControllerBuffer
-      );
-      if (!dao->pluginRepository.save(dbPlugin)) {
-        Logging::write(
-          Error,
-          "Audio::Mixer::saveScene",
-          "Unable to save plugin: " + dbPlugin.filePath + " to sceneId: " + std::to_string(scene.id)
+          "Unable to save channel: " + std::to_string(channel->getIndex()) + " to sceneDbId: " +
+          std::to_string(scene.id)
         );
         result = ERROR;
       }
-    }
-  }
+
+      for (PluginIndex i = 0; i < MAX_PLUGINS_PER_CHANNEL; i++) {
+        const auto plugin = channel->getPluginAtIdx(i);
+        if (!plugin) continue;
+        const auto audioHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
+        const auto audioHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
+        const auto editorHostComponentStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
+        const auto editorHostControllerStateStream = std::make_unique<ResizableMemoryIBStream>(2048);
+        plugin.value()->getState(
+          audioHostComponentStateStream.get(),
+          audioHostControllerStateStream.get(),
+          editorHostComponentStateStream.get(),
+          editorHostControllerStateStream.get()
+        );
+
+        int64 audioHostComponentStateSize = 0;
+        if (Effects::Vst3::Util::getStreamSize(audioHostComponentStateStream.get(), &audioHostComponentStateSize) !=
+            OK) {
+          Logging::write(
+            Error,
+            "Audio::Mixer::saveScene",
+            "Unable to determine stream size for audioHostComponentStateStream"
+          );
+          result = WARNING;
+        }
+
+        int64 audioHostControllerStateSize = 0;
+        if (Effects::Vst3::Util::getStreamSize(audioHostControllerStateStream.get(), &audioHostControllerStateSize) !=
+            OK) {
+          Logging::write(
+            Error,
+            "Audio::Mixer::saveScene",
+            "Unable to determine stream size for audioHostControllerStateStream"
+          );
+          result = WARNING;
+        }
+
+        std::vector<uint8_t> audioHostComponentBuffer(audioHostComponentStateSize);
+        std::vector<uint8_t> audioHostControllerBuffer(audioHostControllerStateSize);
+
+        if (audioHostComponentStateSize > 0) {
+          int32 audioHostComponentNumBytesRead = 0;
+          audioHostComponentStateStream->read(
+            audioHostComponentBuffer.data(),
+            static_cast<int32>(audioHostComponentStateSize),
+            &audioHostComponentNumBytesRead
+          );
+        }
+
+        if (audioHostControllerStateSize > 0) {
+          int32 audioHostControllerNumBytesRead = 0;
+          audioHostControllerStateStream->read(
+            audioHostControllerBuffer.data(),
+            static_cast<int32>(audioHostControllerStateSize),
+            &audioHostControllerNumBytesRead
+          );
+        }
+
+        // TODO: debugged. do we need editorhost state? editorhost seems to get state from audiohost
+        const std::vector<uint8_t> editorHostComponentBuffer(0);
+        const std::vector<uint8_t> editorHostControllerBuffer(0);
+        // if (plugin->editorHost != nullptr) {
+        //   if (const auto populateRes = plugin->populateEditorHostStateBuffers(editorHostComponentBuffer, editorHostControllerBuffer);
+        //       populateRes != OK) {
+        //     Logging::write(
+        //       Error,
+        //       "Audio::Mixer::saveScene",
+        //       "Unable to populate editorHost buffers and thus unable to persist Plugin: " + plugin->name + " Status: " + std::to_string(populateRes)
+        //     );
+        //   }
+        // }
+
+        const auto dbPlugin = Db::Plugin(
+          plugin.value()->path,
+          "vst3",
+          plugin.value()->name,
+          channelIndex,
+          i,
+          audioHostComponentBuffer,
+          audioHostControllerBuffer,
+          editorHostComponentBuffer,
+          editorHostControllerBuffer
+        );
+        if (!dao->pluginRepository.save(dbPlugin)) {
+          Logging::write(
+            Error,
+            "Audio::Mixer::saveScene",
+            "Unable to save plugin: " + dbPlugin.filePath + " to sceneId: " + std::to_string(scene.id)
+          );
+          result = ERROR;
+        }
+      }
+    });
+
+  if (saveRes != OK) return saveRes;
 
   return result;
 }

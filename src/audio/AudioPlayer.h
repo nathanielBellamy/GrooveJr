@@ -167,9 +167,7 @@ struct AudioPlayer {
     );
 
     audioCore->setChannelCount(mixer->getTotalChannelsCount());
-    for (const auto ch: mixer->getEffectsChannels()) {
-      const auto chIndex = ch->getIndex();
-
+    mixer->forEachChannel([this](Effects::EffectsChannel* ch, ChannelIndex chIndex) {
       audioCore->effectsChannelsProcessData[chIndex].pluginCount = ch->pluginCount();
       for (PluginIndex pluginIdx = 0; pluginIdx < ch->pluginCount(); pluginIdx++) {
         const auto pluginOpt = ch->getPluginAtIdx(pluginIdx);
@@ -187,7 +185,7 @@ struct AudioPlayer {
         audioCore->effectsChannelsProcessData[chIndex].buffers[pluginIdx] =
             getPluginBuffers(ch, pluginIdx);
       }
-    }
+    });
 
     Logging::write(
       Info,
@@ -374,10 +372,11 @@ struct AudioPlayer {
     float soloRVals[MAX_EFFECTS_CHANNELS]{0.0f};
     bool soloEngaged = false;
 
+    // TODO: mixer->forEachChannel
     // no solos on main
-    effectsChannels[0] = mixer->getEffectsChannel(0);
+    effectsChannels[0] = mixer->getEffectsChannel(0).value();
     for (ChannelIndex i = 1; i < channelCount; i++) {
-      effectsChannels[i] = mixer->getEffectsChannel(i);
+      effectsChannels[i] = mixer->getEffectsChannel(i).value();
       soloVals[i] = effectsChannels[i]->getSolo();
       soloLVals[i] = effectsChannels[i]->getSoloL();
       soloRVals[i] = effectsChannels[i]->getSoloR();

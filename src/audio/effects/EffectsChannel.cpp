@@ -81,7 +81,7 @@ EffectsChannel::~EffectsChannel() {
 }
 
 std::optional<PluginIndex> EffectsChannel::firstOpenPluginIndex() const {
-	for (PluginIndex i = 0; i < MAX_PLUGINS_PER_CHANNEL; i++) {
+	for (PluginIndex i = 0; i < MAX_PLUGINS_PER_CHANNEL; ++i) {
 		if (!plugins[i])
 			return std::optional(i);
 	}
@@ -278,12 +278,14 @@ Result EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::Vs
 	});
 }
 
-void EffectsChannel::initEditorHost(const PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+Result EffectsChannel::initEditorHost(const PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
 	if (const auto pluginOpt = getPluginAtIdx(pluginIndex); pluginOpt.has_value())
 		pluginOpt.value()->initEditorHost(vstWindow);
+
+	return OK;
 }
 
-void EffectsChannel::terminateEditorHosts() {
+Result EffectsChannel::terminateEditorHosts() {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::terminateEditorHosts",
@@ -292,18 +294,21 @@ void EffectsChannel::terminateEditorHosts() {
 
 	if (forEachPlugin([this](const Vst3::Plugin* plugin, const PluginIndex) {
 		plugin->terminateEditorHost();
-	}) != OK)
+	}) != OK) {
 		Logging::write(
 			Warning,
 			"Audio::EffectsChannel::terminateEditorHosts",
 			"An Error or Warning occurred while terminating EditorHost on ChannelIndex: " + std::to_string(index)
 		);
+		return WARNING;
+	}
 
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::terminateEditorHosts",
 		"Done terminating Editor Hosts on channel " + std::to_string(index)
 	);
+	return OK;
 }
 
 Result EffectsChannel::removePlugin(const PluginIndex pluginIdx) {

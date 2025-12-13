@@ -6,9 +6,8 @@
 
 namespace Gj {
 namespace Gui {
-
 MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer)
-  : QWidget(parent)
+: QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , muteChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::AudioVolumeMuted), tr("&Mute Channel"), this)
@@ -28,7 +27,6 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
     reinterpret_cast<std::atomic<float>*>(&vuBuffer)
   )
   , vuRingBuffer(nullptr) {
-
   mixer->setSetVuRingBufferFunc(
     [this](jack_ringbuffer_t* vuRingBuffer) { setVuRingBuffer(vuRingBuffer); }
   );
@@ -94,7 +92,7 @@ Result MixerWindow::vuWorkerStop() {
   return OK;
 }
 
-void MixerWindow::hydrateState(const AppStatePacket &appState) {
+void MixerWindow::hydrateState(const AppStatePacket& appState) {
   mainChannelContainer.hydrateState(appState);
   effectsChannelsContainer.hydrateState(appState);
 
@@ -142,6 +140,7 @@ void MixerWindow::connectActions() {
   auto muteChannelConnection = connect(&muteChannelAction, &QAction::triggered, [&]() {
     const int channelIdx = muteChannelAction.data().toInt();
 
+    // TODO - start here
     const float newMute = mixer->getEffectsChannel(channelIdx)->toggleMute();
     if (channelIdx == 0) {
       mainChannelContainer.setMute(newMute);
@@ -210,7 +209,5 @@ void MixerWindow::setChannels() {
   mainChannelContainer.setChannel();
   effectsChannelsContainer.setChannels();
 }
-
-
 } // Gui
 } // Gj

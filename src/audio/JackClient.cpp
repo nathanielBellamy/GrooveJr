@@ -676,14 +676,14 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
 }
 
 int JackClient::setSampleRateCallback(jack_nframes_t nframes, void* arg) {
-  if (const auto* mixer = static_cast<Mixer*>(arg); mixer->setSampleRate(nframes) != OK)
+  if (auto* mixer = static_cast<Mixer*>(arg); mixer->setSampleRate(nframes) != OK)
     return kJackError;
 
   return kJackSuccess;
 }
 
 int JackClient::setBufferSizeCallback(jack_nframes_t nframes, void* arg) {
-  if (const auto* mixer = static_cast<Mixer*>(arg); mixer->setAudioFramesPerBuffer(nframes) != OK)
+  if (auto* mixer = static_cast<Mixer*>(arg); mixer->setAudioFramesPerBuffer(nframes) != OK)
     return kJackError;
 
   return kJackSuccess;
