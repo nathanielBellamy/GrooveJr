@@ -43,19 +43,31 @@ PluginSlot::~PluginSlot() {
 
 void PluginSlot::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIndex) {
   channelIndex = newChannelIndex;
-  const auto plugin = mixer->getEffectsChannels().at(channelIndex)->getPluginAtIdx(pluginIndex);
-  if (!plugin) return;
-  pluginName.setText(plugin.value()->name.c_str());
+  const auto res = mixer->runAgainstChannel(
+    channelIndex,
+    [this, &appState](Audio::Effects::Channel* channel) {
+      const auto plugin = channel->getPluginAtIdx(pluginIndex);
+      if (!plugin) return;
+      pluginName.setText(plugin.value()->name.c_str());
 
-  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
-    replaceEffectButton.setEnabled(false);
-    removeEffectButton.setEnabled(false);
-  } else {
-    replaceEffectButton.setEnabled(true);
-    removeEffectButton.setEnabled(true);
-  }
+      if (appState.playState == PLAY || appState.playState == FF || appState.
+          playState == RW) {
+        replaceEffectButton.setEnabled(false);
+        removeEffectButton.setEnabled(false);
+      } else {
+        replaceEffectButton.setEnabled(true);
+        removeEffectButton.setEnabled(true);
+      }
 
-  update();
+      update();
+    });
+
+  if (res != OK)
+    Logging::write(
+      res == WARNING ? Warning : Error,
+      "Gui::PluginSlot::hydrateState",
+      "An error occurred hydrating state against mixer channelIndex: " + std::to_string(channelIndex)
+    );
 }
 
 void PluginSlot::setStyle() {

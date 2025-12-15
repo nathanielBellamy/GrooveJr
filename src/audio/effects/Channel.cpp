@@ -2,7 +2,7 @@
 // Created by ns on 1/12/25.
 //
 
-#include "EffectsChannel.h"
+#include "Channel.h"
 
 #include <caf/log/core.hpp>
 #include <caf/log/level.hpp>
@@ -13,7 +13,7 @@ namespace Audio {
 namespace Effects {
 using namespace Steinberg;
 
-EffectsChannel::EffectsChannel(
+Channel::Channel(
 	AppState* gAppState,
 	std::shared_ptr<JackClient> jackClient,
 	const ChannelIndex index
@@ -28,7 +28,7 @@ EffectsChannel::EffectsChannel(
 	);
 }
 
-EffectsChannel::EffectsChannel(
+Channel::Channel(
 	AppState* gAppState,
 	std::shared_ptr<JackClient> jackClient,
 	const Db::ChannelEntity& channelEntity
@@ -37,18 +37,18 @@ EffectsChannel::EffectsChannel(
   , jackClient(jackClient)
   , index(channelEntity.channelIndex)
   , name(channelEntity.name) {
-	channel.gain.store(channelEntity.gain);
-	channel.mute.store(channelEntity.mute);
-	channel.solo.store(channelEntity.solo);
-	channel.pan.store(channelEntity.pan);
-	channel.gainL.store(channelEntity.gainL);
-	channel.gainR.store(channelEntity.gainR);
-	channel.muteL.store(channelEntity.muteL);
-	channel.muteR.store(channelEntity.muteR);
-	channel.soloL.store(channelEntity.soloL);
-	channel.soloR.store(channelEntity.soloR);
-	channel.panL.store(channelEntity.panL);
-	channel.panR.store(channelEntity.panR);
+	settings.gain.store(channelEntity.gain);
+	settings.mute.store(channelEntity.mute);
+	settings.solo.store(channelEntity.solo);
+	settings.pan.store(channelEntity.pan);
+	settings.gainL.store(channelEntity.gainL);
+	settings.gainR.store(channelEntity.gainR);
+	settings.muteL.store(channelEntity.muteL);
+	settings.muteR.store(channelEntity.muteR);
+	settings.soloL.store(channelEntity.soloL);
+	settings.soloR.store(channelEntity.soloR);
+	settings.panL.store(channelEntity.panL);
+	settings.panR.store(channelEntity.panR);
 
 	Logging::write(
 		Info,
@@ -57,7 +57,7 @@ EffectsChannel::EffectsChannel(
 	);
 }
 
-EffectsChannel::~EffectsChannel() {
+Channel::~Channel() {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::dtor",
@@ -80,7 +80,7 @@ EffectsChannel::~EffectsChannel() {
 	);
 }
 
-std::optional<PluginIndex> EffectsChannel::firstOpenPluginIndex() const {
+std::optional<PluginIndex> Channel::firstOpenPluginIndex() const {
 	for (PluginIndex i = 0; i < MAX_PLUGINS_PER_CHANNEL; ++i) {
 		if (!plugins[i])
 			return std::optional(i);
@@ -88,7 +88,7 @@ std::optional<PluginIndex> EffectsChannel::firstOpenPluginIndex() const {
 	return std::nullopt;
 }
 
-Result EffectsChannel::addReplacePlugin(const std::optional<PluginIndex> effectIdxOpt, const PluginPath& pluginPath) {
+Result Channel::addReplacePlugin(const std::optional<PluginIndex> effectIdxOpt, const PluginPath& pluginPath) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::addReplacePlugin",
@@ -159,7 +159,7 @@ Result EffectsChannel::addReplacePlugin(const std::optional<PluginIndex> effectI
 	return OK;
 }
 
-Result EffectsChannel::loadPlugin(const Db::Plugin& pluginEntity) {
+Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::loadPlugin",
@@ -217,7 +217,7 @@ Result EffectsChannel::loadPlugin(const Db::Plugin& pluginEntity) {
 }
 
 
-Result EffectsChannel::setSampleRate(const double sampleRate) {
+Result Channel::setSampleRate(const double sampleRate) {
 	bool warning = false;
 	const Result setResult = forEachPlugin([this, &sampleRate, &warning](Vst3::Plugin* plugin, PluginIndex pluginIndex) {
 		if (!plugin->audioHost->audioClient->setSamplerate(sampleRate)) {
@@ -236,7 +236,7 @@ Result EffectsChannel::setSampleRate(const double sampleRate) {
 		       : OK;
 }
 
-Result EffectsChannel::setBlockSize(const jack_nframes_t blockSize) {
+Result Channel::setBlockSize(const jack_nframes_t blockSize) {
 	bool warning = false;
 	const auto blockSize32 = static_cast<int32>(blockSize);
 	const auto setResult = forEachPlugin([this, &blockSize32, &warning](Vst3::Plugin* plugin, PluginIndex pluginIndex) {
@@ -256,7 +256,7 @@ Result EffectsChannel::setBlockSize(const jack_nframes_t blockSize) {
 }
 
 
-PluginIndex EffectsChannel::pluginCount() const {
+PluginIndex Channel::pluginCount() const {
 	PluginIndex res = 0;
 
 	std::for_each(std::begin(plugins), std::end(plugins), [&res](std::optional<Vst3::Plugin*> plugin) {
@@ -267,7 +267,7 @@ PluginIndex EffectsChannel::pluginCount() const {
 	return res;
 }
 
-Result EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) {
+Result Channel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::initEditorHosts",
@@ -278,14 +278,14 @@ Result EffectsChannel::initEditorHosts(const std::vector<std::shared_ptr<Gui::Vs
 	});
 }
 
-Result EffectsChannel::initEditorHost(const PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+Result Channel::initEditorHost(const PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
 	if (const auto pluginOpt = getPluginAtIdx(pluginIndex); pluginOpt.has_value())
 		pluginOpt.value()->initEditorHost(vstWindow);
 
 	return OK;
 }
 
-Result EffectsChannel::terminateEditorHosts() {
+Result Channel::terminateEditorHosts() {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::terminateEditorHosts",
@@ -311,7 +311,7 @@ Result EffectsChannel::terminateEditorHosts() {
 	return OK;
 }
 
-Result EffectsChannel::removePlugin(const PluginIndex pluginIdx) {
+Result Channel::removePlugin(const PluginIndex pluginIdx) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::removePlugin",

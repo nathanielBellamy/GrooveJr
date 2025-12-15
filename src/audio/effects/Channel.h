@@ -2,8 +2,8 @@
 // Created by ns on 1/12/25.
 //
 
-#ifndef EFFECTSCHANNEL_H
-#define EFFECTSCHANNEL_H
+#ifndef GJAUDIOEFFECTSCHANNEL_H
+#define GJAUDIOEFFECTSCHANNEL_H
 
 #include <algorithm>
 #include <memory>
@@ -11,7 +11,7 @@
 #include <string>
 
 #include "./vst3/Plugin.h"
-#include "../Channel.h"
+#include "../ChannelSettings.h"
 #include "../../AppState.h"
 #include "../../enums/Result.h"
 #include "../../db/entity/mixer/Plugin.h"
@@ -23,7 +23,7 @@
 namespace Gj {
 namespace Audio {
 namespace Effects {
-class EffectsChannel {
+class Channel {
   // NOTE:
   // fx0:inputBuffers->buffersA, fx1:buffersA->buffersB, fx2:buffersB->buffersA, fx3:buffersA->buffersB, ...
   AppState* gAppState;
@@ -35,21 +35,21 @@ class EffectsChannel {
   std::optional<Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {std::nullopt};
 
 public:
-  Channel channel;
+  ChannelSettings settings;
 
-  EffectsChannel(
+  Channel(
     AppState* gAppState,
     std::shared_ptr<JackClient> jackClient,
     ChannelIndex index
   );
 
-  EffectsChannel(
+  Channel(
     AppState* gAppState,
     std::shared_ptr<JackClient> jackClient,
     const Db::ChannelEntity& channelEntity
   );
 
-  ~EffectsChannel();
+  ~Channel();
 
   Result setupProcessing() const {
     Result res = OK;
@@ -74,158 +74,158 @@ public:
   };
 
   float getGain() const {
-    return channel.gain.load();
+    return settings.gain.load();
   };
 
   bool setGain(const float gain) {
-    channel.gain.store(gain);
+    settings.gain.store(gain);
     return true;
   };
 
   float getGainL() const {
-    return channel.gainL.load();
+    return settings.gainL.load();
   };
 
   bool setGainL(float gain) {
-    channel.gainL.store(gain);
+    settings.gainL.store(gain);
     return true;
   };
 
   float getGainR() const {
-    return channel.gainR.load();
+    return settings.gainR.load();
   };
 
   bool setGainR(float gain) {
-    channel.gainR.store(gain);
+    settings.gainR.store(gain);
     return true;
   };
 
   float getMute() const {
-    return channel.mute.load();
+    return settings.mute.load();
   }
 
   float getMuteL() const {
-    return channel.muteL.load();
+    return settings.muteL.load();
   }
 
   float getMuteR() const {
-    return channel.muteR.load();
+    return settings.muteR.load();
   }
 
   float toggleMute() {
-    const float mute = channel.mute.load();
+    const float mute = settings.mute.load();
     if (mute == 1.0f) {
-      channel.mute.store(0.0f);
+      settings.mute.store(0.0f);
       return 0.0f;
     }
     if (mute == 0.0f) {
-      channel.mute.store(1.0f);
+      settings.mute.store(1.0f);
       return 1.0f;
     }
     return 0.0f;
   }
 
   float toggleMuteL() {
-    const float mute = channel.muteL.load();
+    const float mute = settings.muteL.load();
     if (mute == 1.0f) {
-      channel.muteL.store(0.0f);
+      settings.muteL.store(0.0f);
       return 0.0f;
     }
     if (mute == 0.0f) {
-      channel.muteL.store(1.0f);
+      settings.muteL.store(1.0f);
       return 1.0f;
     }
     return 0.0f;
   }
 
   float toggleMuteR() {
-    const float mute = channel.muteR.load();
+    const float mute = settings.muteR.load();
     if (mute == 1.0f) {
-      channel.muteR.store(0.0f);
+      settings.muteR.store(0.0f);
       return 0.0f;
     }
     if (mute == 0.0f) {
-      channel.muteR.store(1.0f);
+      settings.muteR.store(1.0f);
       return 1.0f;
     }
     return 0.0f;
   }
 
   float getSolo() const {
-    return channel.solo.load();
+    return settings.solo.load();
   }
 
   float getSoloL() const {
-    return channel.soloL.load();
+    return settings.soloL.load();
   }
 
   float getSoloR() const {
-    return channel.soloR.load();
+    return settings.soloR.load();
   }
 
   float toggleSolo() {
-    const float solo = channel.solo.load();
+    const float solo = settings.solo.load();
     if (solo == 1.0f) {
-      channel.solo.store(0.0f);
+      settings.solo.store(0.0f);
       return 0.0f;
     }
     if (solo == 0.0f) {
-      channel.solo.store(1.0f);
+      settings.solo.store(1.0f);
       return 1.0f;
     }
     return 0.0f;
   }
 
   float toggleSoloL() {
-    const float solo = channel.soloL.load();
+    const float solo = settings.soloL.load();
     if (solo == 1.0f) {
-      channel.soloL.store(0.0f);
+      settings.soloL.store(0.0f);
       return 0.0f;
     }
     if (solo == 0.0f) {
-      channel.soloL.store(1.0f);
+      settings.soloL.store(1.0f);
       return 1.0f;
     }
     return 0.0f;
   }
 
   float toggleSoloR() {
-    const float solo = channel.soloR.load();
+    const float solo = settings.soloR.load();
     if (solo == 1.0f) {
-      channel.soloR.store(0.0f);
+      settings.soloR.store(0.0f);
       return 0.0f;
     }
     if (solo == 0.0f) {
-      channel.soloR.store(1.0f);
+      settings.soloR.store(1.0f);
       return 1.0f;
     }
     return 0.0f;
   }
 
   float getPan() const {
-    return channel.pan.load();
+    return settings.pan.load();
   };
 
   bool setPan(float pan) {
-    channel.pan.store(pan);
+    settings.pan.store(pan);
     return true;
   };
 
   float getPanL() const {
-    return channel.panL.load();
+    return settings.panL.load();
   };
 
   bool setPanL(float pan) {
-    channel.panL.store(pan);
+    settings.panL.store(pan);
     return true;
   };
 
   float getPanR() const {
-    return channel.panR.load();
+    return settings.panR.load();
   };
 
   bool setPanR(float pan) {
-    channel.panR.store(pan);
+    settings.panR.store(pan);
     return true;
   };
 
@@ -283,18 +283,18 @@ public:
       id,
       index,
       name,
-      channel.gain.load(),
-      channel.mute.load(),
-      channel.solo.load(),
-      channel.pan.load(),
-      channel.gainL.load(),
-      channel.gainR.load(),
-      channel.muteL.load(),
-      channel.muteR.load(),
-      channel.soloL.load(),
-      channel.soloR.load(),
-      channel.panL.load(),
-      channel.panR.load(),
+      settings.gain.load(),
+      settings.mute.load(),
+      settings.solo.load(),
+      settings.pan.load(),
+      settings.gainL.load(),
+      settings.gainR.load(),
+      settings.muteL.load(),
+      settings.muteR.load(),
+      settings.soloL.load(),
+      settings.soloR.load(),
+      settings.panL.load(),
+      settings.panR.load(),
     };
   }
 };

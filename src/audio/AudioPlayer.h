@@ -167,7 +167,7 @@ struct AudioPlayer {
     );
 
     audioCore->setChannelCount(mixer->getTotalChannelsCount());
-    mixer->forEachChannel([this](Effects::EffectsChannel* ch, ChannelIndex chIndex) {
+    mixer->forEachChannel([this](Effects::Channel* ch, ChannelIndex chIndex) {
       audioCore->effectsChannelsProcessData[chIndex].pluginCount = ch->pluginCount();
       for (PluginIndex pluginIdx = 0; pluginIdx < ch->pluginCount(); pluginIdx++) {
         const auto pluginOpt = ch->getPluginAtIdx(pluginIdx);
@@ -197,7 +197,7 @@ struct AudioPlayer {
   }
 
   IAudioClient::Buffers getPluginBuffers(
-    const Effects::EffectsChannel* effectsChannel,
+    const Effects::Channel* effectsChannel,
     const PluginIndex pluginIdx
   ) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
@@ -366,7 +366,7 @@ struct AudioPlayer {
     }
     const float channelCountF = static_cast<float>(channelCount);
 
-    Effects::EffectsChannel* effectsChannels[MAX_EFFECTS_CHANNELS]{nullptr};
+    Effects::Channel* effectsChannels[MAX_EFFECTS_CHANNELS]{nullptr};
     float soloVals[MAX_EFFECTS_CHANNELS]{0.0f};
     float soloLVals[MAX_EFFECTS_CHANNELS]{0.0f};
     float soloRVals[MAX_EFFECTS_CHANNELS]{0.0f};
@@ -374,9 +374,9 @@ struct AudioPlayer {
 
     // TODO: mixer->forEachChannel
     // no solos on main
-    effectsChannels[0] = mixer->getEffectsChannel(0).value();
+    effectsChannels[0] = mixer->getChannel(0).value();
     for (ChannelIndex i = 1; i < channelCount; i++) {
-      effectsChannels[i] = mixer->getEffectsChannel(i).value();
+      effectsChannels[i] = mixer->getChannel(i).value();
       soloVals[i] = effectsChannels[i]->getSolo();
       soloLVals[i] = effectsChannels[i]->getSoloL();
       soloRVals[i] = effectsChannels[i]->getSoloR();

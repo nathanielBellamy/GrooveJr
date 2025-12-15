@@ -8,18 +8,18 @@
 namespace Gj {
 namespace Gui {
 EffectsChannel::EffectsChannel(
-  QWidget *parent,
-  actor_system &actorSystem,
-  Audio::Mixer *mixer,
+  QWidget* parent,
+  actor_system& actorSystem,
+  Audio::Mixer* mixer,
   const ChannelIndex channelIndex,
-  QAction *removeEffectsChannelAction,
-  QAction *muteChannelAction,
-  QAction *muteLChannelAction,
-  QAction *muteRChannelAction,
-  QAction *soloChannelAction,
-  QAction *soloLChannelAction,
-  QAction *soloRChannelAction,
-  std::atomic<float> *vuPtr
+  QAction* removeEffectsChannelAction,
+  QAction* muteChannelAction,
+  QAction* muteLChannelAction,
+  QAction* muteRChannelAction,
+  QAction* soloChannelAction,
+  QAction* soloLChannelAction,
+  QAction* soloRChannelAction,
+  std::atomic<float>* vuPtr
 )
 : QWidget(parent)
   , channelIndex(channelIndex)
@@ -73,14 +73,30 @@ EffectsChannel::EffectsChannel(
   connectActions();
   setupTitle();
 
-  const auto &channel = mixer->getEffectsChannel(channelIndex)->channel;
 
-  setupGainSlider(channel.gain.load());
-  setupGainLSlider(channel.gainL.load());
-  setupGainRSlider(channel.gainR.load());
-  setupPanSlider(channel.pan.load());
-  setupPanLSlider(channel.panL.load());
-  setupPanRSlider(channel.panR.load());
+  const auto res = mixer->runAgainstChannel(channelIndex, [this](const Audio::Effects::Channel* channel) {
+    std::cout << "creating effects chan against mixer channel " << std::to_string(channel->getIndex()) << std::endl;
+    setupGainSlider(channel->settings.gain.load());
+    std::cout << " gain " << std::to_string(channel->settings.gain.load()) << std::endl;
+    setupGainLSlider(channel->settings.gainL.load());
+    std::cout << " gainL " << std::to_string(channel->settings.gainL.load()) << std::endl;
+    setupGainRSlider(channel->settings.gainR.load());
+    std::cout << " gainR " << std::to_string(channel->settings.gainR.load()) << std::endl;
+    setupPanSlider(channel->settings.pan.load());
+    std::cout << " pan " << std::to_string(channel->settings.pan.load()) << std::endl;
+    setupPanLSlider(channel->settings.panL.load());
+    std::cout << " panL " << std::to_string(channel->settings.panL.load()) << std::endl;
+    setupPanRSlider(channel->settings.panR.load());
+    std::cout << " panR " << std::to_string(channel->settings.panR.load()) << std::endl;
+  });
+
+  if (res != OK)
+    Logging::write(
+      res == WARNING ? Warning : Error,
+      "Gui::EffectsChannel::EffectsChannel()",
+      "An Error occurred during construction against mixer channelIndex: " + std::to_string(channelIndex)
+    );
+
   setStyle();
   setupGrid();
 
@@ -99,7 +115,7 @@ EffectsChannel::~EffectsChannel() {
   );
 }
 
-void EffectsChannel::hydrateState(const AppStatePacket &appStatePacket, const ChannelIndex newChannelIndex) {
+void EffectsChannel::hydrateState(const AppStatePacket& appStatePacket, const ChannelIndex newChannelIndex) {
   Logging::write(
     Info,
     "Gui::EffectsChannel::hydrateState",
@@ -200,7 +216,7 @@ void EffectsChannel::setupTitle() {
   title.setFont({title.font().family(), 16});
 }
 
-constexpr float gainFactor = 2.0f;
+constexpr float GAIN_FACTOR = 2.0f;
 
 void EffectsChannel::setupGainSlider(const float gain) {
   gainSlider.setMinimum(0);
@@ -211,9 +227,19 @@ void EffectsChannel::setupGainSlider(const float gain) {
   );
   gainSlider.setTickPosition(QSlider::NoTicks);
   auto gainSliderConnection = connect(&gainSlider, &QSlider::valueChanged, [this](const int newGain) {
-    mixer->getEffectsChannel(channelIndex)->setGain(
-      Audio::Math::uInt127ToFloat(newGain) * gainFactor
-    );
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGain](Audio::Effects::Channel* channel) {
+      std::cout << "setting gain on mixer channelIndex " << std::to_string(channelIndex) << std::endl;
+      channel->setGain(
+        Audio::Math::uInt127ToFloat(newGain) * GAIN_FACTOR
+      );
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::EffectsChannel::setupGainSlider",
+        "An Error occurred setting gain slider against mixer channelIndex: " + std::to_string(channelIndex)
+      );
   });
 }
 
@@ -226,9 +252,18 @@ void EffectsChannel::setupGainLSlider(const float gainL) {
   );
   gainLSlider.setTickPosition(QSlider::NoTicks);
   auto gainSliderConnection = connect(&gainLSlider, &QSlider::valueChanged, [this](const int newGainL) {
-    mixer->getEffectsChannel(channelIndex)->setGainL(
-      Audio::Math::uInt127ToFloat(newGainL) * gainFactor
-    );
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGainL](Audio::Effects::Channel* channel) {
+      channel->setGainL(
+        Audio::Math::uInt127ToFloat(newGainL) * GAIN_FACTOR
+      );
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::EffectsChannel::setupGainLSlider",
+        "An Error occurred setting gainL slider against mixer channelIndex: " + std::to_string(channelIndex)
+      );
   });
 }
 
@@ -240,10 +275,19 @@ void EffectsChannel::setupGainRSlider(const float gainR) {
     Audio::Math::floatToUInt127(gainR)
   );
   gainRSlider.setTickPosition(QSlider::NoTicks);
-  auto gainSliderConnection = connect(&gainRSlider, &QSlider::valueChanged, [this](const int newGainR) {
-    mixer->getEffectsChannel(channelIndex)->setGainR(
-      Audio::Math::uInt127ToFloat(newGainR) * gainFactor
-    );
+  const auto gainRSliderConnection = connect(&gainRSlider, &QSlider::valueChanged, [this](const int newGainR) {
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGainR](Audio::Effects::Channel* channel) {
+      channel->setGainR(
+        Audio::Math::uInt127ToFloat(newGainR) * GAIN_FACTOR
+      );
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::EffectsChannel::setupGainRSlider",
+        "An Error occurred setting gainR slider against mixer channelIndex: " + std::to_string(channelIndex)
+      );
   });
 }
 
@@ -256,9 +300,18 @@ void EffectsChannel::setupPanSlider(const float pan) {
   );
   panSlider.setTickPosition(QSlider::NoTicks);
   auto panSliderConnection = connect(&panSlider, &QSlider::valueChanged, [this](const int newPan) {
-    mixer->getEffectsChannel(channelIndex)->setPan(
-      Audio::Math::int127ToFloat(newPan)
-    );
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPan](Audio::Effects::Channel* channel) {
+      channel->setPan(
+        Audio::Math::int127ToFloat(newPan)
+      );
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::EffectsChannel::setupPanSlider",
+        "An Error occurred setting pan slider against mixer channelIndex: " + std::to_string(channelIndex)
+      );
   });
 }
 
@@ -271,9 +324,18 @@ void EffectsChannel::setupPanLSlider(const float panL) {
   );
   panLSlider.setTickPosition(QSlider::NoTicks);
   auto panSliderConnection = connect(&panLSlider, &QSlider::valueChanged, [this](const int newPanL) {
-    mixer->getEffectsChannel(channelIndex)->setPanL(
-      Audio::Math::int127ToFloat(newPanL)
-    );
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPanL](Audio::Effects::Channel* channel) {
+      channel->setPanL(
+        Audio::Math::int127ToFloat(newPanL)
+      );
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::EffectsChannel::setupPanLSlider",
+        "An Error occurred setting panL slider against mixer channelIndex: " + std::to_string(channelIndex)
+      );
   });
 }
 
@@ -286,9 +348,18 @@ void EffectsChannel::setupPanRSlider(const float panR) {
   );
   panRSlider.setTickPosition(QSlider::NoTicks);
   auto panSliderConnection = connect(&panRSlider, &QSlider::valueChanged, [this](const int newPanR) {
-    mixer->getEffectsChannel(channelIndex)->setPanR(
-      Audio::Math::int127ToFloat(newPanR)
-    );
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPanR](Audio::Effects::Channel* channel) {
+      channel->setPanR(
+        Audio::Math::int127ToFloat(newPanR)
+      );
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::EffectsChannel::setupPanRSlider",
+        "An Error occurred setting panR slider against mixer channelIndex: " + std::to_string(channelIndex)
+      );
   });
 }
 
@@ -303,7 +374,7 @@ void EffectsChannel::setEffects() {
   if (channelIndex > mixer->getEffectsChannelsCount())
     return;
 
-  for (PluginIndex i = 0; i < mixer->getEffectsChannel(channelIndex)->pluginCount(); i++)
+  for (PluginIndex i = 0; i < mixer->getPluginsOnChannelCount(channelIndex); i++)
     addPlugin(std::optional(i));
 
   Logging::write(
@@ -315,7 +386,7 @@ void EffectsChannel::setEffects() {
 
 void EffectsChannel::addPlugin(const std::optional<PluginIndex> pluginIndex) {
   const PluginIndex newPluginIndex = pluginIndex.value_or(
-    mixer->pluginsOnChannelCount(channelIndex) - 1
+    mixer->getPluginsOnChannelCount(channelIndex) - 1
   );
   Logging::write(
     Info,
@@ -339,7 +410,7 @@ void EffectsChannel::connectActions() {
     effectsContainer.show();
   });
 
-  auto vstSelectConnection = connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl &url) {
+  auto vstSelectConnection = connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl& url) {
     Logging::write(
       Info,
       "Gui::EffectsChannel::vstSelect",

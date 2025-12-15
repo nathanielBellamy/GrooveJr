@@ -76,15 +76,15 @@ add_library(GjAudio SHARED
         Mixer.cpp
         JackClient.h
         JackClient.cpp
-        Channel.h
+        ChannelSettings.h
         Logging.h
         Logging.cpp
         Constants.h
         effects/vst3/Plugin.h
         effects/vst3/Plugin.cpp
         effects/vst3/Util.h
-        effects/EffectsChannel.h
-        effects/EffectsChannel.cpp
+        effects/Channel.h
+        effects/Channel.cpp
         effects/EffectsChannelProcessData.h
 )
 target_compile_options(GjAudio PRIVATE ${INCLUDE_FLAGS})

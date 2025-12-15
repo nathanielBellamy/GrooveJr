@@ -105,7 +105,7 @@ Result Mixer::addEffectsChannel() {
   }
 
   effectsChannels[firstOpenIndex.value()] =
-      new Effects::EffectsChannel(
+      new Effects::Channel(
         gAppState,
         jackClient,
         firstOpenIndex.value()
@@ -118,7 +118,7 @@ Result Mixer::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) {
   gAppState->setAudioFramesPerBuffer(framesPerBuffer);
 
   const auto setRes = forEachChannel(
-    [this, &framesPerBuffer, &warning](Effects::EffectsChannel* channel, ChannelIndex index) {
+    [this, &framesPerBuffer, &warning](Effects::Channel* channel, ChannelIndex index) {
       if (channel->setBlockSize(framesPerBuffer) != OK) {
         Logging::write(
           Warning,
@@ -138,7 +138,7 @@ Result Mixer::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) {
 Result Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) {
   delete effectsChannels[channelEntity.channelIndex].value_or(nullptr);
   effectsChannels[channelEntity.channelIndex] =
-      new Effects::EffectsChannel(
+      new Effects::Channel(
         gAppState,
         jackClient,
         channelEntity
@@ -154,7 +154,7 @@ Result Mixer::removeEffectsChannel(const ChannelIndex idx) {
 Result Mixer::setSampleRate(const uint32_t sampleRate) {
   const auto sampleRateD = static_cast<double>(sampleRate);
   return forEachChannel(
-    [this, &sampleRateD](Effects::EffectsChannel* channel, ChannelIndex) {
+    [this, &sampleRateD](Effects::Channel* channel, ChannelIndex) {
       channel->setSampleRate(sampleRateD);
     });
 }
@@ -203,7 +203,7 @@ Result Mixer::loadPluginOnChannel(const Db::Plugin& plugin) {
   return effectsChannels[plugin.channelIndex].value()->loadPlugin(plugin);
 }
 
-PluginIndex Mixer::pluginsOnChannelCount(const ChannelIndex idx) {
+PluginIndex Mixer::getPluginsOnChannelCount(const ChannelIndex idx) {
   if (!indexHasValidChannel(idx)) {
     Logging::write(
       Warning,
@@ -375,7 +375,7 @@ Result Mixer::deleteChannels() {
     "Deleting channels."
   );
 
-  const auto delRes = forEachChannel([this](Effects::EffectsChannel* channel, const ChannelIndex channelIdx) {
+  const auto delRes = forEachChannel([this](Effects::Channel* channel, const ChannelIndex channelIdx) {
     delete channel;
     effectsChannels[channelIdx].reset();
   });
@@ -510,7 +510,7 @@ Result Mixer::saveChannels() {
   const auto scene = gAppState->getScene();
   // for (const auto effectsChannel: effectsChannels) {
   const auto saveRes = forEachChannel(
-    [this, &scene, &result](Effects::EffectsChannel* channel, ChannelIndex channelIndex) {
+    [this, &scene, &result](Effects::Channel* channel, ChannelIndex channelIndex) {
       if (!dao->channelRepository.save(channel->toEntity())) {
         Logging::write(
           Error,

@@ -8,7 +8,6 @@
 
 namespace Gj {
 namespace Gui {
-
 EffectsChannelsContainer::EffectsChannelsContainer(
   QWidget* parent,
   actor_system& actorSystem,
@@ -20,8 +19,8 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   QAction* soloLChannelAction,
   QAction* soloRChannelAction,
   std::atomic<float>* vuPtr
-  )
-  : QWidget(parent)
+)
+: QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , grid(this)
@@ -38,9 +37,7 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   , soloChannelAction(soloChannelAction)
   , soloLChannelAction(soloLChannelAction)
   , soloRChannelAction(soloRChannelAction)
-  , vuPtr(vuPtr)
-  {
-
+  , vuPtr(vuPtr) {
   setChannels();
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   connectActions();
@@ -54,7 +51,7 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   );
 }
 
-void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
+void EffectsChannelsContainer::hydrateState(const AppStatePacket& appState) {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::hydrateState",
@@ -67,7 +64,7 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket &appState) {
     addEffectsChannelButton.setEnabled(true);
 
   for (int i = 0; i < channels.size(); i++)
-    channels.at(i)->hydrateState(appState, i+1);
+    channels.at(i)->hydrateState(appState, i + 1);
 
   setupGrid();
   update();
@@ -77,7 +74,9 @@ void EffectsChannelsContainer::addEffectsChannel() {
   if (channels.size() > Audio::MAX_EFFECTS_CHANNELS - 2)
     return;
 
-  const int channelIndex = channels.size() + 1;
+  const ChannelIndex channelIndex = channels.size() + 1;
+
+  std::cout << "Adding effects channel " << channelIndex << std::endl;
   const auto effectsChannel = new EffectsChannel(
     this, actorSystem, mixer, channelIndex, &removeEffectsChannelAction,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
@@ -98,7 +97,7 @@ void EffectsChannelsContainer::removeEffectsChannel(const ChannelIndex channelId
   );
 
   const auto itrToRemove = std::find_if(channels.begin(), channels.end(), [&channelIdx](EffectsChannel* channel) {
-      return channel->channelIndex == channelIdx;
+    return channel->channelIndex == channelIdx;
   });
 
   if (itrToRemove != channels.end()) {
@@ -136,7 +135,7 @@ void EffectsChannelsContainer::clearEffectsChannels() {
     "Clear effects channels."
   );
 
-  for (const auto& channel : channels) {
+  for (const auto& channel: channels) {
     delete channel;
   }
 
@@ -170,7 +169,8 @@ void EffectsChannelsContainer::setChannels() {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::setChannels",
-    "Done adding channels - channelsCount: " + std::to_string(channels.size()) + " mixer ecc: " + std::to_string(mixer->getEffectsChannelsCount())
+    "Done adding channels - channelsCount: " + std::to_string(channels.size()) + " mixer ecc: " + std::to_string(
+      mixer->getEffectsChannelsCount())
   );
 
   if (channels.empty())
@@ -190,7 +190,7 @@ void EffectsChannelsContainer::setEffects() const {
     "Gui::EffectsChannelsContainer::addEffectToChannel",
     "Setting effects"
   );
-  for (const auto& channel : channels)
+  for (const auto& channel: channels)
     channel->setEffects();
 }
 
@@ -203,10 +203,10 @@ void EffectsChannelsContainer::connectActions() {
     );
     strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
-    scoped_actor self{ actorSystem };
+    scoped_actor self{actorSystem};
     self->anon_send(
-        actor_cast<actor>(appStateManagerPtr),
-        mix_add_effects_channel_a_v
+      actor_cast<actor>(appStateManagerPtr),
+      mix_add_effects_channel_a_v
     );
 
     addEffectsChannel();
@@ -225,11 +225,11 @@ void EffectsChannelsContainer::connectActions() {
 
     strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
 
-    const scoped_actor self{ actorSystem };
+    const scoped_actor self{actorSystem};
     self->anon_send(
-        actor_cast<actor>(appStateManagerPtr),
-        channelIdx,
-        mix_remove_effects_channel_a_v
+      actor_cast<actor>(appStateManagerPtr),
+      channelIdx,
+      mix_remove_effects_channel_a_v
     );
   });
 }
@@ -246,7 +246,7 @@ void EffectsChannelsContainer::setupGrid() {
   setupChannelsScrollArea();
   grid.addWidget(&addEffectsChannelButton, 0, 1, -1, 1);
   int col = 0;
-  for (const auto &effectsChannel : channels) {
+  for (const auto& effectsChannel: channels) {
     channelsGrid.addWidget(effectsChannel, 0, col, -1, 1);
     col++;
   }
@@ -307,6 +307,5 @@ void EffectsChannelsContainer::setSoloR(const ChannelIndex channelIdx, const flo
 
   channels.at(channelIdx - 1)->setSoloR(val);
 }
-
 } // Gui
 } // Gj

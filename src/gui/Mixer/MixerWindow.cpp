@@ -138,72 +138,128 @@ void MixerWindow::setEffects() {
 
 void MixerWindow::connectActions() {
   auto muteChannelConnection = connect(&muteChannelAction, &QAction::triggered, [&]() {
-    const int channelIdx = muteChannelAction.data().toInt();
+    const ChannelIndex channelIdx = muteChannelAction.data().toULongLong();
 
-    // TODO - start here
-    const float newMute = mixer->getEffectsChannel(channelIdx)->toggleMute();
-    if (channelIdx == 0) {
-      mainChannelContainer.setMute(newMute);
-    } else {
-      effectsChannelsContainer.setMute(channelIdx, newMute);
-    }
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+      const float newMute = channel->toggleMute();
+      if (channelIdx == 0) {
+        mainChannelContainer.setMute(newMute);
+      } else {
+        effectsChannelsContainer.setMute(channelIdx, newMute);
+      }
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::MixerWindow::connectActions::muteChannelAction",
+        "Failed to update mute for channelIndex: " + std::to_string(channelIdx)
+      );
   });
 
   auto muteLChannelConnection = connect(&muteLChannelAction, &QAction::triggered, [&]() {
-    const int channelIdx = muteLChannelAction.data().toInt();
+    const ChannelIndex channelIdx = muteLChannelAction.data().toULongLong();
 
-    const float newMute = mixer->getEffectsChannel(channelIdx)->toggleMuteL();
-    if (channelIdx == 0) {
-      mainChannelContainer.setMuteL(newMute);
-    } else {
-      effectsChannelsContainer.setMuteL(channelIdx, newMute);
-    }
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+      const float newMute = channel->toggleMuteL();
+      if (channelIdx == 0) {
+        mainChannelContainer.setMuteL(newMute);
+      } else {
+        effectsChannelsContainer.setMuteL(channelIdx, newMute);
+      }
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::MixerWindow::connectActions::muteLChannelAction",
+        "Failed to update muteL for channelIndex: " + std::to_string(channelIdx)
+      );
   });
 
   auto muteRChannelConnection = connect(&muteRChannelAction, &QAction::triggered, [&]() {
-    const int channelIdx = muteRChannelAction.data().toInt();
+    const ChannelIndex channelIdx = muteRChannelAction.data().toULongLong();
 
-    const float newMute = mixer->getEffectsChannel(channelIdx)->toggleMuteR();
-    if (channelIdx == 0) {
-      mainChannelContainer.setMuteR(newMute);
-    } else {
-      effectsChannelsContainer.setMuteR(channelIdx, newMute);
-    }
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+      const float newMute = channel->toggleMuteR();
+      if (channelIdx == 0) {
+        mainChannelContainer.setMuteR(newMute);
+      } else {
+        effectsChannelsContainer.setMuteR(channelIdx, newMute);
+      }
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::MixerWindow::connectActions::muteRChannelAction",
+        "Failed to update muteR for channelIndex: " + std::to_string(channelIdx)
+      );
   });
 
   auto soloChannelConnection = connect(&soloChannelAction, &QAction::triggered, [&]() {
-    const int channelIdx = soloChannelAction.data().toInt();
+    const ChannelIndex channelIdx = soloChannelAction.data().toULongLong();
 
-    const float newSolo = mixer->getEffectsChannel(channelIdx)->toggleSolo();
-    if (channelIdx == 0) {
-      mainChannelContainer.setSolo(newSolo);
-    } else {
-      effectsChannelsContainer.setSolo(channelIdx, newSolo);
-    }
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+      const float newSolo = channel->toggleSolo();
+      if (channelIdx == 0) {
+        mainChannelContainer.setSolo(newSolo);
+      } else {
+        effectsChannelsContainer.setSolo(channelIdx, newSolo);
+      }
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::MixerWindow::connectActions::muteRChannelAction",
+        "Failed to update solo for channelIndex: " + std::to_string(channelIdx)
+      );
   });
 
   auto soloLChannelConnection = connect(&soloLChannelAction, &QAction::triggered, [&]() {
-    const int channelIdx = soloLChannelAction.data().toInt();
+    const ChannelIndex channelIdx = soloLChannelAction.data().toULongLong();
 
-    const float newSolo = mixer->getEffectsChannel(channelIdx)->toggleSoloL();
-    if (channelIdx == 0) {
-      mainChannelContainer.setSoloL(newSolo);
-    } else {
-      effectsChannelsContainer.setSoloL(channelIdx, newSolo);
-    }
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+      const float newSolo = channel->toggleSoloL();
+      if (channelIdx == 0) {
+        mainChannelContainer.setSoloL(newSolo);
+      } else {
+        effectsChannelsContainer.setSoloL(channelIdx, newSolo);
+      }
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::MixerWindow::connectActions::soloLChannelAction",
+        "Failed to update soloL for channelIndex: " + std::to_string(channelIdx)
+      );
   });
 
   auto soloRChannelConnection = connect(&soloRChannelAction, &QAction::triggered, [&]() {
-    const int channelIdx = soloRChannelAction.data().toInt();
+    const ChannelIndex channelIdx = soloRChannelAction.data().toInt();
 
-    const float newSolo = mixer->getEffectsChannel(channelIdx)->toggleSoloR();
-    if (channelIdx == 0) {
-      mainChannelContainer.setSoloR(newSolo);
-    } else {
-      effectsChannelsContainer.setSoloR(channelIdx, newSolo);
-    }
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+      if (const auto channel = mixer->getChannel(channelIdx); channel) {
+        const float newSolo = channel.value()->toggleSoloR();
+        if (channelIdx == 0) {
+          mainChannelContainer.setSoloR(newSolo);
+        } else {
+          effectsChannelsContainer.setSoloR(channelIdx, newSolo);
+        }
+      }
+    });
+
+    if (res != OK)
+      Logging::write(
+        res == WARNING ? Warning : Error,
+        "Gui::MixerWindow::connectActions::soloLChannelAction",
+        "Failed to update soloR for channelIndex: " + std::to_string(channelIdx)
+      );
   });
 }
+
 
 void MixerWindow::setChannels() {
   mainChannelContainer.setChannel();

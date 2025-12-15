@@ -6,11 +6,10 @@
 
 namespace Gj {
 namespace Gui {
-
 MuteSoloContainer::MuteSoloContainer(
   QWidget* parent,
   Audio::Mixer* mixer,
-  const int channelIndex,
+  const ChannelIndex channelIndex,
   QAction* openEffectsContainer,
   QAction* muteChannelAction,
   QAction* muteLChannelAction,
@@ -18,8 +17,8 @@ MuteSoloContainer::MuteSoloContainer(
   QAction* soloChannelAction,
   QAction* soloLChannelAction,
   QAction* soloRChannelAction
-  )
-  : QWidget(parent)
+)
+: QWidget(parent)
   , mixer(mixer)
   , channelIndex(channelIndex)
   , grid(this)
@@ -29,22 +28,29 @@ MuteSoloContainer::MuteSoloContainer(
   , solo(this, soloChannelAction, channelIndex)
   , soloL(this, soloLChannelAction, channelIndex)
   , soloR(this, soloRChannelAction, channelIndex)
-  , effects(this, openEffectsContainer)
-  {
+  , effects(this, openEffectsContainer) {
+  const auto res = mixer->runAgainstChannel(channelIndex,
+                                            [this, &channelIndex](const Audio::Effects::Channel* channel) {
+                                              mute.setMute(channel->settings.mute.load());
+                                              muteL.setMute(channel->settings.muteL.load());
+                                              muteR.setMute(channel->settings.muteR.load());
+                                              if (channelIndex > 0) {
+                                                solo.setSolo(channel->settings.solo.load());
+                                                soloL.setSolo(channel->settings.soloL.load());
+                                                soloR.setSolo(channel->settings.soloR.load());
+                                              } else {
+                                                solo.hide();
+                                                soloL.hide();
+                                                soloR.hide();
+                                              }
+                                            });
 
-  const auto& channel = mixer->getEffectsChannel(channelIndex)->channel;
-  mute.setMute(channel.mute.load());
-  muteL.setMute(channel.muteL.load());
-  muteR.setMute(channel.muteR.load());
-  if (channelIndex > 0) {
-    solo.setSolo(channel.solo.load());
-    soloL.setSolo(channel.soloL.load());
-    soloR.setSolo(channel.soloR.load());
-  } else {
-    solo.hide();
-    soloL.hide();
-    soloR.hide();
-  }
+  if (res != OK)
+    Logging::write(
+      res == WARNING ? Warning : Error,
+      "Gui::MuteSoloContainer::MuteSoloContainer()",
+      "An error occurred during construction on channelIndex: " + std::to_string(channelIndex)
+    );
 
   setupGrid();
 }
@@ -57,7 +63,7 @@ MuteSoloContainer::~MuteSoloContainer() {
   );
 }
 
-void MuteSoloContainer::hydrateState(const AppStatePacket &appState, int newChannelIdx) {
+void MuteSoloContainer::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIdx) {
   channelIndex = newChannelIdx;
 }
 
@@ -104,6 +110,5 @@ void MuteSoloContainer::setSoloL(const float val) {
 void MuteSoloContainer::setSoloR(const float val) {
   soloR.setSolo(val);
 }
-
 } // Gui
 } // Gj

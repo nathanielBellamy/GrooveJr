@@ -6,41 +6,40 @@
 
 namespace Gj {
 namespace Db {
-
 ChannelEntity::ChannelEntity(
-    const ID id,
-    const ChannelIndex channelIndex,
-    const AtomicStr& name,
-    const float gain,
-    const float mute,
-    const float solo,
-    const float pan,
-    const float gainL,
-    const float gainR,
-    const float muteL,
-    const float muteR,
-    const float soloL,
-    const float soloR,
-    const float panL,
-    const float panR)
-    : id(id)
-    , channelIndex(channelIndex)
-    , name(name)
-    , gain(gain)
-    , mute(mute)
-    , solo(solo)
-    , pan(pan)
-    , gainL(gainL)
-    , gainR(gainR)
-    , muteL(muteL)
-    , muteR(muteR)
-    , soloL(soloL)
-    , soloR(soloR)
-    , panL(panL)
-    , panR(panR)
-    {}
+  const ID id,
+  const ChannelIndex channelIndex,
+  const AtomicStr& name,
+  const float gain,
+  const float mute,
+  const float solo,
+  const float pan,
+  const float gainL,
+  const float gainR,
+  const float muteL,
+  const float muteR,
+  const float soloL,
+  const float soloR,
+  const float panL,
+  const float panR)
+: id(id)
+  , channelIndex(channelIndex)
+  , name(name)
+  , gain(gain)
+  , mute(mute)
+  , solo(solo)
+  , pan(pan)
+  , gainL(gainL)
+  , gainR(gainR)
+  , muteL(muteL)
+  , muteR(muteR)
+  , soloL(soloL)
+  , soloR(soloR)
+  , panL(panL)
+  , panR(panR) {
+}
 
-ChannelEntity ChannelEntity::deser(sqlite3_stmt *stmt) {
+ChannelEntity ChannelEntity::deser(sqlite3_stmt* stmt) {
   const ID id = sqlite3_column_int(stmt, 0);
   const ChannelIndex channelIndex = sqlite3_column_int(stmt, 1);
   const unsigned char* name = sqlite3_column_text(stmt, 2);
@@ -77,7 +76,7 @@ ChannelEntity ChannelEntity::deser(sqlite3_stmt *stmt) {
 }
 
 std::vector<ChannelEntity> ChannelEntity::baseChannels() {
-  const ChannelEntity baseMain (
+  const ChannelEntity baseMain(
     0,
     0,
     AtomicStr("Main"),
@@ -91,11 +90,11 @@ std::vector<ChannelEntity> ChannelEntity::baseChannels() {
     0.0f,
     0.0f,
     0.0f,
-    0.0f,
-    0.0f
+    -1.0f,
+    1.0f
   );
 
-  const ChannelEntity baseChannel1 (
+  const ChannelEntity baseChannel1(
     0,
     1,
     AtomicStr("==1=="),
@@ -109,8 +108,8 @@ std::vector<ChannelEntity> ChannelEntity::baseChannels() {
     0.0f,
     0.0f,
     0.0f,
-    0.0f,
-    0.0f
+    -1.0f,
+    1.0f
   );
 
   return {
@@ -118,6 +117,5 @@ std::vector<ChannelEntity> ChannelEntity::baseChannels() {
     baseChannel1
   };
 }
-
 } // Db
 } // Gj
