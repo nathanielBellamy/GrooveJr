@@ -18,7 +18,7 @@
 
 #include "../audio/AudioCore.h"
 #include "../audio/AudioPlayer.h"
-#include "../audio/Mixer.h"
+#include "../audio/mixer/Core.h"
 #include "../audio/Cassette.h"
 #include "../Logging.h"
 #include "../enums/Result.h"
@@ -39,16 +39,16 @@ struct AudioThreadState {
   static long id;
 
   AudioThread::pointer self;
-  AppState *gAppState;
-  Audio::Mixer *mixer;
-  Audio::AudioCore *audioCore;
+  AppState* gAppState;
+  Audio::Mixer::Core* mixer;
+  Audio::AudioCore* audioCore;
 
   AudioThreadState(
     AudioThread::pointer self,
     strong_actor_ptr supervisor,
-    AppState *gAppState,
-    Audio::Mixer *mixer,
-    Audio::AudioCore *audioCore
+    AppState* gAppState,
+    Audio::Mixer::Core* mixer,
+    Audio::AudioCore* audioCore
   ) : self(self)
       , gAppState(gAppState)
       , mixer(mixer)
@@ -71,7 +71,7 @@ struct AudioThreadState {
               "Act::AudioThread::audio_thread_init_a",
               "An error occurred during playback."
             );
-        } catch (std::runtime_error &e) {
+        } catch (std::runtime_error& e) {
           Logging::write(
             Error,
             "Act::AudioThread::audio_thread_init_a",

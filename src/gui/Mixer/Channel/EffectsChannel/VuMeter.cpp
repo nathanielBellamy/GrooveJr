@@ -6,17 +6,14 @@
 
 namespace Gj {
 namespace Gui {
-
-VuMeter::VuMeter(QWidget* parent, Audio::Mixer* mixer, std::atomic<float>* vuPtr, const ChannelIndex channelIndex)
-  : QOpenGLWidget(parent)
+VuMeter::VuMeter(QWidget* parent, Audio::Mixer::Core* mixer, std::atomic<float>* vuPtr, const ChannelIndex channelIndex)
+: QOpenGLWidget(parent)
   , channelIndex(channelIndex)
   , vao(0)
   , vbo(0)
   , program(nullptr)
   , mixer(mixer)
-  , vuPtr(vuPtr)
-  {
-
+  , vuPtr(vuPtr) {
   animationStart();
   setStyle();
 }
@@ -90,8 +87,8 @@ void VuMeter::paintGL() {
       const float vuVal = vuVals[chan];
       const float val =
           vuVal < -100.0f
-              ? -100.0f
-              : vuVal > 0.0f
+            ? -100.0f
+            : vuVal > 0.0f
                 ? 0.0f
                 : vuVal;
 
@@ -101,7 +98,8 @@ void VuMeter::paintGL() {
 
       if (i == VU_METER_BLOCK_COUNT - 1 || i == VU_METER_BLOCK_COUNT - 2)
         program->setUniformValue(colorLocation, opaque ? VU_METER_RED : VU_METER_RED_TR);
-      else if (i == VU_METER_BLOCK_COUNT - 3 || i == VU_METER_BLOCK_COUNT - 4 || i == VU_METER_BLOCK_COUNT - 5 || i == VU_METER_BLOCK_COUNT - 6)
+      else if (i == VU_METER_BLOCK_COUNT - 3 || i == VU_METER_BLOCK_COUNT - 4 || i == VU_METER_BLOCK_COUNT - 5 || i ==
+               VU_METER_BLOCK_COUNT - 6)
         program->setUniformValue(colorLocation, opaque ? VU_METER_YELLOW : VU_METER_YELLOW_TR);
       else
         program->setUniformValue(colorLocation, opaque ? VU_METER_GREEN : VU_METER_GREEN_TR);
@@ -131,11 +129,10 @@ void VuMeter::paintGL() {
       glBindVertexArray(vao);
       glBindBuffer(GL_ARRAY_BUFFER, vbo);
       glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-      glDrawArrays(GL_TRIANGLES, 0,  10);
+      glDrawArrays(GL_TRIANGLES, 0, 10);
     }
   }
   program->release();
-
 }
 
 void VuMeter::resizeGL(int w, int h) {
@@ -175,6 +172,5 @@ Result VuMeter::hydrateState(const AppStatePacket& appStatePacket) {
 
   return OK;
 };
-
 } // Gui
 } // Gj

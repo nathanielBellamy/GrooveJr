@@ -10,22 +10,21 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
-
-MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer* mixer, AppState* gAppState, void (*shutdown_handler) (int))
-    : SqlWorkerPoolHost(nullptr)
-    , gAppState(gAppState)
-    , actorSystem(actorSystem)
-    , mixer(mixer)
-    , shutdown_handler(shutdown_handler)
-    , sqlWorkerPool(initQSql())
-    , container(this)
-    , menuBar(new MenuBar(actorSystem, this))
-    , sceneLoadAction(QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen), tr("&Select Scene"), this)
-    , mainToolBar(this, actorSystem, gAppState, mixer, sqlWorkerPool, &sceneLoadAction)
-    , grid(&container)
-    , musicLibraryWindow(&container, actorSystem, gAppState, mixer->dao, sqlWorkerPool)
-    , mixerWindow(&container, actorSystem, mixer)
-    {
+MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer::Core* mixer, AppState* gAppState,
+                       void (*shutdown_handler)(int))
+: SqlWorkerPoolHost(nullptr)
+  , gAppState(gAppState)
+  , actorSystem(actorSystem)
+  , mixer(mixer)
+  , shutdown_handler(shutdown_handler)
+  , sqlWorkerPool(initQSql())
+  , container(this)
+  , menuBar(new MenuBar(actorSystem, this))
+  , sceneLoadAction(QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen), tr("&Select Scene"), this)
+  , mainToolBar(this, actorSystem, gAppState, mixer, sqlWorkerPool, &sceneLoadAction)
+  , grid(&container)
+  , musicLibraryWindow(&container, actorSystem, gAppState, mixer->dao, sqlWorkerPool)
+  , mixerWindow(&container, actorSystem, mixer) {
   Logging::write(
     Info,
     "Gui::MainWindow::MainWindow()",
@@ -64,23 +63,24 @@ SqlWorkerPool* MainWindow::initQSql() {
 }
 
 Result MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
-    Logging::write(
-      Info,
-      "Gui::MainWindow::hydrateState",
-      "Hydrating app state to Gui: id: " + std::to_string(appStatePacket.id) +  " sceneId: " + std::to_string(appStatePacket.sceneId)
-    );
+  Logging::write(
+    Info,
+    "Gui::MainWindow::hydrateState",
+    "Hydrating app state to Gui: id: " + std::to_string(appStatePacket.id) + " sceneId: " + std::to_string(
+      appStatePacket.sceneId)
+  );
 
-    mainToolBar.hydrateState(appStatePacket);
-    mixerWindow.hydrateState(appStatePacket);
-    musicLibraryWindow.hydrateState(appStatePacket);
+  mainToolBar.hydrateState(appStatePacket);
+  mixerWindow.hydrateState(appStatePacket);
+  musicLibraryWindow.hydrateState(appStatePacket);
 
-    Logging::write(
-      Info,
-      "Gui::MainWindow::hydrateState",
-      "Done hydrating state."
-    );
+  Logging::write(
+    Info,
+    "Gui::MainWindow::hydrateState",
+    "Done hydrating state."
+  );
 
-    return OK;
+  return OK;
 }
 
 void MainWindow::setupGrid() {
@@ -99,7 +99,7 @@ void MainWindow::setupGrid() {
   container.setStyleSheet(styleString.data());
 }
 
-void MainWindow::closeEvent (QCloseEvent* e) {
+void MainWindow::closeEvent(QCloseEvent* e) {
   Logging::write(
     Info,
     "Gui::MainWindow::closeEvent",
@@ -134,10 +134,10 @@ void MainWindow::setEffects() {
   mixerWindow.setEffects();
 
   const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-  const scoped_actor self{ actorSystem };
+  const scoped_actor self{actorSystem};
   self->anon_send(
-      actor_cast<actor>(appStateManagerPtr),
-      hydrate_display_a_v
+    actor_cast<actor>(appStateManagerPtr),
+    hydrate_display_a_v
   );
 
   Logging::write(
@@ -168,6 +168,5 @@ void MainWindow::connectActions() {
     }
   });
 }
-
 } // Gui
 } // Gj

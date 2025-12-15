@@ -8,7 +8,7 @@ namespace Gj {
 namespace Gui {
 MuteSoloContainer::MuteSoloContainer(
   QWidget* parent,
-  Audio::Mixer* mixer,
+  Audio::Mixer::Core* mixer,
   const ChannelIndex channelIndex,
   QAction* openEffectsContainer,
   QAction* muteChannelAction,
@@ -29,21 +29,23 @@ MuteSoloContainer::MuteSoloContainer(
   , soloL(this, soloLChannelAction, channelIndex)
   , soloR(this, soloRChannelAction, channelIndex)
   , effects(this, openEffectsContainer) {
-  const auto res = mixer->runAgainstChannel(channelIndex,
-                                            [this, &channelIndex](const Audio::Effects::Channel* channel) {
-                                              mute.setMute(channel->settings.mute.load());
-                                              muteL.setMute(channel->settings.muteL.load());
-                                              muteR.setMute(channel->settings.muteR.load());
-                                              if (channelIndex > 0) {
-                                                solo.setSolo(channel->settings.solo.load());
-                                                soloL.setSolo(channel->settings.soloL.load());
-                                                soloR.setSolo(channel->settings.soloR.load());
-                                              } else {
-                                                solo.hide();
-                                                soloL.hide();
-                                                soloR.hide();
-                                              }
-                                            });
+  const auto res = mixer->runAgainstChannel(
+    channelIndex,
+    [this, &channelIndex](const Audio::Mixer::Channel* channel) {
+      mute.setMute(channel->settings.mute.load());
+      muteL.setMute(channel->settings.muteL.load());
+      muteR.setMute(channel->settings.muteR.load());
+      if (channelIndex > 0) {
+        solo.setSolo(channel->settings.solo.load());
+        soloL.setSolo(channel->settings.soloL.load());
+        soloR.setSolo(channel->settings.soloR.load());
+      } else {
+        solo.hide();
+        soloL.hide();
+        soloR.hide();
+      }
+    }
+  );
 
   if (res != OK)
     Logging::write(

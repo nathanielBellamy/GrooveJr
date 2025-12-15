@@ -17,29 +17,30 @@
 
 #include "public.sdk/source/vst/utility/memoryibstream.h"
 
-#include "../AppState.h"
-#include "../enums/Result.h"
-#include "../Logging.h"
-#include "../db/Dao.h"
-#include "../db/entity/mixer/ChannelEntity.h"
-#include "../db/entity/mixer/Plugin.h"
-#include "../db/entity/mixer/Scene.h"
+#include "../../AppState.h"
+#include "../../enums/Result.h"
+#include "../../Logging.h"
+#include "../../db/Dao.h"
+#include "../../db/entity/mixer/ChannelEntity.h"
+#include "../../db/entity/mixer/Plugin.h"
+#include "../../db/entity/mixer/Scene.h"
 // #include "JackClient.h"
-#include "./effects/Channel.h"
-#include "../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
-#include "effects/vst3/Util.h"
-#include "ThreadStatics.h"
+#include "Channel.h"
+#include "../../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
+#include "../effects/vst3/Util.h"
+#include "../ThreadStatics.h"
 
 namespace Gj {
 namespace Audio {
 // forward decl
 class JackClient;
 
-class Mixer {
+namespace Mixer {
+class Core {
   AppState* gAppState;
   std::shared_ptr<JackClient> jackClient;
   // main channel is effectsChannels.front()
-  std::optional<Effects::Channel*> effectsChannels[MAX_EFFECTS_CHANNELS];
+  std::optional<Channel*> effectsChannels[MAX_MIXER_CHANNELS];
   std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
   std::function<void(jack_ringbuffer_t* eqRingBuffer)> setEqRingBufferFunc;
   std::function<void(jack_ringbuffer_t* vuRingBuffer)> setVuRingBufferFunc;
@@ -51,9 +52,9 @@ class Mixer {
 public:
   Db::Dao* dao;
 
-  explicit Mixer(AppState*, Db::Dao*);
+  explicit Core(AppState*, Db::Dao*);
 
-  ~Mixer();
+  ~Core();
 
 
   bool indexHasValidChannel(ChannelIndex idx) {
@@ -67,7 +68,7 @@ public:
   template<typename F>
   Result forEachChannel(F&& func) {
     bool warning = false;
-    for (ChannelIndex channelIndex = 0; channelIndex < MAX_EFFECTS_CHANNELS; ++channelIndex) {
+    for (ChannelIndex channelIndex = 0; channelIndex < MAX_MIXER_CHANNELS; ++channelIndex) {
       if (!indexHasValidChannel(channelIndex))
         continue;
 
@@ -119,7 +120,7 @@ public:
 
   Result setupProcessing() {
     Result res = OK;
-    const auto setupRes = forEachChannel([this, &res](Effects::Channel* effectsChannel, const ChannelIndex idx) {
+    const auto setupRes = forEachChannel([this, &res](Channel* effectsChannel, const ChannelIndex idx) {
       if (effectsChannel->setupProcessing() != OK)
         res = WARNING;
     });
@@ -139,18 +140,18 @@ public:
   }
 
   [[nodiscard]]
-  std::optional<Effects::Channel*>* getEffectsChannels() {
+  std::optional<Channel*>* getEffectsChannels() {
     return effectsChannels;
   }
 
   [[nodiscard]]
-  std::optional<Effects::Channel*> getChannel(const ChannelIndex index) {
-    if (index > MAX_EFFECTS_CHANNELS) {
+  std::optional<Channel*> getChannel(const ChannelIndex index) {
+    if (index > MAX_MIXER_CHANNELS) {
       Logging::write(
         Warning,
         "Audio::Mixer::getEffectsChannel",
         "Attempting to access out of range Channel at index: " + std::to_string(index) + ". MAX_EFFECTS_CHANNELS: " +
-        std::to_string(MAX_EFFECTS_CHANNELS)
+        std::to_string(MAX_MIXER_CHANNELS)
       );
       return std::nullopt;
     }
@@ -162,7 +163,7 @@ public:
   [[nodiscard]]
   ChannelIndex getEffectsChannelsCount() {
     int count = 0;
-    for (ChannelIndex idx = 1; idx < MAX_EFFECTS_CHANNELS; ++idx) {
+    for (ChannelIndex idx = 1; idx < MAX_MIXER_CHANNELS; ++idx) {
       if (indexHasValidChannel(idx))
         ++count;
     }
@@ -172,7 +173,7 @@ public:
   [[nodiscard]]
   ChannelIndex getTotalChannelsCount() {
     int count = 0;
-    for (ChannelIndex idx = 0; idx < MAX_EFFECTS_CHANNELS; ++idx) {
+    for (ChannelIndex idx = 0; idx < MAX_MIXER_CHANNELS; ++idx) {
       if (indexHasValidChannel(idx))
         ++count;
     }
@@ -256,6 +257,7 @@ public:
 
   Result saveChannels();
 };
+} // Mixer
 } // Audio
 } // Gj
 

@@ -8,7 +8,7 @@ namespace Gj {
 namespace Gui {
 PluginSlot::PluginSlot(QWidget* parent,
                        actor_system& actorSystem,
-                       Audio::Mixer* mixer,
+                       Audio::Mixer::Core* mixer,
                        const ChannelIndex channelIndex,
                        const PluginIndex effectIndex,
                        const bool occupied,
@@ -45,7 +45,7 @@ void PluginSlot::hydrateState(const AppStatePacket& appState, const ChannelIndex
   channelIndex = newChannelIndex;
   const auto res = mixer->runAgainstChannel(
     channelIndex,
-    [this, &appState](Audio::Effects::Channel* channel) {
+    [this, &appState](Audio::Mixer::Channel* channel) {
       const auto plugin = channel->getPluginAtIdx(pluginIndex);
       if (!plugin) return;
       pluginName.setText(plugin.value()->name.c_str());

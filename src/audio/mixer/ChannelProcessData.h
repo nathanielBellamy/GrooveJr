@@ -15,19 +15,19 @@
 
 namespace Gj {
 namespace Audio {
-namespace Effects {
-struct EffectsChannelProcessData {
+namespace Mixer {
+struct ChannelProcessData {
   PluginIndex pluginCount;
   std::array<std::function<bool(Steinberg::Vst::IAudioClient::Buffers&, int64_t frames)>, MAX_PLUGINS_PER_CHANNEL>
   processFuncs{};
   std::array<Steinberg::Vst::IAudioClient::Buffers, MAX_PLUGINS_PER_CHANNEL> buffers{};
   // bool processingEnabled[MAX_PLUGINS_PER_CHANNEL]{false};
 
-  EffectsChannelProcessData()
+  ChannelProcessData()
   : pluginCount(0) {
   };
 };
-} // Effects
+} // Mixer
 } // Audio
 } // Gj
 

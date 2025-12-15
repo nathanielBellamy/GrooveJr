@@ -8,9 +8,8 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
-
-TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer* mixer)
-  : QWidget(parent)
+TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer::Core* mixer)
+: QWidget(parent)
   , sys(sys)
   , grid(this)
   , progressBar(this, mixer, 0)
@@ -19,9 +18,7 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mi
   , pauseButton(this, &pauseTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause))
   , stopButton(this, &stopTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop))
   , rwButton(this, &rwTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipBackward))
-  , ffButton(this, &ffTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipForward))
-  {
-
+  , ffButton(this, &ffTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipForward)) {
   connectActions();
   setupGrid();
 }
@@ -54,8 +51,8 @@ void TransportControl::connectActions() {
 
     const scoped_actor self{sys};
     self->anon_send(
-        actor_cast<actor>(appStateManagerPtr),
-        tc_trig_play_a_v
+      actor_cast<actor>(appStateManagerPtr),
+      tc_trig_play_a_v
     );
   });
 
@@ -69,8 +66,8 @@ void TransportControl::connectActions() {
 
     const scoped_actor self{sys};
     self->anon_send(
-        actor_cast<actor>(appStateManagerPtr),
-        tc_trig_pause_a_v
+      actor_cast<actor>(appStateManagerPtr),
+      tc_trig_pause_a_v
     );
   });
 
@@ -84,8 +81,8 @@ void TransportControl::connectActions() {
 
     scoped_actor self{sys};
     self->anon_send(
-        actor_cast<actor>(appStateManagerPtr),
-        tc_trig_stop_a_v
+      actor_cast<actor>(appStateManagerPtr),
+      tc_trig_stop_a_v
     );
   });
 
@@ -99,8 +96,8 @@ void TransportControl::connectActions() {
 
     scoped_actor self{sys};
     self->anon_send(
-        actor_cast<actor>(appStateManagerPtr),
-        tc_trig_rw_a_v
+      actor_cast<actor>(appStateManagerPtr),
+      tc_trig_rw_a_v
     );
   });
 
@@ -114,14 +111,13 @@ void TransportControl::connectActions() {
 
     scoped_actor self{sys};
     self->anon_send(
-        actor_cast<actor>(appStateManagerPtr),
-        tc_trig_ff_a_v
+      actor_cast<actor>(appStateManagerPtr),
+      tc_trig_ff_a_v
     );
   });
 }
 
 void TransportControl::setupGrid() {
-
   grid.addWidget(&playButton, 0, 0, 1, 1);
   grid.addWidget(&pauseButton, 0, 1, 1, 1);
   grid.addWidget(&stopButton, 0, 2, 1, 1);
@@ -132,6 +128,5 @@ void TransportControl::setupGrid() {
 
   setLayout(&grid);
 }
-
 } // Gui
 } // Gj

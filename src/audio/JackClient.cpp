@@ -40,7 +40,7 @@
 #include <caf/log/core.hpp>
 #include <caf/log/level.hpp>
 
-#include "Mixer.h"
+#include "mixer/Core.h"
 
 //------------------------------------------------------------------------
 namespace Steinberg {
@@ -59,7 +59,7 @@ jack_port_t* outPortR;
 
 using namespace Steinberg;
 
-JackClient::JackClient(Mixer* mixer)
+JackClient::JackClient(Mixer::Core* mixer)
 : mixer(mixer) {
 }
 
@@ -511,8 +511,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   // process effects channels
   // main channel is effectsChannelIdx 0
   const int32_t nframes32t = static_cast<int32_t>(nframes);
-  for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->channelCount; effectsChannelIdx++) {
-    auto [pluginCount, processFuncs, buffers] = audioCore->effectsChannelsProcessData[effectsChannelIdx];
+  for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->mixerChannelCount; effectsChannelIdx++) {
+    auto [pluginCount, processFuncs, buffers] = audioCore->mixerChannelsProcessData[effectsChannelIdx];
     for (PluginIndex pluginIdx = 0; pluginIdx < pluginCount; pluginIdx++) {
       buffers[pluginIdx].numSamples = nframes32t;
 
@@ -524,43 +524,43 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   }
 
   // read channel settings from ringbuffer
-  if (jack_ringbuffer_t* ringBuffer = audioCore->effectsChannelsSettingsRB;
+  if (jack_ringbuffer_t* ringBuffer = audioCore->mixerChannelsSettingsRB;
     jack_ringbuffer_read_space(ringBuffer) >= EffectsSettings_RB_SIZE) {
     jack_ringbuffer_read(
       ringBuffer,
-      reinterpret_cast<char*>(audioCore->effectsChannelsSettings),
+      reinterpret_cast<char*>(audioCore->mixerChannelsSettings),
       EffectsSettings_RB_SIZE
     );
   }
 
-  float rmsL[MAX_EFFECTS_CHANNELS] = {0.0f};
-  float rmsR[MAX_EFFECTS_CHANNELS] = {0.0f};
+  float rmsL[MAX_MIXER_CHANNELS] = {0.0f};
+  float rmsR[MAX_MIXER_CHANNELS] = {0.0f};
   // sum down
   for (jack_nframes_t i = 0; i < nframes; i++) {
     float accumL = 0.0f;
     float accumR = 0.0f;
-    for (ChannelIndex channelIndex = 1; channelIndex < audioCore->channelCount; channelIndex++) {
-      const float factorLL = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorLL(channelIndex)];
-      const float factorLR = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorLR(channelIndex)];
-      const float factorRL = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorRL(channelIndex)];
-      const float factorRR = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorRR(channelIndex)];
+    for (ChannelIndex channelIndex = 1; channelIndex < audioCore->mixerChannelCount; channelIndex++) {
+      const float factorLL = audioCore->mixerChannelsSettings[BfrIdx::ECS::factorLL(channelIndex)];
+      const float factorLR = audioCore->mixerChannelsSettings[BfrIdx::ECS::factorLR(channelIndex)];
+      const float factorRL = audioCore->mixerChannelsSettings[BfrIdx::ECS::factorRL(channelIndex)];
+      const float factorRR = audioCore->mixerChannelsSettings[BfrIdx::ECS::factorRR(channelIndex)];
 
       float valL = 0.0f;
       float valR = 0.0f;
-      if (audioCore->effectsChannelsProcessData[channelIndex].pluginCount == 0) {
+      if (audioCore->mixerChannelsProcessData[channelIndex].pluginCount == 0) {
         valL = factorLL * audioCore->playbackBuffers[BfrIdx::AudCh::LEFT][i]
                + factorRL * audioCore->playbackBuffers[BfrIdx::AudCh::RIGHT][i];
         valR = factorLR * audioCore->playbackBuffers[BfrIdx::AudCh::LEFT][i]
                + factorRR * audioCore->playbackBuffers[BfrIdx::AudCh::RIGHT][i];
       } else {
         const auto writeOutValL =
-            std::isnan(audioCore->effectsChannelsWriteOut[channelIndex][BfrIdx::AudCh::LEFT][i])
+            std::isnan(audioCore->mixerChannelsWriteOut[channelIndex][BfrIdx::AudCh::LEFT][i])
               ? 0.0f
-              : audioCore->effectsChannelsWriteOut[channelIndex][BfrIdx::AudCh::LEFT][i];
+              : audioCore->mixerChannelsWriteOut[channelIndex][BfrIdx::AudCh::LEFT][i];
         const auto writeOutValR =
-            std::isnan(audioCore->effectsChannelsWriteOut[channelIndex][BfrIdx::AudCh::RIGHT][i])
+            std::isnan(audioCore->mixerChannelsWriteOut[channelIndex][BfrIdx::AudCh::RIGHT][i])
               ? 0.0f
-              : audioCore->effectsChannelsWriteOut[channelIndex][BfrIdx::AudCh::RIGHT][i];
+              : audioCore->mixerChannelsWriteOut[channelIndex][BfrIdx::AudCh::RIGHT][i];
         valL = factorLL * writeOutValL + factorRL * writeOutValR;
         valR = factorLR * writeOutValL + factorRR * writeOutValR;
       }
@@ -576,13 +576,13 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   }
 
   const float nframesF = static_cast<float>(nframes);
-  for (ChannelIndex chIdx = 1; chIdx < audioCore->channelCount; chIdx++) {
+  for (ChannelIndex chIdx = 1; chIdx < audioCore->mixerChannelCount; chIdx++) {
     audioCore->vu_buffer_in[BfrIdx::VU::left(chIdx)] = std::sqrt(rmsL[chIdx] / nframesF);
     audioCore->vu_buffer_in[BfrIdx::VU::right(chIdx)] = std::sqrt(rmsR[chIdx] / nframesF);
   }
 
   // process summed down mix through main effects
-  auto [effectCount, processFuncs, buffers] = audioCore->effectsChannelsProcessData[0];
+  auto [effectCount, processFuncs, buffers] = audioCore->mixerChannelsProcessData[0];
   for (PluginIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
     buffers[pluginIdx].numSamples = static_cast<int32_t>(nframes);
 
@@ -593,10 +593,10 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   }
 
   // write out processed main channel to audio out
-  const float factorLL = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorLL(0)];
-  const float factorLR = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorLR(0)];
-  const float factorRL = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorRL(0)];
-  const float factorRR = audioCore->effectsChannelsSettings[BfrIdx::ECS::factorRR(0)];
+  const float factorLL = audioCore->mixerChannelsSettings[BfrIdx::ECS::factorLL(0)];
+  const float factorLR = audioCore->mixerChannelsSettings[BfrIdx::ECS::factorLR(0)];
+  const float factorRL = audioCore->mixerChannelsSettings[BfrIdx::ECS::factorRL(0)];
+  const float factorRR = audioCore->mixerChannelsSettings[BfrIdx::ECS::factorRR(0)];
 
   for (size_t chan = 0; chan < 2; chan++) {
     std::copy(
@@ -676,14 +676,14 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
 }
 
 int JackClient::setSampleRateCallback(jack_nframes_t nframes, void* arg) {
-  if (auto* mixer = static_cast<Mixer*>(arg); mixer->setSampleRate(nframes) != OK)
+  if (auto* mixer = static_cast<Mixer::Core*>(arg); mixer->setSampleRate(nframes) != OK)
     return kJackError;
 
   return kJackSuccess;
 }
 
 int JackClient::setBufferSizeCallback(jack_nframes_t nframes, void* arg) {
-  if (auto* mixer = static_cast<Mixer*>(arg); mixer->setAudioFramesPerBuffer(nframes) != OK)
+  if (auto* mixer = static_cast<Mixer::Core*>(arg); mixer->setAudioFramesPerBuffer(nframes) != OK)
     return kJackError;
 
   return kJackSuccess;

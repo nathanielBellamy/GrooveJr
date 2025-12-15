@@ -8,7 +8,7 @@
 
 #include <sndfile.hh>
 #include "../enums/PlayState.h"
-#include "./effects/EffectsChannelProcessData.h"
+#include "mixer/ChannelProcessData.h"
 #include "./Constants.h"
 #include "./AudioDeck.h"
 #include "ThreadStatics.h"
@@ -22,7 +22,7 @@
 
 namespace Gj {
 namespace Audio {
-constexpr size_t EffectsChannelsProcessData_RB_SIZE = MAX_EFFECTS_CHANNELS * sizeof(Effects::EffectsChannelProcessData);
+constexpr size_t EffectsChannelsProcessData_RB_SIZE = MAX_MIXER_CHANNELS * sizeof(Mixer::ChannelProcessData);
 
 struct AudioCore {
   long threadId;
@@ -63,22 +63,22 @@ struct AudioCore {
   jack_ringbuffer_t* playbackSettingsFromAudioThreadRB{nullptr};
   std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
-  size_t channelCount;
-  jack_ringbuffer_t* effectsChannelsProcessDataRB{};
-  std::array<Effects::EffectsChannelProcessData, MAX_EFFECTS_CHANNELS> effectsChannelsProcessData{};
-  float effectsChannelsSettings[MAX_EFFECTS_CHANNELS * 4]{0.0f};
-  jack_ringbuffer_t* effectsChannelsSettingsRB{nullptr};
-  float effectsChannelsWriteOutBuffer[2 * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_EFFECTS_CHANNELS]{0.0f};
-  float* effectsChannelsWriteOut[MAX_EFFECTS_CHANNELS][2]{nullptr};
+  size_t mixerChannelCount;
+  jack_ringbuffer_t* mixerChannelsProcessDataRB{};
+  std::array<Mixer::ChannelProcessData, MAX_MIXER_CHANNELS> mixerChannelsProcessData{};
+  float mixerChannelsSettings[MAX_MIXER_CHANNELS * 4]{0.0f};
+  jack_ringbuffer_t* mixerChannelsSettingsRB{nullptr};
+  float mixerChannelsWriteOutBuffer[2 * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_MIXER_CHANNELS]{0.0f};
+  float* mixerChannelsWriteOut[MAX_MIXER_CHANNELS][2]{nullptr};
 
   AudioCore(AppState* gAppState)
   : gAppState(gAppState)
     , fft_eq_ring_buffer(jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE))
-    , vu_ring_buffer(jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS))
+    , vu_ring_buffer(jack_ringbuffer_create(2 * MAX_MIXER_CHANNELS))
     , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE))
     , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE))
-    , effectsChannelsSettingsRB(jack_ringbuffer_create(EffectsSettings_RB_SIZE))
-    , effectsChannelsProcessDataRB(jack_ringbuffer_create(EffectsChannelsProcessData_RB_SIZE)) {
+    , mixerChannelsSettingsRB(jack_ringbuffer_create(EffectsSettings_RB_SIZE))
+    , mixerChannelsProcessDataRB(jack_ringbuffer_create(EffectsChannelsProcessData_RB_SIZE)) {
     Logging::write(
       Info,
       "Audio::AudioCore::AudioCore()",
@@ -102,7 +102,7 @@ struct AudioCore {
 
     jack_ringbuffer_free(fft_eq_ring_buffer);
     jack_ringbuffer_free(vu_ring_buffer);
-    jack_ringbuffer_free(effectsChannelsSettingsRB);
+    jack_ringbuffer_free(mixerChannelsSettingsRB);
     jack_ringbuffer_free(playbackSettingsToAudioThreadRB);
     jack_ringbuffer_free(playbackSettingsFromAudioThreadRB);
 
@@ -144,9 +144,9 @@ struct AudioCore {
     playbackBuffers[0] = &playbackBuffersBuffer[0];
     playbackBuffers[1] = &playbackBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX];
 
-    for (ChannelIndex i = 0; i < MAX_EFFECTS_CHANNELS; i++) {
-      effectsChannelsWriteOut[i][0] = &effectsChannelsWriteOutBuffer[2 * i * AUDIO_FRAMES_PER_BUFFER_MAX];
-      effectsChannelsWriteOut[i][1] = &effectsChannelsWriteOutBuffer[(2 * i + 1) * AUDIO_FRAMES_PER_BUFFER_MAX];
+    for (ChannelIndex i = 0; i < MAX_MIXER_CHANNELS; i++) {
+      mixerChannelsWriteOut[i][0] = &mixerChannelsWriteOutBuffer[2 * i * AUDIO_FRAMES_PER_BUFFER_MAX];
+      mixerChannelsWriteOut[i][1] = &mixerChannelsWriteOutBuffer[(2 * i + 1) * AUDIO_FRAMES_PER_BUFFER_MAX];
     }
 
     return OK;
@@ -301,7 +301,7 @@ struct AudioCore {
   }
 
   Result setChannelCount(const ChannelIndex val) {
-    channelCount = val;
+    mixerChannelCount = val;
     return OK;
   }
 
@@ -389,7 +389,7 @@ struct AudioCore {
   }
 
   Result clearBuffers() {
-    std::fill_n(effectsChannelsWriteOutBuffer, 2 * MAX_EFFECTS_CHANNELS * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
+    std::fill_n(mixerChannelsWriteOutBuffer, 2 * MAX_MIXER_CHANNELS * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
     std::fill_n(playbackBuffersBuffer, 2 * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
     std::fill_n(processBuffersBuffer, 2 * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
 

@@ -26,73 +26,79 @@
 #include <jack/ringbuffer.h>
 
 #include "../../../audio/Constants.h"
-#include "../../../audio/Mixer.h"
+#include "../../../audio/mixer/Core.h"
 #include "../../../enums/PlayState.h"
 #include "../../../enums/Result.h"
 
 namespace Gj {
 namespace Gui {
-
-  constexpr int EG_GRAPH_TRIM = 125;
-  constexpr int EG_GRAPH_AVG_SIZE = 6;
+constexpr int EG_GRAPH_TRIM = 125;
+constexpr int EG_GRAPH_AVG_SIZE = 6;
 
 class EqGraph final : public QOpenGLWidget, protected QOpenGLFunctions {
+public:
+  EqGraph(QWidget* parent, Audio::Mixer::Core* mixer);
 
-  public:
-    EqGraph(QWidget* parent, Audio::Mixer* mixer);
-    ~EqGraph();
-    void setEqRingBuffer(jack_ringbuffer_t* eqRingBuffer);
-    Result hydrateState(const AppStatePacket& appStatePacket);
+  ~EqGraph();
 
-  private slots:
-    void animationLoop();
+  void setEqRingBuffer(jack_ringbuffer_t* eqRingBuffer);
 
-  private:
-    bool running = false;
-    int h = 126;
-    int w = Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM;
-    int maxBarH = 30;
-    float maxBarHf = 30.0f;
-    Audio::Mixer* mixer;
-    jack_ringbuffer_t* eqRingBuffer;
-    float eqBuffer[Audio::FFT_EQ_RING_BUFFER_SIZE]{ 0.0f };
-    std::atomic<int> avgIndex = 0;
-    float barHeightBufferAvg[EG_GRAPH_AVG_SIZE][Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM]{ 0.0f };
-    std::atomic<float> barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM]{ 0.0f };
-    float vertices[(Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM) * 6] { 0.0f };
+  Result hydrateState(const AppStatePacket& appStatePacket);
 
-    int colorLocation;
-    std::atomic<int> colorIndex = 0;
-    std::atomic<int> backgroundColorIndex = 4;
-    std::vector<QColor> colors = {
-      QColor(0, 197, 170, 255),
-      QColor(255, 0, 255, 255),
-      QColor(24, 147, 224, 255),
-      QColor(255, 255, 255, 255),
-      QColor(0, 0, 0, 255),
-    };
+private slots:
+  void animationLoop();
 
-    std::atomic<bool> stopEqWorkerThread = false;
-    std::thread eqWorkerThread;
-    QTimer animationTimer;
-    GLuint vao, vbo;
-    QOpenGLShaderProgram* program;
+private:
+  bool running = false;
+  int h = 126;
+  int w = Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM;
+  int maxBarH = 30;
+  float maxBarHf = 30.0f;
+  Audio::Mixer::Core* mixer;
+  jack_ringbuffer_t* eqRingBuffer;
+  float eqBuffer[Audio::FFT_EQ_RING_BUFFER_SIZE]{0.0f};
+  std::atomic<int> avgIndex = 0;
+  float barHeightBufferAvg[EG_GRAPH_AVG_SIZE][Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM]{0.0f};
+  std::atomic<float> barHeightBuffer[Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM]{0.0f};
+  float vertices[(Audio::FFT_EQ_FREQ_SIZE - 2 * EG_GRAPH_TRIM) * 6]{0.0f};
 
-    void animationStart();
-    void animationStop();
+  int colorLocation;
+  std::atomic<int> colorIndex = 0;
+  std::atomic<int> backgroundColorIndex = 4;
+  std::vector<QColor> colors = {
+    QColor(0, 197, 170, 255),
+    QColor(255, 0, 255, 255),
+    QColor(24, 147, 224, 255),
+    QColor(255, 255, 255, 255),
+    QColor(0, 0, 0, 255),
+  };
 
-    void setStyle();
-    void mousePressEvent(QMouseEvent* event) override;
-    void initializeGL() override;
-    void paintGL() override;
-    void resizeGL(int w, int h) override;
-    void startWorker();
-    void stopWorker();
+  std::atomic<bool> stopEqWorkerThread = false;
+  std::thread eqWorkerThread;
+  QTimer animationTimer;
+  GLuint vao, vbo;
+  QOpenGLShaderProgram* program;
+
+  void animationStart();
+
+  void animationStop();
+
+  void setStyle();
+
+  void mousePressEvent(QMouseEvent* event) override;
+
+  void initializeGL() override;
+
+  void paintGL() override;
+
+  void resizeGL(int w, int h) override;
+
+  void startWorker();
+
+  void stopWorker();
 };
-
 } // Gui
 } // Gj
-
 
 
 #endif //EQGRAPH_H

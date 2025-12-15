@@ -20,7 +20,7 @@
 #include "../../../messaging/atoms.h"
 #include "../../../messaging/EnvelopeQtPtr.h"
 #include "../../../enums/PlayState.h"
-#include "../../../audio/Mixer.h"
+#include "../../../audio/mixer/Core.h"
 #include "../../Color.h"
 
 #include "TransportControlButton.h"
@@ -29,38 +29,38 @@
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class TransportControl final : public QWidget {
-  public:
-    TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer* mixer);
-    int hydrateState(const AppStatePacket& appStatePacket);
-    void setPlayState(PlayState state);
+public:
+  TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer::Core* mixer);
 
-  private:
-    actor_system& sys;
-    PlayState playState;
-    QGridLayout grid;
+  int hydrateState(const AppStatePacket& appStatePacket);
 
-    ProgressBar progressBar;
-    PlaybackSpeedSlider playbackSpeedSlider;
-    TransportControlButton playButton;
-    TransportControlButton pauseButton;
-    TransportControlButton stopButton;
-    TransportControlButton rwButton;
-    TransportControlButton ffButton;
-    QAction playTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay), "", this};
-    QAction pauseTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause), "", this};
-    QAction stopTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop), "", this};
-    QAction rwTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipBackward), "", this};
-    QAction ffTrigAction {style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipForward), "", this};
+  void setPlayState(PlayState state);
 
-    void connectActions();
-    void setupGrid();
+private:
+  actor_system& sys;
+  PlayState playState;
+  QGridLayout grid;
+
+  ProgressBar progressBar;
+  PlaybackSpeedSlider playbackSpeedSlider;
+  TransportControlButton playButton;
+  TransportControlButton pauseButton;
+  TransportControlButton stopButton;
+  TransportControlButton rwButton;
+  TransportControlButton ffButton;
+  QAction playTrigAction{style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay), "", this};
+  QAction pauseTrigAction{style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause), "", this};
+  QAction stopTrigAction{style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop), "", this};
+  QAction rwTrigAction{style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipBackward), "", this};
+  QAction ffTrigAction{style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipForward), "", this};
+
+  void connectActions();
+
+  void setupGrid();
 };
-
-
 } // Gui
 } // Gj
 

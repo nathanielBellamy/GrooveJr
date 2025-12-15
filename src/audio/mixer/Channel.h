@@ -10,8 +10,8 @@
 #include <optional>
 #include <string>
 
-#include "./vst3/Plugin.h"
-#include "../ChannelSettings.h"
+#include "../effects/vst3/Plugin.h"
+#include "ChannelSettings.h"
 #include "../../AppState.h"
 #include "../../enums/Result.h"
 #include "../../db/entity/mixer/Plugin.h"
@@ -22,7 +22,7 @@
 
 namespace Gj {
 namespace Audio {
-namespace Effects {
+namespace Mixer {
 class Channel {
   // NOTE:
   // fx0:inputBuffers->buffersA, fx1:buffersA->buffersB, fx2:buffersB->buffersA, fx3:buffersA->buffersB, ...
@@ -32,7 +32,7 @@ class Channel {
   ChannelIndex index;
   AtomicStr name{"Channel"};
 
-  std::optional<Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {std::nullopt};
+  std::optional<Effects::Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {std::nullopt};
 
 public:
   ChannelSettings settings;
@@ -66,7 +66,7 @@ public:
   ChannelIndex getIndex() const { return index; }
 
   [[nodiscard]]
-  std::optional<Vst3::Plugin*> getPluginAtIdx(const PluginIndex idx) const {
+  std::optional<Effects::Vst3::Plugin*> getPluginAtIdx(const PluginIndex idx) const {
     if (idx > MAX_PLUGINS_PER_CHANNEL)
       return std::nullopt;
 
@@ -298,7 +298,7 @@ public:
     };
   }
 };
-} // Effects
+} // Mixer
 } // Audio
 } // Gj
 

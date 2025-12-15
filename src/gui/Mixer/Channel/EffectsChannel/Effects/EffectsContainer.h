@@ -19,47 +19,51 @@
 #include "VstWindow.h"
 #include "VstWindowSelectButton.h"
 #include "../AddPluginButton.h"
-#include "../../../../../audio/Mixer.h"
+#include "../../../../../audio/mixer/Core.h"
 #include "../../../../../Logging.h"
 #include "../../../../../types/AtomicStr.h"
 #include "../../../../../types/Types.h"
 
 namespace Gj {
 namespace Gui {
-
 class EffectsContainer final : public QWidget {
+public:
+  EffectsContainer(
+    QWidget* parent,
+    Audio::Mixer::Core* mixer,
+    ChannelIndex channelIndex,
+    QAction* addEffectAction,
+    QAction* removeEffectAction
+  );
 
-  public:
-    EffectsContainer(
-      QWidget* parent,
-      Audio::Mixer* mixer,
-      ChannelIndex channelIndex,
-      QAction* addEffectAction,
-      QAction* removeEffectAction
-    );
-    ~EffectsContainer() override;
-    void addEffect(PluginIndex newEffectIndex, const AtomicStr& pluginName);
+  ~EffectsContainer() override;
 
-  private:
-    Audio::Mixer* mixer;
-    ChannelIndex channelIndex;
-    QAction* addPluginAction;
-    AddPluginButton addPluginButton;
-    QAction* removePluginAction;
-    QGridLayout grid;
-    std::vector<std::shared_ptr<VstWindow>> vstWindows {};
-    QAction selectVstWindowAction;
-    std::vector<VstWindowSelectButton*> vstWindowSelectButtons {};
-    std::vector<QLabel*> vstWindowSelectLabels {};
+  void addEffect(PluginIndex newEffectIndex, const AtomicStr& pluginName);
 
-    void connectActions();
-    void clearButtonsAndLabels();
-    void setupGrid();
-    void setStyle();
-    void showEvent(QShowEvent *event) override;
-    void hideEvent(QHideEvent *event) override;
+private:
+  Audio::Mixer::Core* mixer;
+  ChannelIndex channelIndex;
+  QAction* addPluginAction;
+  AddPluginButton addPluginButton;
+  QAction* removePluginAction;
+  QGridLayout grid;
+  std::vector<std::shared_ptr<VstWindow> > vstWindows{};
+  QAction selectVstWindowAction;
+  std::vector<VstWindowSelectButton*> vstWindowSelectButtons{};
+  std::vector<QLabel*> vstWindowSelectLabels{};
+
+  void connectActions();
+
+  void clearButtonsAndLabels();
+
+  void setupGrid();
+
+  void setStyle();
+
+  void showEvent(QShowEvent* event) override;
+
+  void hideEvent(QHideEvent* event) override;
 };
-
 } // Gui
 } // Gj
 

@@ -72,20 +72,20 @@ add_library(GjAudio SHARED
         ThreadStatics.h
         ThreadStatics.cpp
         Math.h
-        Mixer.h
-        Mixer.cpp
         JackClient.h
         JackClient.cpp
-        ChannelSettings.h
         Logging.h
         Logging.cpp
         Constants.h
         effects/vst3/Plugin.h
         effects/vst3/Plugin.cpp
         effects/vst3/Util.h
-        effects/Channel.h
-        effects/Channel.cpp
-        effects/EffectsChannelProcessData.h
+        mixer/ChannelProcessData.h
+        mixer/Channel.h
+        mixer/Channel.cpp
+        mixer/ChannelSettings.h
+        mixer/Core.h
+        mixer/Core.cpp
 )
 target_compile_options(GjAudio PRIVATE ${INCLUDE_FLAGS})
 add_definitions(-DQT_NO_VERSION_TAGGING)

@@ -22,7 +22,7 @@
 #include "./MusicLibraryManager.h"
 
 #include "../gui/MainWindow.h"
-#include "../audio/Mixer.h"
+#include "../audio/mixer/Core.h"
 #include "../audio/AudioCore.h"
 
 using namespace caf;
@@ -46,7 +46,7 @@ struct SupervisorState {
   SupervisorState(
     Supervisor::pointer self,
     AppState* gAppState,
-    Audio::Mixer* mixer,
+    Audio::Mixer::Core* mixer,
     Audio::AudioCore* audioCore,
     void (*shutdown_handler)(int)
   )

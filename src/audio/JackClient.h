@@ -23,7 +23,9 @@
 namespace Gj {
 namespace Audio {
 // forward decl
-class Mixer;
+namespace Mixer {
+class Core;
+} // Mixer
 
 using namespace Steinberg::Vst;
 
@@ -36,7 +38,7 @@ public:
   using JackPorts = std::vector<jack_port_t*>;
   using JackName = std::string;
 
-  explicit JackClient(Mixer* mixer);
+  explicit JackClient(Mixer::Core* mixer);
 
   ~JackClient() override;
 
@@ -59,7 +61,7 @@ public:
 
   //--------------------------------------------------------------------
 private:
-  Mixer* mixer;
+  Mixer::Core* mixer;
 
   // Jack objects
   jack_client_t* jackClient = nullptr;

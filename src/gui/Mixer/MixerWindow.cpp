@@ -6,7 +6,7 @@
 
 namespace Gj {
 namespace Gui {
-MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer)
+MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer)
 : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
@@ -140,7 +140,7 @@ void MixerWindow::connectActions() {
   auto muteChannelConnection = connect(&muteChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = muteChannelAction.data().toULongLong();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
       const float newMute = channel->toggleMute();
       if (channelIdx == 0) {
         mainChannelContainer.setMute(newMute);
@@ -160,7 +160,7 @@ void MixerWindow::connectActions() {
   auto muteLChannelConnection = connect(&muteLChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = muteLChannelAction.data().toULongLong();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
       const float newMute = channel->toggleMuteL();
       if (channelIdx == 0) {
         mainChannelContainer.setMuteL(newMute);
@@ -180,7 +180,7 @@ void MixerWindow::connectActions() {
   auto muteRChannelConnection = connect(&muteRChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = muteRChannelAction.data().toULongLong();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
       const float newMute = channel->toggleMuteR();
       if (channelIdx == 0) {
         mainChannelContainer.setMuteR(newMute);
@@ -200,7 +200,7 @@ void MixerWindow::connectActions() {
   auto soloChannelConnection = connect(&soloChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = soloChannelAction.data().toULongLong();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
       const float newSolo = channel->toggleSolo();
       if (channelIdx == 0) {
         mainChannelContainer.setSolo(newSolo);
@@ -220,7 +220,7 @@ void MixerWindow::connectActions() {
   auto soloLChannelConnection = connect(&soloLChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = soloLChannelAction.data().toULongLong();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
       const float newSolo = channel->toggleSoloL();
       if (channelIdx == 0) {
         mainChannelContainer.setSoloL(newSolo);
@@ -240,7 +240,7 @@ void MixerWindow::connectActions() {
   auto soloRChannelConnection = connect(&soloRChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = soloRChannelAction.data().toInt();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
       if (const auto channel = mixer->getChannel(channelIdx); channel) {
         const float newSolo = channel.value()->toggleSoloR();
         if (channelIdx == 0) {

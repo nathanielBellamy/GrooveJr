@@ -22,7 +22,7 @@
 #include "../../../Shared/VstSelect.h"
 #include "../../../../actors/ActorIds.h"
 #include "../../../../messaging/atoms.h"
-#include "../../../../audio/Mixer.h"
+#include "../../../../audio/mixer/Core.h"
 #include "../../../Color.h"
 
 using namespace caf;
@@ -33,7 +33,7 @@ class PluginSlot final : public QWidget {
 public:
   PluginSlot(QWidget* parent,
              actor_system& actorSystem,
-             Audio::Mixer* mixer,
+             Audio::Mixer::Core* mixer,
              ChannelIndex channelIndex,
              PluginIndex effectIndex,
              bool occupied,
@@ -46,7 +46,7 @@ public:
 
 private:
   actor_system& actorSystem;
-  Audio::Mixer* mixer;
+  Audio::Mixer::Core* mixer;
   ChannelIndex channelIndex;
   PluginIndex pluginIndex;
   bool occupied;

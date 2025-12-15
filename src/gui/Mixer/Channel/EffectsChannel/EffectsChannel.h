@@ -22,7 +22,7 @@
 
 #include "../../../../AppState.h"
 
-#include "../../../../audio/Mixer.h"
+#include "../../../../audio/mixer/Core.h"
 #include "../../../../audio/Math.h"
 #include "PluginSlots.h"
 #include "MuteSoloContainer.h"
@@ -38,83 +38,103 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
-
 class EffectsChannel final : public QWidget {
+public:
+  EffectsChannel(
+    QWidget* parent,
+    actor_system& actorSystem,
+    Audio::Mixer::Core* mixer,
+    ChannelIndex channelIndex,
+    QAction* removeEffectsChannelAction,
+    QAction* muteChannelAction,
+    QAction* muteLChannelAction,
+    QAction* muteRChannelAction,
+    QAction* soloChannelAction,
+    QAction* soloLChannelAction,
+    QAction* soloRChannelAction,
+    std::atomic<float>* vuPtr
+  );
 
-  public:
-    EffectsChannel(
-      QWidget* parent,
-      actor_system& actorSystem,
-      Audio::Mixer* mixer,
-      ChannelIndex channelIndex,
-      QAction* removeEffectsChannelAction,
-      QAction* muteChannelAction,
-      QAction* muteLChannelAction,
-      QAction* muteRChannelAction,
-      QAction* soloChannelAction,
-      QAction* soloLChannelAction,
-      QAction* soloRChannelAction,
-      std::atomic<float>* vuPtr
-    );
-    ~EffectsChannel() override;
-    void hydrateState(const AppStatePacket& appStatePacket, ChannelIndex newChannelIndex);
-    void updateShowRemoveEffectsChannelButton(bool val);
-    void setMute(float val);
-    void setMuteL(float val);
-    void setMuteR(float val);
-    void setSolo(float val);
-    void setSoloL(float val);
-    void setSoloR(float val);
-    void setEffects();
-    void addPlugin(std::optional<PluginIndex> pluginIndex);
-    ChannelIndex channelIndex;
+  ~EffectsChannel() override;
 
-  private:
-    actor_system& actorSystem;
-    strong_actor_ptr appStateManagerPtr;
-    Audio::Mixer* mixer;
-    std::atomic<float>* vuPtr;
-    VuMeter vuMeter;
-    QAction* removeEffectsChannelAction;
-    RemoveEffectsChannelButton removeEffectsChannelButton;
-    QAction addPluginAction;
-    AddPluginButton addPluginButton;
-    QAction openEffectsContainer;
-    VstSelect vstSelect;
-    QUrl vstUrl;
-    QAction replacePluginAction;
-    QAction removePluginAction;
-    EffectsContainer effectsContainer;
-    QGridLayout grid;
-    QLabel title;
-    QSlider gainSlider;
-    QLabel  gainLabel;
-    QSlider gainLSlider;
-    QLabel  gainLLabel;
-    QSlider gainRSlider;
-    QLabel  gainRLabel;
-    QSlider panSlider;
-    QLabel  panLabel;
-    QSlider panLSlider;
-    QLabel  panLLabel;
-    QSlider panRSlider;
-    QLabel  panRLabel;
-    QScrollArea effectsSlotsScrollArea;
-    PluginSlots effectsSlots;
-    MuteSoloContainer muteSoloContainer;
-    void setStyle();
-    void setupGrid();
-    void setupTitle();
-    void setupGainSlider(float gain);
-    void setupGainLSlider(float gainL);
-    void setupGainRSlider(float gainR);
-    void setupPanSlider(float pan);
-    void setupPanLSlider(float panL);
-    void setupPanRSlider(float panR);
-    void connectActions();
-    void setupEffectsSlotsScrollArea();
+  void hydrateState(const AppStatePacket& appStatePacket, ChannelIndex newChannelIndex);
+
+  void updateShowRemoveEffectsChannelButton(bool val);
+
+  void setMute(float val);
+
+  void setMuteL(float val);
+
+  void setMuteR(float val);
+
+  void setSolo(float val);
+
+  void setSoloL(float val);
+
+  void setSoloR(float val);
+
+  void setEffects();
+
+  void addPlugin(std::optional<PluginIndex> pluginIndex);
+
+  ChannelIndex channelIndex;
+
+private:
+  actor_system& actorSystem;
+  strong_actor_ptr appStateManagerPtr;
+  Audio::Mixer::Core* mixer;
+  std::atomic<float>* vuPtr;
+  VuMeter vuMeter;
+  QAction* removeEffectsChannelAction;
+  RemoveEffectsChannelButton removeEffectsChannelButton;
+  QAction addPluginAction;
+  AddPluginButton addPluginButton;
+  QAction openEffectsContainer;
+  VstSelect vstSelect;
+  QUrl vstUrl;
+  QAction replacePluginAction;
+  QAction removePluginAction;
+  EffectsContainer effectsContainer;
+  QGridLayout grid;
+  QLabel title;
+  QSlider gainSlider;
+  QLabel gainLabel;
+  QSlider gainLSlider;
+  QLabel gainLLabel;
+  QSlider gainRSlider;
+  QLabel gainRLabel;
+  QSlider panSlider;
+  QLabel panLabel;
+  QSlider panLSlider;
+  QLabel panLLabel;
+  QSlider panRSlider;
+  QLabel panRLabel;
+  QScrollArea effectsSlotsScrollArea;
+  PluginSlots effectsSlots;
+  MuteSoloContainer muteSoloContainer;
+
+  void setStyle();
+
+  void setupGrid();
+
+  void setupTitle();
+
+  void setupGainSlider(float gain);
+
+  void setupGainLSlider(float gainL);
+
+  void setupGainRSlider(float gainR);
+
+  void setupPanSlider(float pan);
+
+  void setupPanLSlider(float panL);
+
+  void setupPanRSlider(float panR);
+
+  void connectActions();
+
+  void setupEffectsSlotsScrollArea();
 };
-
 } // Gui
 } // Gj
 

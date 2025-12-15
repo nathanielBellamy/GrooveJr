@@ -6,11 +6,9 @@
 
 namespace Gj {
 namespace Gui {
-
-PlaybackSpeedSlider::PlaybackSpeedSlider(QWidget* parent, Audio::Mixer* mixer)
-  : QSlider(Qt::Horizontal, parent)
-  , mixer(mixer)
-  {
+PlaybackSpeedSlider::PlaybackSpeedSlider(QWidget* parent, Audio::Mixer::Core* mixer)
+: QSlider(Qt::Horizontal, parent)
+  , mixer(mixer) {
   setMinimum(-200);
   setMaximum(200);
   setTickInterval(1);
@@ -25,6 +23,5 @@ PlaybackSpeedSlider::PlaybackSpeedSlider(QWidget* parent, Audio::Mixer* mixer)
 void PlaybackSpeedSlider::mouseDoubleClickEvent(QMouseEvent* event) {
   setValue(100);
 }
-
 } // Gui
 } // Gj

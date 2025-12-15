@@ -15,7 +15,7 @@
 
 #include "AudioCore.h"
 #include "Constants.h"
-#include "Mixer.h"
+#include "mixer/Core.h"
 #include "ThreadStatics.h"
 #include "BufferIndeces.h"
 
@@ -33,7 +33,7 @@ struct AudioPlayer {
 
   AudioCore* audioCore;
 
-  Mixer* mixer;
+  Mixer::Core* mixer;
 
   AppState* gAppState;
 
@@ -41,7 +41,7 @@ struct AudioPlayer {
 
   bool jackClientIsActive = false;
 
-  float effectsChannelsSettings[2 * MAX_EFFECTS_CHANNELS]{};
+  float mixerChannelsSettings[2 * MAX_MIXER_CHANNELS]{};
 
   sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
 
@@ -55,9 +55,9 @@ struct AudioPlayer {
 
   jack_ringbuffer_t* vu_ring_buffer_out;
 
-  Effects::EffectsChannelProcessData effectsChannelsProcessData[MAX_EFFECTS_CHANNELS]{};
+  Mixer::ChannelProcessData mixerChannelsProcessData[MAX_MIXER_CHANNELS]{};
 
-  AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer* mixer, AppState* gAppState)
+  AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer::Core* mixer, AppState* gAppState)
   : threadId(ThreadStatics::incrThreadId())
     , actorSystem(actorSystem)
     , audioCore(audioCore)
@@ -140,7 +140,7 @@ struct AudioPlayer {
       return 1;
     }
 
-    // update plugin effects with info about audio to be processed
+    // update plugins with info about audio to be processed
     const SF_INFO sfInfo = audioCore->currentDeck().decoratedAudioFile->audioFile.sfInfo;
     if (mixer->setSampleRate(sfInfo.samplerate) != OK)
       Logging::write(
@@ -167,14 +167,14 @@ struct AudioPlayer {
     );
 
     audioCore->setChannelCount(mixer->getTotalChannelsCount());
-    mixer->forEachChannel([this](Effects::Channel* ch, ChannelIndex chIndex) {
-      audioCore->effectsChannelsProcessData[chIndex].pluginCount = ch->pluginCount();
+    mixer->forEachChannel([this](Mixer::Channel* ch, ChannelIndex chIndex) {
+      audioCore->mixerChannelsProcessData[chIndex].pluginCount = ch->pluginCount();
       for (PluginIndex pluginIdx = 0; pluginIdx < ch->pluginCount(); pluginIdx++) {
         const auto pluginOpt = ch->getPluginAtIdx(pluginIdx);
         if (!pluginOpt.has_value())
           continue;
 
-        audioCore->effectsChannelsProcessData[chIndex].processFuncs[pluginIdx] =
+        audioCore->mixerChannelsProcessData[chIndex].processFuncs[pluginIdx] =
             [audioClient = pluginOpt.value()->audioHost->audioClient](auto&& buffers, auto&& continuousFrames) {
               return audioClient->process(
                 std::forward<decltype(buffers)>(buffers),
@@ -182,7 +182,7 @@ struct AudioPlayer {
               );
             };
 
-        audioCore->effectsChannelsProcessData[chIndex].buffers[pluginIdx] =
+        audioCore->mixerChannelsProcessData[chIndex].buffers[pluginIdx] =
             getPluginBuffers(ch, pluginIdx);
       }
     });
@@ -197,7 +197,7 @@ struct AudioPlayer {
   }
 
   IAudioClient::Buffers getPluginBuffers(
-    const Effects::Channel* effectsChannel,
+    const Mixer::Channel* channel,
     const PluginIndex pluginIdx
   ) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
@@ -206,7 +206,7 @@ struct AudioPlayer {
     // - the channels are then summed down into the processBuffers
     // - the main channel then acts upon the processBuffers
 
-    if (effectsChannel->getIndex() == 0) // main
+    if (channel->getIndex() == 0) // main
       // all plugins on main operate on process
       return {
         audioCore->processBuffers,
@@ -217,8 +217,8 @@ struct AudioPlayer {
       };
 
     // non-main channel from here on
-    const auto effectCount = effectsChannel->pluginCount();
-    const auto writeOut = const_cast<float**>(audioCore->effectsChannelsWriteOut[effectsChannel->getIndex()]);
+    const auto effectCount = channel->pluginCount();
+    const auto writeOut = const_cast<float**>(audioCore->mixerChannelsWriteOut[channel->getIndex()]);
     if (effectCount == 1) {
       // single effect on non-main channel so goes from playbackBuffers to writeout
       return {
@@ -321,10 +321,10 @@ struct AudioPlayer {
     // -   mixer sets flag saying processing is good to go
     // -   audioThread re-instates processing
     // updateProcessDataRingBuffer()
-    if (jack_ringbuffer_write_space(audioCore->effectsChannelsProcessDataRB) > EffectsChannelsProcessData_RB_SIZE - 2)
+    if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > EffectsChannelsProcessData_RB_SIZE - 2)
       jack_ringbuffer_write(
-        audioCore->effectsChannelsProcessDataRB,
-        reinterpret_cast<char*>(effectsChannelsProcessData),
+        audioCore->mixerChannelsProcessDataRB,
+        reinterpret_cast<char*>(mixerChannelsProcessData),
         EffectsChannelsProcessData_RB_SIZE
       );
 
@@ -366,34 +366,34 @@ struct AudioPlayer {
     }
     const float channelCountF = static_cast<float>(channelCount);
 
-    Effects::Channel* effectsChannels[MAX_EFFECTS_CHANNELS]{nullptr};
-    float soloVals[MAX_EFFECTS_CHANNELS]{0.0f};
-    float soloLVals[MAX_EFFECTS_CHANNELS]{0.0f};
-    float soloRVals[MAX_EFFECTS_CHANNELS]{0.0f};
+    Mixer::Channel* channels[MAX_MIXER_CHANNELS]{nullptr};
+    float soloVals[MAX_MIXER_CHANNELS]{0.0f};
+    float soloLVals[MAX_MIXER_CHANNELS]{0.0f};
+    float soloRVals[MAX_MIXER_CHANNELS]{0.0f};
     bool soloEngaged = false;
 
     // TODO: mixer->forEachChannel
     // no solos on main
-    effectsChannels[0] = mixer->getChannel(0).value();
+    channels[0] = mixer->getChannel(0).value();
     for (ChannelIndex i = 1; i < channelCount; i++) {
-      effectsChannels[i] = mixer->getChannel(i).value();
-      soloVals[i] = effectsChannels[i]->getSolo();
-      soloLVals[i] = effectsChannels[i]->getSoloL();
-      soloRVals[i] = effectsChannels[i]->getSoloR();
+      channels[i] = mixer->getChannel(i).value();
+      soloVals[i] = channels[i]->getSolo();
+      soloLVals[i] = channels[i]->getSoloL();
+      soloRVals[i] = channels[i]->getSoloR();
       if (!soloEngaged && (soloVals[i] == 1.0f || soloLVals[i] == 1.0f || soloRVals[i] == 1.0f))
         soloEngaged = true;
     }
 
     // update buffer
     for (ChannelIndex chIdx = 0; chIdx < channelCount; chIdx++) {
-      const auto effectsChannel = effectsChannels[chIdx];
+      const auto channel = channels[chIdx];
       const bool isMain = chIdx == 0;
-      const float gain = effectsChannel->getGain();
-      const float gainL = effectsChannel->getGainL();
-      const float gainR = effectsChannel->getGainR();
-      const float mute = effectsChannel->getMute();
-      const float muteL = effectsChannel->getMuteL();
-      const float muteR = effectsChannel->getMuteR();
+      const float gain = channel->getGain();
+      const float gainL = channel->getGainL();
+      const float gainR = channel->getGainR();
+      const float mute = channel->getMute();
+      const float muteL = channel->getMuteL();
+      const float muteR = channel->getMuteR();
       const float solo = isMain // no solo on main
                            ? 1.0f
                            : soloEngaged
@@ -409,32 +409,32 @@ struct AudioPlayer {
                             : soloEngaged
                                 ? soloRVals[chIdx]
                                 : 1.0f;
-      const float pan = effectsChannel->getPan();
-      const float panL = effectsChannel->getPanL();
-      const float panR = effectsChannel->getPanR();
+      const float pan = channel->getPan();
+      const float panL = channel->getPanL();
+      const float panR = channel->getPanR();
 
-      effectsChannelsSettings[BfrIdx::ECS::factorLL(chIdx)] = AudioCore::factorLL(
+      mixerChannelsSettings[BfrIdx::ECS::factorLL(chIdx)] = AudioCore::factorLL(
         gain, gainL, gainR,
         mute, muteL, muteR,
         solo, soloL, soloR,
         pan, panL, panR,
         channelCountF
       );
-      effectsChannelsSettings[BfrIdx::ECS::factorLR(chIdx)] = AudioCore::factorLR(
+      mixerChannelsSettings[BfrIdx::ECS::factorLR(chIdx)] = AudioCore::factorLR(
         gain, gainL, gainR,
         mute, muteL, muteR,
         solo, soloL, soloR,
         pan, panL, panR,
         channelCountF
       );
-      effectsChannelsSettings[BfrIdx::ECS::factorRL(chIdx)] = AudioCore::factorRL(
+      mixerChannelsSettings[BfrIdx::ECS::factorRL(chIdx)] = AudioCore::factorRL(
         gain, gainL, gainR,
         mute, muteL, muteR,
         solo, soloL, soloR,
         pan, panL, panR,
         channelCountF
       );
-      effectsChannelsSettings[BfrIdx::ECS::factorRR(chIdx)] = AudioCore::factorRR(
+      mixerChannelsSettings[BfrIdx::ECS::factorRR(chIdx)] = AudioCore::factorRR(
         gain, gainL, gainR,
         mute, muteL, muteR,
         solo, soloL, soloR,
@@ -444,8 +444,8 @@ struct AudioPlayer {
     }
 
     // write to effectsSettings ring buffer
-    if (jack_ringbuffer_write_space(audioCore->effectsChannelsSettingsRB) >= EffectsSettings_RB_SIZE - 2) {
-      jack_ringbuffer_write(audioCore->effectsChannelsSettingsRB, reinterpret_cast<char*>(effectsChannelsSettings),
+    if (jack_ringbuffer_write_space(audioCore->mixerChannelsSettingsRB) >= EffectsSettings_RB_SIZE - 2) {
+      jack_ringbuffer_write(audioCore->mixerChannelsSettingsRB, reinterpret_cast<char*>(mixerChannelsSettings),
                             EffectsSettings_RB_SIZE);
     }
 
@@ -473,7 +473,7 @@ struct AudioPlayer {
     fft_eq_ring_buffer_out = jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE);
     mixer->getSetEqRingBufferFunc()(fft_eq_ring_buffer_out);
 
-    vu_ring_buffer_out = jack_ringbuffer_create(2 * MAX_EFFECTS_CHANNELS);
+    vu_ring_buffer_out = jack_ringbuffer_create(2 * MAX_MIXER_CHANNELS);
     mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
 
     return OK;

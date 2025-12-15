@@ -16,7 +16,7 @@
 
 #include "../../../AppState.h"
 #include "../../../enums/Result.h"
-#include "../../../audio/Mixer.h"
+#include "../../../audio/mixer/Core.h"
 #include "../../../actors/ActorIds.h"
 #include "../../../messaging/atoms.h"
 
@@ -25,13 +25,12 @@
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class Scenes final : public QWidget {
   actor_system& sys;
   AppState* gAppState;
-  Audio::Mixer* mixer;
+  Audio::Mixer::Core* mixer;
   QGridLayout grid;
   QLabel title;
   ScenesTableView* tableView = nullptr;
@@ -42,22 +41,23 @@ class Scenes final : public QWidget {
   QAction sceneLoadAction;
 
   void connectActions();
+
   void setupGrid();
+
   Result setStyle();
 
-  public:
-    Scenes(
-      QWidget* parent,
-      actor_system& sys,
-      AppState* gAppState,
-      Audio::Mixer* mixer,
-      SqlWorkerPool* sqlWorkerPool,
-      QAction* sceneLoadAction
-    );
-    Result hydrateState(const AppStatePacket& appStatePacket);
+public:
+  Scenes(
+    QWidget* parent,
+    actor_system& sys,
+    AppState* gAppState,
+    Audio::Mixer::Core* mixer,
+    SqlWorkerPool* sqlWorkerPool,
+    QAction* sceneLoadAction
+  );
+
+  Result hydrateState(const AppStatePacket& appStatePacket);
 };
-
-
 } // Gui
 } // Gj
 

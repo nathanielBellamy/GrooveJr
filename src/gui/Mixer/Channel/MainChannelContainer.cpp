@@ -6,11 +6,10 @@
 
 namespace Gj {
 namespace Gui {
-
 MainChannelContainer::MainChannelContainer(
   QWidget* parent,
   actor_system& actorSystem,
-  Audio::Mixer* mixer,
+  Audio::Mixer::Core* mixer,
   QAction* muteChannelAction,
   QAction* muteLChannelAction,
   QAction* muteRChannelAction,
@@ -18,8 +17,8 @@ MainChannelContainer::MainChannelContainer(
   QAction* soloLChannelAction,
   QAction* soloRChannelAction,
   std::atomic<float>* vuPtr
-  )
-  : QWidget(parent)
+)
+: QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , grid(this)
@@ -35,8 +34,7 @@ MainChannelContainer::MainChannelContainer(
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction,
     vuPtr
-  ))
-  {
+  )) {
   setupGrid();
   setStyle();
 
@@ -47,7 +45,7 @@ MainChannelContainer::MainChannelContainer(
   );
 }
 
-void MainChannelContainer::hydrateState(const AppStatePacket &appState) const {
+void MainChannelContainer::hydrateState(const AppStatePacket& appState) const {
   mainChannel->hydrateState(appState, 0);
 }
 
@@ -79,9 +77,9 @@ void MainChannelContainer::setChannel() {
   );
 
   mainChannel = std::make_unique<EffectsChannel>(this, actorSystem, mixer, 0, nullptr,
-    muteChannelAction, muteLChannelAction, muteRChannelAction,
-    soloChannelAction, soloLChannelAction, soloRChannelAction,
-    vuPtr
+                                                 muteChannelAction, muteLChannelAction, muteRChannelAction,
+                                                 soloChannelAction, soloLChannelAction, soloRChannelAction,
+                                                 vuPtr
   );
 
   setupGrid();
@@ -91,6 +89,5 @@ void MainChannelContainer::setChannel() {
     "Done setting channel."
   );
 }
-
 } // Gui
 } // Gj

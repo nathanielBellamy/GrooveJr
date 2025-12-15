@@ -10,7 +10,7 @@
 
 namespace Gj {
 namespace Audio {
-namespace Effects {
+namespace Mixer {
 using namespace Steinberg;
 
 Channel::Channel(
@@ -64,7 +64,7 @@ Channel::~Channel() {
 		"Destroying EffectsChannel: " + std::to_string(index)
 	);
 
-	if (forEachPlugin([this](const Vst3::Plugin* plugin, const PluginIndex) {
+	if (forEachPlugin([this](const Effects::Vst3::Plugin* plugin, const PluginIndex) {
 		delete plugin;
 	}) != OK)
 		Logging::write(
@@ -95,7 +95,7 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> effectIdxOpt, 
 		"Adding effect: " + pluginPath + " to channel " + std::to_string(index)
 	);
 
-	const auto plugin = new Vst3::Plugin(
+	const auto plugin = new Effects::Vst3::Plugin(
 		pluginPath,
 		gAppState,
 		jackClient
@@ -167,7 +167,7 @@ Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 		std::to_string(pluginEntity.pluginIndex)
 	);
 
-	const auto plugin = new Vst3::Plugin(pluginEntity, gAppState, jackClient);
+	const auto plugin = new Effects::Vst3::Plugin(pluginEntity, gAppState, jackClient);
 
 	Logging::write(
 		Info,
@@ -219,17 +219,18 @@ Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 
 Result Channel::setSampleRate(const double sampleRate) {
 	bool warning = false;
-	const Result setResult = forEachPlugin([this, &sampleRate, &warning](Vst3::Plugin* plugin, PluginIndex pluginIndex) {
-		if (!plugin->audioHost->audioClient->setSamplerate(sampleRate)) {
-			Logging::write(
-				Warning,
-				"Audio::EffectsChannel::setSampleRate",
-				"Unable to set Sample Rate of " + std::to_string(sampleRate) + " for plugin " + plugin->getName() +
-				" channelIndex " + std::to_string(index)
-			);
-			warning = true;
-		}
-	});
+	const Result setResult = forEachPlugin(
+		[this, &sampleRate, &warning](Effects::Vst3::Plugin* plugin, PluginIndex pluginIndex) {
+			if (!plugin->audioHost->audioClient->setSamplerate(sampleRate)) {
+				Logging::write(
+					Warning,
+					"Audio::EffectsChannel::setSampleRate",
+					"Unable to set Sample Rate of " + std::to_string(sampleRate) + " for plugin " + plugin->getName() +
+					" channelIndex " + std::to_string(index)
+				);
+				warning = true;
+			}
+		});
 
 	return warning || setResult != OK
 		       ? WARNING
@@ -239,17 +240,18 @@ Result Channel::setSampleRate(const double sampleRate) {
 Result Channel::setBlockSize(const jack_nframes_t blockSize) {
 	bool warning = false;
 	const auto blockSize32 = static_cast<int32>(blockSize);
-	const auto setResult = forEachPlugin([this, &blockSize32, &warning](Vst3::Plugin* plugin, PluginIndex pluginIndex) {
-		if (!plugin->audioHost->audioClient->setBlockSize(blockSize32)) {
-			Logging::write(
-				Warning,
-				"Audio::EffectsChannel::setBlockSize",
-				"Unable to set Block Size of " + std::to_string(blockSize32) + " + for plugin " + plugin->getName() +
-				" channelIndex " + std::to_string(index)
-			);
-			warning = true;
-		}
-	});
+	const auto setResult = forEachPlugin(
+		[this, &blockSize32, &warning](Effects::Vst3::Plugin* plugin, PluginIndex pluginIndex) {
+			if (!plugin->audioHost->audioClient->setBlockSize(blockSize32)) {
+				Logging::write(
+					Warning,
+					"Audio::EffectsChannel::setBlockSize",
+					"Unable to set Block Size of " + std::to_string(blockSize32) + " + for plugin " + plugin->getName() +
+					" channelIndex " + std::to_string(index)
+				);
+				warning = true;
+			}
+		});
 	return warning || setResult != OK
 		       ? WARNING
 		       : OK;
@@ -259,7 +261,7 @@ Result Channel::setBlockSize(const jack_nframes_t blockSize) {
 PluginIndex Channel::pluginCount() const {
 	PluginIndex res = 0;
 
-	std::for_each(std::begin(plugins), std::end(plugins), [&res](std::optional<Vst3::Plugin*> plugin) {
+	std::for_each(std::begin(plugins), std::end(plugins), [&res](std::optional<Effects::Vst3::Plugin*> plugin) {
 		if (plugin)
 			res++;
 	});
@@ -273,7 +275,7 @@ Result Channel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow
 		"Audio::EffectsChannel::initEditorHosts",
 		"Initializing Editor Hosts on channel " + std::to_string(index)
 	);
-	return forEachPlugin([this, &vstWindows](Vst3::Plugin* plugin, const PluginIndex pluginIndex) {
+	return forEachPlugin([this, &vstWindows](Effects::Vst3::Plugin* plugin, const PluginIndex pluginIndex) {
 		plugin->initEditorHost(vstWindows.at(pluginIndex));
 	});
 }
@@ -292,7 +294,7 @@ Result Channel::terminateEditorHosts() {
 		"Terminating Editor Hosts on channel " + std::to_string(index)
 	);
 
-	if (forEachPlugin([this](const Vst3::Plugin* plugin, const PluginIndex) {
+	if (forEachPlugin([this](const Effects::Vst3::Plugin* plugin, const PluginIndex) {
 		plugin->terminateEditorHost();
 	}) != OK) {
 		Logging::write(
@@ -334,6 +336,6 @@ Result Channel::removePlugin(const PluginIndex pluginIdx) {
 
 	return OK;
 }
-} // Effects
+} // Mixer
 } // Audio
 } // Gj

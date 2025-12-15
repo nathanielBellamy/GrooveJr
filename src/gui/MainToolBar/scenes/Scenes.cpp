@@ -6,15 +6,14 @@
 
 namespace Gj {
 namespace Gui {
-
 Scenes::Scenes(
   QWidget* parent,
   actor_system& sys,
   AppState* gAppState,
-  Audio::Mixer* mixer,
+  Audio::Mixer::Core* mixer,
   SqlWorkerPool* sqlWorkerPool,
   QAction* sceneLoadAction)
-  : QWidget(parent)
+: QWidget(parent)
   , sys(sys)
   , mixer(mixer)
   , grid(this)
@@ -23,9 +22,7 @@ Scenes::Scenes(
   , sceneNewButton(this, &sceneNewAction, QString("New"))
   , sceneSaveAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSave), tr("&Save"), this)
   , sceneSaveButton(this, &sceneSaveAction, QString("Save"))
-  , sceneLoadAction(sceneLoadAction)
-  {
-
+  , sceneLoadAction(sceneLoadAction) {
   tableView = new ScenesTableView(
     this,
     sys,
@@ -85,6 +82,5 @@ void Scenes::connectActions() {
 Result Scenes::hydrateState(const AppStatePacket& appStatePacket) {
   return OK;
 }
-
 } // Gui
 } // Gj

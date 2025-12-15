@@ -8,7 +8,7 @@ namespace Gj {
 namespace Gui {
 EffectsContainer::EffectsContainer(
   QWidget* parent,
-  Audio::Mixer* mixer,
+  Audio::Mixer::Core* mixer,
   const ChannelIndex channelIndex,
   QAction* addEffectAction,
   QAction* removeEffectAction

@@ -7,10 +7,11 @@
 
 #include <atomic>
 
-#include "../db/entity/mixer/ChannelEntity.h"
+#include "../../db/entity/mixer/ChannelEntity.h"
 
 namespace Gj {
 namespace Audio {
+namespace Mixer {
 struct ChannelSettings {
   std::atomic<float> gain = {1.0f};
   std::atomic<float> mute = {0.0f};
@@ -26,6 +27,7 @@ struct ChannelSettings {
   std::atomic<float> panL = {-1.0f};
   std::atomic<float> panR = {1.0f};
 };
+} // Mixer
 } // Db
 } // Gj
 

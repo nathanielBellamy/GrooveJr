@@ -24,7 +24,7 @@
 #include "../enums/PlayState.h"
 #include "../AppState.h"
 #include "../audio/AudioCore.h"
-#include "../audio/Mixer.h"
+#include "../audio/mixer/Core.h"
 
 using namespace caf;
 
@@ -68,7 +68,7 @@ using AppStateManager = typed_actor<AppStateManagerTrait>;
 struct AppStateManagerState {
   AppStateManager::pointer self;
   AppState* gAppState;
-  Audio::Mixer* mixer;
+  Audio::Mixer::Core* mixer;
   Audio::AudioCore* audioCore;
   Db::Dao* dao;
   strong_actor_ptr playback;
@@ -94,7 +94,7 @@ struct AppStateManagerState {
     AppStateManager::pointer self,
     strong_actor_ptr supervisor,
     AppState* gAppState,
-    Audio::Mixer* mixer,
+    Audio::Mixer::Core* mixer,
     Db::Dao* dao,
     Audio::AudioCore* audioCore
   )

@@ -33,16 +33,16 @@ using Display = typed_actor<DisplayTrait>;
 
 struct DisplayState {
   Display::pointer self;
-  QApplication *qtApp;
-  Gui::MainWindow *mainWindow;
+  QApplication* qtApp;
+  Gui::MainWindow* mainWindow;
   Gui::Hydrater hydrater{};
   strong_actor_ptr guiThreadPtr;
 
   DisplayState(
     Display::pointer self,
     strong_actor_ptr supervisor,
-    Audio::Mixer *mixer,
-    AppState *gAppState,
+    Audio::Mixer::Core* mixer,
+    AppState* gAppState,
     void (*shutdown_handler)(int)
   )
   : self(self) {

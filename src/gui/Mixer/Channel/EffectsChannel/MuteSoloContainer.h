@@ -12,8 +12,8 @@
 #include "../../../../AppState.h"
 #include "../../../../Logging.h"
 
-#include "../../../../audio/ChannelSettings.h"
-#include "../../../../audio/Mixer.h"
+#include "../../../../audio/mixer/ChannelSettings.h"
+#include "../../../../audio/mixer/Core.h"
 
 #include "../MuteButton.h"
 #include "../SoloButton.h"
@@ -25,7 +25,7 @@ class MuteSoloContainer final : public QWidget {
 public:
   MuteSoloContainer(
     QWidget* parent,
-    Audio::Mixer* mixer,
+    Audio::Mixer::Core* mixer,
     ChannelIndex channelIndex,
     QAction* openEffectsContainer,
     QAction* muteChannelAction,
@@ -53,7 +53,7 @@ public:
   void setSoloR(float val);
 
 private:
-  Audio::Mixer* mixer;
+  Audio::Mixer::Core* mixer;
   ChannelIndex channelIndex;
   QGridLayout grid;
   MuteButton mute;

@@ -26,7 +26,7 @@
 
 #include "./audio/effects/vst3/host/App.h"
 #include "./audio/effects/vst3/Plugin.h"
-#include "./audio/Mixer.h"
+#include "./audio/mixer/Core.h"
 #include "./audio/AudioCore.h"
 
 #include "./Logging.h"
@@ -36,11 +36,9 @@
 #include "./db/Dao.h"
 
 namespace Gj {
-
 extern "C" {
-    int main(int argc, char *argv[]);
+int main(int argc, char* argv[]);
 }
-
 } // Gj
 
 #endif //MAIN_H

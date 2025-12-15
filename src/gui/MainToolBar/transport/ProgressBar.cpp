@@ -7,16 +7,14 @@
 
 namespace Gj {
 namespace Gui {
-
-ProgressBar::ProgressBar(QWidget* parent, Audio::Mixer* mixer, const sf_count_t frameId)
-  : QWidget(parent)
+ProgressBar::ProgressBar(QWidget* parent, Audio::Mixer::Core* mixer, const sf_count_t frameId)
+: QWidget(parent)
   , frames(1)
   , frameId(frameId)
   , mixer(mixer)
-  // , painter(this)
-  // , pen(Qt::NoPen)
-  {
-
+// , painter(this)
+// , pen(Qt::NoPen)
+{
   mixer->setUpdateProgressBarFunc(
     [this](const sf_count_t newFrames, const sf_count_t newFrame) { updateProgressBar(newFrames, newFrame); }
   );
@@ -54,16 +52,15 @@ void ProgressBar::mousePressEvent(QMouseEvent* event) {
   const float percent = x / static_cast<float>(width());
 
   frameId = static_cast<sf_count_t>(std::floor(percent * static_cast<float>(frames)));
-  Audio::Mixer::setFrameId(frameId);
+  Audio::Mixer::Core::setFrameId(frameId);
   update();
 }
 
-Result ProgressBar::hydrateState(const AppStatePacket &appStatePacket) {
+Result ProgressBar::hydrateState(const AppStatePacket& appStatePacket) {
   if (appStatePacket.playState == STOP)
     updateProgressBar(1, 0);
 
   return OK;
 }
-
 } // Gui
 } // Gj

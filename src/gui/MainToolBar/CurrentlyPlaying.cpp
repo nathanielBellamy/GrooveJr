@@ -6,9 +6,8 @@
 
 namespace Gj {
 namespace Gui {
-
-CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, Audio::Mixer* mixer)
-  : QWidget(parent)
+CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer)
+: QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , track(new QLabel)
@@ -17,9 +16,7 @@ CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, A
   , albumScrollArea(new QScrollArea(this))
   , artist(new QLabel)
   , artistScrollArea(new QScrollArea(this))
-  , grid(this)
-  {
-
+  , grid(this) {
   track->setWordWrap(false);
   album->setWordWrap(false);
   artist->setWordWrap(false);
@@ -61,6 +58,5 @@ void CurrentlyPlaying::hydrateState(const AppStatePacket& appStatePacket) const 
   album->setText(QString(appStatePacket.currentlyPlayingAlbumTitle.c_str()));
   artist->setText(QString(appStatePacket.currentlyPlayingArtistName.c_str()));
 }
-
 } // Gui
 } // Gj

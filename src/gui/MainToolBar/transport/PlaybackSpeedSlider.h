@@ -7,19 +7,18 @@
 
 #include <QSlider>
 
-#include "../../../audio/Mixer.h"
+#include "../../../audio/mixer/Core.h"
 
 namespace Gj {
 namespace Gui {
-
 class PlaybackSpeedSlider final : public QSlider {
-  Audio::Mixer* mixer;
+  Audio::Mixer::Core* mixer;
 
-  public:
-    PlaybackSpeedSlider(QWidget* parent, Audio::Mixer* mixer);
-    void mouseDoubleClickEvent(QMouseEvent* event) override;
+public:
+  PlaybackSpeedSlider(QWidget* parent, Audio::Mixer::Core* mixer);
+
+  void mouseDoubleClickEvent(QMouseEvent* event) override;
 };
-
 } // Gui
 } // Gj
 

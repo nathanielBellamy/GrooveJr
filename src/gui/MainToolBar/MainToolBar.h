@@ -21,7 +21,7 @@
 #include "../../messaging/atoms.h"
 #include "../../messaging/EnvelopeQtPtr.h"
 #include "../../enums/PlayState.h"
-#include "../../audio/Mixer.h"
+#include "../../audio/mixer/Core.h"
 #include "../Color.h"
 #include "../QSql/SqlWorkerPool.h"
 
@@ -32,31 +32,29 @@
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class MainToolBar final : public QToolBar {
-  public:
-    MainToolBar(
-      QWidget* parent,
-      actor_system& sys,
-      AppState* gAppState,
-      Audio::Mixer* mixer,
-      SqlWorkerPool* sqlWorkerPool,
-      QAction* sceneLoadAction
-    );
-    int hydrateState(const AppStatePacket& appStatePacket);
+public:
+  MainToolBar(
+    QWidget* parent,
+    actor_system& sys,
+    AppState* gAppState,
+    Audio::Mixer::Core* mixer,
+    SqlWorkerPool* sqlWorkerPool,
+    QAction* sceneLoadAction
+  );
 
-  private:
-    actor_system& sys;
-    QLabel title;
-    Scenes scenes;
-    CurrentlyPlaying currentlyPlaying;
-    TransportControl transportControl;
-    EqGraph eqGraph;
+  int hydrateState(const AppStatePacket& appStatePacket);
+
+private:
+  actor_system& sys;
+  QLabel title;
+  Scenes scenes;
+  CurrentlyPlaying currentlyPlaying;
+  TransportControl transportControl;
+  EqGraph eqGraph;
 };
-
-
 } // Gui
 } // Gj
 

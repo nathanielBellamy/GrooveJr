@@ -6,16 +6,13 @@
 
 namespace Gj {
 namespace Gui {
-
-EqGraph::EqGraph(QWidget* parent, Audio::Mixer* mixer)
-  : QOpenGLWidget(parent)
+EqGraph::EqGraph(QWidget* parent, Audio::Mixer::Core* mixer)
+: QOpenGLWidget(parent)
   , mixer(mixer)
   , eqRingBuffer(nullptr)
   , vao(0)
   , vbo(0)
-  , program(nullptr)
-  {
-
+  , program(nullptr) {
   mixer->setSetEqRingBufferFunc(
     [this](jack_ringbuffer_t* eqRingBuffer) { setEqRingBuffer(eqRingBuffer); }
   );
@@ -148,19 +145,19 @@ void EqGraph::startWorker() {
           const float x = static_cast<float>(i) * barWidth - 1.0f;
           // bottom triangle
           vertices[sixI] = x;
-          vertices[sixI+1] = barHeightBuffer[i + 1];
-          vertices[sixI+2] = x + barWidth;
-          vertices[sixI+3] = barHeightBuffer[i + 1];
-          vertices[sixI+4] = x + barWidth;
-          vertices[sixI+5] = barHeightBuffer[i];
+          vertices[sixI + 1] = barHeightBuffer[i + 1];
+          vertices[sixI + 2] = x + barWidth;
+          vertices[sixI + 3] = barHeightBuffer[i + 1];
+          vertices[sixI + 4] = x + barWidth;
+          vertices[sixI + 5] = barHeightBuffer[i];
 
           // top triangle
-          vertices[sixI+6] = x;
-          vertices[sixI+7] = barHeightBuffer[i + 1];
-          vertices[sixI+8] = x + barWidth;
-          vertices[sixI+9] = barHeightBuffer[i];
-          vertices[sixI+10] = x;
-          vertices[sixI+11] = barHeightBuffer[i];
+          vertices[sixI + 6] = x;
+          vertices[sixI + 7] = barHeightBuffer[i + 1];
+          vertices[sixI + 8] = x + barWidth;
+          vertices[sixI + 9] = barHeightBuffer[i];
+          vertices[sixI + 10] = x;
+          vertices[sixI + 11] = barHeightBuffer[i];
         }
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -213,6 +210,5 @@ Result EqGraph::hydrateState(const AppStatePacket& appStatePacket) {
 
   return OK;
 }
-
 } // Gui
 } // Gj

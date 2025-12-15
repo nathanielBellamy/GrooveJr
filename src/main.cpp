@@ -10,10 +10,9 @@ using namespace Steinberg;
 using namespace Steinberg::Vst;
 
 namespace Gj {
-
 Audio::Effects::Vst3::Host::App* pluginContext;
 AppState* gAppState;
-Audio::Mixer* mixer;
+Audio::Mixer::Core* mixer;
 Db::Dao* dao;
 Audio::AudioCore* audioCore;
 
@@ -59,7 +58,7 @@ void shutdown_handler(const int sig) {
   );
 
   pluginContext->terminate();
-  PluginContextFactory::instance().setPluginContext (nullptr);
+  PluginContextFactory::instance().setPluginContext(nullptr);
   delete pluginContext;
   Logging::write(
     Info,
@@ -78,7 +77,7 @@ void shutdown_handler(const int sig) {
 Result initVst3PluginContext() {
   try {
     pluginContext = new Audio::Effects::Vst3::Host::App();
-    PluginContextFactory::instance().setPluginContext (pluginContext);
+    PluginContextFactory::instance().setPluginContext(pluginContext);
     return OK;
   } catch (...) {
     return ERROR;
@@ -86,8 +85,7 @@ Result initVst3PluginContext() {
 }
 
 extern "C" {
-
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   // setup signal handle
   struct sigaction sigIntHandler{};
   sigIntHandler.sa_handler = shutdown_handler;
@@ -165,12 +163,12 @@ int main(int argc, char *argv[]) {
     "Instantiated audioCore"
   );
 
-  mixer = new Audio::Mixer(gAppState, dao);
+  mixer = new Audio::Mixer::Core(gAppState, dao);
   Logging::write(
     Info,
     "main",
     "Instantiated Mixer"
-    );
+  );
 
   // init actor system
   init_global_meta_objects<id_block::groovejr>();
@@ -187,6 +185,5 @@ int main(int argc, char *argv[]) {
   );
   return 0;
 }
-
 } // extern C
 } // Gj

@@ -14,32 +14,33 @@
 #include <QScrollBar>
 
 #include "../../AppState.h"
-#include "../../audio/Mixer.h"
+#include "../../audio/mixer/Core.h"
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class CurrentlyPlaying final : public QWidget {
-  public:
-    explicit CurrentlyPlaying(QWidget *parent, actor_system& actorSystem, Audio::Mixer* mixer);
-    void hydrateState(const AppStatePacket& appStatePacket) const;
+public:
+  explicit CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer);
 
-  private:
-    actor_system& actorSystem;
-    Audio::Mixer* mixer;
-    QLabel* track;
-    QScrollArea* trackScrollArea;
-    QLabel* album;
-    QScrollArea* albumScrollArea;
-    QLabel* artist;
-    QScrollArea* artistScrollArea;
-    QGridLayout grid;
-    void setupGrid();
-    void setStyle();
+  void hydrateState(const AppStatePacket& appStatePacket) const;
+
+private:
+  actor_system& actorSystem;
+  Audio::Mixer::Core* mixer;
+  QLabel* track;
+  QScrollArea* trackScrollArea;
+  QLabel* album;
+  QScrollArea* albumScrollArea;
+  QLabel* artist;
+  QScrollArea* artistScrollArea;
+  QGridLayout grid;
+
+  void setupGrid();
+
+  void setStyle();
 };
-
 } // Gui
 } // Gj
 

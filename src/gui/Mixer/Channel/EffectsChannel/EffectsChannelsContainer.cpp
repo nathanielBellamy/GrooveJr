@@ -11,7 +11,7 @@ namespace Gui {
 EffectsChannelsContainer::EffectsChannelsContainer(
   QWidget* parent,
   actor_system& actorSystem,
-  Audio::Mixer* mixer,
+  Audio::Mixer::Core* mixer,
   QAction* muteChannelAction,
   QAction* muteLChannelAction,
   QAction* muteRChannelAction,
@@ -71,12 +71,11 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket& appState) {
 }
 
 void EffectsChannelsContainer::addEffectsChannel() {
-  if (channels.size() > Audio::MAX_EFFECTS_CHANNELS - 2)
+  if (channels.size() > Audio::MAX_MIXER_CHANNELS - 2)
     return;
 
   const ChannelIndex channelIndex = channels.size() + 1;
 
-  std::cout << "Adding effects channel " << channelIndex << std::endl;
   const auto effectsChannel = new EffectsChannel(
     this, actorSystem, mixer, channelIndex, &removeEffectsChannelAction,
     muteChannelAction, muteLChannelAction, muteRChannelAction,

@@ -17,41 +17,44 @@
 #include "../../../../AppState.h"
 #include "AddPluginButton.h"
 #include "PluginSlot.h"
-#include "../../../../audio/Mixer.h"
+#include "../../../../audio/mixer/Core.h"
 
 using namespace caf;
 
 namespace Gj {
 namespace Gui {
-
 class PluginSlots final : public QWidget {
+public:
+  PluginSlots(
+    QWidget* parent,
+    actor_system& actorSystem,
+    Audio::Mixer::Core* mixer,
+    int channelIndex,
+    QAction* replaceEffectAction,
+    QAction* removeEffectAction
+  );
 
-  public:
-    PluginSlots(
-      QWidget* parent,
-      actor_system& actorSystem,
-      Audio::Mixer* mixer,
-      int channelIndex,
-      QAction* replaceEffectAction,
-      QAction* removeEffectAction
-    );
-    ~PluginSlots() override;
-    void addEffectSlot();
-    void removeEffectSlot();
-    void hydrateState(const AppStatePacket& appState, int newChannelIndex);
-    void reset();
+  ~PluginSlots() override;
 
-  private:
-    actor_system& actorSystem;
-    Audio::Mixer* mixer;
-    int channelIndex;
-    QGridLayout grid;
-    std::vector<std::unique_ptr<PluginSlot>> effectsSlots {};
-    QAction* replaceEffectAction;
-    QAction* removeEffectAction;
-    void setupGrid();
+  void addEffectSlot();
+
+  void removeEffectSlot();
+
+  void hydrateState(const AppStatePacket& appState, int newChannelIndex);
+
+  void reset();
+
+private:
+  actor_system& actorSystem;
+  Audio::Mixer::Core* mixer;
+  int channelIndex;
+  QGridLayout grid;
+  std::vector<std::unique_ptr<PluginSlot> > effectsSlots{};
+  QAction* replaceEffectAction;
+  QAction* removeEffectAction;
+
+  void setupGrid();
 };
-
 } // Gui
 } // Gj
 

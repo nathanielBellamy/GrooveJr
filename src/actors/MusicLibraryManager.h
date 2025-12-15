@@ -27,7 +27,6 @@ using namespace caf;
 
 namespace Gj {
 namespace Act {
-
 struct MusicLibraryManagerTrait {
   using signatures = type_list<
     result<void>(std::string /*dirPath*/, ml_scan_dir_a)
@@ -38,15 +37,15 @@ using MusicLibraryManager = typed_actor<MusicLibraryManagerTrait>;
 
 struct MusicLibraryManagerState {
   MusicLibraryManager::pointer self;
-  Audio::Mixer *mixer;
-  Db::Dao *dao;
-  AppState *gAppState;
+  Audio::Mixer::Core* mixer;
+  Db::Dao* dao;
+  AppState* gAppState;
 
   MusicLibraryManagerState(
     MusicLibraryManager::pointer self,
     strong_actor_ptr supervisor,
-    Audio::Mixer *mixer,
-    AppState *gAppState
+    Audio::Mixer::Core* mixer,
+    AppState* gAppState
   )
   : self(self)
     , mixer(mixer)

@@ -2,25 +2,26 @@
 // Created by ns on 1/12/25.
 //
 
-#include "Mixer.h"
+#include "Core.h"
 
 namespace Gj {
 namespace Audio {
+namespace Mixer {
 using namespace Steinberg;
 
-Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
+Core::Core(AppState* gAppState, Db::Dao* dao)
 : gAppState(gAppState)
   , jackClient(new JackClient(this))
   , dao(dao) {
   Logging::write(
     Info,
-    "Audio::Mixer::Mixer()",
+    "Audio::Mixer::Core()",
     "Instantiating Mixer..."
   );
 
   Logging::write(
     Info,
-    "Audio::Mixer::Mixer()",
+    "Audio::Mixer::Core()",
     "Retrieving effects..."
   );
 
@@ -31,28 +32,28 @@ Mixer::Mixer(AppState* gAppState, Db::Dao* dao)
   if (jackClient->getJackClient() == nullptr) {
     Logging::write(
       Error,
-      "Audio::Mixer::Mixer()",
+      "Audio::Mixer::Core()",
       "Failed to initialize JackClient"
     );
   } else {
     Logging::write(
       Info,
-      "Audio::Mixer::Mixer()",
+      "Audio::Mixer::Core()",
       "Initialized GrooveJr JackClient."
     );
   }
 
   Logging::write(
     Info,
-    "Audio::Mixer::Mixer()",
+    "Audio::Mixer::Core()",
     "Initialized Mixer."
   );
 }
 
-Mixer::~Mixer() {
+Core::~Core() {
   Logging::write(
     Info,
-    "Audio::Mixer::~Mixer",
+    "Audio::Mixer::~Core",
     "Destroying Mixer."
   );
 
@@ -60,52 +61,52 @@ Mixer::~Mixer() {
 
   Logging::write(
     Info,
-    "Audio::Mixer::~Mixer",
+    "Audio::Mixer::~Core",
     "Mixer done deleting effectsChannels"
   );
 
   if (jack_client_close(jackClient->getJackClient())) {
     Logging::write(
       Error,
-      "Audio::Mixer::~Mixer",
+      "Audio::Mixer::~Core",
       "Failed to close JackClient"
     );
   } else {
     Logging::write(
       Info,
-      "Audio::Mixer::~Mixer",
+      "Audio::Mixer::~Core",
       "Closed JackClient"
     );
   }
 
   Logging::write(
     Info,
-    "Audio::Mixer::~Mixer",
+    "Audio::Mixer::~Core",
     "Destroyed Mixer."
   );
 }
 
-std::optional<PluginIndex> Mixer::firstOpenChannelIndex() const {
-  for (ChannelIndex i = 0; i < MAX_EFFECTS_CHANNELS; ++i) {
+std::optional<PluginIndex> Core::firstOpenChannelIndex() const {
+  for (ChannelIndex i = 0; i < MAX_MIXER_CHANNELS; ++i) {
     if (!effectsChannels[i])
       return std::optional(i);
   }
   return std::nullopt;
 }
 
-Result Mixer::addEffectsChannel() {
+Result Core::addEffectsChannel() {
   const auto firstOpenIndex = firstOpenChannelIndex();
   if (!firstOpenIndex) {
     Logging::write(
       Warning,
-      "Audio::Mixer::addEffectsChannel",
+      "Audio::Mixer::Core::addEffectsChannel",
       "Attempting to add too many channels."
     );
     return WARNING;
   }
 
   effectsChannels[firstOpenIndex.value()] =
-      new Effects::Channel(
+      new Channel(
         gAppState,
         jackClient,
         firstOpenIndex.value()
@@ -113,16 +114,16 @@ Result Mixer::addEffectsChannel() {
   return OK;
 }
 
-Result Mixer::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) {
+Result Core::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) {
   bool warning = false;
   gAppState->setAudioFramesPerBuffer(framesPerBuffer);
 
   const auto setRes = forEachChannel(
-    [this, &framesPerBuffer, &warning](Effects::Channel* channel, ChannelIndex index) {
+    [this, &framesPerBuffer, &warning](Channel* channel, ChannelIndex index) {
       if (channel->setBlockSize(framesPerBuffer) != OK) {
         Logging::write(
           Warning,
-          "Audio::Mixer::setAudioFramesPerBuffer",
+          "Audio::Mixer::Core::setAudioFramesPerBuffer",
           "Failed to set audio frames per buffer on channel " + std::to_string(index)
         );
         warning = true;
@@ -135,10 +136,10 @@ Result Mixer::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) {
 }
 
 
-Result Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) {
+Result Core::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) {
   delete effectsChannels[channelEntity.channelIndex].value_or(nullptr);
   effectsChannels[channelEntity.channelIndex] =
-      new Effects::Channel(
+      new Channel(
         gAppState,
         jackClient,
         channelEntity
@@ -146,20 +147,20 @@ Result Mixer::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity
   return OK;
 }
 
-Result Mixer::removeEffectsChannel(const ChannelIndex idx) {
+Result Core::removeEffectsChannel(const ChannelIndex idx) {
   delete effectsChannels[idx].value_or(nullptr);
   return OK;
 }
 
-Result Mixer::setSampleRate(const uint32_t sampleRate) {
+Result Core::setSampleRate(const uint32_t sampleRate) {
   const auto sampleRateD = static_cast<double>(sampleRate);
   return forEachChannel(
-    [this, &sampleRateD](Effects::Channel* channel, ChannelIndex) {
+    [this, &sampleRateD](Channel* channel, ChannelIndex) {
       channel->setSampleRate(sampleRateD);
     });
 }
 
-void Mixer::incorporateLatencySamples(const int latencySamples) const {
+void Core::incorporateLatencySamples(const int latencySamples) const {
   if (gAppState->audioFramesPerBuffer > latencySamples) return;
 
   const double exponent = std::log2(latencySamples);
@@ -167,17 +168,17 @@ void Mixer::incorporateLatencySamples(const int latencySamples) const {
   gAppState->audioFramesPerBuffer = static_cast<int>(std::pow(2, std::ceil(exponent)));
 }
 
-Result Mixer::addPluginToChannel(const ChannelIndex channelIndex, const PluginPath& pluginPath) {
+Result Core::addPluginToChannel(const ChannelIndex channelIndex, const PluginPath& pluginPath) {
   Logging::write(
     Info,
-    "Audio::Mixer::addPluginToChannel",
+    "Audio::Mixer::Core::addPluginToChannel",
     "Adding plugin " + pluginPath + " to channel " + std::to_string(channelIndex)
   );
 
   if (!indexHasValidChannel(channelIndex)) {
     Logging::write(
       Error,
-      "Audio::Mixer::addPluginToChannel",
+      "Audio::Mixer::Core::addPluginToChannel",
       "No channel found at idx: " + std::to_string(channelIndex)
     );
     return ERROR;
@@ -186,16 +187,16 @@ Result Mixer::addPluginToChannel(const ChannelIndex channelIndex, const PluginPa
   return effectsChannels[channelIndex].value()->addReplacePlugin(std::optional<PluginIndex>(), pluginPath);
 }
 
-Result Mixer::loadPluginOnChannel(const Db::Plugin& plugin) {
+Result Core::loadPluginOnChannel(const Db::Plugin& plugin) {
   Logging::write(
     Info,
-    "Audio::Mixer::loadPluginOnChannel",
+    "Audio::Mixer::Core::loadPluginOnChannel",
     "Adding plugin " + plugin.filePath + " to channel " + std::to_string(plugin.channelIndex)
   );
   if (!indexHasValidChannel(plugin.channelIndex)) {
     Logging::write(
       Error,
-      "Audio::Mixer::loadPluginOnChannel",
+      "Audio::Mixer::Core::loadPluginOnChannel",
       "No channel found at idx: " + std::to_string(plugin.channelIndex)
     );
     return ERROR;
@@ -203,11 +204,11 @@ Result Mixer::loadPluginOnChannel(const Db::Plugin& plugin) {
   return effectsChannels[plugin.channelIndex].value()->loadPlugin(plugin);
 }
 
-PluginIndex Mixer::getPluginsOnChannelCount(const ChannelIndex idx) {
+PluginIndex Core::getPluginsOnChannelCount(const ChannelIndex idx) {
   if (!indexHasValidChannel(idx)) {
     Logging::write(
       Warning,
-      "Audio::Mixer::pluginsOnChannelCount",
+      "Audio::Mixer::Core::pluginsOnChannelCount",
       "Attempting to get plugin count on empty channel " + std::to_string(idx)
     );
     return 0;
@@ -215,12 +216,12 @@ PluginIndex Mixer::getPluginsOnChannelCount(const ChannelIndex idx) {
   return effectsChannels[idx].value()->pluginCount();
 }
 
-Result Mixer::initEditorHostsOnChannel(const ChannelIndex idx,
-                                       std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) {
+Result Core::initEditorHostsOnChannel(const ChannelIndex idx,
+                                      std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) {
   if (!indexHasValidChannel(idx)) {
     Logging::write(
       Warning,
-      "Audio::Mixer::initEditorHostsOnChannel",
+      "Audio::Mixer::Core::initEditorHostsOnChannel",
       "Attempting to init Editorhost on ChannelIndex: " + std::to_string(idx) + " but no channel is not valid."
     );
     return WARNING;
@@ -228,12 +229,12 @@ Result Mixer::initEditorHostsOnChannel(const ChannelIndex idx,
   return effectsChannels[idx].value()->initEditorHosts(vstWindows);
 }
 
-Result Mixer::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex newPluginIndex,
-                                      std::shared_ptr<Gui::VstWindow> vstWindow) {
+Result Core::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex newPluginIndex,
+                                     std::shared_ptr<Gui::VstWindow> vstWindow) {
   if (!indexHasValidChannel(idx)) {
     Logging::write(
       Warning,
-      "Audio::Mixer::initEditorHostOnChannel",
+      "Audio::Mixer::Core::initEditorHostOnChannel",
       "Attempting to init Editorhost on ChannelIndex " + std::to_string(idx) + " but no channel is not valid."
     );
     return WARNING;
@@ -241,17 +242,17 @@ Result Mixer::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex 
   return effectsChannels[idx].value()->initEditorHost(newPluginIndex, vstWindow);
 }
 
-Result Mixer::terminateEditorHostsOnChannel(const ChannelIndex idx) {
+Result Core::terminateEditorHostsOnChannel(const ChannelIndex idx) {
   Logging::write(
     Info,
-    "Audio::Mixer::terminateEditorHostsOnChannel",
+    "Audio::Mixer::Core::terminateEditorHostsOnChannel",
     "Terminating editor hosts on channelIndex: " + std::to_string(idx)
   );
 
   if (!indexHasValidChannel(idx)) {
     Logging::write(
       Error,
-      "Audio::Mixer::terminateEditorHostsOnChannel",
+      "Audio::Mixer::Core::terminateEditorHostsOnChannel",
       "Attempting to terminate editor host on out of range channelIndex: " + std::to_string(idx) + " channelCount: " +
       std::to_string(getTotalChannelsCount())
     );
@@ -261,12 +262,12 @@ Result Mixer::terminateEditorHostsOnChannel(const ChannelIndex idx) {
   return effectsChannels[idx].value()->terminateEditorHosts();
 }
 
-Result Mixer::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx,
-                                     const PluginPath& pluginPath) {
+Result Core::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx,
+                                    const PluginPath& pluginPath) {
   if (!indexHasValidChannel(channelIdx)) {
     Logging::write(
       Error,
-      "Audio::Mixer::terminateEditorHostsOnChannel",
+      "Audio::Mixer::Core::terminateEditorHostsOnChannel",
       "Attempting to replace plugin on channelIndex: " + std::to_string(channelIdx) +
       " but no valid channel found. channelCount: " +
       std::to_string(getTotalChannelsCount())
@@ -276,11 +277,11 @@ Result Mixer::replacePluginOnChannel(const ChannelIndex channelIdx, const Plugin
   return effectsChannels[channelIdx].value()->addReplacePlugin(pluginIdx, pluginPath);
 }
 
-Result Mixer::removePluginFromChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx) {
+Result Core::removePluginFromChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx) {
   if (!indexHasValidChannel(channelIdx)) {
     Logging::write(
       Error,
-      "Audio::Mixer::terminateEditorHostsOnChannel",
+      "Audio::Mixer::Core::terminateEditorHostsOnChannel",
       "Attempting to remove plugin on channelIndex: " + std::to_string(channelIdx) +
       " but no valid channel found. channelCount: " +
       std::to_string(getTotalChannelsCount())
@@ -291,11 +292,11 @@ Result Mixer::removePluginFromChannel(const ChannelIndex channelIdx, const Plugi
   return effectsChannels[channelIdx].value()->removePlugin(pluginIdx);
 }
 
-Result Mixer::setGainOnChannel(const ChannelIndex channelIdx, const float gain) {
+Result Core::setGainOnChannel(const ChannelIndex channelIdx, const float gain) {
   if (!indexHasValidChannel(channelIdx)) {
     Logging::write(
       Error,
-      "Audio::Mixer::setGainOnChannel",
+      "Audio::Mixer::Core::setGainOnChannel",
       "Attempting to set gain on channelIndex: " + std::to_string(channelIdx) +
       " but no valid channel found. channelCount: " +
       std::to_string(getTotalChannelsCount())
@@ -306,10 +307,10 @@ Result Mixer::setGainOnChannel(const ChannelIndex channelIdx, const float gain) 
   return effectsChannels[channelIdx].value()->setGain(gain) ? OK : ERROR;
 }
 
-Result Mixer::loadScene(const ID sceneDbId) {
+Result Core::loadScene(const ID sceneDbId) {
   Logging::write(
     Info,
-    "Audio::Mixer::loadScene",
+    "Audio::Mixer::Core::loadScene",
     "Loading sceneDbId: " + std::to_string(sceneDbId)
   );
 
@@ -317,7 +318,7 @@ Result Mixer::loadScene(const ID sceneDbId) {
   if (!sceneOpt) {
     Logging::write(
       Error,
-      "Audio::Mixer::loadScene",
+      "Audio::Mixer::Core::loadScene",
       "Unable to find sceneDbId: " + std::to_string(sceneDbId)
     );
     return ERROR;
@@ -325,7 +326,7 @@ Result Mixer::loadScene(const ID sceneDbId) {
   const auto scene = sceneOpt.value();
   Logging::write(
     Info,
-    "Audio::Mixer::loadScene",
+    "Audio::Mixer::Core::loadScene",
     "Loading Scene: " + scene.toStdString()
   );
   gAppState->setScene(scene);
@@ -342,17 +343,17 @@ Result Mixer::loadScene(const ID sceneDbId) {
 
   Logging::write(
     Info,
-    "Audio::Mixer::loadScene",
+    "Audio::Mixer::Core::loadScene",
     "Loaded sceneDbId: " + std::to_string(scene.id)
   );
 
   return OK;
 }
 
-ID Mixer::newScene() const {
+ID Core::newScene() const {
   Logging::write(
     Info,
-    "Audio::Mixer::newScene",
+    "Audio::Mixer::Core::newScene",
     "Creating New Scene."
   );
 
@@ -361,21 +362,21 @@ ID Mixer::newScene() const {
 
   Logging::write(
     Info,
-    "Audio::Mixer::loadSceneById",
+    "Audio::Mixer::Core::loadSceneById",
     "Created New Scene sceneId: " + std::to_string(id)
   );
 
   return id;
 }
 
-Result Mixer::deleteChannels() {
+Result Core::deleteChannels() {
   Logging::write(
     Info,
-    "Audio::Mixer::deleteChannels",
+    "Audio::Mixer::Core::deleteChannels",
     "Deleting channels."
   );
 
-  const auto delRes = forEachChannel([this](Effects::Channel* channel, const ChannelIndex channelIdx) {
+  const auto delRes = forEachChannel([this](Channel* channel, const ChannelIndex channelIdx) {
     delete channel;
     effectsChannels[channelIdx].reset();
   });
@@ -383,23 +384,23 @@ Result Mixer::deleteChannels() {
   if (delRes != OK)
     Logging::write(
       Warning,
-      "Audio::Mixer::deleteChannels",
+      "Audio::Mixer::Core::deleteChannels",
       "A Warning or Error Occurred while deleting channels."
     );
 
   Logging::write(
     Info,
-    "Audio::Mixer::deleteChannels",
+    "Audio::Mixer::Core::deleteChannels",
     "Done deleting channels."
   );
 
   return delRes == OK ? OK : WARNING;
 }
 
-Result Mixer::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
+Result Core::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
   Logging::write(
     Info,
-    "Audio::Mixer::setChannels",
+    "Audio::Mixer::Core::setChannels",
     "Setting channels. ChannelCount: " + std::to_string(channelEntities.size())
   );
 
@@ -415,17 +416,17 @@ Result Mixer::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
 
   Logging::write(
     Info,
-    "Audio::Mixer::setChannels",
+    "Audio::Mixer::Core::setChannels",
     "Done setting channels: " + std::to_string(channelEntities.size())
   );
 
   return OK;
 }
 
-Result Mixer::setPlugins(const std::vector<Db::Plugin>& plugins) {
+Result Core::setPlugins(const std::vector<Db::Plugin>& plugins) {
   Logging::write(
     Info,
-    "Audio::Mixer::setPlugins",
+    "Audio::Mixer::Core::setPlugins",
     "Setting plugins."
   );
 
@@ -443,13 +444,13 @@ Result Mixer::setPlugins(const std::vector<Db::Plugin>& plugins) {
       if (loadPluginOnChannel(plugin) == OK) {
         Logging::write(
           Info,
-          "Audio::Mixer::setPlugins",
+          "Audio::Mixer::Core::setPlugins",
           "Loaded plugin " + plugin.name + " on channel " + std::to_string(plugin.channelIndex)
         );
       } else {
         Logging::write(
           Error,
-          "Audio::Mixer::setPlugins",
+          "Audio::Mixer::Core::setPlugins",
           "Could not add plugin: " + plugin.filePath + " to channel " + std::to_string(plugin.channelIndex)
         );
       }
@@ -458,23 +459,23 @@ Result Mixer::setPlugins(const std::vector<Db::Plugin>& plugins) {
 
   Logging::write(
     Info,
-    "Audio::Mixer::setPlugins",
+    "Audio::Mixer::Core::setPlugins",
     "Done setting plugins."
   );
   return OK;
 }
 
-Result Mixer::saveScene() {
+Result Core::saveScene() {
   Logging::write(
     Info,
-    "Audio::Mixer::saveScene",
+    "Audio::Mixer::Core::saveScene",
     "Saving scene."
   );
   const auto scene = dao->sceneRepository.update(gAppState->getScene());
   if (!scene) {
     Logging::write(
       Error,
-      "Audio::Mixer::saveScene",
+      "Audio::Mixer::Core::saveScene",
       "Could not update scene."
     );
     return ERROR;
@@ -485,7 +486,7 @@ Result Mixer::saveScene() {
   if (const int persistRes = dao->appStateRepository.persistAndSet(); persistRes != 0) {
     Logging::write(
       Error,
-      "Audio::Mixer::saveScene",
+      "Audio::Mixer::Core::saveScene",
       "Failed to persist state: " + std::to_string(persistRes)
     );
     return ERROR;
@@ -495,7 +496,7 @@ Result Mixer::saveScene() {
     if (saveChannelsRes == ERROR)
       Logging::write(
         Error,
-        "Audio::Mixer::saveScene",
+        "Audio::Mixer::Core::saveScene",
         "Failed to save channels."
       );
 
@@ -505,16 +506,15 @@ Result Mixer::saveScene() {
   return OK;
 }
 
-Result Mixer::saveChannels() {
+Result Core::saveChannels() {
   Result result = OK;
   const auto scene = gAppState->getScene();
-  // for (const auto effectsChannel: effectsChannels) {
   const auto saveRes = forEachChannel(
-    [this, &scene, &result](Effects::Channel* channel, ChannelIndex channelIndex) {
+    [this, &scene, &result](Channel* channel, ChannelIndex channelIndex) {
       if (!dao->channelRepository.save(channel->toEntity())) {
         Logging::write(
           Error,
-          "Audio::Mixer::saveScene",
+          "Audio::Mixer::Core::saveScene",
           "Unable to save channel: " + std::to_string(channel->getIndex()) + " to sceneDbId: " +
           std::to_string(scene.id)
         );
@@ -540,7 +540,7 @@ Result Mixer::saveChannels() {
             OK) {
           Logging::write(
             Error,
-            "Audio::Mixer::saveScene",
+            "Audio::Mixer::Core::saveScene",
             "Unable to determine stream size for audioHostComponentStateStream"
           );
           result = WARNING;
@@ -551,7 +551,7 @@ Result Mixer::saveChannels() {
             OK) {
           Logging::write(
             Error,
-            "Audio::Mixer::saveScene",
+            "Audio::Mixer::Core::saveScene",
             "Unable to determine stream size for audioHostControllerStateStream"
           );
           result = WARNING;
@@ -586,7 +586,7 @@ Result Mixer::saveChannels() {
         //       populateRes != OK) {
         //     Logging::write(
         //       Error,
-        //       "Audio::Mixer::saveScene",
+        //       "Audio::Mixer::Core::saveScene",
         //       "Unable to populate editorHost buffers and thus unable to persist Plugin: " + plugin->name + " Status: " + std::to_string(populateRes)
         //     );
         //   }
@@ -606,7 +606,7 @@ Result Mixer::saveChannels() {
         if (!dao->pluginRepository.save(dbPlugin)) {
           Logging::write(
             Error,
-            "Audio::Mixer::saveScene",
+            "Audio::Mixer::Core::saveScene",
             "Unable to save plugin: " + dbPlugin.filePath + " to sceneId: " + std::to_string(scene.id)
           );
           result = ERROR;
@@ -619,10 +619,10 @@ Result Mixer::saveChannels() {
   return result;
 }
 
-Result Mixer::setFrameId(const sf_count_t frameId) {
+Result Core::setFrameId(const sf_count_t frameId) {
   Logging::write(
     Info,
-    "Audio::Mixer::setFramePercent",
+    "Audio::Mixer::Core::setFramePercent",
     "Setting frameId: " + std::to_string(frameId)
   );
 
@@ -631,5 +631,6 @@ Result Mixer::setFrameId(const sf_count_t frameId) {
 
   return OK;
 }
+} // Mixer
 } // Audio
 } // Gj

@@ -24,7 +24,7 @@
 #include "./MainToolBar/MainToolBar.h"
 
 #include "../AppState.h"
-#include "../audio/Mixer.h"
+#include "../audio/mixer/Core.h"
 #include "Hydrater.h"
 
 #include <QAction>
@@ -38,54 +38,60 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
-
 class MainWindow final : public SqlWorkerPoolHost {
   Q_OBJECT
 
-  public:
-    explicit MainWindow(
-      actor_system& actorSystem,
-      Audio::Mixer* mixer,
-      AppState* gAppState,
-      void (*shutdown_handler) (int)
-    );
-    ~MainWindow();
-    void closeEvent(QCloseEvent* event) override;
-    void setChannels();
-    void setEffects();
-    void connectHydrater(const Hydrater& hydrater) {
-      const auto hydraterConnection =
+public:
+  explicit MainWindow(
+    actor_system& actorSystem,
+    Audio::Mixer::Core* mixer,
+    AppState* gAppState,
+    void (*shutdown_handler)(int)
+  );
+
+  ~MainWindow();
+
+  void closeEvent(QCloseEvent* event) override;
+
+  void setChannels();
+
+  void setEffects();
+
+  void connectHydrater(const Hydrater& hydrater) {
+    const auto hydraterConnection =
         connect(&hydrater, &Hydrater::hydrate, this, [&](const AppStatePacket& packet) {
           hydrateState(packet);
         });
-    };
+  };
 
-  public slots:
-    Result hydrateState(const AppStatePacket& appStatePacket);
+public slots:
+  Result hydrateState(const AppStatePacket& appStatePacket);
 
-  private:
-    AppState* gAppState;
-    actor_system& actorSystem;
-    Audio::Mixer* mixer;
-    void (*shutdown_handler)(int);
-    QThread sqlWorkerPoolThread;
-    SqlWorkerPool* sqlWorkerPool;
-    QWidget container;
-    MenuBar* menuBar;
-    QAction sceneLoadAction;
-    MainToolBar mainToolBar;
-    QGridLayout grid;
-    MusicLibraryWindow musicLibraryWindow;
-    MixerWindow mixerWindow;
+private:
+  AppState* gAppState;
+  actor_system& actorSystem;
+  Audio::Mixer::Core* mixer;
 
-    void setupGrid();
-    void connectActions();
-    SqlWorkerPool* initQSql();
+  void (*shutdown_handler)(int);
+
+  QThread sqlWorkerPoolThread;
+  SqlWorkerPool* sqlWorkerPool;
+  QWidget container;
+  MenuBar* menuBar;
+  QAction sceneLoadAction;
+  MainToolBar mainToolBar;
+  QGridLayout grid;
+  MusicLibraryWindow musicLibraryWindow;
+  MixerWindow mixerWindow;
+
+  void setupGrid();
+
+  void connectActions();
+
+  SqlWorkerPool* initQSql();
 };
-
 } // Gui
 } // Gj
-
 
 
 #endif //MAINWINDOW_H

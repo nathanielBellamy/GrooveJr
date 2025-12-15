@@ -18,7 +18,7 @@
 #include "./AudioThread.h"
 
 #include "../AppState.h"
-#include "../audio/Mixer.h"
+#include "../audio/mixer/Core.h"
 #include "../audio/AudioCore.h"
 #include "../enums/PlayState.h"
 
@@ -42,16 +42,16 @@ struct PlaybackState {
   Playback::pointer self;
   AudioThread::pointer audioThread;
 
-  AppState *gAppState;
-  Audio::Mixer *mixer;
-  Audio::AudioCore *audioCore;
+  AppState* gAppState;
+  Audio::Mixer::Core* mixer;
+  Audio::AudioCore* audioCore;
 
   PlaybackState(
     Playback::pointer self,
     strong_actor_ptr supervisor,
-    AppState *gAppState,
-    Audio::Mixer *mixer,
-    Audio::AudioCore *audioCore)
+    AppState* gAppState,
+    Audio::Mixer::Core* mixer,
+    Audio::AudioCore* audioCore)
   : self(self)
     , audioThread(nullptr)
     , gAppState(gAppState)

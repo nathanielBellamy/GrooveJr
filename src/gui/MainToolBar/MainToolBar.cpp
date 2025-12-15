@@ -8,16 +8,14 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
-
-MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, AppState* gAppState, Audio::Mixer* mixer, SqlWorkerPool* sqlWorkerPool, QAction* sceneLoadAction)
-  : QToolBar(parent)
+MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, AppState* gAppState, Audio::Mixer::Core* mixer,
+                         SqlWorkerPool* sqlWorkerPool, QAction* sceneLoadAction)
+: QToolBar(parent)
   , sys(sys)
   , scenes(this, sys, gAppState, mixer, sqlWorkerPool, sceneLoadAction)
   , currentlyPlaying(this, sys, mixer)
   , transportControl(this, sys, mixer)
-  , eqGraph(this, mixer)
-  {
-
+  , eqGraph(this, mixer) {
   title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
   title.setText("GrooveJr");
   title.setFont({title.font().family(), 18});
@@ -48,6 +46,5 @@ int MainToolBar::hydrateState(const AppStatePacket& appStatePacket) {
 
   return 0;
 }
-
 } // Gui
 } // Gj

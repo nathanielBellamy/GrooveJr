@@ -10,7 +10,7 @@ namespace Gui {
 EffectsChannel::EffectsChannel(
   QWidget* parent,
   actor_system& actorSystem,
-  Audio::Mixer* mixer,
+  Audio::Mixer::Core* mixer,
   const ChannelIndex channelIndex,
   QAction* removeEffectsChannelAction,
   QAction* muteChannelAction,
@@ -74,20 +74,13 @@ EffectsChannel::EffectsChannel(
   setupTitle();
 
 
-  const auto res = mixer->runAgainstChannel(channelIndex, [this](const Audio::Effects::Channel* channel) {
-    std::cout << "creating effects chan against mixer channel " << std::to_string(channel->getIndex()) << std::endl;
+  const auto res = mixer->runAgainstChannel(channelIndex, [this](const Audio::Mixer::Channel* channel) {
     setupGainSlider(channel->settings.gain.load());
-    std::cout << " gain " << std::to_string(channel->settings.gain.load()) << std::endl;
     setupGainLSlider(channel->settings.gainL.load());
-    std::cout << " gainL " << std::to_string(channel->settings.gainL.load()) << std::endl;
     setupGainRSlider(channel->settings.gainR.load());
-    std::cout << " gainR " << std::to_string(channel->settings.gainR.load()) << std::endl;
     setupPanSlider(channel->settings.pan.load());
-    std::cout << " pan " << std::to_string(channel->settings.pan.load()) << std::endl;
     setupPanLSlider(channel->settings.panL.load());
-    std::cout << " panL " << std::to_string(channel->settings.panL.load()) << std::endl;
     setupPanRSlider(channel->settings.panR.load());
-    std::cout << " panR " << std::to_string(channel->settings.panR.load()) << std::endl;
   });
 
   if (res != OK)
@@ -227,8 +220,7 @@ void EffectsChannel::setupGainSlider(const float gain) {
   );
   gainSlider.setTickPosition(QSlider::NoTicks);
   auto gainSliderConnection = connect(&gainSlider, &QSlider::valueChanged, [this](const int newGain) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGain](Audio::Effects::Channel* channel) {
-      std::cout << "setting gain on mixer channelIndex " << std::to_string(channelIndex) << std::endl;
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGain](Audio::Mixer::Channel* channel) {
       channel->setGain(
         Audio::Math::uInt127ToFloat(newGain) * GAIN_FACTOR
       );
@@ -252,7 +244,7 @@ void EffectsChannel::setupGainLSlider(const float gainL) {
   );
   gainLSlider.setTickPosition(QSlider::NoTicks);
   auto gainSliderConnection = connect(&gainLSlider, &QSlider::valueChanged, [this](const int newGainL) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGainL](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGainL](Audio::Mixer::Channel* channel) {
       channel->setGainL(
         Audio::Math::uInt127ToFloat(newGainL) * GAIN_FACTOR
       );
@@ -276,7 +268,7 @@ void EffectsChannel::setupGainRSlider(const float gainR) {
   );
   gainRSlider.setTickPosition(QSlider::NoTicks);
   const auto gainRSliderConnection = connect(&gainRSlider, &QSlider::valueChanged, [this](const int newGainR) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGainR](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGainR](Audio::Mixer::Channel* channel) {
       channel->setGainR(
         Audio::Math::uInt127ToFloat(newGainR) * GAIN_FACTOR
       );
@@ -300,7 +292,7 @@ void EffectsChannel::setupPanSlider(const float pan) {
   );
   panSlider.setTickPosition(QSlider::NoTicks);
   auto panSliderConnection = connect(&panSlider, &QSlider::valueChanged, [this](const int newPan) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPan](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPan](Audio::Mixer::Channel* channel) {
       channel->setPan(
         Audio::Math::int127ToFloat(newPan)
       );
@@ -324,7 +316,7 @@ void EffectsChannel::setupPanLSlider(const float panL) {
   );
   panLSlider.setTickPosition(QSlider::NoTicks);
   auto panSliderConnection = connect(&panLSlider, &QSlider::valueChanged, [this](const int newPanL) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPanL](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPanL](Audio::Mixer::Channel* channel) {
       channel->setPanL(
         Audio::Math::int127ToFloat(newPanL)
       );
@@ -348,7 +340,7 @@ void EffectsChannel::setupPanRSlider(const float panR) {
   );
   panRSlider.setTickPosition(QSlider::NoTicks);
   auto panSliderConnection = connect(&panRSlider, &QSlider::valueChanged, [this](const int newPanR) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPanR](Audio::Effects::Channel* channel) {
+    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPanR](Audio::Mixer::Channel* channel) {
       channel->setPanR(
         Audio::Math::int127ToFloat(newPanR)
       );
