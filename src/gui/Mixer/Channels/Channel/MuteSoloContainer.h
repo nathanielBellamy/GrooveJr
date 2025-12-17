@@ -15,9 +15,9 @@
 #include "../../../../audio/mixer/ChannelSettings.h"
 #include "../../../../audio/mixer/Core.h"
 
-#include "../MuteButton.h"
-#include "../SoloButton.h"
-#include "EffectsButton.h"
+#include "MuteButton.h"
+#include "SoloButton.h"
+#include "Plugins/PluginsButton.h"
 
 namespace Gj {
 namespace Gui {
@@ -63,7 +63,7 @@ private:
   SoloButton solo;
   SoloButton soloL;
   SoloButton soloR;
-  EffectsButton effects;
+  PluginsButton effects;
 
   void setupGrid();
 };

@@ -8,7 +8,7 @@
 #include <QAction>
 #include <QPushButton>
 
-#include "../../Color.h"
+#include "../../../Color.h"
 
 namespace Gj {
 namespace Gui {

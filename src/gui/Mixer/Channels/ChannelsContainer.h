@@ -7,7 +7,7 @@
 
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
-#include "../../../../messaging/atoms.h"
+#include "../../../messaging/atoms.h"
 
 #include <algorithm>
 #include <atomic>
@@ -21,24 +21,24 @@
 #include <QScrollArea>
 #include <QWidget>
 
-#include "../../../../Logging.h"
-#include "../../../../AppState.h"
-#include "../../../../enums/Result.h"
+#include "../../../Logging.h"
+#include "../../../AppState.h"
+#include "../../../enums/Result.h"
 
-#include "../../../Color.h"
-#include "../../../../audio/mixer/Core.h"
-#include "../../../../audio/Constants.h"
-#include "EffectsChannel.h"
-#include "AddEffectsChannelButton.h"
+#include "../../Color.h"
+#include "../../../audio/mixer/Core.h"
+#include "../../../audio/Constants.h"
+#include "Channel/Channel.h"
+#include "AddChannelButton.h"
 
 using namespace caf;
 
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-class EffectsChannelsContainer final : public QWidget {
+class ChannelsContainer final : public QWidget {
 public:
-  EffectsChannelsContainer(
+  ChannelsContainer(
     QWidget* parent,
     actor_system& actorSystem,
     Audio::Mixer::Core* mixer,
@@ -83,10 +83,10 @@ private:
   QWidget channelsWidget;
   QScrollArea channelsScrollArea;
   QGridLayout channelsGrid;
-  std::vector<EffectsChannel*> channels;
+  std::vector<Channel*> channels;
   QAction addEffectsChannelAction;
   QAction removeEffectsChannelAction;
-  AddEffectsChannelButton addEffectsChannelButton;
+  AddChannelButton addEffectsChannelButton;
   QAction* muteChannelAction;
   QAction* muteLChannelAction;
   QAction* muteRChannelAction;

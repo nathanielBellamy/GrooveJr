@@ -18,11 +18,11 @@
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-class RemoveEffectsChannelButton final : public QPushButton {
+class RemoveChannelButton final : public QPushButton {
 public:
-  RemoveEffectsChannelButton(QWidget* parent, ChannelIndex channelIndex, QAction* action);
+  RemoveChannelButton(QWidget* parent, ChannelIndex channelIndex, QAction* action);
 
-  ~RemoveEffectsChannelButton();
+  ~RemoveChannelButton();
 
   void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx);
 

@@ -2,13 +2,13 @@
 // Created by ns on 3/7/25.
 //
 
-#include "EffectsChannel.h"
+#include "Channel.h"
 
 
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-EffectsChannel::EffectsChannel(
+Channel::Channel(
   QWidget* parent,
   actor_system& actorSystem,
   Audio::Mixer::Core* mixer,
@@ -101,7 +101,7 @@ EffectsChannel::EffectsChannel(
   );
 }
 
-EffectsChannel::~EffectsChannel() {
+Channel::~Channel() {
   Logging::write(
     Info,
     "Gui::EffectsChannel::~EffectsChannel",
@@ -109,7 +109,7 @@ EffectsChannel::~EffectsChannel() {
   );
 }
 
-void EffectsChannel::hydrateState(const AppStatePacket& appStatePacket, const ChannelIndex newChannelIndex) {
+void Channel::hydrateState(const AppStatePacket& appStatePacket, const ChannelIndex newChannelIndex) {
   Logging::write(
     Info,
     "Gui::EffectsChannel::hydrateState",
@@ -136,7 +136,7 @@ void EffectsChannel::hydrateState(const AppStatePacket& appStatePacket, const Ch
   // setupGrid();
 }
 
-void EffectsChannel::updateShowRemoveEffectsChannelButton(const bool val) {
+void Channel::updateShowRemoveEffectsChannelButton(const bool val) {
   if (val) {
     removeEffectsChannelButton.show();
   } else {
@@ -144,7 +144,7 @@ void EffectsChannel::updateShowRemoveEffectsChannelButton(const bool val) {
   }
 }
 
-void EffectsChannel::setStyle() {
+void Channel::setStyle() {
   setFixedHeight(340);
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   setStyleSheet(
@@ -152,7 +152,7 @@ void EffectsChannel::setStyle() {
   );
 }
 
-void EffectsChannel::setupGrid() {
+void Channel::setupGrid() {
   grid.setVerticalSpacing(4);
   grid.setHorizontalSpacing(4);
 
@@ -189,7 +189,7 @@ void EffectsChannel::setupGrid() {
   setupEffectsSlotsScrollArea();
 }
 
-void EffectsChannel::setupEffectsSlotsScrollArea() {
+void Channel::setupEffectsSlotsScrollArea() {
   effectsSlotsScrollArea.setFixedSize(QSize(200, 175));
   effectsSlotsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
   effectsSlotsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
@@ -201,7 +201,7 @@ void EffectsChannel::setupEffectsSlotsScrollArea() {
   effectsSlots.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 }
 
-void EffectsChannel::setupTitle() {
+void Channel::setupTitle() {
   if (channelIndex == 0) {
     title.setText("Main");
   } else {
@@ -212,7 +212,7 @@ void EffectsChannel::setupTitle() {
 
 constexpr float GAIN_FACTOR = 2.0f;
 
-void EffectsChannel::setupGainSlider(const float gain) {
+void Channel::setupGainSlider(const float gain) {
   gainSlider.setMinimum(0);
   gainSlider.setMaximum(127);
   gainSlider.setTickInterval(1);
@@ -236,7 +236,7 @@ void EffectsChannel::setupGainSlider(const float gain) {
   });
 }
 
-void EffectsChannel::setupGainLSlider(const float gainL) {
+void Channel::setupGainLSlider(const float gainL) {
   gainLSlider.setMinimum(0);
   gainLSlider.setMaximum(127);
   gainLSlider.setTickInterval(1);
@@ -260,7 +260,7 @@ void EffectsChannel::setupGainLSlider(const float gainL) {
   });
 }
 
-void EffectsChannel::setupGainRSlider(const float gainR) {
+void Channel::setupGainRSlider(const float gainR) {
   gainRSlider.setMinimum(0);
   gainRSlider.setMaximum(127);
   gainRSlider.setTickInterval(1);
@@ -284,7 +284,7 @@ void EffectsChannel::setupGainRSlider(const float gainR) {
   });
 }
 
-void EffectsChannel::setupPanSlider(const float pan) {
+void Channel::setupPanSlider(const float pan) {
   panSlider.setMinimum(-127);
   panSlider.setMaximum(127);
   panSlider.setTickInterval(1);
@@ -308,7 +308,7 @@ void EffectsChannel::setupPanSlider(const float pan) {
   });
 }
 
-void EffectsChannel::setupPanLSlider(const float panL) {
+void Channel::setupPanLSlider(const float panL) {
   panLSlider.setMinimum(-100);
   panLSlider.setMaximum(100);
   panLSlider.setTickInterval(1);
@@ -332,7 +332,7 @@ void EffectsChannel::setupPanLSlider(const float panL) {
   });
 }
 
-void EffectsChannel::setupPanRSlider(const float panR) {
+void Channel::setupPanRSlider(const float panR) {
   panRSlider.setMinimum(-100);
   panRSlider.setMaximum(100);
   panRSlider.setTickInterval(1);
@@ -356,7 +356,7 @@ void EffectsChannel::setupPanRSlider(const float panR) {
   });
 }
 
-void EffectsChannel::setEffects() {
+void Channel::setEffects() {
   Logging::write(
     Info,
     "Gui::EffectsChannel::setEffects",
@@ -377,7 +377,7 @@ void EffectsChannel::setEffects() {
   );
 }
 
-void EffectsChannel::addPlugin(const std::optional<PluginIndex> pluginIndex) {
+void Channel::addPlugin(const std::optional<PluginIndex> pluginIndex) {
   const PluginIndex newPluginIndex = pluginIndex.value_or(
     mixer->getPluginsOnChannelCount(channelIndex) - 1
   );
@@ -398,7 +398,7 @@ void EffectsChannel::addPlugin(const std::optional<PluginIndex> pluginIndex) {
   );
 }
 
-void EffectsChannel::connectActions() {
+void Channel::connectActions() {
   auto openEffectsContainerConnection = connect(&openEffectsContainer, &QAction::triggered, [&]() {
     effectsContainer.show();
   });
@@ -503,27 +503,27 @@ void EffectsChannel::connectActions() {
   });
 }
 
-void EffectsChannel::setMute(const float val) {
+void Channel::setMute(const float val) {
   muteSoloContainer.setMute(val);
 }
 
-void EffectsChannel::setMuteL(const float val) {
+void Channel::setMuteL(const float val) {
   muteSoloContainer.setMuteL(val);
 }
 
-void EffectsChannel::setMuteR(const float val) {
+void Channel::setMuteR(const float val) {
   muteSoloContainer.setMuteR(val);
 }
 
-void EffectsChannel::setSolo(const float val) {
+void Channel::setSolo(const float val) {
   muteSoloContainer.setSolo(val);
 }
 
-void EffectsChannel::setSoloL(const float val) {
+void Channel::setSoloL(const float val) {
   muteSoloContainer.setSoloL(val);
 }
 
-void EffectsChannel::setSoloR(const float val) {
+void Channel::setSoloR(const float val) {
   muteSoloContainer.setSoloR(val);
 }
 } // Mixer

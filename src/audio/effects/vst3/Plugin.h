@@ -19,7 +19,7 @@
 #include "../../JackClient.h"
 #include "./host/audiohost/source/audiohost.h"
 #include "./host/editorhost/source/editorhost.h"
-#include "../../../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
+#include "../../../gui/Mixer/Channels/Channel/Plugins/VstWindow.h"
 #include "Util.h"
 #include "../../../types/AtomicStr.h"
 

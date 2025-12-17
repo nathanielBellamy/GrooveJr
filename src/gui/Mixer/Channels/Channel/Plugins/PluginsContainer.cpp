@@ -2,12 +2,12 @@
 // Created by ns on 3/16/25.
 //
 
-#include "EffectsContainer.h"
+#include "PluginsContainer.h"
 
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-EffectsContainer::EffectsContainer(
+PluginsContainer::PluginsContainer(
   QWidget* parent,
   Audio::Mixer::Core* mixer,
   const ChannelIndex channelIndex,
@@ -34,7 +34,7 @@ EffectsContainer::EffectsContainer(
   hide();
 }
 
-EffectsContainer::~EffectsContainer() {
+PluginsContainer::~PluginsContainer() {
   Logging::write(
     Info,
     "Gui::EffectsContainer::~EffectsContainer",
@@ -54,7 +54,7 @@ EffectsContainer::~EffectsContainer() {
   );
 }
 
-void EffectsContainer::connectActions() {
+void PluginsContainer::connectActions() {
   const auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
     const PluginIndex effectIndex = selectVstWindowAction.data().toULongLong();
     vstWindows.at(effectIndex)->activateWindow();
@@ -74,7 +74,7 @@ void EffectsContainer::connectActions() {
   });
 }
 
-void EffectsContainer::setStyle() {
+void PluginsContainer::setStyle() {
   setMinimumSize(QSize(300, 200));
   setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
   setStyleSheet(
@@ -82,7 +82,7 @@ void EffectsContainer::setStyle() {
   );
 }
 
-void EffectsContainer::setupGrid() {
+void PluginsContainer::setupGrid() {
   grid.setVerticalSpacing(10);
 
   int j = 0;
@@ -98,7 +98,7 @@ void EffectsContainer::setupGrid() {
   setLayout(&grid);
 }
 
-void EffectsContainer::showEvent(QShowEvent* event) {
+void PluginsContainer::showEvent(QShowEvent* event) {
   Logging::write(
     Info,
     "EffectsContainer::initVstWindows()",
@@ -125,7 +125,7 @@ void EffectsContainer::showEvent(QShowEvent* event) {
   );
 }
 
-void EffectsContainer::addEffect(const PluginIndex newEffectIndex, const AtomicStr& pluginName) {
+void PluginsContainer::addEffect(const PluginIndex newEffectIndex, const AtomicStr& pluginName) {
   auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, newEffectIndex, pluginName);
   vstWindows.push_back(std::move(vstWindow));
   vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, newEffectIndex, pluginName, &selectVstWindowAction));
@@ -142,7 +142,7 @@ void EffectsContainer::addEffect(const PluginIndex newEffectIndex, const AtomicS
   }
 }
 
-void EffectsContainer::clearButtonsAndLabels() {
+void PluginsContainer::clearButtonsAndLabels() {
   for (const auto button: vstWindowSelectButtons)
     delete button;
 
@@ -153,7 +153,7 @@ void EffectsContainer::clearButtonsAndLabels() {
   vstWindowSelectLabels.clear();
 }
 
-void EffectsContainer::hideEvent(QHideEvent* event) {
+void PluginsContainer::hideEvent(QHideEvent* event) {
   mixer->terminateEditorHostsOnChannel(channelIndex);
   for (auto vstWindow: vstWindows)
     vstWindow->close();

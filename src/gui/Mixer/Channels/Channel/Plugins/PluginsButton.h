@@ -8,14 +8,14 @@
 #include <QAction>
 #include <QPushButton>
 
-#include "../../../Color.h"
+#include "../../../../Color.h"
 
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-class EffectsButton final : public QPushButton {
+class PluginsButton final : public QPushButton {
 public:
-  EffectsButton(QWidget* parent, QAction* openEffectsContainer);
+  PluginsButton(QWidget* parent, QAction* openEffectsContainer);
 
 private:
   QAction* openEffectsContainer;

@@ -2,12 +2,12 @@
 // Created by ns on 5/3/25.
 //
 
-#include "RemoveEffectsChannelButton.h"
+#include "RemoveChannelButton.h"
 
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-RemoveEffectsChannelButton::RemoveEffectsChannelButton(QWidget* parent, ChannelIndex channelIndex, QAction* action)
+RemoveChannelButton::RemoveChannelButton(QWidget* parent, ChannelIndex channelIndex, QAction* action)
 : QPushButton("", parent)
   , channelIndex(channelIndex)
   , removeEffectsChannelAction(action) {
@@ -16,7 +16,7 @@ RemoveEffectsChannelButton::RemoveEffectsChannelButton(QWidget* parent, ChannelI
   setStyle();
 }
 
-RemoveEffectsChannelButton::~RemoveEffectsChannelButton() {
+RemoveChannelButton::~RemoveChannelButton() {
   Logging::write(
     Info,
     "Gui::RemoveEffectsChannelButton::~RemoveEffectsChannelButton",
@@ -25,17 +25,17 @@ RemoveEffectsChannelButton::~RemoveEffectsChannelButton() {
 }
 
 
-void RemoveEffectsChannelButton::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIdx) {
+void RemoveChannelButton::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIdx) {
   channelIndex = newChannelIdx;
 }
 
 
-void RemoveEffectsChannelButton::mousePressEvent(QMouseEvent* event) {
+void RemoveChannelButton::mousePressEvent(QMouseEvent* event) {
   removeEffectsChannelAction->setData(static_cast<quint64>(channelIndex));
   removeEffectsChannelAction->activate(QAction::Trigger);
 }
 
-void RemoveEffectsChannelButton::setStyle() {
+void RemoveChannelButton::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   setMinimumSize(QSize(20, 20));
   setStyleSheet("padding: 2px;");

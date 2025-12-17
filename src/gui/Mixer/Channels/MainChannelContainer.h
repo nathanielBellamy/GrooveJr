@@ -14,7 +14,7 @@
 #include <QWidget>
 
 #include "../../../AppState.h"
-#include "EffectsChannel/EffectsChannel.h"
+#include "Channel/Channel.h"
 #include "../../../audio/mixer/Core.h"
 #include "../../Color.h"
 
@@ -79,7 +79,7 @@ private:
   QAction* soloChannelAction;
   QAction* soloLChannelAction;
   QAction* soloRChannelAction;
-  std::unique_ptr<EffectsChannel> mainChannel;
+  std::unique_ptr<Channel> mainChannel;
 
   void setStyle();
 

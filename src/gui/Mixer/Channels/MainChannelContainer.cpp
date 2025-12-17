@@ -30,7 +30,7 @@ MainChannelContainer::MainChannelContainer(
   , soloChannelAction(soloChannelAction)
   , soloLChannelAction(soloLChannelAction)
   , soloRChannelAction(soloRChannelAction)
-  , mainChannel(std::make_unique<EffectsChannel>(
+  , mainChannel(std::make_unique<Channel>(
     this, actorSystem, mixer, 0, nullptr,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction,
@@ -77,7 +77,7 @@ void MainChannelContainer::setChannel() {
     "Setting channel."
   );
 
-  mainChannel = std::make_unique<EffectsChannel>(this, actorSystem, mixer, 0, nullptr,
+  mainChannel = std::make_unique<Channel>(this, actorSystem, mixer, 0, nullptr,
                                                  muteChannelAction, muteLChannelAction, muteRChannelAction,
                                                  soloChannelAction, soloLChannelAction, soloRChannelAction,
                                                  vuPtr

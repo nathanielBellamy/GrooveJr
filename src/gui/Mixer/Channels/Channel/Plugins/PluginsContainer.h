@@ -18,7 +18,7 @@
 #include "../../../../Color.h"
 #include "VstWindow.h"
 #include "VstWindowSelectButton.h"
-#include "../AddPluginButton.h"
+#include "AddPluginButton.h"
 #include "../../../../../audio/mixer/Core.h"
 #include "../../../../../Logging.h"
 #include "../../../../../types/AtomicStr.h"
@@ -27,9 +27,9 @@
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-class EffectsContainer final : public QWidget {
+class PluginsContainer final : public QWidget {
 public:
-  EffectsContainer(
+  PluginsContainer(
     QWidget* parent,
     Audio::Mixer::Core* mixer,
     ChannelIndex channelIndex,
@@ -37,7 +37,7 @@ public:
     QAction* removeEffectAction
   );
 
-  ~EffectsContainer() override;
+  ~PluginsContainer() override;
 
   void addEffect(PluginIndex newEffectIndex, const AtomicStr& pluginName);
 

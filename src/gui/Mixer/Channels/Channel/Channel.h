@@ -24,11 +24,11 @@
 
 #include "../../../../audio/mixer/Core.h"
 #include "../../../../audio/Math.h"
-#include "PluginSlots.h"
+#include "Plugins/PluginSlots.h"
 #include "MuteSoloContainer.h"
-#include "RemoveEffectsChannelButton.h"
+#include "RemoveChannelButton.h"
 #include "VuMeter.h"
-#include "./Effects/EffectsContainer.h"
+#include "./Plugins/PluginsContainer.h"
 #include "../../../Shared/VstSelect.h"
 #include "../../../Color.h"
 
@@ -39,9 +39,9 @@ using namespace caf;
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-class EffectsChannel final : public QWidget {
+class Channel final : public QWidget {
 public:
-  EffectsChannel(
+  Channel(
     QWidget* parent,
     actor_system& actorSystem,
     Audio::Mixer::Core* mixer,
@@ -56,7 +56,7 @@ public:
     std::atomic<float>* vuPtr
   );
 
-  ~EffectsChannel() override;
+  ~Channel() override;
 
   void hydrateState(const AppStatePacket& appStatePacket, ChannelIndex newChannelIndex);
 
@@ -87,7 +87,7 @@ private:
   std::atomic<float>* vuPtr;
   VuMeter vuMeter;
   QAction* removeEffectsChannelAction;
-  RemoveEffectsChannelButton removeEffectsChannelButton;
+  RemoveChannelButton removeEffectsChannelButton;
   QAction addPluginAction;
   AddPluginButton addPluginButton;
   QAction openEffectsContainer;
@@ -95,7 +95,7 @@ private:
   QUrl vstUrl;
   QAction replacePluginAction;
   QAction removePluginAction;
-  EffectsContainer effectsContainer;
+  PluginsContainer effectsContainer;
   QGridLayout grid;
   QLabel title;
   QSlider gainSlider;

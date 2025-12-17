@@ -26,7 +26,7 @@
 #include "../../db/entity/mixer/Scene.h"
 // #include "JackClient.h"
 #include "Channel.h"
-#include "../../gui/Mixer/Channel/EffectsChannel/Effects/VstWindow.h"
+#include "../../gui/Mixer/Channels/Channel/Plugins/VstWindow.h"
 #include "../effects/vst3/Util.h"
 #include "../ThreadStatics.h"
 

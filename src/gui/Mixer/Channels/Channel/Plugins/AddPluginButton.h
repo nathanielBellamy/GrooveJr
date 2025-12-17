@@ -9,7 +9,7 @@
 #include <QPushButton>
 #include <QWidget>
 
-#include "../../../Color.h"
+#include "../../../../Color.h"
 
 namespace Gj {
 namespace Gui {

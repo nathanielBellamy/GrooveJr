@@ -16,14 +16,14 @@
 #include <QLabel>
 #include <QWidget>
 
-#include "../../../../AppState.h"
+#include "../../../../../AppState.h"
 #include "RemovePluginButton.h"
 #include "ReplacePluginButton.h"
-#include "../../../Shared/VstSelect.h"
-#include "../../../../actors/ActorIds.h"
-#include "../../../../messaging/atoms.h"
-#include "../../../../audio/mixer/Core.h"
-#include "../../../Color.h"
+#include "../../../../Shared/VstSelect.h"
+#include "../../../../../actors/ActorIds.h"
+#include "../../../../../messaging/atoms.h"
+#include "../../../../../audio/mixer/Core.h"
+#include "../../../../Color.h"
 
 using namespace caf;
 

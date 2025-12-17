@@ -9,14 +9,14 @@
 #include <QPoint>
 #include <QPushButton>
 
-#include "../../../Color.h"
+#include "../../Color.h"
 
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-class AddEffectsChannelButton : public QPushButton {
+class AddChannelButton : public QPushButton {
 public:
-  AddEffectsChannelButton(QWidget* parent, QAction* action);
+  AddChannelButton(QWidget* parent, QAction* action);
 
 private:
   QAction* addEffectsChannelAction;

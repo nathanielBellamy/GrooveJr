@@ -2,14 +2,14 @@
 // Created by ns on 3/7/25.
 //
 
-#include "EffectsChannelsContainer.h"
+#include "ChannelsContainer.h"
 
-#include "../../../../audio/Constants.h"
+#include "../../../audio/Constants.h"
 
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-EffectsChannelsContainer::EffectsChannelsContainer(
+ChannelsContainer::ChannelsContainer(
   QWidget* parent,
   actor_system& actorSystem,
   Audio::Mixer::Core* mixer,
@@ -52,7 +52,7 @@ EffectsChannelsContainer::EffectsChannelsContainer(
   );
 }
 
-void EffectsChannelsContainer::hydrateState(const AppStatePacket& appState) {
+void ChannelsContainer::hydrateState(const AppStatePacket& appState) {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::hydrateState",
@@ -71,13 +71,13 @@ void EffectsChannelsContainer::hydrateState(const AppStatePacket& appState) {
   update();
 }
 
-void EffectsChannelsContainer::addEffectsChannel() {
+void ChannelsContainer::addEffectsChannel() {
   if (channels.size() > Audio::MAX_MIXER_CHANNELS - 2)
     return;
 
   const ChannelIndex channelIndex = channels.size() + 1;
 
-  const auto effectsChannel = new EffectsChannel(
+  const auto effectsChannel = new Channel(
     this, actorSystem, mixer, channelIndex, &removeEffectsChannelAction,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction,
@@ -89,14 +89,14 @@ void EffectsChannelsContainer::addEffectsChannel() {
     channels.front()->updateShowRemoveEffectsChannelButton(true);
 }
 
-void EffectsChannelsContainer::removeEffectsChannel(const ChannelIndex channelIdx) {
+void ChannelsContainer::removeEffectsChannel(const ChannelIndex channelIdx) {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::removeEffectsChannel",
     "Removing effects channels channel " + std::to_string(channelIdx)
   );
 
-  const auto itrToRemove = std::find_if(channels.begin(), channels.end(), [&channelIdx](EffectsChannel* channel) {
+  const auto itrToRemove = std::find_if(channels.begin(), channels.end(), [&channelIdx](Channel* channel) {
     return channel->channelIndex == channelIdx;
   });
 
@@ -128,7 +128,7 @@ void EffectsChannelsContainer::removeEffectsChannel(const ChannelIndex channelId
   );
 }
 
-void EffectsChannelsContainer::clearEffectsChannels() {
+void ChannelsContainer::clearEffectsChannels() {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::clearEffectsChannels",
@@ -148,7 +148,7 @@ void EffectsChannelsContainer::clearEffectsChannels() {
   );
 }
 
-void EffectsChannelsContainer::setChannels() {
+void ChannelsContainer::setChannels() {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::setChannels",
@@ -184,7 +184,7 @@ void EffectsChannelsContainer::setChannels() {
   );
 }
 
-void EffectsChannelsContainer::setEffects() const {
+void ChannelsContainer::setEffects() const {
   Logging::write(
     Info,
     "Gui::EffectsChannelsContainer::addEffectToChannel",
@@ -194,7 +194,7 @@ void EffectsChannelsContainer::setEffects() const {
     channel->setEffects();
 }
 
-void EffectsChannelsContainer::connectActions() {
+void ChannelsContainer::connectActions() {
   auto addEffectsChannelConnection = connect(&addEffectsChannelAction, &QAction::triggered, [&]() {
     Logging::write(
       Info,
@@ -234,7 +234,7 @@ void EffectsChannelsContainer::connectActions() {
   });
 }
 
-void EffectsChannelsContainer::setStyle() {
+void ChannelsContainer::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet(
     ("border-radius: 5px; background-color: " + Color::toHex(GjC::LIGHT_200)).data()
@@ -242,7 +242,7 @@ void EffectsChannelsContainer::setStyle() {
   channelsWidget.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
 }
 
-void EffectsChannelsContainer::setupGrid() {
+void ChannelsContainer::setupGrid() {
   setupChannelsScrollArea();
   grid.addWidget(&addEffectsChannelButton, 0, 1, -1, 1);
   int col = 0;
@@ -252,7 +252,7 @@ void EffectsChannelsContainer::setupGrid() {
   }
 }
 
-void EffectsChannelsContainer::setupChannelsScrollArea() {
+void ChannelsContainer::setupChannelsScrollArea() {
   channelsScrollArea.setMinimumWidth(500);
   channelsScrollArea.setMaximumWidth(1000);
   grid.addWidget(&channelsScrollArea, 0, 0, -1, 1);
@@ -266,42 +266,42 @@ void EffectsChannelsContainer::setupChannelsScrollArea() {
   channelsWidget.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 }
 
-void EffectsChannelsContainer::setMute(const ChannelIndex channelIdx, const float val) const {
+void ChannelsContainer::setMute(const ChannelIndex channelIdx, const float val) const {
   if (!channelIdx)
     return;
 
   channels.at(channelIdx - 1)->setMute(val);
 }
 
-void EffectsChannelsContainer::setMuteL(const ChannelIndex channelIdx, const float val) const {
+void ChannelsContainer::setMuteL(const ChannelIndex channelIdx, const float val) const {
   if (!channelIdx)
     return;
 
   channels.at(channelIdx - 1)->setMuteL(val);
 }
 
-void EffectsChannelsContainer::setMuteR(const ChannelIndex channelIdx, const float val) const {
+void ChannelsContainer::setMuteR(const ChannelIndex channelIdx, const float val) const {
   if (!channelIdx)
     return;
 
   channels.at(channelIdx - 1)->setMuteR(val);
 }
 
-void EffectsChannelsContainer::setSolo(const ChannelIndex channelIdx, const float val) const {
+void ChannelsContainer::setSolo(const ChannelIndex channelIdx, const float val) const {
   if (!channelIdx)
     return;
 
   channels.at(channelIdx - 1)->setSolo(val);
 }
 
-void EffectsChannelsContainer::setSoloL(const ChannelIndex channelIdx, const float val) const {
+void ChannelsContainer::setSoloL(const ChannelIndex channelIdx, const float val) const {
   if (!channelIdx)
     return;
 
   channels.at(channelIdx - 1)->setSoloL(val);
 }
 
-void EffectsChannelsContainer::setSoloR(const ChannelIndex channelIdx, const float val) const {
+void ChannelsContainer::setSoloR(const ChannelIndex channelIdx, const float val) const {
   if (!channelIdx)
     return;
 

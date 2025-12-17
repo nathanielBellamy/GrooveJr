@@ -13,11 +13,11 @@
 #include <QGridLayout>
 #include <QWidget>
 
-#include "../../../../Logging.h"
-#include "../../../../AppState.h"
+#include "../../../../../Logging.h"
+#include "../../../../../AppState.h"
 #include "AddPluginButton.h"
 #include "PluginSlot.h"
-#include "../../../../audio/mixer/Core.h"
+#include "../../../../../audio/mixer/Core.h"
 
 using namespace caf;
 

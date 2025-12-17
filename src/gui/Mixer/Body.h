@@ -13,8 +13,8 @@
 
 #include <jack/ringbuffer.h>
 
-#include "./Channel/MainChannelContainer.h"
-#include "./Channel/EffectsChannel/EffectsChannelsContainer.h"
+#include "./Channels/MainChannelContainer.h"
+#include "Channels/ChannelsContainer.h"
 
 #include "../../AppState.h"
 #include "../../audio/mixer/Core.h"
@@ -51,7 +51,7 @@ private:
   QGridLayout grid;
   QLabel title;
   MainChannelContainer mainChannelContainer;
-  EffectsChannelsContainer effectsChannelsContainer;
+  ChannelsContainer effectsChannelsContainer;
 
   std::thread vuWorker;
   std::atomic<bool> vuWorkerRunning = false;

@@ -12,8 +12,8 @@
 #include <QStyle>
 #include <QVariant>
 
-#include "../../../../AppState.h"
-#include "../../../../Logging.h"
+#include "../../../../../AppState.h"
+#include "../../../../../Logging.h"
 
 namespace Gj {
 namespace Gui {
