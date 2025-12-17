@@ -6,6 +6,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 ReplacePluginButton::ReplacePluginButton(
   QWidget* parent,
   const ChannelIndex channelIndex,
@@ -46,5 +47,6 @@ void ReplacePluginButton::setStyle() {
   setMinimumSize(QSize(20, 20));
   setStyleSheet("padding: 2px;");
 }
+} // Mixer
 } // Gui
 } // Gj

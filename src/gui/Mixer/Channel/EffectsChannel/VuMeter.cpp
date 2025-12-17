@@ -6,6 +6,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 VuMeter::VuMeter(QWidget* parent, Audio::Mixer::Core* mixer, std::atomic<float>* vuPtr, const ChannelIndex channelIndex)
 : QOpenGLWidget(parent)
   , channelIndex(channelIndex)
@@ -172,5 +173,6 @@ Result VuMeter::hydrateState(const AppStatePacket& appStatePacket) {
 
   return OK;
 };
+} // Mixer
 } // Gui
 } // Gj

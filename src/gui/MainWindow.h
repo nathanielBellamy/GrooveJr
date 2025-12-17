@@ -19,7 +19,7 @@
 
 #include "./Color.h"
 #include "./MenuBar/MenuBar.h"
-#include "./Mixer/MixerWindow.h"
+#include "./Mixer/Body.h"
 #include "./MusicLibrary/MusicLibraryWindow.h"
 #include "./MainToolBar/MainToolBar.h"
 
@@ -82,7 +82,7 @@ private:
   MainToolBar mainToolBar;
   QGridLayout grid;
   MusicLibraryWindow musicLibraryWindow;
-  MixerWindow mixerWindow;
+  Mixer::Body mixerWindow;
 
   void setupGrid();
 

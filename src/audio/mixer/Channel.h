@@ -241,9 +241,9 @@ public:
 
   PluginIndex pluginCount() const;
 
-  Result initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows);
+  Result initEditorHosts(const std::vector<std::shared_ptr<Gui::Mixer::VstWindow> >& vstWindows);
 
-  Result initEditorHost(PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const;
+  Result initEditorHost(PluginIndex pluginIndex, std::shared_ptr<Gui::Mixer::VstWindow> vstWindow) const;
 
   Result terminateEditorHosts();
 

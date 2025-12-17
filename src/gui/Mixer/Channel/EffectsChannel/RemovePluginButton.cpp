@@ -6,15 +6,15 @@
 
 namespace Gj {
 namespace Gui {
-
+namespace Mixer {
 RemovePluginButton::RemovePluginButton(
   QWidget* parent,
   const ChannelIndex channelIndex,
   const PluginIndex pluginIndex,
   const bool occupied,
   QAction* action
-  )
-  : QPushButton("", parent)
+)
+: QPushButton("", parent)
   , channelIndex(channelIndex)
   , pluginIndex(pluginIndex)
   , occupied(occupied)
@@ -24,7 +24,7 @@ RemovePluginButton::RemovePluginButton(
   setStyle();
 }
 
-void RemovePluginButton::hydrateState(const AppStatePacket &appState, ChannelIndex newChannelIdx) {
+void RemovePluginButton::hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx) {
   channelIndex = newChannelIdx;
 }
 
@@ -38,6 +38,6 @@ void RemovePluginButton::setStyle() {
   setMinimumSize(QSize(20, 20));
   setStyleSheet("padding: 2px;");
 }
-
+} // Mixer
 } // Gui
 } // Gj

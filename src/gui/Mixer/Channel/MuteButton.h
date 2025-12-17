@@ -12,24 +12,26 @@
 
 namespace Gj {
 namespace Gui {
-
+namespace Mixer {
 class MuteButton final : public QPushButton {
+public:
+  MuteButton(QWidget* parent, QAction* muteChannelAction, int channelIndex);
 
-  public:
-    MuteButton(QWidget* parent, QAction* muteChannelAction, int channelIndex);
-    void setMute(float val);
+  void setMute(float val);
 
-  private:
-    int channelIndex;
-    QAction* muteChannelAction;
-    std::string styleString(float muteVal) const;
-    void setStyle();
-    void mousePressEvent(QMouseEvent* event) override;
+private:
+  int channelIndex;
+  QAction* muteChannelAction;
+
+  std::string styleString(float muteVal) const;
+
+  void setStyle();
+
+  void mousePressEvent(QMouseEvent* event) override;
 };
-
+} // Mixer
 } // Gui
 } // Gj
-
 
 
 #endif //MUTEBUTTON_H

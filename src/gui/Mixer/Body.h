@@ -24,11 +24,12 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
-class MixerWindow final : public QWidget {
+namespace Mixer {
+class Body final : public QWidget {
 public:
-  explicit MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer);
+  explicit Body(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer);
 
-  ~MixerWindow();
+  ~Body();
 
   void hydrateState(const AppStatePacket& appStatePacket);
 
@@ -71,6 +72,7 @@ private:
 
   void connectActions();
 };
+} // Mixer
 } // Gui
 } // Gj
 

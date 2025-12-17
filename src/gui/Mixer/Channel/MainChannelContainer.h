@@ -22,6 +22,7 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 class MainChannelContainer final : public QWidget {
 public:
   MainChannelContainer(
@@ -84,6 +85,7 @@ private:
 
   void setupGrid();
 };
+} // Mixer
 } // Gui
 } // Gj
 

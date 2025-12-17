@@ -21,6 +21,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 class MuteSoloContainer final : public QWidget {
 public:
   MuteSoloContainer(
@@ -66,6 +67,7 @@ private:
 
   void setupGrid();
 };
+} // Mixer
 } // Gui
 } // Gj
 

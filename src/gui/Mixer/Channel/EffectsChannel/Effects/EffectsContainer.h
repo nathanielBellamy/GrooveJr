@@ -26,6 +26,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 class EffectsContainer final : public QWidget {
 public:
   EffectsContainer(
@@ -64,6 +65,7 @@ private:
 
   void hideEvent(QHideEvent* event) override;
 };
+} // Mixer
 } // Gui
 } // Gj
 

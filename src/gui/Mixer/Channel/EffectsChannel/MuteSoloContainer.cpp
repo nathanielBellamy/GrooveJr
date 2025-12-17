@@ -6,6 +6,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 MuteSoloContainer::MuteSoloContainer(
   QWidget* parent,
   Audio::Mixer::Core* mixer,
@@ -112,5 +113,6 @@ void MuteSoloContainer::setSoloL(const float val) {
 void MuteSoloContainer::setSoloR(const float val) {
   soloR.setSolo(val);
 }
+} // Mixer
 } // Gui
 } // Gj

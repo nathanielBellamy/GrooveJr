@@ -6,13 +6,11 @@
 
 namespace Gj {
 namespace Gui {
-
+namespace Mixer {
 SoloButton::SoloButton(QWidget* parent, QAction* soloChannelAction, const int channelIndex)
-  : QPushButton("&S", parent)
+: QPushButton("&S", parent)
   , channelIndex(channelIndex)
-  , soloChannelAction(soloChannelAction)
-  {
-
+  , soloChannelAction(soloChannelAction) {
   setStyle();
 }
 
@@ -21,7 +19,7 @@ void SoloButton::setStyle() {
   setStyleSheet(styleString(0.0f).data());
 }
 
-void SoloButton::mousePressEvent(QMouseEvent* event){
+void SoloButton::mousePressEvent(QMouseEvent* event) {
   soloChannelAction->setData(channelIndex);
   soloChannelAction->activate(QAction::Trigger);
 }
@@ -29,7 +27,8 @@ void SoloButton::mousePressEvent(QMouseEvent* event){
 std::string SoloButton::styleString(const float soloVal) const {
   std::string styleString = "border-radius: 5px; border: 2px solid white; ";
   if (soloVal == 1.0f) {
-    styleString += "background-color: " + Color::toHex(GjC::SOLO_YELLOW) + "; color: " + Color::toHex(GjC::DARK_400) +"; ";
+    styleString += "background-color: " + Color::toHex(GjC::SOLO_YELLOW) + "; color: " + Color::toHex(GjC::DARK_400) +
+        "; ";
   } else {
     styleString += "background-color: " + Color::toHex(GjC::LIGHT_200) + "; ";
   }
@@ -39,6 +38,6 @@ std::string SoloButton::styleString(const float soloVal) const {
 void SoloButton::setSolo(const float val) {
   setStyleSheet(styleString(val).data());
 }
-
+} // Mixer
 } // Gui
 } // Gj

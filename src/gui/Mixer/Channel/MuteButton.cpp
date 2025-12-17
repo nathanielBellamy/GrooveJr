@@ -6,22 +6,21 @@
 
 namespace Gj {
 namespace Gui {
-
+namespace Mixer {
 MuteButton::MuteButton(QWidget* parent, QAction* muteChannelAction, const int channelIndex)
-  : QPushButton("&M", parent)
+: QPushButton("&M", parent)
   , channelIndex(channelIndex)
-  , muteChannelAction(muteChannelAction)
-  {
-
+  , muteChannelAction(muteChannelAction) {
   setStyle();
 }
 
 std::string MuteButton::styleString(const float muteVal) const {
   std::string styleString = "border-radius: 5px; border: 2px solid white;";
   if (muteVal == 1.0f) {
-    styleString += " background-color: " + Color::toHex(GjC::MUTE_BLUE) +"; color: " + Color::toHex(GjC::DARK_400) + "; ";
+    styleString += " background-color: " + Color::toHex(GjC::MUTE_BLUE) + "; color: " + Color::toHex(GjC::DARK_400) +
+        "; ";
   } else {
-    styleString += " background-color: "  + Color::toHex(GjC::LIGHT_200) + "; ";
+    styleString += " background-color: " + Color::toHex(GjC::LIGHT_200) + "; ";
   }
   return styleString;
 };
@@ -36,10 +35,10 @@ void MuteButton::setStyle() {
   setStyleSheet(styleString(false).data());
 }
 
-void MuteButton::mousePressEvent(QMouseEvent* event){
+void MuteButton::mousePressEvent(QMouseEvent* event) {
   muteChannelAction->setData(channelIndex);
   muteChannelAction->activate(QAction::Trigger);
 }
-
+} // Mixer
 } // Gui
 } // Gj

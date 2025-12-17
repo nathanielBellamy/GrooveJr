@@ -18,36 +18,39 @@
 
 namespace Gj {
 namespace Gui {
-
+namespace Mixer {
 using namespace Steinberg::Vst::EditorHost;
 
 class VstWindow final : public QWidget, public IWindow {
-
 	ChannelIndex channelIndex;
 	PluginIndex effectIndex;
 	AtomicStr name;
 	QGridLayout grid;
+
 	void setStyle();
+
 	void setupGrid();
 
 public:
-  explicit VstWindow(QWidget* parent, ChannelIndex channelIndex, PluginIndex effectIndex, const AtomicStr& name);
-	~VstWindow () noexcept override;
+	explicit VstWindow(QWidget* parent, ChannelIndex channelIndex, PluginIndex effectIndex, const AtomicStr& name);
 
-	void show () override;
-	void close () override;
-	void resize (Size newSize) override;
-	Size getContentSize () override;
+	~VstWindow() noexcept override;
 
-	[[nodiscard]] NativePlatformWindow getNativePlatformWindow () const override;
+	void show() override;
 
-	Steinberg::tresult queryInterface (const Steinberg::TUID iid, void** obj) override;
+	void close() override;
 
+	void resize(Size newSize) override;
+
+	Size getContentSize() override;
+
+	[[nodiscard]] NativePlatformWindow getNativePlatformWindow() const override;
+
+	Steinberg::tresult queryInterface(const Steinberg::TUID iid, void** obj) override;
 };
-
+} // Mixer
 } // Gui
 } // Gj
-
 
 
 #endif //VSTWINDOW_H

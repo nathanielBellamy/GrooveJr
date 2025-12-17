@@ -195,10 +195,10 @@ public:
 
   Result loadPluginOnChannel(const Db::Plugin& plugin);
 
-  Result initEditorHostsOnChannel(ChannelIndex idx, std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows);
+  Result initEditorHostsOnChannel(ChannelIndex idx, std::vector<std::shared_ptr<Gui::Mixer::VstWindow> >& vstWindows);
 
   Result initEditorHostOnChannel(ChannelIndex idx, PluginIndex newPluginIndex,
-                                 std::shared_ptr<Gui::VstWindow> vstWindow);
+                                 std::shared_ptr<Gui::Mixer::VstWindow> vstWindow);
 
   Result terminateEditorHostsOnChannel(ChannelIndex idx);
 

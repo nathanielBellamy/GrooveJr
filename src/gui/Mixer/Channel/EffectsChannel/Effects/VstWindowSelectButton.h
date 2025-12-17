@@ -14,16 +14,17 @@
 
 namespace Gj {
 namespace Gui {
-
+namespace Mixer {
 class VstWindowSelectButton final : public QPushButton {
   PluginIndex effectIndex;
   QAction* selectAction;
+
   void mousePressEvent(QMouseEvent* event) override;
 
-  public:
-    VstWindowSelectButton(QWidget* parent, PluginIndex effectIndex, const AtomicStr& pluginName, QAction* selectAction);
+public:
+  VstWindowSelectButton(QWidget* parent, PluginIndex effectIndex, const AtomicStr& pluginName, QAction* selectAction);
 };
-
+} // Mixer
 } // Gui
 } // Gj
 

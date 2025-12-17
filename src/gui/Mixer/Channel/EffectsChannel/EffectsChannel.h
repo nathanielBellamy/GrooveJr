@@ -38,6 +38,7 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 class EffectsChannel final : public QWidget {
 public:
   EffectsChannel(
@@ -135,6 +136,7 @@ private:
 
   void setupEffectsSlotsScrollArea();
 };
+} // Mixer
 } // Gui
 } // Gj
 

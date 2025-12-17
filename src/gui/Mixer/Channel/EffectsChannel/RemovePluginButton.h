@@ -16,23 +16,25 @@
 
 namespace Gj {
 namespace Gui {
-
+namespace Mixer {
 class RemovePluginButton final : public QPushButton {
+public:
+  RemovePluginButton(QWidget* parent, ChannelIndex channelIndex, PluginIndex pluginIndex, bool occupied,
+                     QAction* action);
 
-  public:
-    RemovePluginButton(QWidget* parent, ChannelIndex channelIndex, PluginIndex pluginIndex, bool occupied, QAction* action);
-    void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx);
+  void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx);
 
-  private:
-    ChannelIndex channelIndex;
-    PluginIndex pluginIndex;
-    bool occupied;
-    QAction* removePluginAction;
-    void mousePressEvent(QMouseEvent* event) override;
-    void setStyle();
+private:
+  ChannelIndex channelIndex;
+  PluginIndex pluginIndex;
+  bool occupied;
+  QAction* removePluginAction;
 
+  void mousePressEvent(QMouseEvent* event) override;
+
+  void setStyle();
 };
-
+} // Mixer
 } // Gui
 } // Gj
 

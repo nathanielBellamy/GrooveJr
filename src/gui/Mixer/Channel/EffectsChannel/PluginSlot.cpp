@@ -6,6 +6,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 PluginSlot::PluginSlot(QWidget* parent,
                        actor_system& actorSystem,
                        Audio::Mixer::Core* mixer,
@@ -89,5 +90,6 @@ void PluginSlot::setupGrid() {
   grid.setVerticalSpacing(4);
   grid.setHorizontalSpacing(4);
 }
+} // Mixer
 } // Gui
 } // Gj

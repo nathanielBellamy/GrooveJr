@@ -6,6 +6,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 EffectsContainer::EffectsContainer(
   QWidget* parent,
   Audio::Mixer::Core* mixer,
@@ -157,5 +158,6 @@ void EffectsContainer::hideEvent(QHideEvent* event) {
   for (auto vstWindow: vstWindows)
     vstWindow->close();
 }
+} // Mixer
 } // Gui
 } // Gj

@@ -7,6 +7,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 EffectsChannel::EffectsChannel(
   QWidget* parent,
   actor_system& actorSystem,
@@ -525,5 +526,6 @@ void EffectsChannel::setSoloL(const float val) {
 void EffectsChannel::setSoloR(const float val) {
   muteSoloContainer.setSoloR(val);
 }
+} // Mixer
 } // Gui
 } // Gj

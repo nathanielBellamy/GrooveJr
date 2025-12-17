@@ -12,22 +12,24 @@
 
 namespace Gj {
 namespace Gui {
-
+namespace Mixer {
 class SoloButton final : public QPushButton {
+public:
+  SoloButton(QWidget* parent, QAction* soloChannelAction, int channelIndex);
 
-  public:
-    SoloButton(QWidget* parent, QAction* soloChannelAction, int channelIndex);
-    void setSolo(float val);
+  void setSolo(float val);
 
-  private:
-    int channelIndex;
-    QAction* soloChannelAction;
-    std::string styleString(float soloVal) const;
-    void setStyle();
-    void mousePressEvent(QMouseEvent* event) override;
+private:
+  int channelIndex;
+  QAction* soloChannelAction;
 
+  std::string styleString(float soloVal) const;
+
+  void setStyle();
+
+  void mousePressEvent(QMouseEvent* event) override;
 };
-
+} // Mixer
 } // Gui
 } // Gj
 

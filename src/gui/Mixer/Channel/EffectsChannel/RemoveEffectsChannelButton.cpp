@@ -6,9 +6,9 @@
 
 namespace Gj {
 namespace Gui {
-
-RemoveEffectsChannelButton::RemoveEffectsChannelButton(QWidget *parent, ChannelIndex channelIndex, QAction* action)
-  : QPushButton("", parent)
+namespace Mixer {
+RemoveEffectsChannelButton::RemoveEffectsChannelButton(QWidget* parent, ChannelIndex channelIndex, QAction* action)
+: QPushButton("", parent)
   , channelIndex(channelIndex)
   , removeEffectsChannelAction(action) {
   setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
@@ -25,7 +25,7 @@ RemoveEffectsChannelButton::~RemoveEffectsChannelButton() {
 }
 
 
-void RemoveEffectsChannelButton::hydrateState(const AppStatePacket &appState, const ChannelIndex newChannelIdx) {
+void RemoveEffectsChannelButton::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIdx) {
   channelIndex = newChannelIdx;
 }
 
@@ -40,6 +40,6 @@ void RemoveEffectsChannelButton::setStyle() {
   setMinimumSize(QSize(20, 20));
   setStyleSheet("padding: 2px;");
 }
-
+} // Mixer
 } // Gui
 } // Gj

@@ -23,6 +23,7 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 class PluginSlots final : public QWidget {
 public:
   PluginSlots(
@@ -55,6 +56,7 @@ private:
 
   void setupGrid();
 };
+} // Mixer
 } // Gui
 } // Gj
 

@@ -17,23 +17,25 @@
 
 namespace Gj {
 namespace Gui {
-
+namespace Mixer {
 class RemoveEffectsChannelButton final : public QPushButton {
+public:
+  RemoveEffectsChannelButton(QWidget* parent, ChannelIndex channelIndex, QAction* action);
 
-  public:
-    RemoveEffectsChannelButton(QWidget* parent, ChannelIndex channelIndex, QAction* action);
-    ~RemoveEffectsChannelButton();
-    void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx);
+  ~RemoveEffectsChannelButton();
 
-  private:
-    ChannelIndex channelIndex;
-    bool occupied;
-    QAction* removeEffectsChannelAction;
-    void mousePressEvent(QMouseEvent* event) override;
-    void setStyle();
+  void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx);
 
+private:
+  ChannelIndex channelIndex;
+  bool occupied;
+  QAction* removeEffectsChannelAction;
+
+  void mousePressEvent(QMouseEvent* event) override;
+
+  void setStyle();
 };
-
+} // Mixer
 } // Gui
 } // Gj
 

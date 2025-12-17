@@ -13,17 +13,19 @@
 
 namespace Gj {
 namespace Gui {
-
+namespace Mixer {
 class AddEffectsChannelButton : public QPushButton {
-  public:
-    AddEffectsChannelButton(QWidget* parent, QAction* action);
+public:
+  AddEffectsChannelButton(QWidget* parent, QAction* action);
 
-  private:
-    QAction* addEffectsChannelAction;
-    void setStyle();
-    void mousePressEvent(QMouseEvent* event) override;
+private:
+  QAction* addEffectsChannelAction;
+
+  void setStyle();
+
+  void mousePressEvent(QMouseEvent* event) override;
 };
-
+} // Mixer
 } // Gui
 } // Gj
 

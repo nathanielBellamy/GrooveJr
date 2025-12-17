@@ -8,6 +8,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 EffectsChannelsContainer::EffectsChannelsContainer(
   QWidget* parent,
   actor_system& actorSystem,
@@ -306,5 +307,6 @@ void EffectsChannelsContainer::setSoloR(const ChannelIndex channelIdx, const flo
 
   channels.at(channelIdx - 1)->setSoloR(val);
 }
+} // Mixer
 } // Gui
 } // Gj

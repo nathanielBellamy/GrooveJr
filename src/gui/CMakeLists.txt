@@ -54,8 +54,8 @@ qt_add_library(GjGui STATIC
         MenuBar/Menus/Music/FolderSelect.cpp
         Shared/VstSelect.h
         Shared/VstSelect.cpp
-        Mixer/MixerWindow.h
-        Mixer/MixerWindow.cpp
+        Mixer/Body.h
+        Mixer/Body.cpp
         Mixer/Channel/MainChannelContainer.h
         Mixer/Channel/MainChannelContainer.cpp
         Mixer/Channel/MuteButton.h

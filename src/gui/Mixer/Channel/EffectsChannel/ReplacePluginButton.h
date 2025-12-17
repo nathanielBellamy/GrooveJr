@@ -17,6 +17,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 class ReplacePluginButton final : public QPushButton {
 public:
   ReplacePluginButton(QWidget* parent, ChannelIndex channelIndex, PluginIndex pluginIndex, bool occupied,
@@ -36,6 +37,7 @@ private:
 
   void setStyle();
 };
+} // Mixer
 } // Gui
 } // Gj
 

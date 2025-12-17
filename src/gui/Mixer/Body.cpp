@@ -2,11 +2,12 @@
 // Created by ns on 2/28/25.
 //
 
-#include "MixerWindow.h"
+#include "Body.h"
 
 namespace Gj {
 namespace Gui {
-MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer)
+namespace Mixer {
+Body::Body(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer)
 : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
@@ -41,16 +42,16 @@ MixerWindow::MixerWindow(QWidget* parent, actor_system& actorSystem, Audio::Mixe
 
   Logging::write(
     Info,
-    "Gui::MixerWindow::MixerWindow()",
-    "Instantiated MixerWindow"
+    "Gui::Body::Body()",
+    "Instantiated Body"
   );
 }
 
-MixerWindow::~MixerWindow() {
+Body::~Body() {
   vuWorkerStop();
 }
 
-Result MixerWindow::vuWorkerStart() {
+Result Body::vuWorkerStart() {
   stopVuWorker.store(false);
   vuWorker = std::thread([this]() {
     vuWorkerRunning = true;
@@ -87,12 +88,12 @@ Result MixerWindow::vuWorkerStart() {
   return OK;
 }
 
-Result MixerWindow::vuWorkerStop() {
+Result Body::vuWorkerStop() {
   stopVuWorker.store(true);
   return OK;
 }
 
-void MixerWindow::hydrateState(const AppStatePacket& appState) {
+void Body::hydrateState(const AppStatePacket& appState) {
   mainChannelContainer.hydrateState(appState);
   effectsChannelsContainer.hydrateState(appState);
 
@@ -104,12 +105,12 @@ void MixerWindow::hydrateState(const AppStatePacket& appState) {
   }
 }
 
-void MixerWindow::setStyle() {
+void Body::setStyle() {
   const std::string styleString = "background-color: " + Color::toHex(GjC::DARK_400) + ";";
   setStyleSheet(styleString.data());
 }
 
-void MixerWindow::setupGrid() {
+void Body::setupGrid() {
   grid.setVerticalSpacing(1);
 
   grid.addWidget(&title, 0, 0, 1, -1);
@@ -124,10 +125,10 @@ void MixerWindow::setupGrid() {
   setLayout(&grid);
 }
 
-void MixerWindow::setEffects() {
+void Body::setEffects() {
   Logging::write(
     Info,
-    "Gui::MixerWindow::setEffects",
+    "Gui::Body::setEffects",
     "Setting effects."
   );
 
@@ -136,7 +137,7 @@ void MixerWindow::setEffects() {
 }
 
 
-void MixerWindow::connectActions() {
+void Body::connectActions() {
   auto muteChannelConnection = connect(&muteChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = muteChannelAction.data().toULongLong();
 
@@ -152,7 +153,7 @@ void MixerWindow::connectActions() {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::MixerWindow::connectActions::muteChannelAction",
+        "Gui::Body::connectActions::muteChannelAction",
         "Failed to update mute for channelIndex: " + std::to_string(channelIdx)
       );
   });
@@ -172,7 +173,7 @@ void MixerWindow::connectActions() {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::MixerWindow::connectActions::muteLChannelAction",
+        "Gui::Body::connectActions::muteLChannelAction",
         "Failed to update muteL for channelIndex: " + std::to_string(channelIdx)
       );
   });
@@ -192,7 +193,7 @@ void MixerWindow::connectActions() {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::MixerWindow::connectActions::muteRChannelAction",
+        "Gui::Body::connectActions::muteRChannelAction",
         "Failed to update muteR for channelIndex: " + std::to_string(channelIdx)
       );
   });
@@ -212,7 +213,7 @@ void MixerWindow::connectActions() {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::MixerWindow::connectActions::muteRChannelAction",
+        "Gui::Body::connectActions::muteRChannelAction",
         "Failed to update solo for channelIndex: " + std::to_string(channelIdx)
       );
   });
@@ -232,7 +233,7 @@ void MixerWindow::connectActions() {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::MixerWindow::connectActions::soloLChannelAction",
+        "Gui::Body::connectActions::soloLChannelAction",
         "Failed to update soloL for channelIndex: " + std::to_string(channelIdx)
       );
   });
@@ -254,16 +255,17 @@ void MixerWindow::connectActions() {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::MixerWindow::connectActions::soloLChannelAction",
+        "Gui::Body::connectActions::soloLChannelAction",
         "Failed to update soloR for channelIndex: " + std::to_string(channelIdx)
       );
   });
 }
 
 
-void MixerWindow::setChannels() {
+void Body::setChannels() {
   mainChannelContainer.setChannel();
   effectsChannelsContainer.setChannels();
 }
+} // Mixer
 } // Gui
 } // Gj

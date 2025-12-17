@@ -6,6 +6,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 PluginSlots::PluginSlots(QWidget* parent,
                          actor_system& actorSystem,
                          Audio::Mixer::Core* mixer,
@@ -92,5 +93,6 @@ void PluginSlots::reset() {
     "Done resetting EffectsSlots on channel " + std::to_string(channelIndex)
   );
 }
+} // Mixer
 } // Gui
 } // Gj

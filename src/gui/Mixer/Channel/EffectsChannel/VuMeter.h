@@ -25,6 +25,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 constexpr int VU_METER_AVG_SIZE = 4;
 constexpr int VU_METER_BLOCK_COUNT = 16;
 constexpr float VU_METER_BLOCK_HEIGHT = 1.3f / static_cast<float>(VU_METER_BLOCK_COUNT);
@@ -80,6 +81,7 @@ private:
 
   void resizeGL(int w, int h) override;
 };
+} // Mixer
 } // Gui
 } // Gj
 

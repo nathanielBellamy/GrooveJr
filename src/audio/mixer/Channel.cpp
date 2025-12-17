@@ -269,7 +269,7 @@ PluginIndex Channel::pluginCount() const {
 	return res;
 }
 
-Result Channel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow> >& vstWindows) {
+Result Channel::initEditorHosts(const std::vector<std::shared_ptr<Gui::Mixer::VstWindow> >& vstWindows) {
 	Logging::write(
 		Info,
 		"Audio::EffectsChannel::initEditorHosts",
@@ -280,7 +280,7 @@ Result Channel::initEditorHosts(const std::vector<std::shared_ptr<Gui::VstWindow
 	});
 }
 
-Result Channel::initEditorHost(const PluginIndex pluginIndex, std::shared_ptr<Gui::VstWindow> vstWindow) const {
+Result Channel::initEditorHost(const PluginIndex pluginIndex, std::shared_ptr<Gui::Mixer::VstWindow> vstWindow) const {
 	if (const auto pluginOpt = getPluginAtIdx(pluginIndex); pluginOpt.has_value())
 		pluginOpt.value()->initEditorHost(vstWindow);
 

@@ -8,16 +8,17 @@
 
 namespace Gj {
 namespace Gui {
-
-VstWindow::VstWindow(QWidget* parent, const ChannelIndex channelIndex, const PluginIndex effectIndex, const AtomicStr& name)
-  : QWidget(parent)
+namespace Mixer {
+VstWindow::VstWindow(QWidget* parent, const ChannelIndex channelIndex, const PluginIndex effectIndex,
+                     const AtomicStr& name)
+: QWidget(parent)
   , channelIndex(channelIndex)
   , effectIndex(effectIndex)
   , name(name)
-  , grid(this)
-  {
-
-  setWindowTitle("Channel " + QString::number(channelIndex) + " - Effect " + QString::number(effectIndex + 1) + " - " + name.c_str());
+  , grid(this) {
+  setWindowTitle(
+    "Channel " + QString::number(channelIndex) + " - Effect " + QString::number(effectIndex + 1) + " - " + name.
+    c_str());
 
   setStyle();
   setupGrid();
@@ -57,7 +58,7 @@ void VstWindow::show() {
   //   "EditorHost called VstWindow show"
   // );
   // nativeParentWidget()->windowHandle();
- // TODO
+  // TODO
 }
 
 void VstWindow::close() {
@@ -92,9 +93,9 @@ Size VstWindow::getContentSize() {
   };
 }
 
-Steinberg::tresult VstWindow::queryInterface (const Steinberg::TUID iid, void** obj) {
+Steinberg::tresult VstWindow::queryInterface(const Steinberg::TUID iid, void** obj) {
   return 1;
 };
-
+} // Mixer
 } // Gui
 } // Gj

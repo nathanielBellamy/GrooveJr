@@ -6,6 +6,7 @@
 
 namespace Gj {
 namespace Gui {
+namespace Mixer {
 MainChannelContainer::MainChannelContainer(
   QWidget* parent,
   actor_system& actorSystem,
@@ -89,5 +90,6 @@ void MainChannelContainer::setChannel() {
     "Done setting channel."
   );
 }
+} // Mixer
 } // Gui
 } // Gj
