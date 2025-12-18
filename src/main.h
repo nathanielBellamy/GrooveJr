@@ -24,8 +24,8 @@
 #include <QApplication>
 #include "./gui/MainWindow.h"
 
-#include "./audio/effects/vst3/host/App.h"
-#include "./audio/effects/vst3/Plugin.h"
+#include "./audio/plugins/vst3/host/App.h"
+#include "./audio/plugins/vst3/Plugin.h"
 #include "./audio/mixer/Core.h"
 #include "./audio/AudioCore.h"
 

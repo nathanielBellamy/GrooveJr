@@ -2,15 +2,15 @@
 // Created by ns on 1/12/25.
 //
 
-#ifndef GJAUDIOEFFECTSCHANNEL_H
-#define GJAUDIOEFFECTSCHANNEL_H
+#ifndef GJAUDIOMIXERCHANNEL_H
+#define GJAUDIOMIXERCHANNEL_H
 
 #include <algorithm>
 #include <memory>
 #include <optional>
 #include <string>
 
-#include "../effects/vst3/Plugin.h"
+#include "../plugins/vst3/Plugin.h"
 #include "ChannelSettings.h"
 #include "../../AppState.h"
 #include "../../enums/Result.h"
@@ -32,7 +32,7 @@ class Channel {
   ChannelIndex index;
   AtomicStr name{"Channel"};
 
-  std::optional<Effects::Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {std::nullopt};
+  std::optional<Plugins::Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {std::nullopt};
 
 public:
   ChannelSettings settings;
@@ -66,7 +66,7 @@ public:
   ChannelIndex getIndex() const { return index; }
 
   [[nodiscard]]
-  std::optional<Effects::Vst3::Plugin*> getPluginAtIdx(const PluginIndex idx) const {
+  std::optional<Plugins::Vst3::Plugin*> getPluginAtIdx(const PluginIndex idx) const {
     if (idx > MAX_PLUGINS_PER_CHANNEL)
       return std::nullopt;
 
@@ -231,7 +231,7 @@ public:
 
   std::optional<PluginIndex> firstOpenPluginIndex() const;
 
-  Result addReplacePlugin(std::optional<PluginIndex> effectIdxOpt, const PluginPath& pluginPath);
+  Result addReplacePlugin(std::optional<PluginIndex> pluginIdxOpt, const PluginPath& pluginPath);
 
   Result loadPlugin(const Db::Plugin& pluginEntity);
 
@@ -268,7 +268,7 @@ public:
       } catch (...) {
         Logging::write(
           Error,
-          "Audio::Effects::EffectsChannel::forEachPlugin",
+          "Audio::Mixer::Channel::forEachPlugin",
           "Error during lambda function for pluginIdx: " +
           std::to_string(pluginIndex)
         );
@@ -303,4 +303,4 @@ public:
 } // Gj
 
 
-#endif //EFFECTCHANNEL_H
+#endif //GJAUDIOMIXERCHANNEL_H

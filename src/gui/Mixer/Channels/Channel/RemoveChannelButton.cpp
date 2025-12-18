@@ -10,7 +10,7 @@ namespace Mixer {
 RemoveChannelButton::RemoveChannelButton(QWidget* parent, ChannelIndex channelIndex, QAction* action)
 : QPushButton("", parent)
   , channelIndex(channelIndex)
-  , removeEffectsChannelAction(action) {
+  , removeChannelAction(action) {
   setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
   setCursor(Qt::PointingHandCursor);
   setStyle();
@@ -19,8 +19,8 @@ RemoveChannelButton::RemoveChannelButton(QWidget* parent, ChannelIndex channelIn
 RemoveChannelButton::~RemoveChannelButton() {
   Logging::write(
     Info,
-    "Gui::RemoveEffectsChannelButton::~RemoveEffectsChannelButton",
-    "Destroying RemoveEffectsChannelButton"
+    "Gui::Mixer::RemoveChannelButton::~RemoveChannelButton",
+    "Destroying RemoveChannelButton"
   );
 }
 
@@ -31,8 +31,8 @@ void RemoveChannelButton::hydrateState(const AppStatePacket& appState, const Cha
 
 
 void RemoveChannelButton::mousePressEvent(QMouseEvent* event) {
-  removeEffectsChannelAction->setData(static_cast<quint64>(channelIndex));
-  removeEffectsChannelAction->activate(QAction::Trigger);
+  removeChannelAction->setData(static_cast<quint64>(channelIndex));
+  removeChannelAction->activate(QAction::Trigger);
 }
 
 void RemoveChannelButton::setStyle() {

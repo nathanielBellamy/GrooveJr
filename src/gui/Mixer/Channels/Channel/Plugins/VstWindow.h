@@ -23,7 +23,7 @@ using namespace Steinberg::Vst::EditorHost;
 
 class VstWindow final : public QWidget, public IWindow {
 	ChannelIndex channelIndex;
-	PluginIndex effectIndex;
+	PluginIndex pluginIndex;
 	AtomicStr name;
 	QGridLayout grid;
 
@@ -32,7 +32,7 @@ class VstWindow final : public QWidget, public IWindow {
 	void setupGrid();
 
 public:
-	explicit VstWindow(QWidget* parent, ChannelIndex channelIndex, PluginIndex effectIndex, const AtomicStr& name);
+	explicit VstWindow(QWidget* parent, ChannelIndex channelIndex, PluginIndex pluginIndex, const AtomicStr& name);
 
 	~VstWindow() noexcept override;
 

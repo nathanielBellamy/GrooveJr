@@ -2,8 +2,8 @@
 // Created by ns on 5/26/25.
 //
 
-#ifndef EFFECT_H
-#define EFFECT_H
+#ifndef GJDBPLUGIN_H
+#define GJDBPLUGIN_H
 
 #include <string>
 #include <vector>
@@ -16,7 +16,6 @@
 
 namespace Gj {
 namespace Db {
-
 struct Plugin {
   ID id = 0;
   PluginPath filePath;
@@ -33,6 +32,7 @@ struct Plugin {
   bool operator=(const Plugin& rhs) const {
     return id == rhs.id;
   }
+
   bool operator<(const Plugin& rhs) const {
     return pluginIndex < rhs.pluginIndex;
   }
@@ -61,11 +61,11 @@ struct Plugin {
     std::vector<uint8_t> editorHostComponentStateBlob,
     std::vector<uint8_t> editorHostControllerStateBlob
   );
+
   static Plugin deser(sqlite3_stmt* stmt);
 };
-
 } // Db
 } // Gj
 
 
-#endif //EFFECT_H
+#endif //GJDBPLUGIN_H

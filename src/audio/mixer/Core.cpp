@@ -19,12 +19,6 @@ Core::Core(AppState* gAppState, Db::Dao* dao)
     "Instantiating Mixer..."
   );
 
-  Logging::write(
-    Info,
-    "Audio::Mixer::Core()",
-    "Retrieving effects..."
-  );
-
   loadScene(gAppState->getSceneDbId());
 
   jackClient->initialize("GrooveJr");
@@ -62,7 +56,7 @@ Core::~Core() {
   Logging::write(
     Info,
     "Audio::Mixer::~Core",
-    "Mixer done deleting effectsChannels"
+    "Mixer done deleting channels"
   );
 
   if (jack_client_close(jackClient->getJackClient())) {
@@ -88,24 +82,24 @@ Core::~Core() {
 
 std::optional<PluginIndex> Core::firstOpenChannelIndex() const {
   for (ChannelIndex i = 0; i < MAX_MIXER_CHANNELS; ++i) {
-    if (!effectsChannels[i])
+    if (!channels[i])
       return std::optional(i);
   }
   return std::nullopt;
 }
 
-Result Core::addEffectsChannel() {
+Result Core::addChannel() {
   const auto firstOpenIndex = firstOpenChannelIndex();
   if (!firstOpenIndex) {
     Logging::write(
       Warning,
-      "Audio::Mixer::Core::addEffectsChannel",
+      "Audio::Mixer::Core::addChannel",
       "Attempting to add too many channels."
     );
     return WARNING;
   }
 
-  effectsChannels[firstOpenIndex.value()] =
+  channels[firstOpenIndex.value()] =
       new Channel(
         gAppState,
         jackClient,
@@ -136,9 +130,9 @@ Result Core::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) {
 }
 
 
-Result Core::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity) {
-  delete effectsChannels[channelEntity.channelIndex].value_or(nullptr);
-  effectsChannels[channelEntity.channelIndex] =
+Result Core::addChannelFromEntity(const Db::ChannelEntity& channelEntity) {
+  delete channels[channelEntity.channelIndex].value_or(nullptr);
+  channels[channelEntity.channelIndex] =
       new Channel(
         gAppState,
         jackClient,
@@ -147,8 +141,8 @@ Result Core::addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity)
   return OK;
 }
 
-Result Core::removeEffectsChannel(const ChannelIndex idx) {
-  delete effectsChannels[idx].value_or(nullptr);
+Result Core::removeChannel(const ChannelIndex idx) {
+  delete channels[idx].value_or(nullptr);
   return OK;
 }
 
@@ -184,7 +178,7 @@ Result Core::addPluginToChannel(const ChannelIndex channelIndex, const PluginPat
     return ERROR;
   }
 
-  return effectsChannels[channelIndex].value()->addReplacePlugin(std::optional<PluginIndex>(), pluginPath);
+  return channels[channelIndex].value()->addReplacePlugin(std::optional<PluginIndex>(), pluginPath);
 }
 
 Result Core::loadPluginOnChannel(const Db::Plugin& plugin) {
@@ -201,7 +195,7 @@ Result Core::loadPluginOnChannel(const Db::Plugin& plugin) {
     );
     return ERROR;
   }
-  return effectsChannels[plugin.channelIndex].value()->loadPlugin(plugin);
+  return channels[plugin.channelIndex].value()->loadPlugin(plugin);
 }
 
 PluginIndex Core::getPluginsOnChannelCount(const ChannelIndex idx) {
@@ -213,7 +207,7 @@ PluginIndex Core::getPluginsOnChannelCount(const ChannelIndex idx) {
     );
     return 0;
   }
-  return effectsChannels[idx].value()->pluginCount();
+  return channels[idx].value()->pluginCount();
 }
 
 Result Core::initEditorHostsOnChannel(const ChannelIndex idx,
@@ -226,7 +220,7 @@ Result Core::initEditorHostsOnChannel(const ChannelIndex idx,
     );
     return WARNING;
   }
-  return effectsChannels[idx].value()->initEditorHosts(vstWindows);
+  return channels[idx].value()->initEditorHosts(vstWindows);
 }
 
 Result Core::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex newPluginIndex,
@@ -239,7 +233,7 @@ Result Core::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex n
     );
     return WARNING;
   }
-  return effectsChannels[idx].value()->initEditorHost(newPluginIndex, vstWindow);
+  return channels[idx].value()->initEditorHost(newPluginIndex, vstWindow);
 }
 
 Result Core::terminateEditorHostsOnChannel(const ChannelIndex idx) {
@@ -259,7 +253,7 @@ Result Core::terminateEditorHostsOnChannel(const ChannelIndex idx) {
     return WARNING;
   }
 
-  return effectsChannels[idx].value()->terminateEditorHosts();
+  return channels[idx].value()->terminateEditorHosts();
 }
 
 Result Core::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx,
@@ -274,7 +268,7 @@ Result Core::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginI
     );
     return WARNING;
   }
-  return effectsChannels[channelIdx].value()->addReplacePlugin(pluginIdx, pluginPath);
+  return channels[channelIdx].value()->addReplacePlugin(pluginIdx, pluginPath);
 }
 
 Result Core::removePluginFromChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx) {
@@ -289,7 +283,7 @@ Result Core::removePluginFromChannel(const ChannelIndex channelIdx, const Plugin
     return WARNING;
   }
 
-  return effectsChannels[channelIdx].value()->removePlugin(pluginIdx);
+  return channels[channelIdx].value()->removePlugin(pluginIdx);
 }
 
 Result Core::setGainOnChannel(const ChannelIndex channelIdx, const float gain) {
@@ -304,7 +298,7 @@ Result Core::setGainOnChannel(const ChannelIndex channelIdx, const float gain) {
     return WARNING;
   }
 
-  return effectsChannels[channelIdx].value()->setGain(gain) ? OK : ERROR;
+  return channels[channelIdx].value()->setGain(gain) ? OK : ERROR;
 }
 
 Result Core::loadScene(const ID sceneDbId) {
@@ -338,8 +332,8 @@ Result Core::loadScene(const ID sceneDbId) {
   if (channelsWasEmpty)
     saveChannels();
 
-  const std::vector<Db::Plugin> effects = dao->sceneRepository.getPlugins(scene.id);
-  setPlugins(effects);
+  const std::vector<Db::Plugin> plugins = dao->sceneRepository.getPlugins(scene.id);
+  setPlugins(plugins);
 
   Logging::write(
     Info,
@@ -378,7 +372,7 @@ Result Core::deleteChannels() {
 
   const auto delRes = forEachChannel([this](Channel* channel, const ChannelIndex channelIdx) {
     delete channel;
-    effectsChannels[channelIdx].reset();
+    channels[channelIdx].reset();
   });
 
   if (delRes != OK)
@@ -412,7 +406,7 @@ Result Core::setChannels(std::vector<Db::ChannelEntity> channelEntities) {
 
   std::sort(channelEntities.begin(), channelEntities.end());
   for (const auto& channelEntity: channelEntities)
-    addEffectsChannelFromEntity(channelEntity);
+    addChannelFromEntity(channelEntity);
 
   Logging::write(
     Info,
@@ -438,9 +432,9 @@ Result Core::setPlugins(const std::vector<Db::Plugin>& plugins) {
     pluginsByChannel.at(plugin.channelIndex).push_back(plugin);
   }
 
-  for (const auto& effectsChannelPlugins: pluginsByChannel) {
-    std::sort(effectsChannelPlugins.begin(), effectsChannelPlugins.end());
-    for (const auto& plugin: effectsChannelPlugins) {
+  for (const auto& plugins: pluginsByChannel) {
+    std::sort(plugins.begin(), plugins.end());
+    for (const auto& plugin: plugins) {
       if (loadPluginOnChannel(plugin) == OK) {
         Logging::write(
           Info,
@@ -536,7 +530,7 @@ Result Core::saveChannels() {
         );
 
         int64 audioHostComponentStateSize = 0;
-        if (Effects::Vst3::Util::getStreamSize(audioHostComponentStateStream.get(), &audioHostComponentStateSize) !=
+        if (Plugins::Vst3::Util::getStreamSize(audioHostComponentStateStream.get(), &audioHostComponentStateSize) !=
             OK) {
           Logging::write(
             Error,
@@ -547,7 +541,7 @@ Result Core::saveChannels() {
         }
 
         int64 audioHostControllerStateSize = 0;
-        if (Effects::Vst3::Util::getStreamSize(audioHostControllerStateStream.get(), &audioHostControllerStateSize) !=
+        if (Plugins::Vst3::Util::getStreamSize(audioHostControllerStateStream.get(), &audioHostControllerStateSize) !=
             OK) {
           Logging::write(
             Error,

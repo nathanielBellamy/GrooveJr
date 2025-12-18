@@ -11,20 +11,20 @@ PluginsContainer::PluginsContainer(
   QWidget* parent,
   Audio::Mixer::Core* mixer,
   const ChannelIndex channelIndex,
-  QAction* addEffectAction,
-  QAction* removeEffectAction
+  QAction* addPluginAction,
+  QAction* removePluginAction
 )
 : QWidget(nullptr)
   , mixer(mixer)
   , channelIndex(channelIndex)
-  , addPluginAction(addEffectAction)
-  , addPluginButton(this, addEffectAction)
-  , removePluginAction(removeEffectAction)
+  , addPluginAction(addPluginAction)
+  , addPluginButton(this, addPluginAction)
+  , removePluginAction(removePluginAction)
   , grid(this) {
   if (channelIndex == 0) {
-    setWindowTitle("Main Channel Effects");
+    setWindowTitle("Main Channel Plugins");
   } else {
-    setWindowTitle("Channel " + QString::number(channelIndex) + " Effects");
+    setWindowTitle("Channel " + QString::number(channelIndex) + " Plugins");
   }
 
   setStyle();
@@ -37,8 +37,8 @@ PluginsContainer::PluginsContainer(
 PluginsContainer::~PluginsContainer() {
   Logging::write(
     Info,
-    "Gui::EffectsContainer::~EffectsContainer",
-    "Destroying Effects Container for Channel : " + std::to_string(channelIndex)
+    "Gui::PluginsContainer::~PluginsContainer",
+    "Destroying Plugins Container for Channel : " + std::to_string(channelIndex)
   );
 
   clearButtonsAndLabels();
@@ -49,21 +49,21 @@ PluginsContainer::~PluginsContainer() {
 
   Logging::write(
     Info,
-    "Gui::EffectsContainer::~EffectsContainer",
-    "Destroyed Effects Container for Channel : " + std::to_string(channelIndex)
+    "Gui::PluginsContainer::~PluginsContainer",
+    "Destroyed Plugins Container for Channel : " + std::to_string(channelIndex)
   );
 }
 
 void PluginsContainer::connectActions() {
   const auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
-    const PluginIndex effectIndex = selectVstWindowAction.data().toULongLong();
-    vstWindows.at(effectIndex)->activateWindow();
-    vstWindows.at(effectIndex)->raise();
+    const PluginIndex pluginIndex = selectVstWindowAction.data().toULongLong();
+    vstWindows.at(pluginIndex)->activateWindow();
+    vstWindows.at(pluginIndex)->raise();
     activateWindow();
     raise();
   });
 
-  const auto removeEffectActionConnection = connect(removePluginAction, &QAction::triggered, [&]() {
+  const auto removePluginActionConnection = connect(removePluginAction, &QAction::triggered, [&]() {
     const PluginIndex pluginIndex = removePluginAction->data().toULongLong();
     vstWindows.at(pluginIndex)->hide();
     vstWindows.erase(vstWindows.begin() + pluginIndex);
@@ -101,7 +101,7 @@ void PluginsContainer::setupGrid() {
 void PluginsContainer::showEvent(QShowEvent* event) {
   Logging::write(
     Info,
-    "EffectsContainer::initVstWindows()",
+    "PluginsContainer::initVstWindows()",
     "Created VstWindows for channel: " + std::to_string(channelIndex)
   );
 
@@ -109,7 +109,7 @@ void PluginsContainer::showEvent(QShowEvent* event) {
   if (mixer->initEditorHostsOnChannel(channelIndex, vstWindows) != OK)
     Logging::write(
       Warning,
-      "Gui::EffectsContainer::showEvent",
+      "Gui::PluginsContainer::showEvent",
       "An Error or Warning Occurred while initializing EditorHosts"
     );
 
@@ -120,21 +120,21 @@ void PluginsContainer::showEvent(QShowEvent* event) {
   }
   Logging::write(
     Info,
-    "EffectsContainer::initVstWindows()",
+    "PluginsContainer::initVstWindows()",
     "Editorhosts initialized for channel: " + std::to_string(channelIndex)
   );
 }
 
-void PluginsContainer::addEffect(const PluginIndex newEffectIndex, const AtomicStr& pluginName) {
-  auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, newEffectIndex, pluginName);
+void PluginsContainer::addPlugin(const PluginIndex newPluginIndex, const AtomicStr& pluginName) {
+  auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, newPluginIndex, pluginName);
   vstWindows.push_back(std::move(vstWindow));
-  vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, newEffectIndex, pluginName, &selectVstWindowAction));
+  vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, newPluginIndex, pluginName, &selectVstWindowAction));
   const auto label = new QLabel(this);
-  label->setText((std::to_string(newEffectIndex + 1) + ".").data());
+  label->setText((std::to_string(newPluginIndex + 1) + ".").data());
   vstWindowSelectLabels.push_back(label);
 
   if (isVisible()) {
-    mixer->initEditorHostOnChannel(channelIndex, newEffectIndex, vstWindows.back());
+    mixer->initEditorHostOnChannel(channelIndex, newPluginIndex, vstWindows.back());
     setupGrid();
     resize(width(), height() + 40);
     activateWindow();

@@ -23,8 +23,8 @@ Channel::Channel(
   , index(index) {
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::ctor",
-		"Instantiating EffectsChannel: " + std::to_string(index)
+		"Audio::Mixer::Channel::ctor",
+		"Instantiating MixerChannel: " + std::to_string(index)
 	);
 }
 
@@ -52,31 +52,31 @@ Channel::Channel(
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::ctor",
-		"Instantiating EffectsChannel fromEntity: " + std::to_string(index)
+		"Audio::Mixer::Channel::ctor",
+		"Instantiating MixerChannel fromEntity: " + std::to_string(index)
 	);
 }
 
 Channel::~Channel() {
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::dtor",
-		"Destroying EffectsChannel: " + std::to_string(index)
+		"Audio::Mixer::Channel::dtor",
+		"Destroying MixerChannel: " + std::to_string(index)
 	);
 
-	if (forEachPlugin([this](const Effects::Vst3::Plugin* plugin, const PluginIndex) {
+	if (forEachPlugin([this](const Plugins::Vst3::Plugin* plugin, const PluginIndex) {
 		delete plugin;
 	}) != OK)
 		Logging::write(
 			Warning,
-			"Audio::EffectsChannel::dtor",
-			"An Warning or Error occurred while destroying a plugin on EffectsChannelIndex: " + std::to_string(index)
+			"Audio::Mixer::Channel::dtor",
+			"An Warning or Error occurred while destroying a plugin on ChannelIndex: " + std::to_string(index)
 		);
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::dtor",
-		"Destroyed EffectsChannel: " + std::to_string(index)
+		"Audio::Mixer::Channel::dtor",
+		"Destroyed Channel: " + std::to_string(index)
 	);
 }
 
@@ -88,14 +88,14 @@ std::optional<PluginIndex> Channel::firstOpenPluginIndex() const {
 	return std::nullopt;
 }
 
-Result Channel::addReplacePlugin(const std::optional<PluginIndex> effectIdxOpt, const PluginPath& pluginPath) {
+Result Channel::addReplacePlugin(const std::optional<PluginIndex> pluginIdxOpt, const PluginPath& pluginPath) {
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::addReplacePlugin",
-		"Adding effect: " + pluginPath + " to channel " + std::to_string(index)
+		"Audio::Mixer::Channel::addReplacePlugin",
+		"Adding plugin: " + pluginPath + " to channel " + std::to_string(index)
 	);
 
-	const auto plugin = new Effects::Vst3::Plugin(
+	const auto plugin = new Plugins::Vst3::Plugin(
 		pluginPath,
 		gAppState,
 		jackClient
@@ -103,7 +103,7 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> effectIdxOpt, 
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::addReplacePlugin",
+		"Audio::Mixer::Channel::addReplacePlugin",
 		"Instantiated plugin " + plugin->path + " for channel " + std::to_string(index)
 	);
 
@@ -115,7 +115,7 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> effectIdxOpt, 
 	if (!processor->canProcessSampleSize(gAppStateAudioFramesPerBuffer)) {
 		Logging::write(
 			Warning,
-			"Audio::EffectsChannel::addReplacePlugin",
+			"Audio::Mixer::Channel::addReplacePlugin",
 			"Processor for " + pluginPath + " on channel " + std::to_string(index) + " cannot process sample size " +
 			std::to_string(gAppState->audioFramesPerBuffer)
 		);
@@ -134,25 +134,25 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> effectIdxOpt, 
 		44100.0
 	};
 	processor->setupProcessing(setup);
-	if (!effectIdxOpt) {
+	if (!pluginIdxOpt) {
 		const auto idxToPut = firstOpenPluginIndex();
 		if (!idxToPut) {
 			Logging::write(
 				Warning,
-				"Audio::EffectsChannel::addReplacePlugin",
+				"Audio::Mixer::Channel::addReplacePlugin",
 				"Attempted to add too many plugins to Channel: " + std::to_string(index)
 			);
 			return WARNING;
 		}
 		plugins[idxToPut.value()] = plugin;
 	} else {
-		delete plugins[effectIdxOpt.value()].value_or(nullptr);
-		plugins[effectIdxOpt.value()] = plugin;
+		delete plugins[pluginIdxOpt.value()].value_or(nullptr);
+		plugins[pluginIdxOpt.value()] = plugin;
 	}
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::addReplacePlugin",
+		"Audio::MixerChannel::addReplacePlugin",
 		"Plugin " + pluginPath + " added on channel " + std::to_string(index)
 	);
 
@@ -162,17 +162,17 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> effectIdxOpt, 
 Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::loadPlugin",
-		"Adding effect: " + pluginEntity.filePath + " to channel " + std::to_string(index) + " at effectIndex " +
+		"Audio::MixerChannel::loadPlugin",
+		"Adding plugin: " + pluginEntity.filePath + " to channel " + std::to_string(index) + " at pluginIndex " +
 		std::to_string(pluginEntity.pluginIndex)
 	);
 
-	const auto plugin = new Effects::Vst3::Plugin(pluginEntity, gAppState, jackClient);
+	const auto plugin = new Plugins::Vst3::Plugin(pluginEntity, gAppState, jackClient);
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::loadPlugin",
-		"Instantiated plugin " + plugin->name + " on channel " + std::to_string(index) + " at effectIndex " +
+		"Audio::Mixer::Channel::loadPlugin",
+		"Instantiated plugin " + plugin->name + " on channel " + std::to_string(index) + " at pluginIndex " +
 		std::to_string(pluginEntity.pluginIndex)
 	);
 
@@ -183,7 +183,7 @@ Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 	if (!processor->canProcessSampleSize(gAppState->getAudioFramesPerBuffer())) {
 		Logging::write(
 			Warning,
-			"Audio::EffectsChannel::loadPlugin",
+			"Audio::Mixer::Channel::loadPlugin",
 			"Processor for " + pluginEntity.filePath + " on channel " + std::to_string(index) + " cannot process sample size "
 			+ std::to_string(gAppState->audioFramesPerBuffer)
 		);
@@ -208,8 +208,8 @@ Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::loadPlugin",
-		"Effect " + plugin->path + " added on channel " + std::to_string(index) + " at effectIndex " + std::to_string(
+		"Audio::Mixer::Channel::loadPlugin",
+		"Plugin " + plugin->path + " added on channel " + std::to_string(index) + " at pluginIndex " + std::to_string(
 			pluginEntity.pluginIndex)
 	);
 
@@ -220,11 +220,11 @@ Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 Result Channel::setSampleRate(const double sampleRate) {
 	bool warning = false;
 	const Result setResult = forEachPlugin(
-		[this, &sampleRate, &warning](Effects::Vst3::Plugin* plugin, PluginIndex pluginIndex) {
+		[this, &sampleRate, &warning](Plugins::Vst3::Plugin* plugin, PluginIndex pluginIndex) {
 			if (!plugin->audioHost->audioClient->setSamplerate(sampleRate)) {
 				Logging::write(
 					Warning,
-					"Audio::EffectsChannel::setSampleRate",
+					"Audio::Mixer::Channel::setSampleRate",
 					"Unable to set Sample Rate of " + std::to_string(sampleRate) + " for plugin " + plugin->getName() +
 					" channelIndex " + std::to_string(index)
 				);
@@ -241,11 +241,11 @@ Result Channel::setBlockSize(const jack_nframes_t blockSize) {
 	bool warning = false;
 	const auto blockSize32 = static_cast<int32>(blockSize);
 	const auto setResult = forEachPlugin(
-		[this, &blockSize32, &warning](Effects::Vst3::Plugin* plugin, PluginIndex pluginIndex) {
+		[this, &blockSize32, &warning](Plugins::Vst3::Plugin* plugin, PluginIndex pluginIndex) {
 			if (!plugin->audioHost->audioClient->setBlockSize(blockSize32)) {
 				Logging::write(
 					Warning,
-					"Audio::EffectsChannel::setBlockSize",
+					"Audio::Mixer::Channel::setBlockSize",
 					"Unable to set Block Size of " + std::to_string(blockSize32) + " + for plugin " + plugin->getName() +
 					" channelIndex " + std::to_string(index)
 				);
@@ -261,7 +261,7 @@ Result Channel::setBlockSize(const jack_nframes_t blockSize) {
 PluginIndex Channel::pluginCount() const {
 	PluginIndex res = 0;
 
-	std::for_each(std::begin(plugins), std::end(plugins), [&res](std::optional<Effects::Vst3::Plugin*> plugin) {
+	std::for_each(std::begin(plugins), std::end(plugins), [&res](std::optional<Plugins::Vst3::Plugin*> plugin) {
 		if (plugin)
 			res++;
 	});
@@ -272,10 +272,10 @@ PluginIndex Channel::pluginCount() const {
 Result Channel::initEditorHosts(const std::vector<std::shared_ptr<Gui::Mixer::VstWindow> >& vstWindows) {
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::initEditorHosts",
+		"Audio::Mixer::Channel::initEditorHosts",
 		"Initializing Editor Hosts on channel " + std::to_string(index)
 	);
-	return forEachPlugin([this, &vstWindows](Effects::Vst3::Plugin* plugin, const PluginIndex pluginIndex) {
+	return forEachPlugin([this, &vstWindows](Plugins::Vst3::Plugin* plugin, const PluginIndex pluginIndex) {
 		plugin->initEditorHost(vstWindows.at(pluginIndex));
 	});
 }
@@ -290,16 +290,16 @@ Result Channel::initEditorHost(const PluginIndex pluginIndex, std::shared_ptr<Gu
 Result Channel::terminateEditorHosts() {
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::terminateEditorHosts",
+		"Audio::Mixer::Channel::terminateEditorHosts",
 		"Terminating Editor Hosts on channel " + std::to_string(index)
 	);
 
-	if (forEachPlugin([this](const Effects::Vst3::Plugin* plugin, const PluginIndex) {
+	if (forEachPlugin([this](const Plugins::Vst3::Plugin* plugin, const PluginIndex) {
 		plugin->terminateEditorHost();
 	}) != OK) {
 		Logging::write(
 			Warning,
-			"Audio::EffectsChannel::terminateEditorHosts",
+			"Audio::Mixer::Channel::terminateEditorHosts",
 			"An Error or Warning occurred while terminating EditorHost on ChannelIndex: " + std::to_string(index)
 		);
 		return WARNING;
@@ -307,7 +307,7 @@ Result Channel::terminateEditorHosts() {
 
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::terminateEditorHosts",
+		"Audio::Mixer::Channel::terminateEditorHosts",
 		"Done terminating Editor Hosts on channel " + std::to_string(index)
 	);
 	return OK;
@@ -316,14 +316,14 @@ Result Channel::terminateEditorHosts() {
 Result Channel::removePlugin(const PluginIndex pluginIdx) {
 	Logging::write(
 		Info,
-		"Audio::EffectsChannel::removePlugin",
+		"Audio::Mixer::Channel::removePlugin",
 		"Removing plugin " + std::to_string(pluginIdx) + " from channel " + std::to_string(index)
 	);
 
 	if (pluginIdx > MAX_PLUGINS_PER_CHANNEL) {
 		Logging::write(
 			Error,
-			"Audio::EffectsChannel::removePlugin",
+			"Audio::Mixer::Channel::removePlugin",
 			"Attempting to remove plugin at out of range idx: " + std::to_string(pluginIdx) + ". MAX_PLUGINS_PER_CHANNEL: "
 			+
 			std::to_string(MAX_PLUGINS_PER_CHANNEL)

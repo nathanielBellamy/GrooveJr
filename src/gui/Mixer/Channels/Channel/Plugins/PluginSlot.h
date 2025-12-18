@@ -2,8 +2,8 @@
 // Created by ns on 3/8/25.
 //
 
-#ifndef EFFECTSLOT_H
-#define EFFECTSLOT_H
+#ifndef GJGUIMIXERPLUGINSLOT_H
+#define GJGUIMIXERPLUGINSLOT_H
 
 #include <iostream>
 
@@ -36,10 +36,10 @@ public:
              actor_system& actorSystem,
              Audio::Mixer::Core* mixer,
              ChannelIndex channelIndex,
-             PluginIndex effectIndex,
+             PluginIndex pluginIndex,
              bool occupied,
-             QAction* replaceEffectAction,
-             QAction* removeEffectAction);
+             QAction* replacePluginAction,
+             QAction* removePluginAction);
 
   ~PluginSlot() override;
 
@@ -53,8 +53,8 @@ private:
   bool occupied;
   QGridLayout grid;
   QLabel title;
-  ReplacePluginButton replaceEffectButton;
-  RemovePluginButton removeEffectButton;
+  ReplacePluginButton replacePluginButton;
+  RemovePluginButton removePluginButton;
   QUrl vstUrl;
   QLabel pluginName;
 
@@ -66,4 +66,4 @@ private:
 } // Gui
 } // Gj
 
-#endif //EFFECTSLOT_H
+#endif //GJGUIMIXERPLUGINSLOT_H

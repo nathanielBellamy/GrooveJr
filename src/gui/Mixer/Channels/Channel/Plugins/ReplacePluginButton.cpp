@@ -27,11 +27,10 @@ ReplacePluginButton::ReplacePluginButton(
 ReplacePluginButton::~ReplacePluginButton() {
   Logging::write(
     Info,
-    "Gui::ReplaceEffectButton::~ReplaceEffectButton",
-    "Destroying ReplaceEffectButton."
+    "Gui::ReplacePluginButton::~ReplacePluginButton",
+    "Destroying ReplacePluginButton."
   );
 }
-
 
 void ReplacePluginButton::hydrateState(const AppStatePacket& appState, int newChannelIdx) {
   channelIndex = newChannelIdx;

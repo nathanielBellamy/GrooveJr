@@ -28,7 +28,7 @@ public:
     QWidget* parent,
     Audio::Mixer::Core* mixer,
     ChannelIndex channelIndex,
-    QAction* openEffectsContainer,
+    QAction* openPluginsContainer,
     QAction* muteChannelAction,
     QAction* muteLChannelAction,
     QAction* muteRChannelAction,
@@ -63,7 +63,7 @@ private:
   SoloButton solo;
   SoloButton soloL;
   SoloButton soloR;
-  PluginsButton effects;
+  PluginsButton plugins;
 
   void setupGrid();
 };

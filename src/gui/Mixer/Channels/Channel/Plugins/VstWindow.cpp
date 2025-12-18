@@ -9,15 +9,15 @@
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-VstWindow::VstWindow(QWidget* parent, const ChannelIndex channelIndex, const PluginIndex effectIndex,
+VstWindow::VstWindow(QWidget* parent, const ChannelIndex channelIndex, const PluginIndex pluginIndex,
                      const AtomicStr& name)
 : QWidget(parent)
   , channelIndex(channelIndex)
-  , effectIndex(effectIndex)
+  , pluginIndex(pluginIndex)
   , name(name)
   , grid(this) {
   setWindowTitle(
-    "Channel " + QString::number(channelIndex) + " - Effect " + QString::number(effectIndex + 1) + " - " + name.
+    "Channel " + QString::number(channelIndex) + " - PluginIndex " + QString::number(pluginIndex + 1) + " - " + name.
     c_str());
 
   setStyle();

@@ -2,8 +2,8 @@
 // Created by ns on 4/27/25.
 //
 
-#ifndef ADDEFFECTSCHANNELBUTTON_H
-#define ADDEFFECTSCHANNELBUTTON_H
+#ifndef ADDCHANNELBUTTON_H
+#define ADDCHANNELBUTTON_H
 
 #include <QAction>
 #include <QPoint>
@@ -19,7 +19,7 @@ public:
   AddChannelButton(QWidget* parent, QAction* action);
 
 private:
-  QAction* addEffectsChannelAction;
+  QAction* addChannelAction;
 
   void setStyle();
 
@@ -30,4 +30,4 @@ private:
 } // Gj
 
 
-#endif //ADDEFFECTSCHANNELBUTTON_H
+#endif //ADDCHANNELBUTTON_H

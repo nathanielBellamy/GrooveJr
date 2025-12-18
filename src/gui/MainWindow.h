@@ -55,7 +55,7 @@ public:
 
   void setChannels();
 
-  void setEffects();
+  void setPlugins();
 
   void connectHydrater(const Hydrater& hydrater) {
     const auto hydraterConnection =

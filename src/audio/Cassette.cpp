@@ -100,7 +100,7 @@ int Cassette::init() {
     return 1;
   };
 
-  // update plugin effects with info about audio to be processed
+  // update plugins with info about audio to be processed
   // if (mixer->setSampleRate(sfInfo.samplerate) != OK) {
   //   Logging::write(
   //     Warning,

@@ -6,9 +6,8 @@
 
 namespace Gj {
 namespace Db {
-
 Dao::Dao(AppState* gAppState)
-  : db(nullptr)
+: db(nullptr)
   , gAppState(gAppState)
   , appStateRepository(&db, gAppState)
   , channelRepository(&db, gAppState)
@@ -21,9 +20,7 @@ Dao::Dao(AppState* gAppState)
   , genreRepository(&db, gAppState)
   , playlistRepository(&db, gAppState)
   , queueRepository(&db, gAppState)
-  , trackRepository(&db, gAppState)
-  {
-
+  , trackRepository(&db, gAppState) {
   if (initDb() == 0) {
     if (initSchema() == 0) {
       Logging::write(
@@ -36,14 +33,14 @@ Dao::Dao(AppState* gAppState)
       // const auto resTrack = trackRepository.getAll();
       // const auto resPlugin = pluginRepository.getAll();
       // const auto resScene = sceneRepository.getAll();
-      // const auto resSceneEffects = sceneRepository.getPlugins(0);
+      // const auto resScenePlugins = sceneRepository.getPlugins(0);
     }
   }
 }
 
 Dao::~Dao() {
-// TODO: debug warning about deleting forward decl
-//  delete db;
+  // TODO: debug warning about deleting forward decl
+  //  delete db;
 }
 
 int Dao::initDb() {
@@ -252,20 +249,19 @@ int Dao::initSchema() const {
 
   if (sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr) != SQLITE_OK) {
     Logging::write(
-        Critical,
-        "Db::Dao::initSchema",
-        "Unable to provision the database. Message: " + std::string(sqlite3_errmsg(db))
+      Critical,
+      "Db::Dao::initSchema",
+      "Unable to provision the database. Message: " + std::string(sqlite3_errmsg(db))
     );
     return 1;
   }
 
   Logging::write(
-      Info,
-      "Db::Dao::initSchema",
-      "Provisioned the database."
+    Info,
+    "Db::Dao::initSchema",
+    "Provisioned the database."
   );
   return 0;
 }
-
 } // Db
 } // Gj

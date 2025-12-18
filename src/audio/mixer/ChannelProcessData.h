@@ -2,8 +2,8 @@
 // Created by ns on 4/19/25.
 //
 
-#ifndef EFFECTSCHANNELPROCESSDATA_H
-#define EFFECTSCHANNELPROCESSDATA_H
+#ifndef GJGUIMIXERCHANNELPROCESSDATA_H
+#define GJGUIMIXERCHANNELPROCESSDATA_H
 
 #include <array>
 #include <functional>
@@ -31,4 +31,4 @@ struct ChannelProcessData {
 } // Audio
 } // Gj
 
-#endif //EFFECTSCHANNELPROCESSDATA_H
+#endif //GJGUIMIXERCHANNELPROCESSDATA_H

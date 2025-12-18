@@ -2,8 +2,8 @@
 // Created by ns on 4/30/25.
 //
 
-#ifndef REMOVEEFFECTBUTTON_H
-#define REMOVEEFFECTBUTTON_H
+#ifndef REMOVEPLUGINBUTTON_H
+#define REMOVEPLUGINBUTTON_H
 
 #include <QAction>
 #include <QIcon>
@@ -38,4 +38,4 @@ private:
 } // Gui
 } // Gj
 
-#endif //REMOVEEFFECTBUTTON_H
+#endif //REMOVEPLUGINBUTTON_H

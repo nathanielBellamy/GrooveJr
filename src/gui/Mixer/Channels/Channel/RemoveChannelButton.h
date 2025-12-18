@@ -2,8 +2,8 @@
 // Created by ns on 5/3/25.
 //
 
-#ifndef REMOVEEFFECTSCHANNELBUTTON_H
-#define REMOVEEFFECTSCHANNELBUTTON_H
+#ifndef REMOVECHANNELBUTTON_H
+#define REMOVECHANNELBUTTON_H
 
 #include <QAction>
 #include <QIcon>
@@ -29,7 +29,7 @@ public:
 private:
   ChannelIndex channelIndex;
   bool occupied;
-  QAction* removeEffectsChannelAction;
+  QAction* removeChannelAction;
 
   void mousePressEvent(QMouseEvent* event) override;
 
@@ -39,4 +39,4 @@ private:
 } // Gui
 } // Gj
 
-#endif //REMOVEEFFECTSCHANNELBUTTON_H
+#endif //REMOVECHANNELBUTTON_H

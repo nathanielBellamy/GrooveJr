@@ -6,20 +6,19 @@
 
 namespace Gj {
 namespace Db {
-
 Plugin::Plugin(
-    const ID id,
-    const AtomicStr& filePath,
-    const AtomicStr& format,
-    const AtomicStr& name,
-    const ChannelIndex channelIndex,
-    const PluginIndex pluginIndex,
-    std::vector<uint8_t> audioHostComponentStateBlob,
-    std::vector<uint8_t> audioHostControllerStateBlob,
-    std::vector<uint8_t> editorHostComponentStateBlob,
-    std::vector<uint8_t> editorHostControllerStateBlob
-  )
-  : id(id)
+  const ID id,
+  const AtomicStr& filePath,
+  const AtomicStr& format,
+  const AtomicStr& name,
+  const ChannelIndex channelIndex,
+  const PluginIndex pluginIndex,
+  std::vector<uint8_t> audioHostComponentStateBlob,
+  std::vector<uint8_t> audioHostControllerStateBlob,
+  std::vector<uint8_t> editorHostComponentStateBlob,
+  std::vector<uint8_t> editorHostControllerStateBlob
+)
+: id(id)
   , filePath(filePath)
   , format(format)
   , name(name)
@@ -28,21 +27,21 @@ Plugin::Plugin(
   , audioHostComponentStateBlob(audioHostComponentStateBlob)
   , audioHostControllerStateBlob(audioHostControllerStateBlob)
   , editorHostComponentStateBlob(editorHostComponentStateBlob)
-  , editorHostControllerStateBlob(editorHostControllerStateBlob)
-  {}
+  , editorHostControllerStateBlob(editorHostControllerStateBlob) {
+}
 
 Plugin::Plugin(
-    const AtomicStr& filePath,
-    const AtomicStr& format,
-    const AtomicStr& name,
-    const ChannelIndex channelIndex,
-    const PluginIndex pluginIdx,
-    std::vector<uint8_t> audioHostComponentStateBlob,
-    std::vector<uint8_t> audioHostControllerStateBlob,
-    std::vector<uint8_t> editorHostComponentStateBlob,
-    std::vector<uint8_t> editorHostControllerStateBlob
-  )
-  : filePath(filePath)
+  const AtomicStr& filePath,
+  const AtomicStr& format,
+  const AtomicStr& name,
+  const ChannelIndex channelIndex,
+  const PluginIndex pluginIdx,
+  std::vector<uint8_t> audioHostComponentStateBlob,
+  std::vector<uint8_t> audioHostControllerStateBlob,
+  std::vector<uint8_t> editorHostComponentStateBlob,
+  std::vector<uint8_t> editorHostControllerStateBlob
+)
+: filePath(filePath)
   , format(format)
   , name(name)
   , channelIndex(channelIndex)
@@ -50,14 +49,14 @@ Plugin::Plugin(
   , audioHostComponentStateBlob(audioHostComponentStateBlob)
   , audioHostControllerStateBlob(audioHostControllerStateBlob)
   , editorHostComponentStateBlob(editorHostComponentStateBlob)
-  , editorHostControllerStateBlob(editorHostControllerStateBlob)
-  {}
+  , editorHostControllerStateBlob(editorHostControllerStateBlob) {
+}
 
-Plugin Plugin::deser(sqlite3_stmt *stmt) {
+Plugin Plugin::deser(sqlite3_stmt* stmt) {
   Logging::write(
     Info,
-    "Db::Effect::deser",
-    "Deserializing effect"
+    "Db::Plugin::deser",
+    "Deserializing plugin"
   );
 
   const ID id = sqlite3_column_int(stmt, 0);
@@ -81,7 +80,7 @@ Plugin Plugin::deser(sqlite3_stmt *stmt) {
   );
   Logging::write(
     Info,
-    "Effect::deser",
+    "Plugin::deser",
     "Found audioHostComponentStateBlob of size " + std::to_string(audioHostComponentStateBlobDeser.size())
   );
 
@@ -91,7 +90,7 @@ Plugin Plugin::deser(sqlite3_stmt *stmt) {
   );
   Logging::write(
     Info,
-    "Effect::deser",
+    "Plugin::deser",
     "Found audioHostControllerStateBlob of size " + std::to_string(audioHostControllerStateBlobSize)
   );
 
@@ -101,7 +100,7 @@ Plugin Plugin::deser(sqlite3_stmt *stmt) {
   );
   Logging::write(
     Info,
-    "Effect::deser",
+    "Plugin::deser",
     "Found editorHostComponentStateBlob of size " + std::to_string(editorHostComponentStateBlobDeser.size())
   );
 
@@ -111,14 +110,14 @@ Plugin Plugin::deser(sqlite3_stmt *stmt) {
   );
   Logging::write(
     Info,
-    "Effect::deser",
+    "Plugin::deser",
     "Found editorHostControllerStateBlob of size " + std::to_string(editorHostControllerStateBlobDeser.size())
   );
 
   Logging::write(
     Info,
-    "Db::Effect::deser",
-    "Done deserializing effect"
+    "Db::Plugin::deser",
+    "Done deserializing plugin"
   );
   return {
     id,
@@ -133,6 +132,5 @@ Plugin Plugin::deser(sqlite3_stmt *stmt) {
     editorHostControllerStateBlobDeser
   };
 }
-
 } // Db
 } // Gj

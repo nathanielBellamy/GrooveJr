@@ -2,8 +2,8 @@
 // Created by ns on 3/25/25.
 //
 
-#ifndef EFFECTSBUTTON_H
-#define EFFECTSBUTTON_H
+#ifndef GJGUIMIXERPLUGINSBUTTON_H
+#define GJGUIMIXERPLUGINSBUTTON_H
 
 #include <QAction>
 #include <QPushButton>
@@ -15,10 +15,10 @@ namespace Gui {
 namespace Mixer {
 class PluginsButton final : public QPushButton {
 public:
-  PluginsButton(QWidget* parent, QAction* openEffectsContainer);
+  PluginsButton(QWidget* parent, QAction* openPluginsContainer);
 
 private:
-  QAction* openEffectsContainer;
+  QAction* openPluginsContainer;
 
   void setStyle();
 
@@ -28,4 +28,4 @@ private:
 } // Gui
 } // Gj
 
-#endif //EFFECTSBUTTON_H
+#endif //GJGUIMIXERPLUGINSBUTTON_H

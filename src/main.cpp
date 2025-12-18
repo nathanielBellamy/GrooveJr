@@ -10,7 +10,7 @@ using namespace Steinberg;
 using namespace Steinberg::Vst;
 
 namespace Gj {
-Audio::Effects::Vst3::Host::App* pluginContext;
+Audio::Plugins::Vst3::Host::App* pluginContext;
 AppState* gAppState;
 Audio::Mixer::Core* mixer;
 Db::Dao* dao;
@@ -76,7 +76,7 @@ void shutdown_handler(const int sig) {
 
 Result initVst3PluginContext() {
   try {
-    pluginContext = new Audio::Effects::Vst3::Host::App();
+    pluginContext = new Audio::Plugins::Vst3::Host::App();
     PluginContextFactory::instance().setPluginContext(pluginContext);
     return OK;
   } catch (...) {

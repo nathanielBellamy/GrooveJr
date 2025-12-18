@@ -2,8 +2,8 @@
 // Created by ns on 3/7/25.
 //
 
-#ifndef EFFECTSCHANNELCONTAINER_H
-#define EFFECTSCHANNELCONTAINER_H
+#ifndef GJGUIMIXERCHANNELCONTAINER_H
+#define GJGUIMIXERCHANNELCONTAINER_H
 
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
@@ -65,13 +65,13 @@ public:
 
   void setSoloR(ChannelIndex channelIdx, float val) const;
 
-  void addEffectsChannel();
+  void addChannel();
 
-  void removeEffectsChannel(ChannelIndex channelIdx);
+  void removeChannel(ChannelIndex channelIdx);
 
-  void clearEffectsChannels();
+  void clearChannels();
 
-  void setEffects() const;
+  void setPlugins() const;
 
   void setChannels();
 
@@ -84,9 +84,9 @@ private:
   QScrollArea channelsScrollArea;
   QGridLayout channelsGrid;
   std::vector<Channel*> channels;
-  QAction addEffectsChannelAction;
-  QAction removeEffectsChannelAction;
-  AddChannelButton addEffectsChannelButton;
+  QAction addChannelAction;
+  QAction removeChannelAction;
+  AddChannelButton addChannelButton;
   QAction* muteChannelAction;
   QAction* muteLChannelAction;
   QAction* muteRChannelAction;
@@ -108,4 +108,4 @@ private:
 } // Gj
 
 
-#endif //EFFECTSCHANNELCONTAINER_H
+#endif //GJGUIMIXERCHANNELCONTAINER_H

@@ -22,7 +22,7 @@
 
 namespace Gj {
 namespace Audio {
-constexpr size_t EffectsChannelsProcessData_RB_SIZE = MAX_MIXER_CHANNELS * sizeof(Mixer::ChannelProcessData);
+constexpr size_t MixerChannelsProcessData_RB_SIZE = MAX_MIXER_CHANNELS * sizeof(Mixer::ChannelProcessData);
 
 struct AudioCore {
   long threadId;
@@ -77,8 +77,8 @@ struct AudioCore {
     , vu_ring_buffer(jack_ringbuffer_create(2 * MAX_MIXER_CHANNELS))
     , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE))
     , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE))
-    , mixerChannelsSettingsRB(jack_ringbuffer_create(EffectsSettings_RB_SIZE))
-    , mixerChannelsProcessDataRB(jack_ringbuffer_create(EffectsChannelsProcessData_RB_SIZE)) {
+    , mixerChannelsSettingsRB(jack_ringbuffer_create(ChannelsSettings_RB_SIZE))
+    , mixerChannelsProcessDataRB(jack_ringbuffer_create(MixerChannelsProcessData_RB_SIZE)) {
     Logging::write(
       Info,
       "Audio::AudioCore::AudioCore()",

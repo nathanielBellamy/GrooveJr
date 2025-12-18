@@ -61,13 +61,13 @@ void MainChannelContainer::setupGrid() {
   grid.addWidget(mainChannel.get(), 0, 0, -1, -1);
 }
 
-void MainChannelContainer::setEffects() const {
+void MainChannelContainer::setPlugins() const {
   Logging::write(
     Info,
-    "Gui::MainChannelContainer::setEffects",
-    "Setting effects."
+    "Gui::MainChannelContainer::setPlugins",
+    "Setting plugins."
   );
-  return mainChannel->setEffects();
+  return mainChannel->setPlugins();
 }
 
 void MainChannelContainer::setChannel() {
@@ -78,9 +78,9 @@ void MainChannelContainer::setChannel() {
   );
 
   mainChannel = std::make_unique<Channel>(this, actorSystem, mixer, 0, nullptr,
-                                                 muteChannelAction, muteLChannelAction, muteRChannelAction,
-                                                 soloChannelAction, soloLChannelAction, soloRChannelAction,
-                                                 vuPtr
+                                          muteChannelAction, muteLChannelAction, muteRChannelAction,
+                                          soloChannelAction, soloLChannelAction, soloRChannelAction,
+                                          vuPtr
   );
 
   setupGrid();

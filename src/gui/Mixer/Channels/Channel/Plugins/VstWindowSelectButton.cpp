@@ -8,10 +8,10 @@
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const PluginIndex effectIndex,
+VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const PluginIndex pluginIndex,
                                              const AtomicStr& pluginName, QAction* selectAction)
 : QPushButton(pluginName.c_str(), parent)
-  , effectIndex(effectIndex)
+  , pluginIndex(pluginIndex)
   , selectAction(selectAction) {
   setCursor(Qt::PointingHandCursor);
   setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -21,7 +21,7 @@ VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const PluginIndex 
 }
 
 void VstWindowSelectButton::mousePressEvent(QMouseEvent* event) {
-  selectAction->setData(static_cast<quint64>(effectIndex));
+  selectAction->setData(static_cast<quint64>(pluginIndex));
   selectAction->activate(QAction::Trigger);
 }
 } // Mixer

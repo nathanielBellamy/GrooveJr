@@ -7,9 +7,9 @@
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-AddPluginButton::AddPluginButton(QWidget* parent, QAction* addEffectAction)
+AddPluginButton::AddPluginButton(QWidget* parent, QAction* addPluginAction)
 : QPushButton("&+", parent)
-  , addPluginAction(addEffectAction) {
+  , addPluginAction(addPluginAction) {
   setStyle();
 }
 

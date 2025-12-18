@@ -7,9 +7,9 @@
 namespace Gj {
 namespace Gui {
 namespace Mixer {
-PluginsButton::PluginsButton(QWidget* parent, QAction* openEffectsContainer)
+PluginsButton::PluginsButton(QWidget* parent, QAction* openPluginsContainer)
 : QPushButton("&Fx", parent)
-  , openEffectsContainer(openEffectsContainer) {
+  , openPluginsContainer(openPluginsContainer) {
   setStyle();
 }
 
@@ -22,7 +22,7 @@ void PluginsButton::setStyle() {
 }
 
 void PluginsButton::mousePressEvent(QMouseEvent* event) {
-  openEffectsContainer->activate(QAction::Trigger);
+  openPluginsContainer->activate(QAction::Trigger);
 }
 } // Mixer
 } // Gui

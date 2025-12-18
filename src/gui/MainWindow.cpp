@@ -124,14 +124,14 @@ void MainWindow::setChannels() {
   );
 }
 
-void MainWindow::setEffects() {
+void MainWindow::setPlugins() {
   Logging::write(
     Info,
-    "Gui::MainWindow::setEffects",
-    "Setting effects."
+    "Gui::MainWindow::setPlugins",
+    "Setting plugins."
   );
 
-  mixerWindow.setEffects();
+  mixerWindow.setPlugins();
 
   const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
   const scoped_actor self{actorSystem};
@@ -142,8 +142,8 @@ void MainWindow::setEffects() {
 
   Logging::write(
     Info,
-    "Gui::MainWindow::setEffects",
-    "Done setting effects."
+    "Gui::MainWindow::setPlugins",
+    "Done setting plugins."
   );
 }
 
@@ -158,7 +158,7 @@ void MainWindow::connectActions() {
 
       mixer->loadScene(sceneDbId);
       setChannels();
-      setEffects();
+      setPlugins();
 
       Logging::write(
         Info,

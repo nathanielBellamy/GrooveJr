@@ -2,8 +2,8 @@
 // Created by ns on 3/7/25.
 //
 
-#ifndef GUIEFFECTSCHANNEL_H
-#define GUIEFFECTSCHANNEL_H
+#ifndef GJGUIMIXERCHANNEL_H
+#define GJGUIMIXERCHANNEL_H
 
 #include <atomic>
 #include <optional>
@@ -46,7 +46,7 @@ public:
     actor_system& actorSystem,
     Audio::Mixer::Core* mixer,
     ChannelIndex channelIndex,
-    QAction* removeEffectsChannelAction,
+    QAction* removeChannelAction,
     QAction* muteChannelAction,
     QAction* muteLChannelAction,
     QAction* muteRChannelAction,
@@ -60,7 +60,7 @@ public:
 
   void hydrateState(const AppStatePacket& appStatePacket, ChannelIndex newChannelIndex);
 
-  void updateShowRemoveEffectsChannelButton(bool val);
+  void updateShowRemoveChannelButton(bool val);
 
   void setMute(float val);
 
@@ -74,7 +74,7 @@ public:
 
   void setSoloR(float val);
 
-  void setEffects();
+  void setPlugins();
 
   void addPlugin(std::optional<PluginIndex> pluginIndex);
 
@@ -86,16 +86,16 @@ private:
   Audio::Mixer::Core* mixer;
   std::atomic<float>* vuPtr;
   VuMeter vuMeter;
-  QAction* removeEffectsChannelAction;
-  RemoveChannelButton removeEffectsChannelButton;
+  QAction* removeChannelAction;
+  RemoveChannelButton removeChannelButton;
   QAction addPluginAction;
   AddPluginButton addPluginButton;
-  QAction openEffectsContainer;
+  QAction openPluginsContainer;
   VstSelect vstSelect;
   QUrl vstUrl;
   QAction replacePluginAction;
   QAction removePluginAction;
-  PluginsContainer effectsContainer;
+  PluginsContainer pluginsContainer;
   QGridLayout grid;
   QLabel title;
   QSlider gainSlider;
@@ -110,8 +110,8 @@ private:
   QLabel panLLabel;
   QSlider panRSlider;
   QLabel panRLabel;
-  QScrollArea effectsSlotsScrollArea;
-  PluginSlots effectsSlots;
+  QScrollArea pluginSlotsScrollArea;
+  PluginSlots pluginSlots;
   MuteSoloContainer muteSoloContainer;
 
   void setStyle();
@@ -134,10 +134,10 @@ private:
 
   void connectActions();
 
-  void setupEffectsSlotsScrollArea();
+  void setupPluginSlotsScrollArea();
 };
 } // Mixer
 } // Gui
 } // Gj
 
-#endif //GUIEFFECTSCHANNEL_H
+#endif //GJGUIMIXERCHANNEL_H

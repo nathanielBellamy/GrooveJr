@@ -11,59 +11,59 @@ PluginSlots::PluginSlots(QWidget* parent,
                          actor_system& actorSystem,
                          Audio::Mixer::Core* mixer,
                          const int channelIndex,
-                         QAction* replaceEffectAction,
-                         QAction* removeEffectAction)
+                         QAction* replacePluginAction,
+                         QAction* removePluginAction)
 : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , channelIndex(channelIndex)
   , grid(this)
-  , replaceEffectAction(replaceEffectAction)
-  , removeEffectAction(removeEffectAction) {
+  , replacePluginAction(replacePluginAction)
+  , removePluginAction(removePluginAction) {
   setupGrid();
 }
 
 PluginSlots::~PluginSlots() {
   Logging::write(
     Info,
-    "Gui::EffectsSlots::~EffectsSlots",
-    "Destroying EffectsSlots on Channel " + std::to_string(channelIndex)
+    "Gui::PluginSlots::~PluginSlots",
+    "Destroying PluginSlots on Channel " + std::to_string(channelIndex)
   );
 
-  effectsSlots.clear();
+  pluginSlots.clear();
 
   Logging::write(
     Info,
-    "Gui::EffectsSlots::~EffectsSlots",
-    "Done destroying EffectsSlots on Channel " + std::to_string(channelIndex)
+    "Gui::PluginSlots::~PluginSlots",
+    "Done destroying PluginSlots on Channel " + std::to_string(channelIndex)
   );
 }
 
 void PluginSlots::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
   channelIndex = newChannelIndex;
 
-  for (const auto& effectSlot: effectsSlots)
-    effectSlot->hydrateState(appState, channelIndex);
+  for (const auto& pluginSlot: pluginSlots)
+    pluginSlot->hydrateState(appState, channelIndex);
 }
 
-void PluginSlots::addEffectSlot() {
+void PluginSlots::addSlot() {
   auto slot = std::make_unique<PluginSlot>(
     this,
     actorSystem,
     mixer,
     channelIndex,
-    effectsSlots.size(),
+    pluginSlots.size(),
     false,
-    replaceEffectAction,
-    removeEffectAction
+    replacePluginAction,
+    removePluginAction
   );
-  effectsSlots.push_back(std::move(slot));
+  pluginSlots.push_back(std::move(slot));
   setupGrid();
   update();
 }
 
-void PluginSlots::removeEffectSlot() {
-  effectsSlots.pop_back();
+void PluginSlots::removeSlot() {
+  pluginSlots.pop_back();
   setupGrid();
   update();
 }
@@ -72,8 +72,8 @@ void PluginSlots::setupGrid() {
   grid.setVerticalSpacing(4);
 
   int row = 0;
-  for (auto& effectSlot: effectsSlots) {
-    grid.addWidget(effectSlot.get(), row, 0, 1, 1);
+  for (auto& pluginSlot: pluginSlots) {
+    grid.addWidget(pluginSlot.get(), row, 0, 1, 1);
     row++;
   }
 }
@@ -81,16 +81,16 @@ void PluginSlots::setupGrid() {
 void PluginSlots::reset() {
   Logging::write(
     Info,
-    "Gui::EffectsSlots::reset",
-    "Resetting EffectsSlots on Channel " + std::to_string(channelIndex)
+    "Gui::PluginSlots::reset",
+    "Resetting PluginSlots on Channel " + std::to_string(channelIndex)
   );
 
-  effectsSlots.clear();
+  pluginSlots.clear();
 
   Logging::write(
     Info,
-    "Gui::EffectsSlots::reset",
-    "Done resetting EffectsSlots on channel " + std::to_string(channelIndex)
+    "Gui::PluginSlots::reset",
+    "Done resetting PluginSlots on channel " + std::to_string(channelIndex)
   );
 }
 } // Mixer

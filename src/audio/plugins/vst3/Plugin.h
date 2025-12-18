@@ -25,7 +25,7 @@
 
 namespace Gj {
 namespace Audio {
-namespace Effects {
+namespace Plugins {
 namespace Vst3 {
 using namespace Steinberg;
 
@@ -71,8 +71,8 @@ struct Plugin {
   Result cacheEditorHostState() const;
 
   [[nodiscard]]
-  Result populateEditorHostStateBuffers(std::vector<uint8_t> &componentStateBuffer,
-                                        std::vector<uint8_t> &controllerStateBuffer) const;
+  Result populateEditorHostStateBuffers(std::vector<uint8_t>& componentStateBuffer,
+                                        std::vector<uint8_t>& controllerStateBuffer) const;
 
   [[nodiscard]]
   Result terminateEditorHost() const;
@@ -81,10 +81,10 @@ struct Plugin {
   AtomicStr getName() const { return name; };
 
   void setState(
-    ResizableMemoryIBStream *audioHostComponentState,
-    ResizableMemoryIBStream *audioHostControllerState,
-    ResizableMemoryIBStream *editorHostComponentState,
-    ResizableMemoryIBStream *editorHostControllerState
+    ResizableMemoryIBStream* audioHostComponentState,
+    ResizableMemoryIBStream* audioHostControllerState,
+    ResizableMemoryIBStream* editorHostComponentState,
+    ResizableMemoryIBStream* editorHostControllerState
   ) const {
     audioHost->setState(audioHostComponentState, audioHostControllerState);
     if (editorHost != nullptr)
@@ -92,17 +92,17 @@ struct Plugin {
   }
 
   void loadState(
-    const std::vector<uint8_t> &audioHostComponentStateBlob,
-    const std::vector<uint8_t> &audioHostControllerStateBlob,
-    const std::vector<uint8_t> &editorHostComponentStateBlob,
-    const std::vector<uint8_t> &editorHostControllerStateBlob
+    const std::vector<uint8_t>& audioHostComponentStateBlob,
+    const std::vector<uint8_t>& audioHostControllerStateBlob,
+    const std::vector<uint8_t>& editorHostComponentStateBlob,
+    const std::vector<uint8_t>& editorHostControllerStateBlob
   );
 
   void getState(
-    ResizableMemoryIBStream *audioHostComponentState,
-    ResizableMemoryIBStream *audioHostControllerState,
-    ResizableMemoryIBStream *editorHostComponentState,
-    ResizableMemoryIBStream *editorHostControllerState
+    ResizableMemoryIBStream* audioHostComponentState,
+    ResizableMemoryIBStream* audioHostControllerState,
+    ResizableMemoryIBStream* editorHostComponentState,
+    ResizableMemoryIBStream* editorHostControllerState
   ) const {
     audioHost->getState(audioHostComponentState, audioHostControllerState);
     if (editorHost != nullptr)
@@ -110,7 +110,7 @@ struct Plugin {
   }
 };
 } // Vst3
-} // Effects
+} // Plugins
 } // Audio
 } // Gj
 

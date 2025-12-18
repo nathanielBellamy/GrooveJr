@@ -508,11 +508,11 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
     nframes
   );
 
-  // process effects channels
-  // main channel is effectsChannelIdx 0
+  // process channels
+  // main channel is chhannelIdx 0
   const int32_t nframes32t = static_cast<int32_t>(nframes);
-  for (ChannelIndex effectsChannelIdx = 1; effectsChannelIdx < audioCore->mixerChannelCount; effectsChannelIdx++) {
-    auto [pluginCount, processFuncs, buffers] = audioCore->mixerChannelsProcessData[effectsChannelIdx];
+  for (ChannelIndex chhannelIdx = 1; chhannelIdx < audioCore->mixerChannelCount; chhannelIdx++) {
+    auto [pluginCount, processFuncs, buffers] = audioCore->mixerChannelsProcessData[chhannelIdx];
     for (PluginIndex pluginIdx = 0; pluginIdx < pluginCount; pluginIdx++) {
       buffers[pluginIdx].numSamples = nframes32t;
 
@@ -525,11 +525,11 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
 
   // read channel settings from ringbuffer
   if (jack_ringbuffer_t* ringBuffer = audioCore->mixerChannelsSettingsRB;
-    jack_ringbuffer_read_space(ringBuffer) >= EffectsSettings_RB_SIZE) {
+    jack_ringbuffer_read_space(ringBuffer) >= ChannelsSettings_RB_SIZE) {
     jack_ringbuffer_read(
       ringBuffer,
       reinterpret_cast<char*>(audioCore->mixerChannelsSettings),
-      EffectsSettings_RB_SIZE
+      ChannelsSettings_RB_SIZE
     );
   }
 
@@ -581,9 +581,9 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
     audioCore->vu_buffer_in[BfrIdx::VU::right(chIdx)] = std::sqrt(rmsR[chIdx] / nframesF);
   }
 
-  // process summed down mix through main effects
-  auto [effectCount, processFuncs, buffers] = audioCore->mixerChannelsProcessData[0];
-  for (PluginIndex pluginIdx = 0; pluginIdx < effectCount; pluginIdx++) {
+  // process summed down mix through main plugins
+  auto [pluginCount, processFuncs, buffers] = audioCore->mixerChannelsProcessData[0];
+  for (PluginIndex pluginIdx = 0; pluginIdx < pluginCount; pluginIdx++) {
     buffers[pluginIdx].numSamples = static_cast<int32_t>(nframes);
 
     processFuncs[pluginIdx](

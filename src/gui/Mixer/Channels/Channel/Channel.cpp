@@ -13,7 +13,7 @@ Channel::Channel(
   actor_system& actorSystem,
   Audio::Mixer::Core* mixer,
   const ChannelIndex channelIndex,
-  QAction* removeEffectsChannelAction,
+  QAction* removeChannelAction,
   QAction* muteChannelAction,
   QAction* muteLChannelAction,
   QAction* muteRChannelAction,
@@ -29,15 +29,15 @@ Channel::Channel(
   , mixer(mixer)
   , vuPtr(vuPtr)
   , vuMeter(this, mixer, vuPtr, channelIndex)
-  , removeEffectsChannelAction(removeEffectsChannelAction)
-  , removeEffectsChannelButton(this, channelIndex, removeEffectsChannelAction)
-  , addPluginAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Effect"), this)
+  , removeChannelAction(removeChannelAction)
+  , removeChannelButton(this, channelIndex, removeChannelAction)
+  , addPluginAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Plugin"), this)
   , addPluginButton(this, &addPluginAction)
-  , openEffectsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Effects"), this)
+  , openPluginsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Plugins"), this)
   , vstSelect(this)
-  , replacePluginAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentRevert), tr("&Replace Effect"), this)
-  , removePluginAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Effect"), this)
-  , effectsContainer(nullptr, mixer, channelIndex, &addPluginAction, &removePluginAction)
+  , replacePluginAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentRevert), tr("&Replace Plugin"), this)
+  , removePluginAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Plugin"), this)
+  , pluginsContainer(nullptr, mixer, channelIndex, &addPluginAction, &removePluginAction)
   , grid(this)
   , title(this)
   , gainSlider(Qt::Vertical, this)
@@ -52,18 +52,18 @@ Channel::Channel(
   , panLLabel("PanL", this)
   , panRSlider(Qt::Horizontal, this)
   , panRLabel("PanR", this)
-  , effectsSlotsScrollArea(this)
-  , effectsSlots(this, actorSystem, mixer, channelIndex, &replacePluginAction, &removePluginAction)
+  , pluginSlotsScrollArea(this)
+  , pluginSlots(this, actorSystem, mixer, channelIndex, &replacePluginAction, &removePluginAction)
   , muteSoloContainer(
-    this, mixer, channelIndex, &openEffectsContainer,
+    this, mixer, channelIndex, &openPluginsContainer,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction
   ) {
-  if (channelIndex > 1 || mixer->getEffectsChannelsCount() > 1) {
-    // can't remove main, must have at least one non-main effects channel
-    removeEffectsChannelButton.show();
+  if (channelIndex > 1 || mixer->getChannelsCount() > 1) {
+    // can't remove main, must have at least one non-main plugins channel
+    removeChannelButton.show();
   } else {
-    removeEffectsChannelButton.hide();
+    removeChannelButton.hide();
   }
 
   // TODO:
@@ -87,7 +87,7 @@ Channel::Channel(
   if (res != OK)
     Logging::write(
       res == WARNING ? Warning : Error,
-      "Gui::EffectsChannel::EffectsChannel()",
+      "Gui::Channel::PluginsChannel()",
       "An Error occurred during construction against mixer channelIndex: " + std::to_string(channelIndex)
     );
 
@@ -96,51 +96,51 @@ Channel::Channel(
 
   Logging::write(
     Info,
-    "Gui::EffectsChannel::EffectsChannel()",
-    "Instantiated EffectsChannel channelIdx: " + std::to_string(channelIndex)
+    "Gui::Channel::PluginsChannel()",
+    "Instantiated Channel channelIdx: " + std::to_string(channelIndex)
   );
 }
 
 Channel::~Channel() {
   Logging::write(
     Info,
-    "Gui::EffectsChannel::~EffectsChannel",
-    "Destroying Effects Channel - channelIdx: " + std::to_string(channelIndex)
+    "Gui::Channel::~PluginsChannel",
+    "Destroying Plugins Channel - channelIdx: " + std::to_string(channelIndex)
   );
 }
 
 void Channel::hydrateState(const AppStatePacket& appStatePacket, const ChannelIndex newChannelIndex) {
   Logging::write(
     Info,
-    "Gui::EffectsChannel::hydrateState",
-    "Hydrating effects channel state to channel: " + std::to_string(newChannelIndex)
+    "Gui::Channel::hydrateState",
+    "Hydrating plugins channel state to channel: " + std::to_string(newChannelIndex)
   );
 
   channelIndex = newChannelIndex;
 
   if (appStatePacket.playState == PLAY || appStatePacket.playState == FF || appStatePacket.playState == RW) {
-    removeEffectsChannelButton.setEnabled(false);
+    removeChannelButton.setEnabled(false);
     addPluginButton.setEnabled(false);
   } else {
-    removeEffectsChannelButton.setEnabled(true);
+    removeChannelButton.setEnabled(true);
     addPluginButton.setEnabled(true);
   }
 
   if (channelIndex > 0)
-    removeEffectsChannelButton.hydrateState(appStatePacket, channelIndex);
+    removeChannelButton.hydrateState(appStatePacket, channelIndex);
 
-  effectsSlots.hydrateState(appStatePacket, channelIndex);
+  pluginSlots.hydrateState(appStatePacket, channelIndex);
   vuMeter.hydrateState(appStatePacket);
 
   setupTitle();
   // setupGrid();
 }
 
-void Channel::updateShowRemoveEffectsChannelButton(const bool val) {
+void Channel::updateShowRemoveChannelButton(const bool val) {
   if (val) {
-    removeEffectsChannelButton.show();
+    removeChannelButton.show();
   } else {
-    removeEffectsChannelButton.hide();
+    removeChannelButton.hide();
   }
 }
 
@@ -159,7 +159,7 @@ void Channel::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, 1);
 
   // can't delete main, must have at least one non-main channel
-  grid.addWidget(&removeEffectsChannelButton, 0, 4, 1, 1);
+  grid.addWidget(&removeChannelButton, 0, 4, 1, 1);
   grid.addWidget(&vuMeter, 1, 0, 3, 1);
   grid.addWidget(&gainSlider, 1, 1, 3, 1);
   grid.addWidget(&gainLabel, 4, 1, 1, 1);
@@ -167,7 +167,7 @@ void Channel::setupGrid() {
   grid.addWidget(&gainLLabel, 4, 2, 1, 1);
   grid.addWidget(&gainRSlider, 1, 3, 3, 1);
   grid.addWidget(&gainRLabel, 4, 3, 1, 1);
-  grid.addWidget(&effectsSlotsScrollArea, 1, 4, 1, 1);
+  grid.addWidget(&pluginSlotsScrollArea, 1, 4, 1, 1);
   grid.addWidget(&addPluginButton, 1, 5, 1, 1);
   // grid.addWidget(&panSlider, 2, 3, 1, 1);
   // grid.addWidget(&panLabel, 2, 4, 1, 1);
@@ -186,19 +186,19 @@ void Channel::setupGrid() {
   grid.setRowStretch(1, 10);
 
   setLayout(&grid);
-  setupEffectsSlotsScrollArea();
+  setupPluginSlotsScrollArea();
 }
 
-void Channel::setupEffectsSlotsScrollArea() {
-  effectsSlotsScrollArea.setFixedSize(QSize(200, 175));
-  effectsSlotsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-  effectsSlotsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-  effectsSlotsScrollArea.setWidgetResizable(true);
-  effectsSlotsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  effectsSlotsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  effectsSlotsScrollArea.setLayoutDirection(Qt::LeftToRight);
-  effectsSlotsScrollArea.setWidget(&effectsSlots);
-  effectsSlots.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+void Channel::setupPluginSlotsScrollArea() {
+  pluginSlotsScrollArea.setFixedSize(QSize(200, 175));
+  pluginSlotsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  pluginSlotsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  pluginSlotsScrollArea.setWidgetResizable(true);
+  pluginSlotsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  pluginSlotsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  pluginSlotsScrollArea.setLayoutDirection(Qt::LeftToRight);
+  pluginSlotsScrollArea.setWidget(&pluginSlots);
+  pluginSlots.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 }
 
 void Channel::setupTitle() {
@@ -230,7 +230,7 @@ void Channel::setupGainSlider(const float gain) {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::EffectsChannel::setupGainSlider",
+        "Gui::Channel::setupGainSlider",
         "An Error occurred setting gain slider against mixer channelIndex: " + std::to_string(channelIndex)
       );
   });
@@ -254,7 +254,7 @@ void Channel::setupGainLSlider(const float gainL) {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::EffectsChannel::setupGainLSlider",
+        "Gui::Channel::setupGainLSlider",
         "An Error occurred setting gainL slider against mixer channelIndex: " + std::to_string(channelIndex)
       );
   });
@@ -278,7 +278,7 @@ void Channel::setupGainRSlider(const float gainR) {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::EffectsChannel::setupGainRSlider",
+        "Gui::Channel::setupGainRSlider",
         "An Error occurred setting gainR slider against mixer channelIndex: " + std::to_string(channelIndex)
       );
   });
@@ -302,7 +302,7 @@ void Channel::setupPanSlider(const float pan) {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::EffectsChannel::setupPanSlider",
+        "Gui::Channel::setupPanSlider",
         "An Error occurred setting pan slider against mixer channelIndex: " + std::to_string(channelIndex)
       );
   });
@@ -326,7 +326,7 @@ void Channel::setupPanLSlider(const float panL) {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::EffectsChannel::setupPanLSlider",
+        "Gui::Channel::setupPanLSlider",
         "An Error occurred setting panL slider against mixer channelIndex: " + std::to_string(channelIndex)
       );
   });
@@ -350,21 +350,21 @@ void Channel::setupPanRSlider(const float panR) {
     if (res != OK)
       Logging::write(
         res == WARNING ? Warning : Error,
-        "Gui::EffectsChannel::setupPanRSlider",
+        "Gui::Channel::setupPanRSlider",
         "An Error occurred setting panR slider against mixer channelIndex: " + std::to_string(channelIndex)
       );
   });
 }
 
-void Channel::setEffects() {
+void Channel::setPlugins() {
   Logging::write(
     Info,
-    "Gui::EffectsChannel::setEffects",
-    "Setting effects on channelIndex: " + std::to_string(channelIndex)
+    "Gui::Channel::setPlugins",
+    "Setting plugins on channelIndex: " + std::to_string(channelIndex)
   );
 
-  effectsSlots.reset();
-  if (channelIndex > mixer->getEffectsChannelsCount())
+  pluginSlots.reset();
+  if (channelIndex > mixer->getChannelsCount())
     return;
 
   for (PluginIndex i = 0; i < mixer->getPluginsOnChannelCount(channelIndex); i++)
@@ -372,8 +372,8 @@ void Channel::setEffects() {
 
   Logging::write(
     Info,
-    "Gui::EffectsChannel::setEffects",
-    "Done setting effects on channelIndex: " + std::to_string(channelIndex)
+    "Gui::Channel::setPlugins",
+    "Done setting plugins on channelIndex: " + std::to_string(channelIndex)
   );
 }
 
@@ -383,30 +383,30 @@ void Channel::addPlugin(const std::optional<PluginIndex> pluginIndex) {
   );
   Logging::write(
     Info,
-    "Gui::EffectsChannel::addPlugin",
+    "Gui::Channel::addPlugin",
     "Adding plugin at index: " + std::to_string(newPluginIndex)
   );
 
-  effectsSlots.addEffectSlot();
+  pluginSlots.addSlot();
   const AtomicStr name = mixer->getPluginName(channelIndex, newPluginIndex);
-  effectsContainer.addEffect(newPluginIndex, name);
+  pluginsContainer.addPlugin(newPluginIndex, name);
 
   Logging::write(
     Info,
-    "Gui::EffectsChannel::addPlugin",
+    "Gui::Channel::addPlugin",
     "Added plugin " + name + " at index: " + std::to_string(newPluginIndex)
   );
 }
 
 void Channel::connectActions() {
-  auto openEffectsContainerConnection = connect(&openEffectsContainer, &QAction::triggered, [&]() {
-    effectsContainer.show();
+  auto openPluginsContainerConnection = connect(&openPluginsContainer, &QAction::triggered, [&]() {
+    pluginsContainer.show();
   });
 
   auto vstSelectConnection = connect(&vstSelect, &QFileDialog::urlSelected, [&](const QUrl& url) {
     Logging::write(
       Info,
-      "Gui::EffectsChannel::vstSelect",
+      "Gui::Channel::vstSelect",
       "Selecting VST for channel " + std::to_string(channelIndex)
     );
     vstUrl = url;
@@ -417,16 +417,16 @@ void Channel::connectActions() {
       const PluginPath pluginPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
         Info,
-        "Gui::EffectsChannel::addPluginAction",
-        "Adding effect: " + pluginPath + " to channel " + std::to_string(channelIndex)
+        "Gui::Channel::addPluginAction",
+        "Adding plugin: " + pluginPath + " to channel " + std::to_string(channelIndex)
       );
 
       if (const auto result = mixer->addPluginToChannel(channelIndex, pluginPath); result != OK) {
         const LogSeverityLevel severity = result == ERROR ? Error : Warning;
         Logging::write(
           severity,
-          "Gui::EffectsChannel::addPluginAction",
-          "Unable to add effect " + pluginPath + " to channel " + std::to_string(channelIndex)
+          "Gui::Channel::addPluginAction",
+          "Unable to add plugin " + pluginPath + " to channel " + std::to_string(channelIndex)
         );
       } else {
         addPlugin(std::optional<PluginIndex>());
@@ -449,15 +449,15 @@ void Channel::connectActions() {
       const auto pluginPath = vstUrl.toDisplayString().toStdString().substr(7);
       Logging::write(
         Info,
-        "Gui::EffectsChannel::replacePluginAction",
-        "Replacing effect " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) + " with " +
+        "Gui::Channel::replacePluginAction",
+        "Replacing plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) + " with " +
         pluginPath
       );
 
       if (mixer->replacePluginOnChannel(channelIndex, pluginIdx, pluginPath) != OK) {
         Logging::write(
           Error,
-          "Gui::EffectsChannel::replacePluginAction",
+          "Gui::Channel::replacePluginAction",
           "Unable to add replace plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) +
           " with " + pluginPath
         );
@@ -479,14 +479,14 @@ void Channel::connectActions() {
     const PluginIndex pluginIdx = removePluginAction.data().toULongLong();
     Logging::write(
       Info,
-      "Gui::EffectsChannel::removePluginAction",
+      "Gui::Channel::removePluginAction",
       "Removing plugin: " + std::to_string(pluginIdx) + " from channel " + std::to_string(channelIndex)
     );
 
     if (mixer->removePluginFromChannel(channelIndex, pluginIdx) != OK) {
       Logging::write(
         Error,
-        "Gui::EffectsChannel::removePluginAction",
+        "Gui::Channel::removePluginAction",
         "Unable to remove plugin" + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex)
       );
     }
@@ -499,7 +499,7 @@ void Channel::connectActions() {
       pluginIdx,
       mix_remove_plugin_on_channel_a_v
     );
-    effectsSlots.removeEffectSlot();
+    pluginSlots.removeSlot();
   });
 }
 

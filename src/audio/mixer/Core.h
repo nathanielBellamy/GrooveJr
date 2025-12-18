@@ -27,7 +27,7 @@
 // #include "JackClient.h"
 #include "Channel.h"
 #include "../../gui/Mixer/Channels/Channel/Plugins/VstWindow.h"
-#include "../effects/vst3/Util.h"
+#include "../plugins/vst3/Util.h"
 #include "../ThreadStatics.h"
 
 namespace Gj {
@@ -39,8 +39,8 @@ namespace Mixer {
 class Core {
   AppState* gAppState;
   std::shared_ptr<JackClient> jackClient;
-  // main channel is effectsChannels.front()
-  std::optional<Channel*> effectsChannels[MAX_MIXER_CHANNELS];
+  // main channel is channels.front()
+  std::optional<Channel*> channels[MAX_MIXER_CHANNELS];
   std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
   std::function<void(jack_ringbuffer_t* eqRingBuffer)> setEqRingBufferFunc;
   std::function<void(jack_ringbuffer_t* vuRingBuffer)> setVuRingBufferFunc;
@@ -58,8 +58,8 @@ public:
 
 
   bool indexHasValidChannel(ChannelIndex idx) {
-    if (!effectsChannels[idx] || effectsChannels[idx].value() == nullptr) {
-      effectsChannels[idx].reset();
+    if (!channels[idx] || channels[idx].value() == nullptr) {
+      channels[idx].reset();
       return false;
     }
     return true;
@@ -73,7 +73,7 @@ public:
         continue;
 
       try {
-        func(effectsChannels[channelIndex].value(), channelIndex);
+        func(channels[channelIndex].value(), channelIndex);
       } catch (...) {
         Logging::write(
           Error,
@@ -99,7 +99,7 @@ public:
     }
 
     try {
-      func(effectsChannels[channelIndex].value());
+      func(channels[channelIndex].value());
     } catch (...) {
       Logging::write(
         Error,
@@ -120,8 +120,8 @@ public:
 
   Result setupProcessing() {
     Result res = OK;
-    const auto setupRes = forEachChannel([this, &res](Channel* effectsChannel, const ChannelIndex idx) {
-      if (effectsChannel->setupProcessing() != OK)
+    const auto setupRes = forEachChannel([this, &res](Channel* channel, const ChannelIndex idx) {
+      if (channel->setupProcessing() != OK)
         res = WARNING;
     });
 
@@ -140,8 +140,8 @@ public:
   }
 
   [[nodiscard]]
-  std::optional<Channel*>* getEffectsChannels() {
-    return effectsChannels;
+  std::optional<Channel*>* getChannels() {
+    return channels;
   }
 
   [[nodiscard]]
@@ -149,19 +149,19 @@ public:
     if (index > MAX_MIXER_CHANNELS) {
       Logging::write(
         Warning,
-        "Audio::Mixer::getEffectsChannel",
-        "Attempting to access out of range Channel at index: " + std::to_string(index) + ". MAX_EFFECTS_CHANNELS: " +
+        "Audio::Mixer::getChannel",
+        "Attempting to access out of range Channel at index: " + std::to_string(index) + ". MAX_MIXER_CHANNELS: " +
         std::to_string(MAX_MIXER_CHANNELS)
       );
       return std::nullopt;
     }
     return indexHasValidChannel(index)
-             ? effectsChannels[index]
+             ? channels[index]
              : std::nullopt;
   }
 
   [[nodiscard]]
-  ChannelIndex getEffectsChannelsCount() {
+  ChannelIndex getChannelsCount() {
     int count = 0;
     for (ChannelIndex idx = 1; idx < MAX_MIXER_CHANNELS; ++idx) {
       if (indexHasValidChannel(idx))
@@ -182,11 +182,11 @@ public:
 
   std::optional<ChannelIndex> firstOpenChannelIndex() const;
 
-  Result addEffectsChannel();
+  Result addChannel();
 
-  Result addEffectsChannelFromEntity(const Db::ChannelEntity& channelEntity);
+  Result addChannelFromEntity(const Db::ChannelEntity& channelEntity);
 
-  Result removeEffectsChannel(ChannelIndex idx);
+  Result removeChannel(ChannelIndex idx);
 
   [[nodiscard]]
   PluginIndex getPluginsOnChannelCount(ChannelIndex idx);
@@ -238,7 +238,7 @@ public:
       );
       return AtomicStr(" - ");
     }
-    return effectsChannels[channelIdx].value()->getPluginName(pluginIndex);
+    return channels[channelIdx].value()->getPluginName(pluginIndex);
   };
 
   Result deleteChannels();

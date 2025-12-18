@@ -31,7 +31,7 @@ constexpr unsigned int FFT_PV_OLA_BUFFER_SIZE = FFT_PV_TIME_SIZE + (FFT_PV_HOP_C
 constexpr float PI = 3.14159265358979323846;
 constexpr float TWO_PI = 2.0f * PI;
 
-constexpr size_t EffectsSettings_RB_SIZE = 2 * MAX_MIXER_CHANNELS * sizeof(float);
+constexpr size_t ChannelsSettings_RB_SIZE = 2 * MAX_MIXER_CHANNELS * sizeof(float);
 constexpr size_t PlaybackSettingsToAudioThread_Count = 3;
 constexpr size_t PlaybackSettingsToAudioThread_RB_SIZE = sizeof(sf_count_t) * PlaybackSettingsToAudioThread_Count;
 constexpr size_t PlaybackSettingsFromAudioThread_Count = 2;

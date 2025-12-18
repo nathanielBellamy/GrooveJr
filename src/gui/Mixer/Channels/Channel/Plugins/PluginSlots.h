@@ -2,8 +2,8 @@
 // Created by ns on 3/8/25.
 //
 
-#ifndef EFFECTSSLOTS_H
-#define EFFECTSSLOTS_H
+#ifndef GJGUIMIXERPLUGINSLOTS_H
+#define GJGUIMIXERPLUGINSLOTS_H
 
 #include <memory>
 #include <vector>
@@ -31,15 +31,15 @@ public:
     actor_system& actorSystem,
     Audio::Mixer::Core* mixer,
     int channelIndex,
-    QAction* replaceEffectAction,
-    QAction* removeEffectAction
+    QAction* replacePluginAction,
+    QAction* removePluginAction
   );
 
   ~PluginSlots() override;
 
-  void addEffectSlot();
+  void addSlot();
 
-  void removeEffectSlot();
+  void removeSlot();
 
   void hydrateState(const AppStatePacket& appState, int newChannelIndex);
 
@@ -50,9 +50,9 @@ private:
   Audio::Mixer::Core* mixer;
   int channelIndex;
   QGridLayout grid;
-  std::vector<std::unique_ptr<PluginSlot> > effectsSlots{};
-  QAction* replaceEffectAction;
-  QAction* removeEffectAction;
+  std::vector<std::unique_ptr<PluginSlot> > pluginSlots{};
+  QAction* replacePluginAction;
+  QAction* removePluginAction;
 
   void setupGrid();
 };
@@ -61,4 +61,4 @@ private:
 } // Gj
 
 
-#endif //EFFECTSSLOTS_H
+#endif //GJGUIMIXERPLUGINSLOTS_H

@@ -163,7 +163,7 @@ struct AudioPlayer {
     Logging::write(
       Info,
       "Audio::AudioPlayer::setupAudioCore",
-      "Setting up AudioCore effects processing..."
+      "Setting up AudioCore Plugin processing..."
     );
 
     audioCore->setChannelCount(mixer->getTotalChannelsCount());
@@ -190,7 +190,7 @@ struct AudioPlayer {
     Logging::write(
       Info,
       "Audio::AudioPlayer::setupAudioCore",
-      "Setup AudioCore Effects processing. Successfully setup AudioCore."
+      "Setup AudioCore Plugin processing. Successfully setup AudioCore."
     );
 
     return 0;
@@ -202,7 +202,7 @@ struct AudioPlayer {
   ) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
 
-    // - each channel gets processed into it's effectChannelWriteOut
+    // - each channel gets processed into it's mixerChannelWriteOut
     // - the channels are then summed down into the processBuffers
     // - the main channel then acts upon the processBuffers
 
@@ -217,10 +217,10 @@ struct AudioPlayer {
       };
 
     // non-main channel from here on
-    const auto effectCount = channel->pluginCount();
+    const auto pluginCount = channel->pluginCount();
     const auto writeOut = const_cast<float**>(audioCore->mixerChannelsWriteOut[channel->getIndex()]);
-    if (effectCount == 1) {
-      // single effect on non-main channel so goes from playbackBuffers to writeout
+    if (pluginCount == 1) {
+      // single plugin on non-main channel so goes from playbackBuffers to writeout
       return {
         audioCore->playbackBuffers,
         2,
@@ -242,7 +242,7 @@ struct AudioPlayer {
       };
     }
 
-    if (pluginIdx == effectCount - 1) {
+    if (pluginIdx == pluginCount - 1) {
       // last plugin of multiple so goes from process to writeout"
       return {
         audioCore->processBuffers,
@@ -308,8 +308,8 @@ struct AudioPlayer {
       );
 
     // TODO:
-    // - update effectsChannelsProcessData write to audioCore->effectsChannelsSettingsProcessDataRB
-    // - read audioCore->effectsChannelsProcessDataRB into audioCore->effectsChannelsProcessData
+    // - update mixerChannelsProcessData write to audioCore->mixerChannelsSettingsProcessDataRB
+    // - read audioCore->mixerChannelsProcessDataRB into audioCore->mixerChannelsProcessData
     // - process
     // - remove disabling of channel/plugin add/remove buttons during playback
 
@@ -321,11 +321,11 @@ struct AudioPlayer {
     // -   mixer sets flag saying processing is good to go
     // -   audioThread re-instates processing
     // updateProcessDataRingBuffer()
-    if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > EffectsChannelsProcessData_RB_SIZE - 2)
+    if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > MixerChannelsProcessData_RB_SIZE - 2)
       jack_ringbuffer_write(
         audioCore->mixerChannelsProcessDataRB,
         reinterpret_cast<char*>(mixerChannelsProcessData),
-        EffectsChannelsProcessData_RB_SIZE
+        MixerChannelsProcessData_RB_SIZE
       );
 
     // std::cout << " DEBUG VALUE FROM AUDIO THREAD " << playbackSettingsFromAudioThread[BfrIdx::PSFAT::DEBUG_VALUE] << std::endl;
@@ -443,10 +443,10 @@ struct AudioPlayer {
       );
     }
 
-    // write to effectsSettings ring buffer
-    if (jack_ringbuffer_write_space(audioCore->mixerChannelsSettingsRB) >= EffectsSettings_RB_SIZE - 2) {
+    // write to mixerChannelSettings ring buffer
+    if (jack_ringbuffer_write_space(audioCore->mixerChannelsSettingsRB) >= ChannelsSettings_RB_SIZE - 2) {
       jack_ringbuffer_write(audioCore->mixerChannelsSettingsRB, reinterpret_cast<char*>(mixerChannelsSettings),
-                            EffectsSettings_RB_SIZE);
+                            ChannelsSettings_RB_SIZE);
     }
 
     return OK;
@@ -493,7 +493,7 @@ struct AudioPlayer {
     while (continueRun()) {
       // std::cout << "audioplayer run playb " << audioCore->playbackBuffers[0][100] << std::endl;
       // std::cout << "audioplayer run proce " << audioCore->processBuffers[0][100] << std::endl << std::endl;
-      // std::cout << "audioplayer run fxcha " << audioCore->effectsChannelsWriteOut[1][0][50] << std::endl << std::endl;
+      // std::cout << "audioplayer run fxcha " << audioCore->mixerChannelsChannelsWriteOut[1][0][50] << std::endl << std::endl;
 
       if (audioCore->shouldUpdateDeckIndex()) {
         audioCore->updateDeckIndexToNext();

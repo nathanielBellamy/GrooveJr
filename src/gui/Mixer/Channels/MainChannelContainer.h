@@ -64,7 +64,7 @@ public:
     mainChannel->setSoloR(val);
   };
 
-  void setEffects() const;
+  void setPlugins() const;
 
   void setChannel();
 

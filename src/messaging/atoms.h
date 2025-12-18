@@ -8,49 +8,68 @@
 
 CAF_BEGIN_TYPE_ID_BLOCK(groovejr, first_custom_type_id)
 
-  // typeIds
-  CAF_ADD_TYPE_ID(groovejr, (Gj::AppStatePacket))
-  CAF_ADD_TYPE_ID(groovejr, (Gj::EnvelopeQtPtr))
-  CAF_ADD_TYPE_ID(groovejr, (Gj::DecksState))
-  CAF_ADD_TYPE_ID(groovejr, (Gj::ChannelIndex))
-  // CAF_ADD_TYPE_ID(groovejr, (Gj::EffectIndex))
-  // CAF_ADD_TYPE_ID(groovejr, (Gj::DeckIndex))
-  CAF_ADD_TYPE_ID(groovejr, (Gj::PluginPath))
+// typeIds
+CAF_ADD_TYPE_ID(groovejr, (Gj::AppStatePacket))
 
-  // atoms
-  CAF_ADD_ATOM(groovejr, supervisor_status_a)
+CAF_ADD_TYPE_ID(groovejr, (Gj::EnvelopeQtPtr))
 
-  CAF_ADD_ATOM(groovejr, current_state_a)
-  CAF_ADD_ATOM(groovejr, hydrate_display_a)
-  CAF_ADD_ATOM(groovejr, read_state_a)
+CAF_ADD_TYPE_ID(groovejr, (Gj::DecksState))
 
-  // Mixer
-  CAF_ADD_ATOM(groovejr, mix_add_effects_channel_a)
-  CAF_ADD_ATOM(groovejr, mix_remove_effects_channel_a)
-  CAF_ADD_ATOM(groovejr, mix_add_plugin_to_channel_a)
-  CAF_ADD_ATOM(groovejr, mix_replace_plugin_on_channel_a)
-  CAF_ADD_ATOM(groovejr, mix_remove_plugin_on_channel_a)
+CAF_ADD_TYPE_ID(groovejr, (Gj::ChannelIndex))
 
-  CAF_ADD_ATOM(groovejr, mix_set_channel_gain_a)
+// CAF_ADD_TYPE_ID(groovejr, (Gj::PluginIndex))
+// CAF_ADD_TYPE_ID(groovejr, (Gj::DeckIndex))
+CAF_ADD_TYPE_ID(groovejr, (Gj::PluginPath))
 
-  // Transport Control
-  CAF_ADD_ATOM(groovejr, tc_trig_play_a)
-  CAF_ADD_ATOM(groovejr, tc_trig_play_ar)
-  CAF_ADD_ATOM(groovejr, tc_trig_pause_a)
-  CAF_ADD_ATOM(groovejr, tc_trig_pause_ar)
-  CAF_ADD_ATOM(groovejr, tc_trig_stop_a)
-  CAF_ADD_ATOM(groovejr, tc_trig_stop_ar)
-  CAF_ADD_ATOM(groovejr, tc_trig_rw_a)
-  CAF_ADD_ATOM(groovejr, tc_trig_rw_ar)
-  CAF_ADD_ATOM(groovejr, tc_trig_ff_a)
-  CAF_ADD_ATOM(groovejr, tc_trig_ff_ar)
+// atoms
+CAF_ADD_ATOM(groovejr, supervisor_status_a)
 
-  CAF_ADD_ATOM(groovejr, tc_trig_play_file_a)
+CAF_ADD_ATOM(groovejr, current_state_a)
 
-  CAF_ADD_ATOM(groovejr, audio_thread_init_a)
+CAF_ADD_ATOM(groovejr, hydrate_display_a)
 
-  // Music Library
-  CAF_ADD_ATOM(groovejr, ml_scan_dir_a)
+CAF_ADD_ATOM(groovejr, read_state_a)
+
+// Mixer
+CAF_ADD_ATOM(groovejr, mix_add_channel_a)
+
+CAF_ADD_ATOM(groovejr, mix_remove_channel_a)
+
+CAF_ADD_ATOM(groovejr, mix_add_plugin_to_channel_a)
+
+CAF_ADD_ATOM(groovejr, mix_replace_plugin_on_channel_a)
+
+CAF_ADD_ATOM(groovejr, mix_remove_plugin_on_channel_a)
+
+CAF_ADD_ATOM(groovejr, mix_set_channel_gain_a)
+
+// Transport Control
+CAF_ADD_ATOM(groovejr, tc_trig_play_a)
+
+CAF_ADD_ATOM(groovejr, tc_trig_play_ar)
+
+CAF_ADD_ATOM(groovejr, tc_trig_pause_a)
+
+CAF_ADD_ATOM(groovejr, tc_trig_pause_ar)
+
+CAF_ADD_ATOM(groovejr, tc_trig_stop_a)
+
+CAF_ADD_ATOM(groovejr, tc_trig_stop_ar)
+
+CAF_ADD_ATOM(groovejr, tc_trig_rw_a)
+
+CAF_ADD_ATOM(groovejr, tc_trig_rw_ar)
+
+CAF_ADD_ATOM(groovejr, tc_trig_ff_a)
+
+CAF_ADD_ATOM(groovejr, tc_trig_ff_ar)
+
+CAF_ADD_ATOM(groovejr, tc_trig_play_file_a)
+
+CAF_ADD_ATOM(groovejr, audio_thread_init_a)
+
+// Music Library
+CAF_ADD_ATOM(groovejr, ml_scan_dir_a)
 
 CAF_END_TYPE_ID_BLOCK(groovejr)
 

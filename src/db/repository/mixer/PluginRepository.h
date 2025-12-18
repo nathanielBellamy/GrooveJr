@@ -2,8 +2,8 @@
 // Created by ns on 5/26/25.
 //
 
-#ifndef EFFECTREPOSITORY_H
-#define EFFECTREPOSITORY_H
+#ifndef GJDBPLUGINREPOSITORY_H
+#define GJDBPLUGINREPOSITORY_H
 
 #include <vector>
 
@@ -15,19 +15,20 @@
 
 namespace Gj {
 namespace Db {
-
 class PluginRepository {
   sqlite3** db;
   AppState* gAppState;
 
-  public:
-    explicit PluginRepository(sqlite3** db, AppState* gAppState);
-    std::vector<Plugin> getAll() const;
-    int save(const Plugin& plugin) const;
-    std::vector<Plugin> getBySceneId(int sceneId) const;
-};
+public:
+  explicit PluginRepository(sqlite3** db, AppState* gAppState);
 
+  std::vector<Plugin> getAll() const;
+
+  int save(const Plugin& plugin) const;
+
+  std::vector<Plugin> getBySceneId(int sceneId) const;
+};
 } // Db
 } // Gj
 
-#endif //EFFECTREPOSITORY_H
+#endif //GJDBPLUGINREPOSITORY_H

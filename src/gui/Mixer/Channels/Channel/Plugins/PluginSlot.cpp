@@ -11,22 +11,22 @@ PluginSlot::PluginSlot(QWidget* parent,
                        actor_system& actorSystem,
                        Audio::Mixer::Core* mixer,
                        const ChannelIndex channelIndex,
-                       const PluginIndex effectIndex,
+                       const PluginIndex pluginIndex,
                        const bool occupied,
-                       QAction* replaceEffectAction,
-                       QAction* removeEffectAction)
+                       QAction* replacePluginAction,
+                       QAction* removePluginAction)
 : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , channelIndex(channelIndex)
-  , pluginIndex(effectIndex)
+  , pluginIndex(pluginIndex)
   , occupied(occupied)
   , grid(this)
   , title(this)
-  , replaceEffectButton(this, channelIndex, effectIndex, occupied, replaceEffectAction)
-  , removeEffectButton(this, channelIndex, effectIndex, occupied, removeEffectAction)
+  , replacePluginButton(this, channelIndex, pluginIndex, occupied, replacePluginAction)
+  , removePluginButton(this, channelIndex, pluginIndex, occupied, removePluginAction)
   , pluginName(this) {
-  title.setText(QString::number(effectIndex + 1));
+  title.setText(QString::number(pluginIndex + 1));
   title.setFont({title.font().family(), 12});
   pluginName.setFont({pluginName.font().family(), 12});
 
@@ -37,8 +37,8 @@ PluginSlot::PluginSlot(QWidget* parent,
 PluginSlot::~PluginSlot() {
   Logging::write(
     Info,
-    "Gui::EffectSlot::~EffectSlot",
-    "Destroying EffectSlot"
+    "Gui::PluginSlot::~PluginSlot",
+    "Destroying PluginSlot"
   );
 }
 
@@ -53,11 +53,11 @@ void PluginSlot::hydrateState(const AppStatePacket& appState, const ChannelIndex
 
       if (appState.playState == PLAY || appState.playState == FF || appState.
           playState == RW) {
-        replaceEffectButton.setEnabled(false);
-        removeEffectButton.setEnabled(false);
+        replacePluginButton.setEnabled(false);
+        removePluginButton.setEnabled(false);
       } else {
-        replaceEffectButton.setEnabled(true);
-        removeEffectButton.setEnabled(true);
+        replacePluginButton.setEnabled(true);
+        removePluginButton.setEnabled(true);
       }
 
       update();
@@ -80,8 +80,8 @@ void PluginSlot::setStyle() {
 
 void PluginSlot::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, 1);
-  grid.addWidget(&replaceEffectButton, 0, 2, 1, 1);
-  grid.addWidget(&removeEffectButton, 0, 3, 1, 1);
+  grid.addWidget(&replacePluginButton, 0, 2, 1, 1);
+  grid.addWidget(&removePluginButton, 0, 3, 1, 1);
   grid.addWidget(&pluginName, 1, 0, -1, -1);
 
   grid.setColumnMinimumWidth(1, 30);

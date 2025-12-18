@@ -9,12 +9,12 @@ namespace Gui {
 namespace Mixer {
 AddChannelButton::AddChannelButton(QWidget* parent, QAction* action)
 : QPushButton("&+", parent)
-  , addEffectsChannelAction(action) {
+  , addChannelAction(action) {
   setStyle();
 }
 
 void AddChannelButton::mousePressEvent(QMouseEvent* event) {
-  addEffectsChannelAction->activate(QAction::Trigger);
+  addChannelAction->activate(QAction::Trigger);
 }
 
 void AddChannelButton::setStyle() {

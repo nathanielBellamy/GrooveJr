@@ -12,13 +12,11 @@
 
 namespace Gj {
 namespace Audio {
-namespace Effects {
+namespace Plugins {
 namespace Vst3 {
-
 using namespace Steinberg;
 
 struct Util {
-
   static Result getStreamSize(IBStream* stream, int64* size) {
     int64 start = 0;
     if (const auto seekRes = stream->seek(0, IBStream::kIBSeekSet, &start); seekRes == kResultOk) {
@@ -68,9 +66,8 @@ struct Util {
     return OK;
   }
 };
-
 } // Vst3
-} // Effects
+} // Plugins
 } // Audio
 } // Gj
 

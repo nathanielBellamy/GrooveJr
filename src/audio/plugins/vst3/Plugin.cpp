@@ -6,16 +6,13 @@
 
 namespace Gj {
 namespace Audio {
-namespace Effects {
+namespace Plugins {
 namespace Vst3 {
-
 using namespace Steinberg;
 
 Plugin::Plugin(const AtomicStr& path, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
-	: gAppState(gAppState)
-	, path(path)
-	{
-
+: gAppState(gAppState)
+  , path(path) {
 	Steinberg::ResizableMemoryIBStream state;
 
 	Logging::write(
@@ -41,7 +38,7 @@ Plugin::Plugin(const AtomicStr& path, AppState* gAppState, std::shared_ptr<JackC
 	const auto moduleName = module->getName();
 	name = moduleName.substr(0, moduleName.find_last_of('.'));
 
-	const auto& cmdArgs = std::vector { path.std_str() };
+	const auto& cmdArgs = std::vector{path.std_str()};
 
 	try {
 		audioHost = new AudioHost::App(
@@ -67,10 +64,8 @@ Plugin::Plugin(const AtomicStr& path, AppState* gAppState, std::shared_ptr<JackC
 }
 
 Plugin::Plugin(const Db::Plugin& pluginEntity, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
-	: gAppState(gAppState)
-	, path(pluginEntity.filePath)
-	{
-
+: gAppState(gAppState)
+  , path(pluginEntity.filePath) {
 	Logging::write(
 		Info,
 		"Audio::Plugin::Plugin::entity",
@@ -94,7 +89,7 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, AppState* gAppState, std::shared_
 	const auto moduleName = module->getName();
 	name = AtomicStr(moduleName.substr(0, moduleName.find_last_of('.')));
 
-	const auto& cmdArgs = std::vector { path.std_str() };
+	const auto& cmdArgs = std::vector{path.std_str()};
 
 	try {
 		audioHost = new AudioHost::App(
@@ -125,7 +120,7 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, AppState* gAppState, std::shared_
 		);
 
 		if (audioHostComponentStateBytesWritten == audioHostComponentStateBytes
-					&& audioHostControllerStateBytesWritten == audioHostControllerStateBytes) {
+		    && audioHostControllerStateBytesWritten == audioHostControllerStateBytes) {
 			audioHost->setState(audioHostComponentState.get(), audioHostControllerState.get());
 		} else {
 			Logging::write(
@@ -176,7 +171,7 @@ Plugin::~Plugin() {
 		, "Audio::Plugin::~Plugin",
 		"Destroying Plugin: " + name
 	);
-  audioHost->terminate();
+	audioHost->terminate();
 
 	Logging::write(
 		Info,
@@ -208,13 +203,13 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 			"Audio::Plugin::initEditorHost",
 			"Initializing editorHost for " + this->path
 		);
-		const auto& cmdArgs = std::vector { path.std_str() };
+		const auto& cmdArgs = std::vector{path.std_str()};
 		editorHost = new EditorHost::App(window);
 		editorHost->setModule(module);
 		editorHost->plugProvider = audioHost->plugProvider;
 		editorHost->editController = audioHost->editController;
 		editorHost->processorComponent = audioHost->component;
-		editorHost->init (cmdArgs);
+		editorHost->init(cmdArgs);
 
 		editorHost->setState(editorHostComponentStateStream.get(), editorHostComponentStateStream.get());
 	} catch (...) {
@@ -249,7 +244,8 @@ Result Plugin::cacheEditorHostState() const {
 }
 
 
-Result Plugin::populateEditorHostStateBuffers(std::vector<uint8_t>& componentStateBuffer, std::vector<uint8_t>& controllerStateBuffer) const {
+Result Plugin::populateEditorHostStateBuffers(std::vector<uint8_t>& componentStateBuffer,
+                                              std::vector<uint8_t>& controllerStateBuffer) const {
 	if (editorHost == nullptr) {
 		Logging::write(
 			Error,
@@ -265,7 +261,7 @@ Result Plugin::populateEditorHostStateBuffers(std::vector<uint8_t>& componentSta
 	if (Util::getStreamSize(editorHostComponentStateStream.get(), &editorHostComponentStateSize) != OK) {
 		Logging::write(
 			Error,
-			"Audio::Effects::Vst3::Plugin::populateEditorHostState",
+			"Audio::Plugins::Vst3::Plugin::populateEditorHostState",
 			"Unable to determine stream size for editorHostComponentStateStream"
 		);
 		return ERROR;
@@ -275,7 +271,7 @@ Result Plugin::populateEditorHostStateBuffers(std::vector<uint8_t>& componentSta
 	if (Util::getStreamSize(editorHostControllerStateStream.get(), &editorHostControllerStateSize) != OK) {
 		Logging::write(
 			Error,
-			"Audio::Effects::Vst3::Plugin::populateEditorHostState",
+			"Audio::Plugins::Vst3::Plugin::populateEditorHostState",
 			"Unable to determine stream size for editorHostControllerStateStream"
 		);
 		return ERROR;
@@ -288,26 +284,26 @@ Result Plugin::populateEditorHostStateBuffers(std::vector<uint8_t>& componentSta
 	int32 editorHostControllerNumBytesRead = 0;
 
 	if (const auto componentRes = editorHostComponentStateStream->read(
-			componentStateBuffer.data(),
-			static_cast<int32>(editorHostComponentStateSize),
-			&editorHostComponentNumBytesRead
-		); componentRes != kResultOk) {
+		componentStateBuffer.data(),
+		static_cast<int32>(editorHostComponentStateSize),
+		&editorHostComponentNumBytesRead
+	); componentRes != kResultOk) {
 		Logging::write(
 			Error,
-			"Audio::Effects::Vst3::Plugin::populateEditorHostState",
+			"Audio::Plugins::Vst3::Plugin::populateEditorHostState",
 			"Unable to read editorHostComponentStateStream. tresult: " + std::to_string(componentRes)
 		);
 		return ERROR;
 	}
 
 	if (const auto controllerRes = editorHostControllerStateStream->read(
-		  controllerStateBuffer.data(),
-		  static_cast<int32>(editorHostControllerStateSize),
-		  &editorHostControllerNumBytesRead
-		); controllerRes != kResultOk) {
+		controllerStateBuffer.data(),
+		static_cast<int32>(editorHostControllerStateSize),
+		&editorHostControllerNumBytesRead
+	); controllerRes != kResultOk) {
 		Logging::write(
 			Error,
-			"Audio::Effects::Vst3::Plugin::populateEditorHostState",
+			"Audio::Plugins::Vst3::Plugin::populateEditorHostState",
 			"Unable to read editorHostControllerStateStream. tresult: " + std::to_string(controllerRes)
 		);
 		return ERROR;
@@ -320,14 +316,14 @@ Result Plugin::populateEditorHostStateBuffers(std::vector<uint8_t>& componentSta
 Result Plugin::terminateEditorHost() const {
 	Logging::write(
 		Info,
-		"Audio::Effects::Vst3::Plugin::terminateEditorHost",
+		"Audio::Plugins::Vst3::Plugin::terminateEditorHost",
 		"Terminating editorHost for Plugin: " + this->name
 	);
 
 	if (editorHost == nullptr) {
 		Logging::write(
 			Warning,
-			"Audio::Effects::Vst3::Plugin::terminateEditorHost",
+			"Audio::Plugins::Vst3::Plugin::terminateEditorHost",
 			"Attempting to terminate null editorHost."
 		);
 		return WARNING;
@@ -337,7 +333,7 @@ Result Plugin::terminateEditorHost() const {
 		// TODO: update editorHost->getState to return a Result
 		Logging::write(
 			Error,
-			"Audio::Effects::Vst3::Plugin::terminateEditorHost",
+			"Audio::Plugins::Vst3::Plugin::terminateEditorHost",
 			"Unable to cache editorHost State. Result: " + std::to_string(cacheRes)
 		);
 	};
@@ -346,13 +342,12 @@ Result Plugin::terminateEditorHost() const {
 
 	Logging::write(
 		Info,
-		"Audio::Effects::Vst3::Plugin::terminateEditorHost",
+		"Audio::Plugins::Vst3::Plugin::terminateEditorHost",
 		"Done terminating editorHost for Plugin: " + this->name
 	);
 	return OK;
 }
-
 } // Vst3
-} // Effects
+} // Plugins
 } // Audio
 } // Gj

@@ -6,7 +6,7 @@
 
 namespace Gj {
 namespace Audio {
-namespace Effects {
+namespace Plugins {
 namespace Vst3 {
 namespace Host {
 using namespace Steinberg;
@@ -30,7 +30,7 @@ tresult PLUGIN_API App::getName(String128 name) {
 }
 
 //-----------------------------------------------------------------------------
-tresult PLUGIN_API App::createInstance(TUID cid, TUID _iid, void **obj) {
+tresult PLUGIN_API App::createInstance(TUID cid, TUID _iid, void** obj) {
   if (FUnknownPrivate::iidEqual(cid, IMessage::iid) &&
       FUnknownPrivate::iidEqual(_iid, IMessage::iid)) {
     *obj = new HostMessage;
@@ -49,7 +49,7 @@ tresult PLUGIN_API App::createInstance(TUID cid, TUID _iid, void **obj) {
 }
 
 //-----------------------------------------------------------------------------
-tresult PLUGIN_API App::queryInterface(const char *_iid, void **obj) {
+tresult PLUGIN_API App::queryInterface(const char* _iid, void** obj) {
   QUERY_INTERFACE(_iid, obj, FUnknown::iid, IHostApplication)
   QUERY_INTERFACE(_iid, obj, IHostApplication::iid, IHostApplication)
 
@@ -71,6 +71,6 @@ uint32 PLUGIN_API App::release() {
 }
 } // Host
 } // Vst3
-} // Effects
+} // Plugins
 } // Audio
 } // Gj

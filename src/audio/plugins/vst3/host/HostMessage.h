@@ -2,8 +2,8 @@
 // Created by ns on 12/20/24.
 //
 
-#ifndef GJEFFECTSVST3HOSTHOSTMESSAGE_H
-#define GJEFFECTSVST3HOSTHOSTMESSAGE_H
+#ifndef GJAUDIOPLUGINSVST3HOSTHOSTMESSAGE_H
+#define GJAUDIOPLUGINSVST3HOSTHOSTMESSAGE_H
 
 #include "public.sdk/source/vst/hosting/pluginterfacesupport.h"
 #include "pluginterfaces/vst/ivsthostapplication.h"
@@ -12,33 +12,32 @@
 
 namespace Gj {
 namespace Audio {
-namespace Effects {
+namespace Plugins {
 namespace Vst3 {
 namespace Host {
-
 using namespace Steinberg;
 using namespace Steinberg::Vst;
 
-class HostMessage final : public IMessage
-{
+class HostMessage final : public IMessage {
 public:
-	HostMessage ();
-	virtual ~HostMessage () noexcept;
+	HostMessage();
 
-	const char* PLUGIN_API getMessageID () override;
-	void PLUGIN_API setMessageID (const char* messageID) override;
-	IAttributeList* PLUGIN_API getAttributes () override;
+	virtual ~HostMessage() noexcept;
+
+	const char* PLUGIN_API getMessageID() override;
+
+	void PLUGIN_API setMessageID(const char* messageID) override;
+
+	IAttributeList* PLUGIN_API getAttributes() override;
 
 	DECLARE_FUNKNOWN_METHODS
 private:
-	char* messageId {nullptr};
+	char* messageId{nullptr};
 	IPtr<IAttributeList> attributeList;
 };
-
-
 } // Host
 } // Vst3
-} // Effects
+} // Plugins
 } // Audio
 } // Gj
 

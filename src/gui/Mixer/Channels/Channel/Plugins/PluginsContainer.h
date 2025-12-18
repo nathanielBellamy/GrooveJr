@@ -2,8 +2,8 @@
 // Created by ns on 3/16/25.
 //
 
-#ifndef EFFECTSCONTAINER_H
-#define EFFECTSCONTAINER_H
+#ifndef GJGUIMIXERPLUGINSCONTAINER_H
+#define GJGUIMIXERPLUGINSCONTAINER_H
 
 #include<memory>
 #include<vector>
@@ -33,13 +33,13 @@ public:
     QWidget* parent,
     Audio::Mixer::Core* mixer,
     ChannelIndex channelIndex,
-    QAction* addEffectAction,
-    QAction* removeEffectAction
+    QAction* addPluginAction,
+    QAction* removePluginAction
   );
 
   ~PluginsContainer() override;
 
-  void addEffect(PluginIndex newEffectIndex, const AtomicStr& pluginName);
+  void addPlugin(PluginIndex newPluginIndex, const AtomicStr& pluginName);
 
 private:
   Audio::Mixer::Core* mixer;
@@ -70,4 +70,4 @@ private:
 } // Gj
 
 
-#endif //EFFECTSCONTAINER_H
+#endif //GJGUIMIXERPLUGINSCONTAINER_H

@@ -16,7 +16,7 @@ namespace Gui {
 namespace Mixer {
 class AddPluginButton final : public QPushButton {
 public:
-  AddPluginButton(QWidget* parent, QAction* addEffectAction);
+  AddPluginButton(QWidget* parent, QAction* addPluginAction);
 
 private:
   QAction* addPluginAction;

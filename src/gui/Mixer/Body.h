@@ -35,7 +35,7 @@ public:
 
   void setChannels();
 
-  void setEffects();
+  void setPlugins();
 
   void setVuRingBuffer(jack_ringbuffer_t* ringBuffer) { vuRingBuffer = ringBuffer; }
 
@@ -51,7 +51,7 @@ private:
   QGridLayout grid;
   QLabel title;
   MainChannelContainer mainChannelContainer;
-  ChannelsContainer effectsChannelsContainer;
+  ChannelsContainer channelsContainer;
 
   std::thread vuWorker;
   std::atomic<bool> vuWorkerRunning = false;

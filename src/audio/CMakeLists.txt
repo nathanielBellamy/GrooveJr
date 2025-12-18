@@ -53,7 +53,7 @@ set(LINK_FLAGS
 
 # compile vst3 audiohost
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${VST3SDK_HOME}/cmake/modules)
-add_subdirectory(effects/vst3/host)
+add_subdirectory(plugins/vst3/host)
 
 # make caf available
 set(CAF_ROOT
@@ -77,9 +77,9 @@ add_library(GjAudio SHARED
         Logging.h
         Logging.cpp
         Constants.h
-        effects/vst3/Plugin.h
-        effects/vst3/Plugin.cpp
-        effects/vst3/Util.h
+        plugins/vst3/Plugin.h
+        plugins/vst3/Plugin.cpp
+        plugins/vst3/Util.h
         mixer/ChannelProcessData.h
         mixer/Channel.h
         mixer/Channel.cpp

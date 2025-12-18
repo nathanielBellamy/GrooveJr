@@ -21,7 +21,7 @@ Body::Body(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer
     &soloChannelAction, &soloLChannelAction, &soloRChannelAction,
     reinterpret_cast<std::atomic<float>*>(&vuBuffer)
   )
-  , effectsChannelsContainer(
+  , channelsContainer(
     this, actorSystem, mixer,
     &muteChannelAction, &muteLChannelAction, &muteRChannelAction,
     &soloChannelAction, &soloLChannelAction, &soloRChannelAction,
@@ -95,7 +95,7 @@ Result Body::vuWorkerStop() {
 
 void Body::hydrateState(const AppStatePacket& appState) {
   mainChannelContainer.hydrateState(appState);
-  effectsChannelsContainer.hydrateState(appState);
+  channelsContainer.hydrateState(appState);
 
   if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
     if (!vuWorkerRunning)
@@ -115,7 +115,7 @@ void Body::setupGrid() {
 
   grid.addWidget(&title, 0, 0, 1, -1);
   grid.addWidget(&mainChannelContainer, 1, 0, -1, 1);
-  grid.addWidget(&effectsChannelsContainer, 1, 1, -1, 1);
+  grid.addWidget(&channelsContainer, 1, 1, -1, 1);
 
   grid.setColumnStretch(0, 1);
   grid.setColumnStretch(1, 10);
@@ -125,15 +125,15 @@ void Body::setupGrid() {
   setLayout(&grid);
 }
 
-void Body::setEffects() {
+void Body::setPlugins() {
   Logging::write(
     Info,
-    "Gui::Body::setEffects",
-    "Setting effects."
+    "Gui::Body::setPlugins",
+    "Setting plugins."
   );
 
-  mainChannelContainer.setEffects();
-  effectsChannelsContainer.setEffects();
+  mainChannelContainer.setPlugins();
+  channelsContainer.setPlugins();
 }
 
 
@@ -146,7 +146,7 @@ void Body::connectActions() {
       if (channelIdx == 0) {
         mainChannelContainer.setMute(newMute);
       } else {
-        effectsChannelsContainer.setMute(channelIdx, newMute);
+        channelsContainer.setMute(channelIdx, newMute);
       }
     });
 
@@ -166,7 +166,7 @@ void Body::connectActions() {
       if (channelIdx == 0) {
         mainChannelContainer.setMuteL(newMute);
       } else {
-        effectsChannelsContainer.setMuteL(channelIdx, newMute);
+        channelsContainer.setMuteL(channelIdx, newMute);
       }
     });
 
@@ -186,7 +186,7 @@ void Body::connectActions() {
       if (channelIdx == 0) {
         mainChannelContainer.setMuteR(newMute);
       } else {
-        effectsChannelsContainer.setMuteR(channelIdx, newMute);
+        channelsContainer.setMuteR(channelIdx, newMute);
       }
     });
 
@@ -206,7 +206,7 @@ void Body::connectActions() {
       if (channelIdx == 0) {
         mainChannelContainer.setSolo(newSolo);
       } else {
-        effectsChannelsContainer.setSolo(channelIdx, newSolo);
+        channelsContainer.setSolo(channelIdx, newSolo);
       }
     });
 
@@ -226,7 +226,7 @@ void Body::connectActions() {
       if (channelIdx == 0) {
         mainChannelContainer.setSoloL(newSolo);
       } else {
-        effectsChannelsContainer.setSoloL(channelIdx, newSolo);
+        channelsContainer.setSoloL(channelIdx, newSolo);
       }
     });
 
@@ -247,7 +247,7 @@ void Body::connectActions() {
         if (channelIdx == 0) {
           mainChannelContainer.setSoloR(newSolo);
         } else {
-          effectsChannelsContainer.setSoloR(channelIdx, newSolo);
+          channelsContainer.setSoloR(channelIdx, newSolo);
         }
       }
     });
@@ -264,7 +264,7 @@ void Body::connectActions() {
 
 void Body::setChannels() {
   mainChannelContainer.setChannel();
-  effectsChannelsContainer.setChannels();
+  channelsContainer.setChannels();
 }
 } // Mixer
 } // Gui
