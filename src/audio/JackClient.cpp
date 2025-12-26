@@ -104,14 +104,14 @@ Result JackClient::initialize(const JackName name) {
 Result JackClient::activate(AudioCore* audioCore) const {
   Logging::write(
     Info,
-    "Audio::JackClient::setup",
+    "Audio::JackClient::activate",
     "Setting up JackClient"
   );
 
   if (setCallbacks(audioCore) != OK) {
     Logging::write(
       Error,
-      "Audio::JackClient::setup",
+      "Audio::JackClient::activate",
       "Unable to set callbacks"
     );
     return ERROR;
@@ -120,7 +120,7 @@ Result JackClient::activate(AudioCore* audioCore) const {
   if (setPorts() != OK) {
     Logging::write(
       Error,
-      "Audio::JackClient::setup",
+      "Audio::JackClient::activate",
       "Unable to set ports"
     );
     return ERROR;
@@ -129,7 +129,7 @@ Result JackClient::activate(AudioCore* audioCore) const {
   if (activateAndConnectPorts() != OK) {
     Logging::write(
       Error,
-      "Audio::JackClient::setup",
+      "Audio::JackClient::activate",
       "Unable to activate jackClient and/or connect ports"
     );
     return ERROR;
@@ -519,17 +519,15 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   // main channel is chhannelIdx 0
   const int32_t nframes32t = static_cast<int32_t>(nframes);
   for (ChannelIndex channelIdx = 1; channelIdx < MAX_MIXER_CHANNELS; channelIdx++) {
-    if (auto [processFuncs, buffers, processingEnabledFor, pluginCount] = audioCore->mixerChannelsProcessData[
+    if (auto [processFuncs, buffers, pluginCount] = audioCore->mixerChannelsProcessData[
         channelIdx];
       pluginCount != 0) {
       for (PluginIndex pluginIdx = 0; pluginIdx < MAX_PLUGINS_PER_CHANNEL; pluginIdx++) {
         buffers[pluginIdx].numSamples = nframes32t;
-
-        if (processingEnabledFor[pluginIdx])
-          processFuncs[pluginIdx](
-            buffers[pluginIdx],
-            nframes
-          );
+        processFuncs[pluginIdx](
+          buffers[pluginIdx],
+          nframes
+        );
       }
     }
   }
@@ -593,7 +591,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   }
 
   // process summed down mix through main plugins
-  auto [processFuncs, buffers, processingEnabled, pluginCount] = audioCore->mixerChannelsProcessData[0];
+  auto [processFuncs, buffers, pluginCount] = audioCore->mixerChannelsProcessData[0];
   for (PluginIndex pluginIdx = 0; pluginIdx < MAX_PLUGINS_PER_CHANNEL; pluginIdx++) {
     buffers[pluginIdx].numSamples = static_cast<int32_t>(nframes);
 
@@ -609,7 +607,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   const float factorRL = audioCore->mixerChannelsSettings[BfrIdx::ECS::factorRL(0)];
   const float factorRR = audioCore->mixerChannelsSettings[BfrIdx::ECS::factorRR(0)];
 
-  for (size_t chan = 0; chan < 2; chan++) {
+  for (size_t chan = 0; chan < AUDIO_CHANNEL_COUNT; chan++) {
     std::copy(
       std::begin(audioCore->fft_eq_time[chan]) + nframes,
       std::end(audioCore->fft_eq_time[chan]),

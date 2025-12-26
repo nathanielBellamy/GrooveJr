@@ -36,11 +36,20 @@ class Channel {
   AtomicStr name{"Channel"};
 
   std::optional<Plugins::Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {std::nullopt};
+  std::optional<Plugins::Vst3::Plugin*> pluginToDelete;
 
   std::mutex processDataMutex;
   ChannelProcessData processData = {};
 
 public:
+  Result deletePluginToDelete() {
+    if (pluginToDelete) {
+      delete pluginToDelete.value();
+      pluginToDelete.reset();
+    }
+    return OK;
+  }
+
   ChannelProcessData getProcessData() {
     std::lock_guard guard(processDataMutex);
     return processData;
@@ -274,6 +283,7 @@ public:
 
   template<typename F>
   Result forEachPlugin(F&& func) {
+    // run against all valid plugins
     bool warning = false;
     for (PluginIndex pluginIndex = 0; pluginIndex < MAX_PLUGINS_PER_CHANNEL; ++pluginIndex) {
       if (!plugins[pluginIndex] || plugins[pluginIndex].value() == nullptr)
@@ -281,6 +291,26 @@ public:
 
       try {
         func(plugins[pluginIndex].value(), pluginIndex);
+      } catch (...) {
+        Logging::write(
+          Error,
+          "Audio::Mixer::Channel::forEachPlugin",
+          "Error during lambda function for pluginIdx: " +
+          std::to_string(pluginIndex)
+        );
+        warning = true;
+      }
+    }
+    return warning ? WARNING : OK;
+  }
+
+  template<typename F>
+  Result forEachPluginSlot(F&& func) {
+    // run against every possible plugin slot
+    bool warning = false;
+    for (PluginIndex pluginIndex = 0; pluginIndex < MAX_PLUGINS_PER_CHANNEL; ++pluginIndex) {
+      try {
+        func(plugins[pluginIndex], pluginIndex);
       } catch (...) {
         Logging::write(
           Error,

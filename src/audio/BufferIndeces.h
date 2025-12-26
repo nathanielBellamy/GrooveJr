@@ -19,6 +19,7 @@ namespace PSFAT {
 static constexpr size_t DEBUG_VALUE = 0;
 
 static constexpr size_t CURRENT_FRAME_ID = 1;
+static constexpr size_t PROCESS_DATA_CHANGE_FLAG = 2;
 } // PSFAT
 
 // playbackSettingsToAudioThread
@@ -27,6 +28,7 @@ static constexpr size_t USER_SETTING_FRAME_ID_FLAG = 0; // bool
 static constexpr size_t NEW_FRAME_ID = 1;
 
 static constexpr size_t PLAYBACK_SPEED = 2;
+static constexpr size_t PROCESS_DATA_CHANGE_FLAG = 3;
 }
 
 

@@ -155,8 +155,9 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> pluginIdxOpt, 
 		}
 		plugins[idxToPut.value()] = plugin;
 	} else {
-		delete plugins[pluginIdxOpt.value()].value_or(nullptr);
-		plugins[pluginIdxOpt.value()] = plugin;
+		const auto pluginIdxToSet = pluginIdxOpt.value();
+		pluginToDelete = plugins[pluginIdxToSet];
+		plugins[pluginIdxToSet] = plugin;
 	}
 
 	Logging::write(

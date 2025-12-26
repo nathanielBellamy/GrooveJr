@@ -32,44 +32,44 @@ struct AudioCore {
   DeckIndex deckIndex = 0;
   DeckIndex deckIndexNext = 0;
   sf_count_t frameAdvance;
-  float fft_eq_time[2][FFT_EQ_TIME_SIZE]{0.0};
-  fftwf_complex fft_eq_freq[2][FFT_EQ_FREQ_SIZE]{};
-  float fft_eq_write_out_buffer[2 * FFT_EQ_FREQ_SIZE]{0.0f};
+  float fft_eq_time[AUDIO_CHANNEL_COUNT][FFT_EQ_TIME_SIZE]{};
+  fftwf_complex fft_eq_freq[AUDIO_CHANNEL_COUNT][FFT_EQ_FREQ_SIZE]{};
+  float fft_eq_write_out_buffer[AUDIO_CHANNEL_COUNT * FFT_EQ_FREQ_SIZE]{};
   fftwf_plan fft_eq_0_plan_r2c;
   fftwf_plan fft_eq_1_plan_r2c;
   jack_ringbuffer_t* fft_eq_ring_buffer{nullptr};
   float fft_pv_time[FFT_PV_TIME_SIZE]{};
-  float fft_pv_ola_buffer[2][FFT_PV_OLA_BUFFER_SIZE]{0.0f};
+  float fft_pv_ola_buffer[AUDIO_CHANNEL_COUNT][FFT_PV_OLA_BUFFER_SIZE]{};
   fftwf_complex fft_pv_freq[FFT_PV_FREQ_SIZE]{};
-  fftwf_complex fft_pv_freq_shift[FFT_PV_FREQ_SIZE]{0.0f};
-  float fft_pv_phase_sum[2][FFT_PV_FREQ_SIZE]{0.0f};
-  float fft_pv_phase_prev[2][FFT_PV_FREQ_SIZE]{0.0f};
-  float fft_pv_phase_prev_init[2][FFT_PV_FREQ_SIZE]{0.0f};
+  fftwf_complex fft_pv_freq_shift[FFT_PV_FREQ_SIZE]{};
+  float fft_pv_phase_sum[AUDIO_CHANNEL_COUNT][FFT_PV_FREQ_SIZE]{};
+  float fft_pv_phase_prev[AUDIO_CHANNEL_COUNT][FFT_PV_FREQ_SIZE]{};
+  float fft_pv_phase_prev_init[AUDIO_CHANNEL_COUNT][FFT_PV_FREQ_SIZE]{};
   fftwf_plan fft_pv_plan_r2c;
   fftwf_plan fft_pv_plan_c2r;
-  float vu_buffer_in[VU_RING_BUFFER_SIZE]{0.0f};
-  float vu_buffer[VU_RING_BUFFER_SIZE]{0.0f};
+  float vu_buffer_in[VU_RING_BUFFER_SIZE]{};
+  float vu_buffer[VU_RING_BUFFER_SIZE]{};
   jack_ringbuffer_t* vu_ring_buffer{nullptr};
-  float processBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{0.0f};
-  float* processBuffers[2]{nullptr, nullptr};
-  float playbackBuffersPre[2][AUDIO_FRAMES_PER_BUFFER_MAX]{0.0f};
-  float playbackBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{0.0f};
-  float* playbackBuffers[2]{nullptr, nullptr};
-  float fftFreqBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * 2]{0.0f};
-  sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{0};
+  float processBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * AUDIO_CHANNEL_COUNT]{};
+  float* processBuffers[AUDIO_CHANNEL_COUNT]{nullptr, nullptr};
+  float playbackBuffersPre[AUDIO_CHANNEL_COUNT][AUDIO_FRAMES_PER_BUFFER_MAX]{};
+  float playbackBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * AUDIO_CHANNEL_COUNT]{};
+  float* playbackBuffers[AUDIO_CHANNEL_COUNT]{nullptr, nullptr};
+  float fftFreqBuffersBuffer[FFT_FREQ_BUFFERS_BUFFER_SIZE]{};
+  sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
   jack_ringbuffer_t* playbackSettingsToAudioThreadRB{nullptr};
 
-  sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{0};
+  sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
   jack_ringbuffer_t* playbackSettingsFromAudioThreadRB{nullptr};
   std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
   size_t mixerChannelCount;
   jack_ringbuffer_t* mixerChannelsProcessDataRB{};
   Mixer::ChannelProcessData mixerChannelsProcessData[MAX_MIXER_CHANNELS]{};
-  float mixerChannelsSettings[MAX_MIXER_CHANNELS * 4]{0.0f};
+  float mixerChannelsSettings[MAX_MIXER_CHANNELS_SETTINGS_COUNT]{};
   jack_ringbuffer_t* mixerChannelsSettingsRB{nullptr};
-  float mixerChannelsWriteOutBuffer[2 * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_MIXER_CHANNELS]{0.0f};
-  float* mixerChannelsWriteOut[MAX_MIXER_CHANNELS][2]{nullptr};
+  float mixerChannelsWriteOutBuffer[AUDIO_CHANNEL_COUNT * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_MIXER_CHANNELS]{};
+  float* mixerChannelsWriteOut[MAX_MIXER_CHANNELS][AUDIO_CHANNEL_COUNT]{};
 
   AudioCore(AppState* gAppState)
   : gAppState(gAppState)
@@ -77,8 +77,8 @@ struct AudioCore {
     , vu_ring_buffer(jack_ringbuffer_create(2 * MAX_MIXER_CHANNELS))
     , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE))
     , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE))
-    , mixerChannelsSettingsRB(jack_ringbuffer_create(ChannelsSettings_RB_SIZE))
-    , mixerChannelsProcessDataRB(jack_ringbuffer_create(MixerChannelsProcessData_RB_SIZE)) {
+    , mixerChannelsProcessDataRB(jack_ringbuffer_create(MixerChannelsProcessData_RB_SIZE))
+    , mixerChannelsSettingsRB(jack_ringbuffer_create(ChannelsSettings_RB_SIZE)) {
     Logging::write(
       Info,
       "Audio::AudioCore::AudioCore()",
@@ -113,6 +113,42 @@ struct AudioCore {
     );
   }
 
+  Result clearBuffers() {
+    std::fill_n(mixerChannelsWriteOutBuffer, AUDIO_CHANNEL_COUNT * MAX_MIXER_CHANNELS * AUDIO_FRAMES_PER_BUFFER_MAX,
+                0.0f);
+    std::fill_n(playbackBuffersBuffer, AUDIO_CHANNEL_COUNT * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
+    std::fill_n(processBuffersBuffer, AUDIO_CHANNEL_COUNT * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
+
+    // fftwf_complex arrays
+    std::memset(fft_eq_freq, 0.0f, sizeof(fft_eq_freq));
+    std::memset(fft_pv_freq, 0.0f, sizeof(fft_pv_freq));
+    std::memset(fft_pv_freq_shift, 0.0f, sizeof(fft_pv_freq_shift));
+
+    // TODO: debug
+    // for (auto ch = 0; ch < AUDIO_FRAMES_PER_BUFFER_MAX; ++ch) {
+    //   std::fill_n(fft_eq_time[ch], FFT_EQ_TIME_SIZE, 0.0f);
+    //   std::fill_n(fft_pv_phase_sum[ch], FFT_PV_FREQ_SIZE, 0.0f);
+    //   std::fill_n(fft_pv_phase_prev[ch], FFT_PV_FREQ_SIZE, 0.0f);
+    //   std::fill_n(fft_pv_phase_prev_init[ch], FFT_PV_FREQ_SIZE, 0.0f);
+    //   std::fill_n(fft_pv_ola_buffer[ch], FFT_PV_OLA_BUFFER_SIZE, 0.0f);
+    // }
+    //
+    // std::fill_n(fft_eq_write_out_buffer, AUDIO_CHANNEL_COUNT * FFT_EQ_FREQ_SIZE, 0.0f);
+    // std::fill_n(vu_buffer_in, VU_RING_BUFFER_SIZE, 0.0f);
+    // std::fill_n(vu_buffer, VU_RING_BUFFER_SIZE, 0.0f);
+    //
+    // std::fill_n(fft_pv_time, FFT_PV_TIME_SIZE, 0.0f);
+    //
+    // std::fill_n(fft_eq_write_out_buffer, AUDIO_CHANNEL_COUNT * FFT_EQ_FREQ_SIZE, 0.0f);
+    // std::fill_n(fftFreqBuffersBuffer, AUDIO_CHANNEL_COUNT * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
+    // std::fill_n(mixerChannelsSettings, MAX_MIXER_CHANNELS_SETTINGS_COUNT, 0.0f);
+    //
+    // std::fill_n(playbackSettingsFromAudioThread, PlaybackSettingsFromAudioThread_Count, 0);
+    // std::fill_n(playbackSettingsToAudioThread, PlaybackSettingsToAudioThread_Count, 0);
+
+    return OK;
+  }
+
   Result init() {
     Logging::write(
       Info,
@@ -120,6 +156,7 @@ struct AudioCore {
       "Initializing AudioCore"
     );
 
+    clearBuffers();
     setBufferRefs();
 
     fft_eq_0_plan_r2c = fftwf_plan_dft_r2c_1d(FFT_EQ_TIME_SIZE, fft_eq_time[0], fft_eq_freq[0], FFTW_ESTIMATE);
@@ -384,14 +421,6 @@ struct AudioCore {
   Result setFrameIdAllDecks(const sf_count_t frameId) const {
     for (DeckIndex i = 0; i < AUDIO_CORE_DECK_COUNT; i++)
       decks[i].frameId = frameId;
-
-    return OK;
-  }
-
-  Result clearBuffers() {
-    std::fill_n(mixerChannelsWriteOutBuffer, 2 * MAX_MIXER_CHANNELS * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
-    std::fill_n(playbackBuffersBuffer, 2 * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
-    std::fill_n(processBuffersBuffer, 2 * AUDIO_FRAMES_PER_BUFFER_MAX, 0.0f);
 
     return OK;
   }

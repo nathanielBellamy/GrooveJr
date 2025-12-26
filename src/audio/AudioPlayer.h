@@ -185,10 +185,14 @@ struct AudioPlayer {
       auto processData = ch->getProcessData();
       processData.pluginCount = ch->pluginCount();
 
-      ch->forEachPlugin(
-        [this, &ch, &processData](const Plugins::Vst3::Plugin* plugin,
+      ch->forEachPluginSlot(
+        [this, &ch, &processData](const std::optional<Plugins::Vst3::Plugin*> pluginOpt,
                                   const PluginIndex pluginIdx) {
-          if (processData.processingEnabledFor[pluginIdx]) {
+          processData.buffers[pluginIdx] =
+              getPluginBuffers(ch, pluginIdx);
+
+          if (const auto plugin = pluginOpt.value_or(nullptr);
+            plugin != nullptr && plugin->audioHost != nullptr && plugin->audioHost->audioClient) {
             processData.processFuncs[pluginIdx] =
                 [audioClient = plugin->audioHost->audioClient](IAudioClient::Buffers& buffers,
                                                                const jack_nframes_t nFrames) {
@@ -212,9 +216,6 @@ struct AudioPlayer {
                   return true;
                 };
           }
-
-          processData.buffers[pluginIdx] =
-              getPluginBuffers(ch, pluginIdx);
           ch->setProcessData(processData);
           mixerChannelsProcessData[ch->getIndex()] = processData;
         });
