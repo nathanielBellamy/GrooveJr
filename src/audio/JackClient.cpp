@@ -476,13 +476,20 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   const auto audioCore = static_cast<AudioCore*>(arg);
   audioCore->clearBuffers();
 
-  // read playbackSettingsToAudioThreadRingBuffer
   if (jack_ringbuffer_read_space(audioCore->playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE -
       2) {
     jack_ringbuffer_read(
       audioCore->playbackSettingsToAudioThreadRB,
       reinterpret_cast<char*>(audioCore->playbackSettingsToAudioThread),
       PlaybackSettingsToAudioThread_RB_SIZE
+    );
+  }
+
+  if (jack_ringbuffer_read_space(audioCore->mixerChannelsProcessDataRB) > MixerChannelsProcessData_RB_SIZE - 2) {
+    jack_ringbuffer_read(
+      audioCore->mixerChannelsProcessDataRB,
+      reinterpret_cast<char*>(audioCore->mixerChannelsProcessData),
+      MixerChannelsProcessData_RB_SIZE
     );
   }
 
@@ -511,15 +518,19 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   // process channels
   // main channel is chhannelIdx 0
   const int32_t nframes32t = static_cast<int32_t>(nframes);
-  for (ChannelIndex chhannelIdx = 1; chhannelIdx < audioCore->mixerChannelCount; chhannelIdx++) {
-    auto [pluginCount, processFuncs, buffers] = audioCore->mixerChannelsProcessData[chhannelIdx];
-    for (PluginIndex pluginIdx = 0; pluginIdx < pluginCount; pluginIdx++) {
-      buffers[pluginIdx].numSamples = nframes32t;
+  for (ChannelIndex channelIdx = 1; channelIdx < MAX_MIXER_CHANNELS; channelIdx++) {
+    if (auto [processFuncs, buffers, processingEnabledFor, pluginCount] = audioCore->mixerChannelsProcessData[
+        channelIdx];
+      pluginCount != 0) {
+      for (PluginIndex pluginIdx = 0; pluginIdx < MAX_PLUGINS_PER_CHANNEL; pluginIdx++) {
+        buffers[pluginIdx].numSamples = nframes32t;
 
-      processFuncs[pluginIdx](
-        buffers[pluginIdx],
-        nframes
-      );
+        if (processingEnabledFor[pluginIdx])
+          processFuncs[pluginIdx](
+            buffers[pluginIdx],
+            nframes
+          );
+      }
     }
   }
 
@@ -582,8 +593,8 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   }
 
   // process summed down mix through main plugins
-  auto [pluginCount, processFuncs, buffers] = audioCore->mixerChannelsProcessData[0];
-  for (PluginIndex pluginIdx = 0; pluginIdx < pluginCount; pluginIdx++) {
+  auto [processFuncs, buffers, processingEnabled, pluginCount] = audioCore->mixerChannelsProcessData[0];
+  for (PluginIndex pluginIdx = 0; pluginIdx < MAX_PLUGINS_PER_CHANNEL; pluginIdx++) {
     buffers[pluginIdx].numSamples = static_cast<int32_t>(nframes);
 
     processFuncs[pluginIdx](

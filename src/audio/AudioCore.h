@@ -65,7 +65,7 @@ struct AudioCore {
 
   size_t mixerChannelCount;
   jack_ringbuffer_t* mixerChannelsProcessDataRB{};
-  std::array<Mixer::ChannelProcessData, MAX_MIXER_CHANNELS> mixerChannelsProcessData{};
+  Mixer::ChannelProcessData mixerChannelsProcessData[MAX_MIXER_CHANNELS]{};
   float mixerChannelsSettings[MAX_MIXER_CHANNELS * 4]{0.0f};
   jack_ringbuffer_t* mixerChannelsSettingsRB{nullptr};
   float mixerChannelsWriteOutBuffer[2 * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_MIXER_CHANNELS]{0.0f};

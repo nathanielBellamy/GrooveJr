@@ -5,13 +5,16 @@
 #ifndef GJAUDIOMIXERCHANNEL_H
 #define GJAUDIOMIXERCHANNEL_H
 
+#include <atomic>
 #include <algorithm>
 #include <memory>
 #include <optional>
 #include <string>
+#include <mutex>
 
 #include "../plugins/vst3/Plugin.h"
 #include "ChannelSettings.h"
+#include "ChannelProcessData.h"
 #include "../../AppState.h"
 #include "../../enums/Result.h"
 #include "../../db/entity/mixer/Plugin.h"
@@ -34,7 +37,20 @@ class Channel {
 
   std::optional<Plugins::Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {std::nullopt};
 
+  std::mutex processDataMutex;
+  ChannelProcessData processData = {};
+
 public:
+  ChannelProcessData getProcessData() {
+    std::lock_guard guard(processDataMutex);
+    return processData;
+  }
+
+  void setProcessData(const ChannelProcessData& data) {
+    std::lock_guard guard(processDataMutex);
+    processData = data;
+  }
+
   ChannelSettings settings;
 
   Channel(
@@ -260,7 +276,7 @@ public:
   Result forEachPlugin(F&& func) {
     bool warning = false;
     for (PluginIndex pluginIndex = 0; pluginIndex < MAX_PLUGINS_PER_CHANNEL; ++pluginIndex) {
-      if (!plugins[pluginIndex])
+      if (!plugins[pluginIndex] || plugins[pluginIndex].value() == nullptr)
         continue;
 
       try {

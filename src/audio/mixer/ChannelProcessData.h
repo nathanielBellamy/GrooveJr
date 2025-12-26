@@ -5,7 +5,6 @@
 #ifndef GJGUIMIXERCHANNELPROCESSDATA_H
 #define GJGUIMIXERCHANNELPROCESSDATA_H
 
-#include <array>
 #include <functional>
 #include <sndfile.hh>
 #include "public.sdk/samples/vst-hosting/audiohost/source/media/imediaserver.h"
@@ -17,15 +16,18 @@ namespace Gj {
 namespace Audio {
 namespace Mixer {
 struct ChannelProcessData {
-  PluginIndex pluginCount;
-  std::array<std::function<bool(Steinberg::Vst::IAudioClient::Buffers&, int64_t frames)>, MAX_PLUGINS_PER_CHANNEL>
-  processFuncs{};
-  std::array<Steinberg::Vst::IAudioClient::Buffers, MAX_PLUGINS_PER_CHANNEL> buffers{};
-  // bool processingEnabled[MAX_PLUGINS_PER_CHANNEL]{false};
+  std::function<bool(Steinberg::Vst::IAudioClient::Buffers&, int64_t frames)> processFuncs[MAX_PLUGINS_PER_CHANNEL]{};
+  Steinberg::Vst::IAudioClient::Buffers buffers[MAX_PLUGINS_PER_CHANNEL]{};
+  bool processingEnabledFor[MAX_PLUGINS_PER_CHANNEL]{};
+  PluginIndex pluginCount = 0;
 
-  ChannelProcessData()
-  : pluginCount(0) {
-  };
+  ChannelProcessData() {
+    std::fill_n(
+      processFuncs,
+      MAX_PLUGINS_PER_CHANNEL,
+      [](auto&&, auto&&) { return true; }
+    );
+  }
 };
 } // Mixer
 } // Audio

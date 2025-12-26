@@ -65,6 +65,7 @@ struct AudioPlayer {
     , gAppState(gAppState)
     , jackClient(mixer->getGjJackClient()) {
     audioCore->clearBuffers();
+    populateMixerChannelsProcessData();
 
     if (jackClient == nullptr) {
       Logging::write(
@@ -130,6 +131,8 @@ struct AudioPlayer {
       "Setting up AudioCore for threadId: " + std::to_string(threadId)
     );
 
+    createRingBuffers();
+
     if (threadId != ThreadStatics::getThreadId()) {
       Logging::write(
         Warning,
@@ -167,25 +170,6 @@ struct AudioPlayer {
     );
 
     audioCore->setChannelCount(mixer->getTotalChannelsCount());
-    mixer->forEachChannel([this](Mixer::Channel* ch, ChannelIndex chIndex) {
-      audioCore->mixerChannelsProcessData[chIndex].pluginCount = ch->pluginCount();
-      for (PluginIndex pluginIdx = 0; pluginIdx < ch->pluginCount(); pluginIdx++) {
-        const auto pluginOpt = ch->getPluginAtIdx(pluginIdx);
-        if (!pluginOpt.has_value())
-          continue;
-
-        audioCore->mixerChannelsProcessData[chIndex].processFuncs[pluginIdx] =
-            [audioClient = pluginOpt.value()->audioHost->audioClient](auto&& buffers, auto&& continuousFrames) {
-              return audioClient->process(
-                std::forward<decltype(buffers)>(buffers),
-                std::forward<decltype(continuousFrames)>(continuousFrames)
-              );
-            };
-
-        audioCore->mixerChannelsProcessData[chIndex].buffers[pluginIdx] =
-            getPluginBuffers(ch, pluginIdx);
-      }
-    });
 
     Logging::write(
       Info,
@@ -194,6 +178,47 @@ struct AudioPlayer {
     );
 
     return 0;
+  }
+
+  Result populateMixerChannelsProcessData() {
+    return mixer->forEachChannel([this](Mixer::Channel* ch, ChannelIndex chIdx) {
+      auto processData = ch->getProcessData();
+      processData.pluginCount = ch->pluginCount();
+
+      ch->forEachPlugin(
+        [this, &ch, &processData](const Plugins::Vst3::Plugin* plugin,
+                                  const PluginIndex pluginIdx) {
+          if (processData.processingEnabledFor[pluginIdx]) {
+            processData.processFuncs[pluginIdx] =
+                [audioClient = plugin->audioHost->audioClient](IAudioClient::Buffers& buffers,
+                                                               const jack_nframes_t nFrames) {
+                  return audioClient->process(
+                    buffers,
+                    nFrames
+                  );
+                };
+          } else if (pluginIdx == 0 || pluginIdx == MAX_PLUGINS_PER_CHANNEL - 1) {
+            processData.processFuncs[pluginIdx] =
+                [](const IAudioClient::Buffers& buffers, const jack_nframes_t nFrames) {
+                  for (int audioChannel = 0; audioChannel < 2; ++audioChannel)
+                    for (auto i = 0; i < nFrames; ++i)
+                      buffers.outputs[audioChannel][i] = buffers.inputs[audioChannel][i];
+
+                  return true;
+                };
+          } else {
+            processData.processFuncs[pluginIdx] =
+                [](const IAudioClient::Buffers&, const jack_nframes_t) {
+                  return true;
+                };
+          }
+
+          processData.buffers[pluginIdx] =
+              getPluginBuffers(ch, pluginIdx);
+          ch->setProcessData(processData);
+          mixerChannelsProcessData[ch->getIndex()] = processData;
+        });
+    });
   }
 
   IAudioClient::Buffers getPluginBuffers(
@@ -207,7 +232,7 @@ struct AudioPlayer {
     // - the main channel then acts upon the processBuffers
 
     if (channel->getIndex() == 0) // main
-      // all plugins on main operate on process
+      // all plugins on main operate on processBuffers
       return {
         audioCore->processBuffers,
         2,
@@ -217,22 +242,7 @@ struct AudioPlayer {
       };
 
     // non-main channel from here on
-    const auto pluginCount = channel->pluginCount();
-    const auto writeOut = const_cast<float**>(audioCore->mixerChannelsWriteOut[channel->getIndex()]);
-    if (pluginCount == 1) {
-      // single plugin on non-main channel so goes from playbackBuffers to writeout
-      return {
-        audioCore->playbackBuffers,
-        2,
-        writeOut,
-        2,
-        audioFramesPerBuffer
-      };
-    }
-
-    // multiple plugins
-    if (pluginIdx == 0) {
-      // first plugin of multiple plugins so goes from playback to process" << std::endl;
+    if (pluginIdx == 0)
       return {
         audioCore->playbackBuffers,
         2,
@@ -240,10 +250,9 @@ struct AudioPlayer {
         2,
         audioFramesPerBuffer
       };
-    }
 
-    if (pluginIdx == pluginCount - 1) {
-      // last plugin of multiple so goes from process to writeout"
+    if (pluginIdx == MAX_PLUGINS_PER_CHANNEL - 1) {
+      const auto writeOut = const_cast<float**>(audioCore->mixerChannelsWriteOut[channel->getIndex()]);
       return {
         audioCore->processBuffers,
         2,
@@ -321,6 +330,7 @@ struct AudioPlayer {
     // -   mixer sets flag saying processing is good to go
     // -   audioThread re-instates processing
     // updateProcessDataRingBuffer()
+
     if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > MixerChannelsProcessData_RB_SIZE - 2)
       jack_ringbuffer_write(
         audioCore->mixerChannelsProcessDataRB,
@@ -346,7 +356,8 @@ struct AudioPlayer {
     }
 
     // write to playbackSettingsToAudioThread ring buffer
-    if (jack_ringbuffer_write_space(audioCore->playbackSettingsToAudioThreadRB) > PlaybackSettingsToAudioThread_RB_SIZE
+    if (jack_ringbuffer_write_space(audioCore->playbackSettingsToAudioThreadRB) >
+        PlaybackSettingsToAudioThread_RB_SIZE
         - 2) {
       jack_ringbuffer_write(
         audioCore->playbackSettingsToAudioThreadRB,
@@ -486,8 +497,6 @@ struct AudioPlayer {
       "Playing"
     );
 
-    createRingBuffers();
-
     audioCore->decks[audioCore->deckIndex].playState = PLAY;
 
     while (continueRun()) {
@@ -506,6 +515,7 @@ struct AudioPlayer {
         );
       }
 
+      populateMixerChannelsProcessData();
       updateRingBuffers();
 
       if (audioCore->threadId != ThreadStatics::getThreadId()) {
