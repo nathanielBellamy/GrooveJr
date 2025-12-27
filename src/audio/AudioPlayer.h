@@ -43,9 +43,9 @@ struct AudioPlayer {
 
   float mixerChannelsSettings[2 * MAX_MIXER_CHANNELS]{};
 
-  sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
+  sf_count_t playbackSettingsToAudioThread[BfrIdx::PSTAT::SIZE]{};
 
-  sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
+  sf_count_t playbackSettingsFromAudioThread[BfrIdx::PSFAT::SIZE]{};
 
   float fft_eq_buffer[FFT_EQ_RING_BUFFER_SIZE]{};
 
@@ -310,11 +310,11 @@ struct AudioPlayer {
 
     // read playbackSettingsFromAudioThread ring buffer
     if (jack_ringbuffer_read_space(audioCore->playbackSettingsFromAudioThreadRB) >
-        PlaybackSettingsFromAudioThread_RB_SIZE - 2)
+        BfrIdx::PSFAT::RB_SIZE - 2)
       jack_ringbuffer_read(
         audioCore->playbackSettingsFromAudioThreadRB,
         reinterpret_cast<char*>(playbackSettingsFromAudioThread),
-        PlaybackSettingsFromAudioThread_RB_SIZE
+        BfrIdx::PSFAT::RB_SIZE
       );
 
     // TODO:
@@ -332,11 +332,12 @@ struct AudioPlayer {
     // -   audioThread re-instates processing
     // updateProcessDataRingBuffer()
 
-    if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > MixerChannelsProcessData_RB_SIZE - 2)
+    if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > BfrIdx::MixerChannel::ProcessData::RB_SIZE
+        - 2)
       jack_ringbuffer_write(
         audioCore->mixerChannelsProcessDataRB,
         reinterpret_cast<char*>(mixerChannelsProcessData),
-        MixerChannelsProcessData_RB_SIZE
+        BfrIdx::MixerChannel::ProcessData::RB_SIZE
       );
 
     // std::cout << " DEBUG VALUE FROM AUDIO THREAD " << playbackSettingsFromAudioThread[BfrIdx::PSFAT::DEBUG_VALUE] << std::endl;
@@ -357,13 +358,11 @@ struct AudioPlayer {
     }
 
     // write to playbackSettingsToAudioThread ring buffer
-    if (jack_ringbuffer_write_space(audioCore->playbackSettingsToAudioThreadRB) >
-        PlaybackSettingsToAudioThread_RB_SIZE
-        - 2) {
+    if (jack_ringbuffer_write_space(audioCore->playbackSettingsToAudioThreadRB) > BfrIdx::PSTAT::RB_SIZE - 2) {
       jack_ringbuffer_write(
         audioCore->playbackSettingsToAudioThreadRB,
         reinterpret_cast<char*>(playbackSettingsToAudioThread),
-        PlaybackSettingsToAudioThread_RB_SIZE
+        BfrIdx::PSTAT::RB_SIZE
       );
     }
 
@@ -425,28 +424,28 @@ struct AudioPlayer {
       const float panL = channel->getPanL();
       const float panR = channel->getPanR();
 
-      mixerChannelsSettings[BfrIdx::ECS::factorLL(chIdx)] = AudioCore::factorLL(
+      mixerChannelsSettings[BfrIdx::MixerChannel::Settings::factorLL(chIdx)] = AudioCore::factorLL(
         gain, gainL, gainR,
         mute, muteL, muteR,
         solo, soloL, soloR,
         pan, panL, panR,
         channelCountF
       );
-      mixerChannelsSettings[BfrIdx::ECS::factorLR(chIdx)] = AudioCore::factorLR(
+      mixerChannelsSettings[BfrIdx::MixerChannel::Settings::factorLR(chIdx)] = AudioCore::factorLR(
         gain, gainL, gainR,
         mute, muteL, muteR,
         solo, soloL, soloR,
         pan, panL, panR,
         channelCountF
       );
-      mixerChannelsSettings[BfrIdx::ECS::factorRL(chIdx)] = AudioCore::factorRL(
+      mixerChannelsSettings[BfrIdx::MixerChannel::Settings::factorRL(chIdx)] = AudioCore::factorRL(
         gain, gainL, gainR,
         mute, muteL, muteR,
         solo, soloL, soloR,
         pan, panL, panR,
         channelCountF
       );
-      mixerChannelsSettings[BfrIdx::ECS::factorRR(chIdx)] = AudioCore::factorRR(
+      mixerChannelsSettings[BfrIdx::MixerChannel::Settings::factorRR(chIdx)] = AudioCore::factorRR(
         gain, gainL, gainR,
         mute, muteL, muteR,
         solo, soloL, soloR,
@@ -456,9 +455,10 @@ struct AudioPlayer {
     }
 
     // write to mixerChannelSettings ring buffer
-    if (jack_ringbuffer_write_space(audioCore->mixerChannelsSettingsRB) >= ChannelsSettings_RB_SIZE - 2) {
+    if (jack_ringbuffer_write_space(audioCore->mixerChannelsSettingsRB) >= BfrIdx::MixerChannel::Settings::RB_SIZE -
+        2) {
       jack_ringbuffer_write(audioCore->mixerChannelsSettingsRB, reinterpret_cast<char*>(mixerChannelsSettings),
-                            ChannelsSettings_RB_SIZE);
+                            BfrIdx::MixerChannel::Settings::RB_SIZE);
     }
 
     return OK;

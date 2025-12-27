@@ -16,6 +16,8 @@ namespace BfrIdx {
 
 // playbackSettingsFromAudioThread
 namespace PSFAT {
+constexpr size_t SIZE = 3;
+constexpr size_t RB_SIZE = sizeof(sf_count_t) * SIZE;
 static constexpr size_t DEBUG_VALUE = 0;
 
 static constexpr size_t CURRENT_FRAME_ID = 1;
@@ -24,6 +26,8 @@ static constexpr size_t PROCESS_DATA_CHANGE_FLAG = 2;
 
 // playbackSettingsToAudioThread
 namespace PSTAT {
+static constexpr size_t SIZE = 4;
+static constexpr size_t RB_SIZE = sizeof(sf_count_t) * SIZE;
 static constexpr size_t USER_SETTING_FRAME_ID_FLAG = 0; // bool
 static constexpr size_t NEW_FRAME_ID = 1;
 
@@ -38,41 +42,51 @@ static constexpr int LEFT = 0;
 static constexpr int RIGHT = 1;
 };
 
-namespace ECS {
+
+namespace MixerChannel {
+namespace ProcessData {
+static constexpr size_t RB_SIZE = MAX_MIXER_CHANNELS * sizeof(Mixer::ChannelProcessData);
+} // ProcessData
+
+namespace Settings {
+static constexpr size_t COUNT = 4;
+static constexpr size_t RB_SIZE = COUNT * MAX_MIXER_CHANNELS * sizeof(float);
+
 static constexpr ChannelIndex factorLL(const ChannelIndex channelIndex) {
-  return 4 * channelIndex;
+  return COUNT * channelIndex;
 }
 
 static constexpr ChannelIndex factorLR(const ChannelIndex channelIndex) {
-  return 4 * channelIndex + 1;
+  return COUNT * channelIndex + 1;
 }
 
 static constexpr ChannelIndex factorRL(const ChannelIndex channelIndex) {
-  return 4 * channelIndex + 2;
+  return COUNT * channelIndex + 2;
 }
 
 static constexpr ChannelIndex factorRR(const ChannelIndex channelIndex) {
-  return 4 * channelIndex + 3;
+  return COUNT * channelIndex + 3;
 }
-}; // ECS
+} // Settings
+}; // MixerChannel
 
 namespace VU {
 static constexpr ChannelIndex left(const ChannelIndex channelIndex) {
-  return 2 * channelIndex;
+  return AUDIO_CHANNEL_COUNT * channelIndex;
 }
 
 static constexpr ChannelIndex right(const ChannelIndex channelIndex) {
-  return 2 * channelIndex + 1;
+  return AUDIO_CHANNEL_COUNT * channelIndex + 1;
 }
 } // VU
 
 namespace FFT {
 static constexpr ChannelIndex left(const ChannelIndex channelIndex) {
-  return 2 * channelIndex;
+  return AUDIO_CHANNEL_COUNT * channelIndex;
 }
 
 static constexpr ChannelIndex right(const ChannelIndex channelIndex) {
-  return 2 * channelIndex + 1;
+  return AUDIO_CHANNEL_COUNT * channelIndex + 1;
 }
 } // FFT
 } // BfrIdx

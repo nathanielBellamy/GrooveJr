@@ -9,9 +9,9 @@
 #include <sndfile.hh>
 #include "../enums/PlayState.h"
 #include "mixer/ChannelProcessData.h"
-#include "./Constants.h"
-#include "./AudioDeck.h"
-#include "ThreadStatics.h"
+#include "BufferIndeces.h"
+#include "Constants.h"
+#include "AudioDeck.h"
 
 #include <jack/ringbuffer.h>
 
@@ -22,8 +22,6 @@
 
 namespace Gj {
 namespace Audio {
-constexpr size_t MixerChannelsProcessData_RB_SIZE = MAX_MIXER_CHANNELS * sizeof(Mixer::ChannelProcessData);
-
 struct AudioCore {
   long threadId;
   AppState* gAppState;
@@ -56,10 +54,10 @@ struct AudioCore {
   float playbackBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * AUDIO_CHANNEL_COUNT]{};
   float* playbackBuffers[AUDIO_CHANNEL_COUNT]{nullptr, nullptr};
   float fftFreqBuffersBuffer[FFT_FREQ_BUFFERS_BUFFER_SIZE]{};
-  sf_count_t playbackSettingsToAudioThread[PlaybackSettingsToAudioThread_Count]{};
+  sf_count_t playbackSettingsToAudioThread[BfrIdx::PSTAT::SIZE]{};
   jack_ringbuffer_t* playbackSettingsToAudioThreadRB{nullptr};
 
-  sf_count_t playbackSettingsFromAudioThread[PlaybackSettingsFromAudioThread_Count]{};
+  sf_count_t playbackSettingsFromAudioThread[BfrIdx::PSFAT::SIZE]{};
   jack_ringbuffer_t* playbackSettingsFromAudioThreadRB{nullptr};
   std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
@@ -74,11 +72,11 @@ struct AudioCore {
   AudioCore(AppState* gAppState)
   : gAppState(gAppState)
     , fft_eq_ring_buffer(jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE))
-    , vu_ring_buffer(jack_ringbuffer_create(2 * MAX_MIXER_CHANNELS))
-    , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsToAudioThread_RB_SIZE))
-    , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(PlaybackSettingsFromAudioThread_RB_SIZE))
-    , mixerChannelsProcessDataRB(jack_ringbuffer_create(MixerChannelsProcessData_RB_SIZE))
-    , mixerChannelsSettingsRB(jack_ringbuffer_create(ChannelsSettings_RB_SIZE)) {
+    , vu_ring_buffer(jack_ringbuffer_create(AUDIO_CHANNEL_COUNT * MAX_MIXER_CHANNELS))
+    , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(BfrIdx::PSTAT::RB_SIZE))
+    , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(BfrIdx::PSFAT::RB_SIZE))
+    , mixerChannelsProcessDataRB(jack_ringbuffer_create(BfrIdx::MixerChannel::ProcessData::RB_SIZE))
+    , mixerChannelsSettingsRB(jack_ringbuffer_create(BfrIdx::MixerChannel::Settings::RB_SIZE)) {
     Logging::write(
       Info,
       "Audio::AudioCore::AudioCore()",
