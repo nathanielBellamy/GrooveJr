@@ -11,6 +11,7 @@
 #include <optional>
 #include <string>
 #include <mutex>
+#include <vector>
 
 #include "../plugins/vst3/Plugin.h"
 #include "ChannelSettings.h"
@@ -36,17 +37,16 @@ class Channel {
   AtomicStr name{"Channel"};
 
   std::optional<Plugins::Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {std::nullopt};
-  std::optional<Plugins::Vst3::Plugin*> pluginToDelete;
+  std::vector<Plugins::Vst3::Plugin*> pluginsToDelete;
 
   std::mutex processDataMutex;
   ChannelProcessData processData = {};
 
 public:
-  Result deletePluginToDelete() {
-    if (pluginToDelete) {
-      delete pluginToDelete.value();
-      pluginToDelete.reset();
-    }
+  Result deletePluginsToDelete() {
+    for (const auto plugin: pluginsToDelete)
+      delete plugin;
+    pluginsToDelete.clear();
     return OK;
   }
 

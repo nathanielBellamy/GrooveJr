@@ -492,6 +492,9 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
       reinterpret_cast<char*>(audioCore->mixerChannelsProcessData),
       BfrIdx::MixerChannel::ProcessData::RB_SIZE
     );
+    audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] = ProcessDataChangeFlag::ROGER;
+  } else {
+    audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] = ProcessDataChangeFlag::BASE;
   }
 
   if (audioCore->playbackSettingsToAudioThread[BfrIdx::PSTAT::USER_SETTING_FRAME_ID_FLAG] == 1) // user set frame Id
@@ -681,6 +684,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
       FFT_EQ_RING_BUFFER_SIZE
     );
   }
+
 
   return kJackSuccess;
 }

@@ -78,6 +78,8 @@ struct AudioThreadState {
             "Error creating AudioPlayer or during AudioPlayer::run: " + std::string(e.what())
           );
         }
+
+        gAppState->setAudioRunning(false);
         Logging::write(
           Info,
           "Act::AudioThread::audio_thread_init_a",

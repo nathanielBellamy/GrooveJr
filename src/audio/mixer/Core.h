@@ -26,6 +26,7 @@
 #include "../../db/entity/mixer/Scene.h"
 // #include "JackClient.h"
 #include "Channel.h"
+#include "../ProcessDataChangeFlag.h"
 #include "../../gui/Mixer/Channels/Channel/Plugins/VstWindow.h"
 #include "../plugins/vst3/Util.h"
 #include "../ThreadStatics.h"
@@ -46,6 +47,7 @@ class Core {
   std::function<void(jack_ringbuffer_t* vuRingBuffer)> setVuRingBufferFunc;
   std::function<void()> eqAnimationStartFunc;
   std::function<void()> eqAnimationStopFunc;
+  std::atomic<ProcessDataChangeFlag_t> processDataChangeFlag;
 
   void incorporateLatencySamples(int latencySamples) const;
 
@@ -55,6 +57,22 @@ public:
   explicit Core(AppState*, Db::Dao*);
 
   ~Core();
+
+  ProcessDataChangeFlag_t getProcessDataChangeFlag() const {
+    return processDataChangeFlag.load();
+  }
+
+  Result setProcessDataChangeFlag(ProcessDataChangeFlag_t flag) {
+    processDataChangeFlag.store(flag);
+    return OK;
+  }
+
+  Result safeDeleteOldPlugins() {
+    if (gAppState->isAudioRunning())
+      return setProcessDataChangeFlag(ProcessDataChangeFlag::ACKNOWLEDGE);
+
+    return deletePluginsToDelete();
+  }
 
 
   bool indexHasValidChannel(ChannelIndex idx) {
@@ -180,6 +198,12 @@ public:
     return count;
   }
 
+  Result deletePluginsToDelete() {
+    return forEachChannel([](Channel* channel, const ChannelIndex idx) {
+      channel->deletePluginsToDelete();
+    });
+  }
+
   std::optional<ChannelIndex> firstOpenChannelIndex() const;
 
   Result addChannel();
@@ -195,6 +219,10 @@ public:
 
   Result loadPluginOnChannel(const Db::Plugin& plugin);
 
+  Result replacePluginOnChannel(ChannelIndex channelIdx, PluginIndex pluginIdx, const PluginPath& pluginPath);
+
+  Result removePluginFromChannel(ChannelIndex channelIdx, PluginIndex pluginIdx);
+
   Result initEditorHostsOnChannel(ChannelIndex idx, std::vector<std::shared_ptr<Gui::Mixer::VstWindow> >& vstWindows);
 
   Result initEditorHostOnChannel(ChannelIndex idx, PluginIndex newPluginIndex,
@@ -203,10 +231,6 @@ public:
   Result terminateEditorHostsOnChannel(ChannelIndex idx);
 
   Result setSampleRate(uint32_t sampleRate);
-
-  Result replacePluginOnChannel(ChannelIndex channelIdx, PluginIndex pluginIdx, const PluginPath& pluginPath);
-
-  Result removePluginFromChannel(ChannelIndex channelIdx, PluginIndex pluginIdx);
 
   jack_nframes_t getAudioFramesPerBuffer() const { return gAppState->getAudioFramesPerBuffer(); };
 

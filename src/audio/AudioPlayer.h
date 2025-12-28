@@ -15,6 +15,7 @@
 
 #include "AudioCore.h"
 #include "Constants.h"
+#include "ProcessDataChangeFlag.h"
 #include "mixer/Core.h"
 #include "ThreadStatics.h"
 #include "BufferIndeces.h"
@@ -41,7 +42,7 @@ struct AudioPlayer {
 
   bool jackClientIsActive = false;
 
-  float mixerChannelsSettings[2 * MAX_MIXER_CHANNELS]{};
+  float mixerChannelsSettings[BfrIdx::MixerChannel::Settings::COUNT * MAX_MIXER_CHANNELS]{};
 
   sf_count_t playbackSettingsToAudioThread[BfrIdx::PSTAT::SIZE]{};
 
@@ -181,13 +182,24 @@ struct AudioPlayer {
   }
 
   Result populateMixerChannelsProcessData() {
-    return mixer->forEachChannel([this](Mixer::Channel* ch, ChannelIndex chIdx) {
+    if (mixer->getProcessDataChangeFlag() == ProcessDataChangeFlag::ACKNOWLEDGE) {
+      playbackSettingsToAudioThread[BfrIdx::PSTAT::PROCESS_DATA_CHANGE_FLAG] =
+          ProcessDataChangeFlag::ACKNOWLEDGE;
+    }
+
+    if (playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] == ProcessDataChangeFlag::ROGER) {
+      mixer->deletePluginsToDelete();
+      playbackSettingsToAudioThread[BfrIdx::PSTAT::PROCESS_DATA_CHANGE_FLAG] = ProcessDataChangeFlag::BASE;
+      mixer->setProcessDataChangeFlag(ProcessDataChangeFlag::BASE);
+    }
+
+    const auto res = mixer->forEachChannel([this](Mixer::Channel* ch, ChannelIndex chIdx) {
       auto processData = ch->getProcessData();
       processData.pluginCount = ch->pluginCount();
 
       ch->forEachPluginSlot(
-        [this, &ch, &processData](const std::optional<Plugins::Vst3::Plugin*> pluginOpt,
-                                  const PluginIndex pluginIdx) {
+        [this, &ch, &chIdx, &processData](const std::optional<Plugins::Vst3::Plugin*> pluginOpt,
+                                          const PluginIndex pluginIdx) {
           processData.buffers[pluginIdx] =
               getPluginBuffers(ch, pluginIdx);
 
@@ -217,9 +229,11 @@ struct AudioPlayer {
                 };
           }
           ch->setProcessData(processData);
-          mixerChannelsProcessData[ch->getIndex()] = processData;
+          mixerChannelsProcessData[chIdx] = processData;
         });
     });
+
+    return res;
   }
 
   IAudioClient::Buffers getPluginBuffers(
@@ -316,21 +330,6 @@ struct AudioPlayer {
         reinterpret_cast<char*>(playbackSettingsFromAudioThread),
         BfrIdx::PSFAT::RB_SIZE
       );
-
-    // TODO:
-    // - update mixerChannelsProcessData write to audioCore->mixerChannelsSettingsProcessDataRB
-    // - read audioCore->mixerChannelsProcessDataRB into audioCore->mixerChannelsProcessData
-    // - process
-    // - remove disabling of channel/plugin add/remove buttons during playback
-
-    // - ok so we need the mixer to know when the audiothread is done with the func ref
-    // - so we need:
-    // -   mixer->requestProcessChange()
-    // -   audioThread sets flag saying, ok don't need that/those process func/s anymore
-    // -   mixer->executeProcessChange()
-    // -   mixer sets flag saying processing is good to go
-    // -   audioThread re-instates processing
-    // updateProcessDataRingBuffer()
 
     if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > BfrIdx::MixerChannel::ProcessData::RB_SIZE
         - 2)
@@ -499,6 +498,7 @@ struct AudioPlayer {
     );
 
     audioCore->decks[audioCore->deckIndex].playState = PLAY;
+    gAppState->setAudioRunning(true);
 
     while (continueRun()) {
       // std::cout << "audioplayer run playb " << audioCore->playbackBuffers[0][100] << std::endl;
@@ -555,6 +555,7 @@ struct AudioPlayer {
       }
     }
 
+    gAppState->setAudioRunning(false);
     jackClientIsActive = false;
 
     if (ThreadStatics::getPlayState() == STOP) {
@@ -562,6 +563,9 @@ struct AudioPlayer {
       mixer->getSetEqRingBufferFunc()(nullptr);
       mixer->getSetVuRingBufferFunc()(nullptr);
     }
+
+    gAppState->setAudioRunning(false);
+    mixer->deletePluginsToDelete();
 
     Logging::write(
       Info,

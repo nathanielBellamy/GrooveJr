@@ -178,7 +178,9 @@ Result Core::addPluginToChannel(const ChannelIndex channelIndex, const PluginPat
     return ERROR;
   }
 
-  return channels[channelIndex].value()->addReplacePlugin(std::optional<PluginIndex>(), pluginPath);
+  const auto res = channels[channelIndex].value()->addReplacePlugin(std::optional<PluginIndex>(), pluginPath);
+  safeDeleteOldPlugins();
+  return res;
 }
 
 Result Core::loadPluginOnChannel(const Db::Plugin& plugin) {
@@ -195,7 +197,45 @@ Result Core::loadPluginOnChannel(const Db::Plugin& plugin) {
     );
     return ERROR;
   }
-  return channels[plugin.channelIndex].value()->loadPlugin(plugin);
+
+  const auto res = channels[plugin.channelIndex].value()->loadPlugin(plugin);
+  safeDeleteOldPlugins();
+  return res;
+}
+
+Result Core::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx,
+                                    const PluginPath& pluginPath) {
+  if (!indexHasValidChannel(channelIdx)) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::Core::terminateEditorHostsOnChannel",
+      "Attempting to replace plugin on channelIndex: " + std::to_string(channelIdx) +
+      " but no valid channel found. channelCount: " +
+      std::to_string(getTotalChannelsCount())
+    );
+    return WARNING;
+  }
+
+  const auto res = channels[channelIdx].value()->addReplacePlugin(pluginIdx, pluginPath);
+  safeDeleteOldPlugins();
+  return res;
+}
+
+Result Core::removePluginFromChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx) {
+  if (!indexHasValidChannel(channelIdx)) {
+    Logging::write(
+      Error,
+      "Audio::Mixer::Core::terminateEditorHostsOnChannel",
+      "Attempting to remove plugin on channelIndex: " + std::to_string(channelIdx) +
+      " but no valid channel found. channelCount: " +
+      std::to_string(getTotalChannelsCount())
+    );
+    return WARNING;
+  }
+
+  const auto res = channels[channelIdx].value()->removePlugin(pluginIdx);
+  safeDeleteOldPlugins();
+  return res;
 }
 
 PluginIndex Core::getPluginsOnChannelCount(const ChannelIndex idx) {
@@ -254,36 +294,6 @@ Result Core::terminateEditorHostsOnChannel(const ChannelIndex idx) {
   }
 
   return channels[idx].value()->terminateEditorHosts();
-}
-
-Result Core::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx,
-                                    const PluginPath& pluginPath) {
-  if (!indexHasValidChannel(channelIdx)) {
-    Logging::write(
-      Error,
-      "Audio::Mixer::Core::terminateEditorHostsOnChannel",
-      "Attempting to replace plugin on channelIndex: " + std::to_string(channelIdx) +
-      " but no valid channel found. channelCount: " +
-      std::to_string(getTotalChannelsCount())
-    );
-    return WARNING;
-  }
-  return channels[channelIdx].value()->addReplacePlugin(pluginIdx, pluginPath);
-}
-
-Result Core::removePluginFromChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx) {
-  if (!indexHasValidChannel(channelIdx)) {
-    Logging::write(
-      Error,
-      "Audio::Mixer::Core::terminateEditorHostsOnChannel",
-      "Attempting to remove plugin on channelIndex: " + std::to_string(channelIdx) +
-      " but no valid channel found. channelCount: " +
-      std::to_string(getTotalChannelsCount())
-    );
-    return WARNING;
-  }
-
-  return channels[channelIdx].value()->removePlugin(pluginIdx);
 }
 
 Result Core::setGainOnChannel(const ChannelIndex channelIdx, const float gain) {

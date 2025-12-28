@@ -20,35 +20,36 @@
 #include "types/AtomicStr.h"
 
 namespace Gj {
-
 struct AppStatePacket {
-    ID id;
-    jack_nframes_t audioFramesPerBuffer;
-    int playState;
-    ID sceneId;
-    sf_count_t crossfade;
-    ID currentlyPlayingId;
-    AtomicStr currentlyPlayingAlbumTitle;
-    AtomicStr currentlyPlayingArtistName;
-    AtomicStr currentlyPlayingTrackTitle;
+  ID id;
+  jack_nframes_t audioFramesPerBuffer;
+  int playState;
+  ID sceneId;
+  sf_count_t crossfade;
+  ID currentlyPlayingId;
+  AtomicStr currentlyPlayingAlbumTitle;
+  AtomicStr currentlyPlayingArtistName;
+  AtomicStr currentlyPlayingTrackTitle;
 };
 
-template <class Inspector>
+template<class Inspector>
 bool inspect(Inspector& f, AppStatePacket& x) {
-    return f.object(x).fields(f.field("", x.playState));
+  return f.object(x).fields(f.field("", x.playState));
 }
 
 struct AppState {
   std::atomic<ID> id;
   std::atomic<jack_nframes_t> audioFramesPerBuffer;
-  std::atomic<PlayState> playState;
+  std::atomic<PlayState> playState; // TODO: remove
+  std::atomic<bool> audioRunning = false;
   std::atomic<Db::Scene> scene;
-  std::atomic<sf_count_t> crossfade{ 0 };
+  std::atomic<sf_count_t> crossfade{0};
   std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
   std::atomic<bool> queuePlay = false;
   std::atomic<TrackNumber> queueIndex = 0;
 
   AppState();
+
   AppState(
     ID id,
     jack_nframes_t audioFramesPerBuffer,
@@ -56,21 +57,33 @@ struct AppState {
     const Db::Scene& scene,
     sf_count_t crossfade
   );
+
   AppStatePacket toPacket();
+
   static AppState fromAppStateEntity(const Db::AppStateEntity& appStateEntity);
 
   // mutations
   void setFromEntityAndScene(const Db::AppStateEntity& appStateEntity, const Db::Scene& newScene) {
     id.store(appStateEntity.id);
     audioFramesPerBuffer.store(appStateEntity.audioFramesPerBuffer);
-    playState.store( STOP);
+    playState.store(STOP);
     crossfade.store(appStateEntity.crossfade);
     scene.store(newScene);
   };
 
+  bool isAudioRunning() const {
+    return audioRunning.load();
+  };
+
+  Result setAudioRunning(const bool val) {
+    audioRunning.store(val);
+    return OK;
+  }
+
   jack_nframes_t getAudioFramesPerBuffer() const {
     return audioFramesPerBuffer.load();
   };
+
   void setAudioFramesPerBuffer(const jack_nframes_t val) {
     audioFramesPerBuffer.store(val);
   }
@@ -78,6 +91,7 @@ struct AppState {
   PlayState getPlayState() const {
     return playState.load();
   };
+
   void setPlayState(const PlayState val) {
     playState.store(val);
   };
@@ -105,18 +119,19 @@ struct AppState {
   sf_count_t getCrossfade() const {
     return crossfade.load();
   }
+
   void setCrossfade(const sf_count_t val) {
     crossfade.store(val);
   }
 
   std::string toString() const {
     return
-      " Gj::AppState { "
-      "  id: " + std::to_string(id) +
-      "  audioFramesPerBuffer: " + std::to_string(audioFramesPerBuffer) +
-      "  playState: " + std::to_string(playState) +
-      "  sceneId: " + std::to_string(scene.load().id) +
-      " } ";
+        " Gj::AppState { "
+        "  id: " + std::to_string(id) +
+        "  audioFramesPerBuffer: " + std::to_string(audioFramesPerBuffer) +
+        "  playState: " + std::to_string(playState) +
+        "  sceneId: " + std::to_string(scene.load().id) +
+        " } ";
   };
 
   Result setCurrentlyPlaying(const Db::DecoratedAudioFile& decoratedAudioFile) {
@@ -128,7 +143,6 @@ struct AppState {
     return currentlyPlaying.load();
   }
 };
-
 } // Gj
 
 #endif //APPSTATE_H

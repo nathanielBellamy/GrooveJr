@@ -156,7 +156,7 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> pluginIdxOpt, 
 		plugins[idxToPut.value()] = plugin;
 	} else {
 		const auto pluginIdxToSet = pluginIdxOpt.value();
-		pluginToDelete = plugins[pluginIdxToSet];
+		pluginsToDelete.push_back(plugins[pluginIdxToSet].value_or(nullptr));
 		plugins[pluginIdxToSet] = plugin;
 	}
 
@@ -341,7 +341,7 @@ Result Channel::removePlugin(const PluginIndex pluginIdx) {
 		return ERROR;
 	}
 
-	delete plugins[pluginIdx].value_or(nullptr);
+	pluginsToDelete.push_back(plugins[pluginIdx].value_or(nullptr));
 	plugins[pluginIdx].reset();
 
 	return OK;
