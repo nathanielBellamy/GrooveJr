@@ -6,11 +6,10 @@
 
 namespace Gj {
 namespace Db {
-
 SceneRepository::SceneRepository(sqlite3** db, AppState* gAppState)
-  : db(db)
-  , gAppState(gAppState)
-  {}
+: db(db)
+  , gAppState(gAppState) {
+}
 
 std::vector<Scene> SceneRepository::getAll() const {
   std::vector<Scene> scenes;
@@ -53,8 +52,8 @@ int SceneRepository::sceneCount() const {
   }
 
   return (sqlite3_step(stmt) == SQLITE_ROW)
-    ? sqlite3_column_int(stmt, 0)
-    : 0;
+           ? sqlite3_column_int(stmt, 0)
+           : 0;
 }
 
 std::optional<SceneID> SceneRepository::nextSceneId() const {
@@ -196,7 +195,7 @@ std::vector<Plugin> SceneRepository::getPlugins(const ID sceneId) const {
   const std::string query = R"sql(
     select * from plugins p
     right join scene_to_plugins stp
-    on ste.pluginId = p.id
+    on stp.pluginId = p.id
     where stp.sceneId = ?;
   )sql";
 
@@ -309,6 +308,5 @@ std::optional<Scene> SceneRepository::findBySceneId(const SceneID sceneId) const
   );
   return std::nullopt;
 }
-
 } // Db
 } // Gj
