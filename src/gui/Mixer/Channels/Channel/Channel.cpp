@@ -118,14 +118,6 @@ void Channel::hydrateState(const AppStatePacket& appStatePacket, const ChannelIn
 
   channelIndex = newChannelIndex;
 
-  if (appStatePacket.playState == PLAY || appStatePacket.playState == FF || appStatePacket.playState == RW) {
-    removeChannelButton.setEnabled(false);
-    addPluginButton.setEnabled(false);
-  } else {
-    removeChannelButton.setEnabled(true);
-    addPluginButton.setEnabled(true);
-  }
-
   if (channelIndex > 0)
     removeChannelButton.hydrateState(appStatePacket, channelIndex);
 

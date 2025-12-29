@@ -59,6 +59,7 @@ void ChannelsContainer::hydrateState(const AppStatePacket& appState) {
     "Hydrating channels state"
   );
 
+  // TODO: can we always enable this too?
   if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW)
     addChannelButton.setEnabled(false);
   else

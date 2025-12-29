@@ -51,15 +51,6 @@ void PluginSlot::hydrateState(const AppStatePacket& appState, const ChannelIndex
       if (!plugin) return;
       pluginName.setText(plugin.value()->name.c_str());
 
-      if (appState.playState == PLAY || appState.playState == FF || appState.
-          playState == RW) {
-        replacePluginButton.setEnabled(false);
-        removePluginButton.setEnabled(false);
-      } else {
-        replacePluginButton.setEnabled(true);
-        removePluginButton.setEnabled(true);
-      }
-
       update();
     });
 
