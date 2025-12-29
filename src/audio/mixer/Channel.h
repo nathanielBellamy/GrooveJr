@@ -39,25 +39,12 @@ class Channel {
   std::optional<Plugins::Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {std::nullopt};
   std::vector<Plugins::Vst3::Plugin*> pluginsToDelete;
 
-  std::mutex processDataMutex;
-  ChannelProcessData processData = {};
-
 public:
   Result deletePluginsToDelete() {
     for (const auto plugin: pluginsToDelete)
       delete plugin;
     pluginsToDelete.clear();
     return OK;
-  }
-
-  ChannelProcessData getProcessData() {
-    std::lock_guard guard(processDataMutex);
-    return processData;
-  }
-
-  void setProcessData(const ChannelProcessData& data) {
-    std::lock_guard guard(processDataMutex);
-    processData = data;
   }
 
   ChannelSettings settings;

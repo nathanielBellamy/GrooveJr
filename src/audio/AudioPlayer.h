@@ -194,7 +194,7 @@ struct AudioPlayer {
     }
 
     const auto res = mixer->forEachChannel([this](Mixer::Channel* ch, ChannelIndex chIdx) {
-      auto processData = ch->getProcessData();
+      Mixer::ChannelProcessData processData{};
       processData.pluginCount = ch->pluginCount();
 
       ch->forEachPluginSlot(
@@ -228,9 +228,9 @@ struct AudioPlayer {
                   return true;
                 };
           }
-          ch->setProcessData(processData);
-          mixerChannelsProcessData[chIdx] = processData;
         });
+
+      mixerChannelsProcessData[chIdx] = processData;
     });
 
     return res;

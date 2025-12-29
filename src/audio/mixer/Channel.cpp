@@ -95,15 +95,6 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> pluginIdxOpt, 
 		"Adding plugin: " + pluginPath + " to channel " + std::to_string(index)
 	);
 
-	// TODO:
-	// - if audio is running and we are replacing a plugin
-	// - we need to:
-	//   1. pause processing on that (ChannelIndex, PluginIndex)
-	//   2. delete the old Plugin
-	//   3. create the new Plugin
-	//   4. update the MixerChannelsProcessData with the new process data
-	//   5. unpause processing on that (ChannelIndex, PluginIndex)
-
 	const auto plugin = new Plugins::Vst3::Plugin(
 		pluginPath,
 		gAppState,
