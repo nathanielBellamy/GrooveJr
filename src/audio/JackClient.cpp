@@ -492,7 +492,10 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
       reinterpret_cast<char*>(audioCore->mixerChannelsProcessData),
       BfrIdx::MixerChannel::ProcessData::RB_SIZE
     );
-    audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] = ProcessDataChangeFlag::ROGER;
+    if (audioCore->playbackSettingsToAudioThread[BfrIdx::PSTAT::PROCESS_DATA_CHANGE_FLAG] ==
+        ProcessDataChangeFlag::ACKNOWLEDGE)
+      audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] =
+          ProcessDataChangeFlag::ROGER;
   } else {
     audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] = ProcessDataChangeFlag::BASE;
   }
