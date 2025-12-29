@@ -185,6 +185,10 @@ struct AudioPlayer {
     if (mixer->getProcessDataChangeFlag() == ProcessDataChangeFlag::ACKNOWLEDGE) {
       playbackSettingsToAudioThread[BfrIdx::PSTAT::PROCESS_DATA_CHANGE_FLAG] =
           ProcessDataChangeFlag::ACKNOWLEDGE;
+
+      // we must re-activate our jackClient so that it can pick up any new plugin processing
+      jackClient->deactivate();
+      jackClient->activate(audioCore);
     }
 
     if (playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] == ProcessDataChangeFlag::ROGER) {
@@ -339,7 +343,8 @@ struct AudioPlayer {
         BfrIdx::MixerChannel::ProcessData::RB_SIZE
       );
 
-    // std::cout << " DEBUG VALUE FROM AUDIO THREAD " << playbackSettingsFromAudioThread[BfrIdx::PSFAT::DEBUG_VALUE] << std::endl;
+    // std::cout << " DEBUG VALUE FROM AUDIO THREAD " << playbackSettingsFromAudioThread[BfrIdx::PSFAT::DEBUG_VALUE] <<
+    //     std::endl;
     const sf_count_t currentFrameId = playbackSettingsFromAudioThread[BfrIdx::PSFAT::CURRENT_FRAME_ID];
     mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, currentFrameId);
 

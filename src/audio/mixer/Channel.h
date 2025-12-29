@@ -251,7 +251,7 @@ public:
 
   Result setBlockSize(jack_nframes_t blockSize);
 
-  PluginIndex pluginCount() const;
+  PluginIndex pluginCount();
 
   Result initEditorHosts(const std::vector<std::shared_ptr<Gui::Mixer::VstWindow> >& vstWindows);
 

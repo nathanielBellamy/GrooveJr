@@ -259,12 +259,11 @@ Result Channel::setBlockSize(const jack_nframes_t blockSize) {
 }
 
 
-PluginIndex Channel::pluginCount() const {
+PluginIndex Channel::pluginCount() {
 	PluginIndex res = 0;
 
-	std::for_each(std::begin(plugins), std::end(plugins), [&res](std::optional<Plugins::Vst3::Plugin*> plugin) {
-		if (plugin && plugin.value() != nullptr)
-			res++;
+	forEachPlugin([&res](Plugins::Vst3::Plugin*, PluginIndex) {
+		res += 1;
 	});
 
 	return res;

@@ -492,6 +492,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
       reinterpret_cast<char*>(audioCore->mixerChannelsProcessData),
       BfrIdx::MixerChannel::ProcessData::RB_SIZE
     );
+
     if (audioCore->playbackSettingsToAudioThread[BfrIdx::PSTAT::PROCESS_DATA_CHANGE_FLAG] ==
         ProcessDataChangeFlag::ACKNOWLEDGE)
       audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] =
@@ -525,11 +526,10 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   // process channels
   // main channel is chhannelIdx 0
   const int32_t nframes32t = static_cast<int32_t>(nframes);
-  for (ChannelIndex channelIdx = 1; channelIdx < MAX_MIXER_CHANNELS; channelIdx++) {
-    if (auto [processFuncs, buffers, pluginCount] = audioCore->mixerChannelsProcessData[
-        channelIdx];
+  for (ChannelIndex channelIdx = 1; channelIdx < MAX_MIXER_CHANNELS; ++channelIdx) {
+    if (auto [processFuncs, buffers, pluginCount] = audioCore->mixerChannelsProcessData[channelIdx];
       pluginCount != 0) {
-      for (PluginIndex pluginIdx = 0; pluginIdx < MAX_PLUGINS_PER_CHANNEL; pluginIdx++) {
+      for (PluginIndex pluginIdx = 0; pluginIdx < MAX_PLUGINS_PER_CHANNEL; ++pluginIdx) {
         buffers[pluginIdx].numSamples = nframes32t;
         processFuncs[pluginIdx](
           buffers[pluginIdx],
