@@ -37,8 +37,6 @@ public:
 
   ~PluginSlots() override;
 
-  void addSlot();
-
   void removeSlot();
 
   void hydrateState(const AppStatePacket& appState, int newChannelIndex);
@@ -50,7 +48,7 @@ private:
   Audio::Mixer::Core* mixer;
   int channelIndex;
   QGridLayout grid;
-  std::vector<std::unique_ptr<PluginSlot> > pluginSlots{};
+  PluginSlot* pluginSlots[Audio::MAX_PLUGINS_PER_CHANNEL]{};
   QAction* replacePluginAction;
   QAction* removePluginAction;
 

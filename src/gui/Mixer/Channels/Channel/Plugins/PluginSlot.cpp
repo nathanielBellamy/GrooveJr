@@ -42,8 +42,10 @@ PluginSlot::~PluginSlot() {
   );
 }
 
-void PluginSlot::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIndex) {
+void PluginSlot::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIndex,
+                              const PluginIndex newPluginIndex) {
   channelIndex = newChannelIndex;
+  pluginIndex = newPluginIndex;
   const auto res = mixer->runAgainstChannel(
     channelIndex,
     [this, &appState](Audio::Mixer::Channel* channel) {

@@ -129,11 +129,10 @@ void Channel::hydrateState(const AppStatePacket& appStatePacket, const ChannelIn
 }
 
 void Channel::updateShowRemoveChannelButton(const bool val) {
-  if (val) {
+  if (val)
     removeChannelButton.show();
-  } else {
+  else
     removeChannelButton.hide();
-  }
 }
 
 void Channel::setStyle() {
@@ -379,7 +378,6 @@ void Channel::addPlugin(const std::optional<PluginIndex> pluginIndex) {
     "Adding plugin at index: " + std::to_string(newPluginIndex)
   );
 
-  pluginSlots.addSlot();
   const AtomicStr name = mixer->getPluginName(channelIndex, newPluginIndex);
   pluginsContainer.addPlugin(newPluginIndex, name);
 
@@ -413,25 +411,14 @@ void Channel::connectActions() {
         "Adding plugin: " + pluginPath + " to channel " + std::to_string(channelIndex)
       );
 
-      if (const auto result = mixer->addPluginToChannel(channelIndex, pluginPath); result != OK) {
-        const LogSeverityLevel severity = result == ERROR ? Error : Warning;
-        Logging::write(
-          severity,
-          "Gui::Channel::addPluginAction",
-          "Unable to add plugin " + pluginPath + " to channel " + std::to_string(channelIndex)
-        );
-      } else {
-        addPlugin(std::optional<PluginIndex>());
-
-        appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-        const scoped_actor self{actorSystem};
-        self->anon_send(
-          actor_cast<actor>(appStateManagerPtr),
-          channelIndex,
-          pluginPath,
-          mix_add_plugin_to_channel_a_v
-        );
-      }
+      appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+      const scoped_actor self{actorSystem};
+      self->anon_send(
+        actor_cast<actor>(appStateManagerPtr),
+        channelIndex,
+        pluginPath,
+        mix_add_plugin_to_channel_a_v
+      );
     }
   });
 
@@ -445,15 +432,6 @@ void Channel::connectActions() {
         "Replacing plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) + " with " +
         pluginPath
       );
-
-      if (mixer->replacePluginOnChannel(channelIndex, pluginIdx, pluginPath) != OK) {
-        Logging::write(
-          Error,
-          "Gui::Channel::replacePluginAction",
-          "Unable to add replace plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex) +
-          " with " + pluginPath
-        );
-      }
 
       appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
       const scoped_actor self{actorSystem};
@@ -475,14 +453,6 @@ void Channel::connectActions() {
       "Removing plugin: " + std::to_string(pluginIdx) + " from channel " + std::to_string(channelIndex)
     );
 
-    if (mixer->removePluginFromChannel(channelIndex, pluginIdx) != OK) {
-      Logging::write(
-        Error,
-        "Gui::Channel::removePluginAction",
-        "Unable to remove plugin" + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIndex)
-      );
-    }
-
     appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
     const scoped_actor self{actorSystem};
     self->anon_send(
@@ -491,7 +461,6 @@ void Channel::connectActions() {
       pluginIdx,
       mix_remove_plugin_on_channel_a_v
     );
-    pluginSlots.removeSlot();
   });
 }
 

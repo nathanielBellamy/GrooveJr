@@ -144,13 +144,13 @@ struct AppStateManagerState {
           "Act::AppStateManager::mix_add_plugin_to_channel_a",
           "Adding Plugin " + pluginPath + " on channel " + std::to_string(channelIdx)
         );
-        // if (!mixer->addPluginToChannel(channelIdx, pluginPath)) {
-        //   Logging::write(
-        //     Error,
-        //     "Act::AppStateManager::mix_add_channel_a",
-        //     "Unable to add plugin: " + pluginPath + " to channel " + std::to_string(channelIdx)
-        //   );
-        // }
+        if (mixer->addPluginToChannel(channelIdx, pluginPath) != OK) {
+          Logging::write(
+            Error,
+            "Act::AppStateManager::mix_add_channel_a",
+            "Unable to add plugin: " + pluginPath + " to channel " + std::to_string(channelIdx)
+          );
+        }
         hydrateStateToDisplay();
       },
       [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, PluginPath pluginPath,
@@ -161,13 +161,14 @@ struct AppStateManagerState {
           "Replacing plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx) + " with " +
           pluginPath
         );
-        // if (mixer->replacePluginOnChannel(channelIdx, pluginIdx, pluginPath) != OK) {
-        //   Logging::write(
-        //     Error,
-        //     "Act::AppStateManager::mix_replace_plugin_on_channel_a",
-        //     "Unable to add replace plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx) + " with " + pluginPath
-        //   );
-        // }
+        if (mixer->replacePluginOnChannel(channelIdx, pluginIdx, pluginPath) != OK) {
+          Logging::write(
+            Error,
+            "Act::AppStateManager::mix_replace_plugin_on_channel_a",
+            "Unable to add replace plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx) +
+            " with " + pluginPath
+          );
+        }
         hydrateStateToDisplay();
       },
       [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, mix_remove_plugin_on_channel_a) {
@@ -176,13 +177,13 @@ struct AppStateManagerState {
           "Act::AppStateManager::mix_remove_plugin_on_channel_a",
           "Removing plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx)
         );
-        // if (mixer->removePluginFromChannel(channelIdx, pluginIdx) != OK) {
-        //   Logging::write(
-        //     Error,
-        //     "Act::AppStateManager::mix_remove_plugin_on_channel_a",
-        //     "Unable to add remove plugin" + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx)
-        //   );
-        // }
+        if (mixer->removePluginFromChannel(channelIdx, pluginIdx) != OK) {
+          Logging::write(
+            Error,
+            "Act::AppStateManager::mix_remove_plugin_on_channel_a",
+            "Unable to add remove plugin" + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx)
+          );
+        }
         hydrateStateToDisplay();
       },
       [this](const ChannelIndex channelIdx, const float gain, mix_set_channel_gain_a) {

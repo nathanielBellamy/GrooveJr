@@ -30,7 +30,7 @@ PluginSlots::~PluginSlots() {
     "Destroying PluginSlots on Channel " + std::to_string(channelIndex)
   );
 
-  pluginSlots.clear();
+  reset();
 
   Logging::write(
     Info,
@@ -42,39 +42,22 @@ PluginSlots::~PluginSlots() {
 void PluginSlots::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
   channelIndex = newChannelIndex;
 
-  for (const auto& pluginSlot: pluginSlots)
-    pluginSlot->hydrateState(appState, channelIndex);
-}
-
-void PluginSlots::addSlot() {
-  auto slot = std::make_unique<PluginSlot>(
-    this,
-    actorSystem,
-    mixer,
-    channelIndex,
-    pluginSlots.size(),
-    false,
-    replacePluginAction,
-    removePluginAction
-  );
-  pluginSlots.push_back(std::move(slot));
-  setupGrid();
-  update();
-}
-
-void PluginSlots::removeSlot() {
-  pluginSlots.pop_back();
-  setupGrid();
-  update();
+  PluginIndex i = 0;
+  for (const auto& pluginSlot: pluginSlots) {
+    if (pluginSlot == nullptr) continue;
+    pluginSlot->hydrateState(appState, channelIndex, i);
+    ++i;
+  }
 }
 
 void PluginSlots::setupGrid() {
   grid.setVerticalSpacing(4);
 
   int row = 0;
-  for (auto& pluginSlot: pluginSlots) {
-    grid.addWidget(pluginSlot.get(), row, 0, 1, 1);
-    row++;
+  for (const auto pluginSlot: pluginSlots) {
+    if (pluginSlot == nullptr) continue;
+    grid.addWidget(pluginSlot, row, 0, 1, 1);
+    ++row;
   }
 }
 
@@ -85,7 +68,8 @@ void PluginSlots::reset() {
     "Resetting PluginSlots on Channel " + std::to_string(channelIndex)
   );
 
-  pluginSlots.clear();
+  for (const auto pluginSlot: pluginSlots)
+    delete pluginSlot;
 
   Logging::write(
     Info,
