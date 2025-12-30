@@ -20,6 +20,7 @@
 #include "../types/AtomicStr.h"
 
 #include "Packet.h"
+#include "mixer/Packet.h"
 
 namespace Gj {
 namespace State {
@@ -33,6 +34,7 @@ struct Core {
   std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
   std::atomic<bool> queuePlay = false;
   std::atomic<TrackNumber> queueIndex = 0;
+  std::atomic<Mixer::Packet> mixer = {};
 
   Core();
 
