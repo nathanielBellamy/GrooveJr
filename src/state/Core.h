@@ -19,25 +19,11 @@
 #include "../types/Types.h"
 #include "../types/AtomicStr.h"
 
+#include "Packet.h"
+
 namespace Gj {
-struct AppStatePacket {
-  ID id;
-  jack_nframes_t audioFramesPerBuffer;
-  int playState;
-  ID sceneId;
-  sf_count_t crossfade;
-  ID currentlyPlayingId;
-  AtomicStr currentlyPlayingAlbumTitle;
-  AtomicStr currentlyPlayingArtistName;
-  AtomicStr currentlyPlayingTrackTitle;
-};
-
-template<class Inspector>
-bool inspect(Inspector& f, AppStatePacket& x) {
-  return f.object(x).fields(f.field("", x.playState));
-}
-
-struct AppState {
+namespace State {
+struct Core {
   std::atomic<ID> id;
   std::atomic<jack_nframes_t> audioFramesPerBuffer;
   std::atomic<PlayState> playState; // TODO: remove
@@ -48,9 +34,9 @@ struct AppState {
   std::atomic<bool> queuePlay = false;
   std::atomic<TrackNumber> queueIndex = 0;
 
-  AppState();
+  Core();
 
-  AppState(
+  Core(
     ID id,
     jack_nframes_t audioFramesPerBuffer,
     PlayState playState,
@@ -58,9 +44,9 @@ struct AppState {
     sf_count_t crossfade
   );
 
-  AppStatePacket toPacket();
+  Packet toPacket();
 
-  static AppState fromAppStateEntity(const Db::AppStateEntity& appStateEntity);
+  static Core fromAppStateEntity(const Db::AppStateEntity& appStateEntity);
 
   // mutations
   void setFromEntityAndScene(const Db::AppStateEntity& appStateEntity, const Db::Scene& newScene) {
@@ -143,6 +129,7 @@ struct AppState {
     return currentlyPlaying.load();
   }
 };
+} // State
 } // Gj
 
 #endif //APPSTATE_H

@@ -12,7 +12,7 @@
 #include "caf/actor_system.hpp"
 
 #include "../../enums/Result.h"
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../../db/Dao.h"
 
 #include "SqlQueryModel.h"
@@ -32,7 +32,7 @@ class SqlTableView : public QTableView {
 protected:
   actor_system& actorSystem;
   Db::Dao* dao;
-  AppState* gAppState;
+  Gj::State::Core* stateCore;
   SqlQueryModel* model;
 
 public:
@@ -40,7 +40,7 @@ public:
     QWidget* parent,
     actor_system& actorSystem,
     Db::Dao* dao,
-    AppState* gAppState,
+    Gj::State::Core* stateCore,
     SqlQueryModel* model
   );
 
@@ -53,8 +53,8 @@ public:
     return model;
   }
 
-  Result hydrateState(const AppStatePacket& appStatePacket) const {
-    model->hydrateState(appStatePacket);
+  Result hydrateState(const Gj::State::Packet& statePacket) const {
+    model->hydrateState(statePacket);
     refresh();
     return OK;
   }

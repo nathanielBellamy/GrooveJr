@@ -18,8 +18,8 @@ namespace Db {
 class ArtistRepository final : public MusicLibraryRepository {
 
   public:
-    ArtistRepository(sqlite3** db, AppState* gAppState)
-      : MusicLibraryRepository(db, gAppState)
+    ArtistRepository(sqlite3** db, State::Core* stateCore)
+      : MusicLibraryRepository(db, stateCore)
       {};
     std::vector<Artist> getAll() const;
     ID save(const Artist& artist) const;

@@ -11,7 +11,7 @@
 #include "caf/actor_system.hpp"
 
 #include "../../enums/Result.h"
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../../db/Dao.h"
 
 #include "../QSql/SqlTableView.h"
@@ -33,11 +33,11 @@ public:
     QWidget* parent,
     actor_system& actorSystem,
     Db::Dao* dao,
-    AppState* gAppState,
+    Gj::State::Core* stateCore,
     SqlQueryModel* model,
     MusicLibraryFilters* filters
   )
-  : SqlTableView(parent, actorSystem, dao, gAppState, model)
+  : SqlTableView(parent, actorSystem, dao, stateCore, model)
     , menu(nullptr)
     , filters(filters) {
     setEditTriggers(NoEditTriggers);

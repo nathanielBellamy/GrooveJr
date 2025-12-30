@@ -16,7 +16,7 @@
 #include <jack/ringbuffer.h>
 
 #include "Cassette.h"
-#include "../state/AppState.h"
+#include "../state/Core.h"
 #include "../Logging.h"
 #include "../enums/Result.h"
 
@@ -24,9 +24,9 @@ namespace Gj {
 namespace Audio {
 struct AudioCore {
   long threadId;
-  AppState* gAppState;
+  State::Core* stateCore;
   sf_count_t crossfade = 0;
-  AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0, gAppState), AudioDeck(1, gAppState), AudioDeck(2, gAppState)};
+  AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0, stateCore), AudioDeck(1, stateCore), AudioDeck(2, stateCore)};
   DeckIndex deckIndex = 0;
   DeckIndex deckIndexNext = 0;
   sf_count_t frameAdvance;
@@ -69,8 +69,8 @@ struct AudioCore {
   float mixerChannelsWriteOutBuffer[AUDIO_CHANNEL_COUNT * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_MIXER_CHANNELS]{};
   float* mixerChannelsWriteOut[MAX_MIXER_CHANNELS][AUDIO_CHANNEL_COUNT]{};
 
-  AudioCore(AppState* gAppState)
-  : gAppState(gAppState)
+  AudioCore(State::Core* stateCore)
+  : stateCore(stateCore)
     , fft_eq_ring_buffer(jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE))
     , vu_ring_buffer(jack_ringbuffer_create(AUDIO_CHANNEL_COUNT * MAX_MIXER_CHANNELS))
     , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(BfrIdx::PSTAT::RB_SIZE))
@@ -297,7 +297,7 @@ struct AudioCore {
       );
       return ERROR;
     };
-    gAppState->setCurrentlyPlaying(decoratedAudioFile);
+    stateCore->setCurrentlyPlaying(decoratedAudioFile);
 
     Logging::write(
       Info,
@@ -324,7 +324,7 @@ struct AudioCore {
       );
       return ERROR;
     };
-    gAppState->setCurrentlyPlaying(decoratedAudioFile);
+    stateCore->setCurrentlyPlaying(decoratedAudioFile);
 
     Logging::write(
       Info,
@@ -358,7 +358,7 @@ struct AudioCore {
 
     decks[deckIndex].playState = STOP;
     if (decks[deckIndexNext].decoratedAudioFile) {
-      gAppState->setCurrentlyPlaying(decks[deckIndexNext].decoratedAudioFile.value());
+      stateCore->setCurrentlyPlaying(decks[deckIndexNext].decoratedAudioFile.value());
       decks[deckIndexNext].playState = PLAY;
     } else {
       decks[deckIndexNext].playState = STOP;
@@ -380,27 +380,27 @@ struct AudioCore {
     const auto& deck = decks[di];
     const float frameIdF = static_cast<float>(deck.frameId);
     const float framesF = static_cast<float>(deck.frames);
-    const float crossfadeF = static_cast<float>(gAppState->getCrossfade());
+    const float crossfadeF = static_cast<float>(stateCore->getCrossfade());
     // TODO: log, exp transition funcs
     if (deckIndex == di) {
-      if (deck.frameId >= deck.frames - gAppState->getCrossfade())
+      if (deck.frameId >= deck.frames - stateCore->getCrossfade())
         return (framesF - frameIdF) / crossfadeF;
 
-      if (deck.frameId <= gAppState->getCrossfade())
+      if (deck.frameId <= stateCore->getCrossfade())
         return frameIdF / crossfadeF;
 
       return 1.0f;
     }
 
     if (di == (deckIndex + 1) % AUDIO_CORE_DECK_COUNT) {
-      if (deck.frameId <= gAppState->getCrossfade())
+      if (deck.frameId <= stateCore->getCrossfade())
         return frameIdF / crossfadeF;
 
       return 0.0f;
     }
 
     if (di == (deckIndex - 1) % AUDIO_CORE_DECK_COUNT) {
-      if (deck.frameId >= deck.frames - gAppState->getCrossfade())
+      if (deck.frameId >= deck.frames - stateCore->getCrossfade())
         return (framesF - frameIdF) / crossfadeF;
 
       return 0.0f;

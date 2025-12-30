@@ -17,7 +17,7 @@
 #include "../Color.h"
 #include "../../enums/Result.h"
 #include "../../Logging.h"
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../../enums/Result.h"
 #include "../../db/Dao.h"
 #include "../../db/entity/musicLibrary/Queue.h"
@@ -46,7 +46,7 @@ enum MusicLibraryWindowMainSection {
 
 class MusicLibraryWindow final : public QWidget {
   actor_system& actorSystem;
-  AppState* gAppState;
+  State::Core* stateCore;
   Db::Dao* dao;
   QGridLayout grid;
   MusicLibraryWindowMainSection mainSection = AUDIO_FILES_VIEW;
@@ -93,21 +93,21 @@ public:
   explicit MusicLibraryWindow(
     QWidget* parent,
     actor_system& actorSystem,
-    AppState* gAppState,
+    State::Core* stateCore,
     Db::Dao* dao,
     SqlWorkerPool* sqlWorkerPool
   );
 
   ~MusicLibraryWindow();
 
-  Result hydrateState(const AppStatePacket& appStatePacket) const {
-    albumTableView->hydrateState(appStatePacket);
-    artistTableView->hydrateState(appStatePacket);
-    audioFileTableView->hydrateState(appStatePacket);
-    cacheTableView->hydrateState(appStatePacket);
-    genreTableView->hydrateState(appStatePacket);
-    playlistTableView->hydrateState(appStatePacket);
-    queueTableView->hydrateState(appStatePacket);
+  Result hydrateState(const State::Packet& statePacket) const {
+    albumTableView->hydrateState(statePacket);
+    artistTableView->hydrateState(statePacket);
+    audioFileTableView->hydrateState(statePacket);
+    cacheTableView->hydrateState(statePacket);
+    genreTableView->hydrateState(statePacket);
+    playlistTableView->hydrateState(statePacket);
+    queueTableView->hydrateState(statePacket);
 
     return OK;
   };

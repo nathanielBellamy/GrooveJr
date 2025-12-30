@@ -9,7 +9,7 @@ namespace Gui {
 
 bool ScenesQueryModel::isCurrentScene(const QModelIndex& item) const {
   const ID id = index(item.row(), SCENES_COL_ID).data().toULongLong();
-  return gAppState->getScene().id == id;
+  return stateCore->getScene().id == id;
 }
 
 QVariant ScenesQueryModel::data(const QModelIndex& item, int role) const {
@@ -19,7 +19,7 @@ QVariant ScenesQueryModel::data(const QModelIndex& item, int role) const {
   return QStandardItemModel::data(item, role);
 }
 
-Result ScenesQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
+Result ScenesQueryModel::hydrateState(const State::Packet& statePacket) {
   refresh();
   return OK;
 }

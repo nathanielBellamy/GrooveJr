@@ -46,7 +46,7 @@ MainChannelContainer::MainChannelContainer(
   );
 }
 
-void MainChannelContainer::hydrateState(const AppStatePacket& appState) const {
+void MainChannelContainer::hydrateState(const State::Packet& appState) const {
   mainChannel->hydrateState(appState, 0);
 }
 

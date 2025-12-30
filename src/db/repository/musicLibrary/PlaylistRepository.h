@@ -17,8 +17,8 @@ namespace Db {
 class PlaylistRepository final : public MusicLibraryRepository {
 
   public:
-    PlaylistRepository(sqlite3** db, AppState* gAppState)
-      : MusicLibraryRepository(db, gAppState)
+    PlaylistRepository(sqlite3** db, State::Core* stateCore)
+      : MusicLibraryRepository(db, stateCore)
       {};
 
     std::vector<Playlist> getAll() const;

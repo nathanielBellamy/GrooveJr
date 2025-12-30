@@ -7,7 +7,7 @@
 
 #include <cstring>
 
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../../enums/Result.h"
 
 #include "SqlWorkerPool.h"
@@ -52,7 +52,7 @@ class SqlQueryModel : public SqlWorkerPoolClient {
 protected:
   QString id;
   SqlWorkerPool* sqlWorkerPool;
-  AppState* gAppState;
+  State::Core* stateCore;
 
   Result setPreviousQuery(const std::string& newQueryString) {
     previousQuery = newQueryString.c_str();
@@ -71,7 +71,7 @@ protected:
 public:
   SqlQueryModel(
     QObject* parent,
-    AppState* gAppState,
+    State::Core* stateCore,
     const QString& id,
     SqlWorkerPool* sqlWorkerPool
   );
@@ -80,7 +80,7 @@ public:
     return id;
   }
 
-  virtual Result hydrateState(const AppStatePacket& appStatePacket) = 0;
+  virtual Result hydrateState(const State::Packet& statePacket) = 0;
 
   virtual Result refresh(bool hard = false) = 0;
 

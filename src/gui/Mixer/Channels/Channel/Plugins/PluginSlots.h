@@ -14,7 +14,7 @@
 #include <QWidget>
 
 #include "../../../../../Logging.h"
-#include "../../../../../state/AppState.h"
+#include "../../../../../state/Core.h"
 #include "AddPluginButton.h"
 #include "PluginSlot.h"
 #include "../../../../../audio/mixer/Core.h"
@@ -39,7 +39,7 @@ public:
 
   void removeSlot();
 
-  void hydrateState(const AppStatePacket& appState, int newChannelIndex);
+  void hydrateState(const State::Packet& appState, int newChannelIndex);
 
   void reset();
 

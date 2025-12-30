@@ -25,7 +25,7 @@ RemoveChannelButton::~RemoveChannelButton() {
 }
 
 
-void RemoveChannelButton::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIdx) {
+void RemoveChannelButton::hydrateState(const State::Packet& appState, const ChannelIndex newChannelIdx) {
   channelIndex = newChannelIdx;
 }
 

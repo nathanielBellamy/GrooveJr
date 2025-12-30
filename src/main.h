@@ -30,7 +30,7 @@
 #include "./audio/AudioCore.h"
 
 #include "./Logging.h"
-#include "./state/AppState.h"
+#include "./state/Core.h"
 #include "./enums/PlayState.h"
 
 #include "./db/Dao.h"

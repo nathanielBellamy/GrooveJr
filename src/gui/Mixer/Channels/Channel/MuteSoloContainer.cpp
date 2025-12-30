@@ -66,7 +66,7 @@ MuteSoloContainer::~MuteSoloContainer() {
   );
 }
 
-void MuteSoloContainer::hydrateState(const AppStatePacket& appState, const ChannelIndex newChannelIdx) {
+void MuteSoloContainer::hydrateState(const State::Packet& appState, const ChannelIndex newChannelIdx) {
   channelIndex = newChannelIdx;
 }
 

@@ -52,7 +52,7 @@ ChannelsContainer::ChannelsContainer(
   );
 }
 
-void ChannelsContainer::hydrateState(const AppStatePacket& appState) {
+void ChannelsContainer::hydrateState(const State::Packet& appState) {
   Logging::write(
     Info,
     "Gui::ChannelsContainer::hydrateState",

@@ -9,14 +9,14 @@ namespace Gui {
 
 SqlQueryModel::SqlQueryModel(
   QObject* parent,
-  AppState* gAppState,
+  State::Core* stateCore,
   const QString& id,
   SqlWorkerPool* sqlWorkerPool
 )
 : SqlWorkerPoolClient(parent)
 , id(id)
 , sqlWorkerPool(sqlWorkerPool)
-, gAppState(gAppState)
+, stateCore(stateCore)
 {
   connectToPool();
 }

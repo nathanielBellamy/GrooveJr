@@ -8,9 +8,9 @@
 namespace Gj {
 namespace Db {
 
-PluginRepository::PluginRepository(sqlite3** db, AppState* gAppState)
+PluginRepository::PluginRepository(sqlite3** db, State::Core* stateCore)
   : db(db)
-  , gAppState(gAppState)
+  , stateCore(stateCore)
   {}
 
 std::vector<Plugin> PluginRepository::getAll() const {
@@ -128,20 +128,20 @@ int PluginRepository::save(const Plugin& plugin) const {
     return 0;
   }
 
-  sqlite3_bind_int(joinStmt, 1, gAppState->getSceneDbId());
+  sqlite3_bind_int(joinStmt, 1, stateCore->getSceneDbId());
   sqlite3_bind_int(joinStmt, 2, pluginId);
 
   if (sqlite3_step(joinStmt) != SQLITE_DONE) {
     Logging::write(
       Error,
       "Db::PluginRepository::save",
-      "Failed to join Plugin " + plugin.name + " id: " + std::to_string(pluginId) + " to sceneDbId: " + std::to_string(gAppState->getSceneDbId()) + ". Message: " + std::string(sqlite3_errmsg(*db))
+      "Failed to join Plugin " + plugin.name + " id: " + std::to_string(pluginId) + " to sceneDbId: " + std::to_string(stateCore->getSceneDbId()) + ". Message: " + std::string(sqlite3_errmsg(*db))
     );
   } else {
     Logging::write(
       Info,
       "Db::PluginRepository::save",
-      "Joined Plugin " + plugin.name + " id: " + std::to_string(pluginId) + " to sceneDbId " + std::to_string(gAppState->getSceneDbId())
+      "Joined Plugin " + plugin.name + " id: " + std::to_string(pluginId) + " to sceneDbId " + std::to_string(stateCore->getSceneDbId())
     );
   }
 

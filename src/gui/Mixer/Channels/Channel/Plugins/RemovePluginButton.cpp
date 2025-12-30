@@ -24,7 +24,7 @@ RemovePluginButton::RemovePluginButton(
   setStyle();
 }
 
-void RemovePluginButton::hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx) {
+void RemovePluginButton::hydrateState(const State::Packet& appState, ChannelIndex newChannelIdx) {
   channelIndex = newChannelIdx;
 }
 

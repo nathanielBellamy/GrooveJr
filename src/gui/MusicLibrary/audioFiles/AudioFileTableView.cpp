@@ -98,8 +98,8 @@ void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent *event) {
       return;
     }
 
-    if (gAppState->getCurrentlyPlaying().audioFile.id == decksState.audioFileIds[decksState.currentDeckIdx]
-          && !gAppState->queuePlay)
+    if (stateCore->getCurrentlyPlaying().audioFile.id == decksState.audioFileIds[decksState.currentDeckIdx]
+          && !stateCore->queuePlay)
       return;
 
     const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);

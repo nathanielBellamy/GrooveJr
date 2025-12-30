@@ -9,7 +9,7 @@ namespace Gui {
 Scenes::Scenes(
   QWidget* parent,
   actor_system& sys,
-  AppState* gAppState,
+  State::Core* stateCore,
   Audio::Mixer::Core* mixer,
   SqlWorkerPool* sqlWorkerPool,
   QAction* sceneLoadAction)
@@ -27,7 +27,7 @@ Scenes::Scenes(
     this,
     sys,
     mixer->dao,
-    gAppState,
+    stateCore,
     sqlWorkerPool,
     sceneLoadAction
   );
@@ -79,7 +79,7 @@ void Scenes::connectActions() {
   });
 }
 
-Result Scenes::hydrateState(const AppStatePacket& appStatePacket) {
+Result Scenes::hydrateState(const State::Packet& statePacket) {
   return OK;
 }
 } // Gui

@@ -17,7 +17,7 @@
 #include "../messaging/atoms.h"
 #include "./AppStateManager.h"
 #include "./Playback.h"
-#include "../state/AppState.h"
+#include "../state/Core.h"
 
 #include "../db/Dao.h"
 
@@ -39,18 +39,18 @@ struct MusicLibraryManagerState {
   MusicLibraryManager::pointer self;
   Audio::Mixer::Core* mixer;
   Db::Dao* dao;
-  AppState* gAppState;
+  State::Core* stateCore;
 
   MusicLibraryManagerState(
     MusicLibraryManager::pointer self,
     strong_actor_ptr supervisor,
     Audio::Mixer::Core* mixer,
-    AppState* gAppState
+    State::Core* stateCore
   )
   : self(self)
     , mixer(mixer)
     , dao(mixer->dao)
-    , gAppState(gAppState) {
+    , stateCore(stateCore) {
     self->link_to(supervisor);
     self->system().registry().put(MUSIC_LIBRARY_MANAGER, actor_cast<strong_actor_ptr>(self));
   }

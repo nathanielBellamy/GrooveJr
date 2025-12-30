@@ -2,14 +2,14 @@
 #ifndef ATOMS_H
 #define ATOMS_H
 
-#include "../state/AppState.h"
+#include "../state/Core.h"
 #include "./EnvelopeQtPtr.h"
 #include "./DecksState.h"
 
 CAF_BEGIN_TYPE_ID_BLOCK(groovejr, first_custom_type_id)
 
 // typeIds
-CAF_ADD_TYPE_ID(groovejr, (Gj::AppStatePacket))
+CAF_ADD_TYPE_ID(groovejr, (Gj::State::Packet))
 
 CAF_ADD_TYPE_ID(groovejr, (Gj::EnvelopeQtPtr))
 

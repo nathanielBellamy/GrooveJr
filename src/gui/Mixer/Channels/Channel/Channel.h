@@ -20,7 +20,7 @@
 #include <QWidget>
 #include <QUrl>
 
-#include "../../../../state/AppState.h"
+#include "../../../../state/Core.h"
 
 #include "../../../../audio/mixer/Core.h"
 #include "../../../../audio/Math.h"
@@ -58,7 +58,7 @@ public:
 
   ~Channel() override;
 
-  void hydrateState(const AppStatePacket& appStatePacket, ChannelIndex newChannelIndex);
+  void hydrateState(const State::Packet& statePacket, ChannelIndex newChannelIndex);
 
   void updateShowRemoveChannelButton(bool val);
 

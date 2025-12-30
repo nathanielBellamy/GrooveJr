@@ -2,33 +2,33 @@
 // Created by ns on 11/16/24.
 //
 
-#include "AppState.h"
+#include "Core.h"
 
 namespace Gj {
-
-AppState::AppState(
+namespace State {
+Core::Core(
   const ID id,
   const jack_nframes_t audioFramesPerBuffer,
   const PlayState playState,
   const Db::Scene& scene,
   const sf_count_t crossfade)
-  : id(id)
+: id(id)
   , audioFramesPerBuffer(audioFramesPerBuffer)
   , playState(playState)
   , scene(scene)
-  , crossfade(crossfade)
-  {}
-
-AppState::AppState() {
-  const auto appState = fromAppStateEntity(Db::AppStateEntity::base());
-  id.store(appState.id);
-  audioFramesPerBuffer.store( appState.audioFramesPerBuffer);
-  playState.store( appState.playState);
-  scene.store( appState.scene);
-  crossfade.store( appState.crossfade);
+  , crossfade(crossfade) {
 }
 
-AppStatePacket AppState::toPacket() {
+Core::Core() {
+  const auto appState = fromAppStateEntity(Db::AppStateEntity::base());
+  id.store(appState.id);
+  audioFramesPerBuffer.store(appState.audioFramesPerBuffer);
+  playState.store(appState.playState);
+  scene.store(appState.scene);
+  crossfade.store(appState.crossfade);
+}
+
+Packet Core::toPacket() {
   const Db::DecoratedAudioFile daf = getCurrentlyPlaying();
   AtomicStr currPlayAlbumTitle, currPlayArtistName, currPlayTrackTitle;
   if (!daf.isValid()) {
@@ -41,7 +41,7 @@ AppStatePacket AppState::toPacket() {
     currPlayTrackTitle = daf.track.title;
   }
 
-  const AppStatePacket packet {
+  return {
     id.load(),
     audioFramesPerBuffer.load(),
     psToInt(playState.load()),
@@ -52,10 +52,9 @@ AppStatePacket AppState::toPacket() {
     currPlayArtistName,
     currPlayTrackTitle
   };
-  return packet;
 }
 
-AppState AppState::fromAppStateEntity(const Db::AppStateEntity& appStateEntity) {
+Core Core::fromAppStateEntity(const Db::AppStateEntity& appStateEntity) {
   Db::Scene scene("My Scene", 1.0f);
   return {
     appStateEntity.id,
@@ -65,5 +64,5 @@ AppState AppState::fromAppStateEntity(const Db::AppStateEntity& appStateEntity) 
     appStateEntity.crossfade,
   };
 }
-
+} // State
 } // Gj

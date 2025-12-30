@@ -16,7 +16,7 @@
 #include <QLabel>
 #include <QWidget>
 
-#include "../../../../../state/AppState.h"
+#include "../../../../../state/Core.h"
 #include "RemovePluginButton.h"
 #include "ReplacePluginButton.h"
 #include "../../../../Shared/VstSelect.h"
@@ -43,7 +43,7 @@ public:
 
   ~PluginSlot() override;
 
-  void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIndex, PluginIndex newPluginIndex);
+  void hydrateState(const State::Packet& appState, ChannelIndex newChannelIndex, PluginIndex newPluginIndex);
 
 private:
   actor_system& actorSystem;

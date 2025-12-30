@@ -6,17 +6,16 @@
 
 namespace Gj {
 namespace Gui {
-
 MusicLibraryWindow::MusicLibraryWindow(
   QWidget* parent,
   actor_system& actorSystem,
-  AppState* gAppState,
+  State::Core* stateCore,
   Db::Dao* dao,
   SqlWorkerPool* sqlWorkerPool
-  )
-  : QWidget(parent)
+)
+: QWidget(parent)
   , actorSystem(actorSystem)
-  , gAppState(gAppState)
+  , stateCore(stateCore)
   , dao(dao)
   , grid(this)
   , cacheButton(this)
@@ -31,9 +30,7 @@ MusicLibraryWindow::MusicLibraryWindow(
   , genreHeader(this)
   , genreClearFilterButton(this)
   , playlistHeader(this)
-  , playlistClearFilterButton(this)
-  {
-
+  , playlistClearFilterButton(this) {
   createAndConnectTableViews(sqlWorkerPool);
   showAsMainSection(AUDIO_FILES_VIEW);
 
@@ -81,13 +78,13 @@ MusicLibraryWindow::MusicLibraryWindow(
 }
 
 Result MusicLibraryWindow::createAndConnectTableViews(SqlWorkerPool* sqlWorkerPool) {
-  albumTableView = new AlbumTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
-  artistTableView = new ArtistTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
-  audioFileTableView = new AudioFileTableView(this, actorSystem, gAppState, dao, &filters, sqlWorkerPool);
-  cacheTableView = new CacheTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
-  genreTableView = new GenreTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
-  playlistTableView = new PlaylistTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
-  queueTableView = new QueueTableView(this, actorSystem, dao, gAppState, &filters, sqlWorkerPool);
+  albumTableView = new AlbumTableView(this, actorSystem, dao, stateCore, &filters, sqlWorkerPool);
+  artistTableView = new ArtistTableView(this, actorSystem, dao, stateCore, &filters, sqlWorkerPool);
+  audioFileTableView = new AudioFileTableView(this, actorSystem, stateCore, dao, &filters, sqlWorkerPool);
+  cacheTableView = new CacheTableView(this, actorSystem, dao, stateCore, &filters, sqlWorkerPool);
+  genreTableView = new GenreTableView(this, actorSystem, dao, stateCore, &filters, sqlWorkerPool);
+  playlistTableView = new PlaylistTableView(this, actorSystem, dao, stateCore, &filters, sqlWorkerPool);
+  queueTableView = new QueueTableView(this, actorSystem, dao, stateCore, &filters, sqlWorkerPool);
 
   sqlWorkerPool->connectClient(albumTableView->getModel());
   sqlWorkerPool->connectClient(artistTableView->getModel());
@@ -124,7 +121,7 @@ MusicLibraryWindow::~MusicLibraryWindow() {
 
 void MusicLibraryWindow::setStyle() {
   setStyleSheet((
-    "background-color: " + Color::toHex(GjC::DARK_400) + "; ").data()
+      "background-color: " + Color::toHex(GjC::DARK_400) + "; ").data()
   );
 }
 
@@ -186,22 +183,22 @@ void MusicLibraryWindow::setupGrid() {
 }
 
 Result MusicLibraryWindow::connectActions() {
-  const auto filesButtonClickedConnection = connect(&filesButton, &QPushButton::clicked, this, [&] () {
+  const auto filesButtonClickedConnection = connect(&filesButton, &QPushButton::clicked, this, [&]() {
     showAsMainSection(AUDIO_FILES_VIEW);
     refresh();
   });
 
-  const auto queueButtonClickedConnection = connect(&queueButton, &QPushButton::clicked, this, [&] () {
+  const auto queueButtonClickedConnection = connect(&queueButton, &QPushButton::clicked, this, [&]() {
     showAsMainSection(QUEUE_VIEW);
     refresh();
   });
 
-  const auto cacheButtonClickedConnection = connect(&cacheButton, &QPushButton::clicked, this, [&] () {
+  const auto cacheButtonClickedConnection = connect(&cacheButton, &QPushButton::clicked, this, [&]() {
     showAsMainSection(CACHE_VIEW);
     refresh();
   });
 
-  const auto clearFiltersButtonClickedConnection = connect(&clearFiltersButton, &QPushButton::clicked, this, [&] () {
+  const auto clearFiltersButtonClickedConnection = connect(&clearFiltersButton, &QPushButton::clicked, this, [&]() {
     filters.filters.at(ALBUM).ids.clear();
     filters.filters.at(ARTIST).ids.clear();
     filters.filters.at(GENRE).ids.clear();
@@ -209,56 +206,67 @@ Result MusicLibraryWindow::connectActions() {
     refresh();
   });
 
-  const auto clearAlbumFilterButtonClickedConnection = connect(&albumClearFilterButton, &QPushButton::clicked, this, [&] () {
-    filters.filters.at(ALBUM).ids.clear();
-    refresh();
-  });
+  const auto clearAlbumFilterButtonClickedConnection = connect(&albumClearFilterButton, &QPushButton::clicked, this,
+                                                               [&]() {
+                                                                 filters.filters.at(ALBUM).ids.clear();
+                                                                 refresh();
+                                                               });
 
-  const auto clearArtistFilterButtonClickedConnection = connect(&artistClearFilterButton, &QPushButton::clicked, this, [&] () {
-    filters.filters.at(ARTIST).ids.clear();
-    refresh();
-  });
+  const auto clearArtistFilterButtonClickedConnection = connect(&artistClearFilterButton, &QPushButton::clicked, this,
+                                                                [&]() {
+                                                                  filters.filters.at(ARTIST).ids.clear();
+                                                                  refresh();
+                                                                });
 
-  const auto clearGenreFilterButtonClickedConnection = connect(&genreClearFilterButton, &QPushButton::clicked, this, [&] () {
-    filters.filters.at(GENRE).ids.clear();
-    refresh();
-  });
+  const auto clearGenreFilterButtonClickedConnection = connect(&genreClearFilterButton, &QPushButton::clicked, this,
+                                                               [&]() {
+                                                                 filters.filters.at(GENRE).ids.clear();
+                                                                 refresh();
+                                                               });
 
-  const auto clearPlaylistFilterButtonClickedConnection = connect(&playlistClearFilterButton, &QPushButton::clicked, this, [&] () {
-    filters.filters.at(PLAYLIST).ids.clear();
-    refresh();
-  });
+  const auto clearPlaylistFilterButtonClickedConnection = connect(&playlistClearFilterButton, &QPushButton::clicked,
+                                                                  this, [&]() {
+                                                                    filters.filters.at(PLAYLIST).ids.clear();
+                                                                    refresh();
+                                                                  });
 
-  const auto albumClickedConnection = connect(albumTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant albumId = albumTableView->getModel()->index(index.row(), 2).data();
-      filters.set(ALBUM, albumId.toInt());
+  const auto albumClickedConnection = connect(albumTableView, &QTableView::clicked, this,
+                                              [&](const QModelIndex& index) {
+                                                const QVariant albumId = albumTableView->getModel()->index(
+                                                  index.row(), 2).data();
+                                                filters.set(ALBUM, albumId.toInt());
 
-      refresh();
-  });
+                                                refresh();
+                                              });
 
-  const auto artistClickedConnection = connect(artistTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant artistId = artistTableView->getModel()->index(index.row(), 1).data();
-      filters.set(ARTIST, artistId.toLongLong());
+  const auto artistClickedConnection = connect(artistTableView, &QTableView::clicked, this,
+                                               [&](const QModelIndex& index) {
+                                                 const QVariant artistId = artistTableView->getModel()->index(
+                                                   index.row(), 1).data();
+                                                 filters.set(ARTIST, artistId.toLongLong());
 
-      refresh();
-  });
+                                                 refresh();
+                                               });
 
-  const auto genreClickedConnection = connect(genreTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant genreId = genreTableView->getModel()->index(index.row(), 1).data();
-      filters.set(GENRE, genreId.toLongLong());
+  const auto genreClickedConnection = connect(genreTableView, &QTableView::clicked, this,
+                                              [&](const QModelIndex& index) {
+                                                const QVariant genreId = genreTableView->getModel()->index(
+                                                  index.row(), 1).data();
+                                                filters.set(GENRE, genreId.toLongLong());
 
-      refresh();
-  });
+                                                refresh();
+                                              });
 
-  const auto playlistClickedConnection = connect(playlistTableView, &QTableView::clicked, this, [&] (const QModelIndex& index) {
-      const QVariant playlistId = playlistTableView->getModel()->index(index.row(), 1).data();
-      filters.set(PLAYLIST, playlistId.toLongLong());
+  const auto playlistClickedConnection = connect(playlistTableView, &QTableView::clicked, this,
+                                                 [&](const QModelIndex& index) {
+                                                   const QVariant playlistId = playlistTableView->getModel()->index(
+                                                     index.row(), 1).data();
+                                                   filters.set(PLAYLIST, playlistId.toLongLong());
 
-      refresh();
-  });
+                                                   refresh();
+                                                 });
 
   return OK;
 }
-
 } // Gui
 } // Gj

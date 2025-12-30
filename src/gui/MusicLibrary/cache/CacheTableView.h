@@ -5,7 +5,7 @@
 #ifndef CACHETABLEVIEW_H
 #define CACHETABLEVIEW_H
 
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../MusicLibraryType.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
@@ -19,7 +19,7 @@ public:
     QWidget* parent,
     actor_system& actorSystem,
     Db::Dao* dao,
-    AppState* gAppState,
+    Gj::State::Core* stateCore,
     MusicLibraryFilters* filters,
     SqlWorkerPool* sqlWorkerPool
   )
@@ -27,8 +27,8 @@ public:
     parent,
     actorSystem,
     dao,
-    gAppState,
-    new CacheQueryModel(parent, gAppState, filters, sqlWorkerPool),
+    stateCore,
+    new CacheQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
   };

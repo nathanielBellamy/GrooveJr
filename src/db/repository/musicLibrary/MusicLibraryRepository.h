@@ -8,19 +8,19 @@
 #include <sqlite3.h>
 
 #include "../../Logging.h"
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 
 namespace Gj {
 namespace Db {
 class MusicLibraryRepository {
 protected:
   sqlite3** db;
-  AppState* gAppState;
+  State::Core* stateCore;
 
 public:
-  MusicLibraryRepository(sqlite3** db, AppState* gAppState)
+  MusicLibraryRepository(sqlite3** db, State::Core* stateCore)
   : db(db)
-    , gAppState(gAppState) {
+    , stateCore(stateCore) {
   };
 };
 } // Db

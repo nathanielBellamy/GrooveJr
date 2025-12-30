@@ -12,7 +12,7 @@
 #include <QStyle>
 #include <QVariant>
 
-#include "../../../../state/AppState.h"
+#include "../../../../state/Core.h"
 #include "../../../../Logging.h"
 
 namespace Gj {
@@ -24,7 +24,7 @@ public:
 
   ~RemoveChannelButton();
 
-  void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx);
+  void hydrateState(const State::Packet& appState, ChannelIndex newChannelIdx);
 
 private:
   ChannelIndex channelIndex;

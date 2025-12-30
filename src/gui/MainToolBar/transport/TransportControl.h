@@ -35,7 +35,7 @@ class TransportControl final : public QWidget {
 public:
   TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer::Core* mixer);
 
-  int hydrateState(const AppStatePacket& appStatePacket);
+  int hydrateState(const State::Packet& statePacket);
 
   void setPlayState(PlayState state);
 

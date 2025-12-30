@@ -11,7 +11,7 @@
 #include <sqlite3.h>
 
 #include "Logging.h"
-#include "../state/AppState.h"
+#include "../state/Core.h"
 
 #include "repository/mixer/ChannelRepository.h"
 #include "repository/mixer/PluginRepository.h"
@@ -30,7 +30,7 @@ namespace Gj {
 namespace Db {
 class Dao {
   sqlite3* db;
-  AppState* gAppState;
+  State::Core* stateCore;
 
 public:
   AppStateRepository appStateRepository;
@@ -46,7 +46,7 @@ public:
   QueueRepository queueRepository;
   TrackRepository trackRepository;
 
-  Dao(AppState* gAppState);
+  Dao(State::Core* stateCore);
 
   ~Dao();
 

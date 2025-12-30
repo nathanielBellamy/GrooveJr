@@ -17,7 +17,7 @@
 #include "../messaging/EnvelopeQtPtr.h"
 #include "./AudioThread.h"
 
-#include "../state/AppState.h"
+#include "../state/Core.h"
 #include "../audio/mixer/Core.h"
 #include "../audio/AudioCore.h"
 #include "../enums/PlayState.h"
@@ -42,19 +42,19 @@ struct PlaybackState {
   Playback::pointer self;
   AudioThread::pointer audioThread;
 
-  AppState* gAppState;
+  State::Core* stateCore;
   Audio::Mixer::Core* mixer;
   Audio::AudioCore* audioCore;
 
   PlaybackState(
     Playback::pointer self,
     strong_actor_ptr supervisor,
-    AppState* gAppState,
+    State::Core* stateCore,
     Audio::Mixer::Core* mixer,
     Audio::AudioCore* audioCore)
   : self(self)
     , audioThread(nullptr)
-    , gAppState(gAppState)
+    , stateCore(stateCore)
     , mixer(mixer)
     , audioCore(audioCore) {
     self->link_to(supervisor);
@@ -106,7 +106,7 @@ struct PlaybackState {
           auto audioThreadActor = self->system().spawn(
             actor_from_state<AudioThreadState>,
             actor_cast<strong_actor_ptr>(self),
-            gAppState,
+            stateCore,
             mixer,
             audioCore
           );

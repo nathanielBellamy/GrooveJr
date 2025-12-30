@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-Result AlbumQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
+Result AlbumQueryModel::hydrateState(const State::Packet& statePacket) {
   Logging::write(
       Info,
       "Gui::AlbumQueryModel::hydrateState",
@@ -67,7 +67,7 @@ QVariant AlbumQueryModel::data(const QModelIndex& item, const int role) const {
 
 bool AlbumQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
   const ID id = index(item.row(), ALBUM_COL_ID).data().toULongLong();
-  return gAppState->getCurrentlyPlaying().album.id == id;
+  return stateCore->getCurrentlyPlaying().album.id == id;
 }
 
 } // Gui

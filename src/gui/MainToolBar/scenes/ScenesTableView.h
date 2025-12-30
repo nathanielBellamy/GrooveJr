@@ -10,7 +10,6 @@
 
 namespace Gj {
 namespace Gui {
-
 class ScenesTableView final : public SqlTableView {
   QAction* sceneLoadAction;
 
@@ -19,39 +18,37 @@ class ScenesTableView final : public SqlTableView {
     return OK;
   }
 
-  void mouseDoubleClickEvent(QMouseEvent *event) override {
+  void mouseDoubleClickEvent(QMouseEvent* event) override {
     if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {
       const SqlQueryModel* model = getModel();
-      const ID sceneDbId =  model->index(clickedIndex.row(), SCENES_COL_ID).data().toULongLong();
+      const ID sceneDbId = model->index(clickedIndex.row(), SCENES_COL_ID).data().toULongLong();
       sceneLoadAction->setData(sceneDbId);
       sceneLoadAction->trigger();
     }
   }
 
-  public:
-    ScenesTableView(
-      QWidget* parent,
-      actor_system& actorSystem,
-      Db::Dao* dao,
-      AppState* gAppState,
-      SqlWorkerPool* workerPool,
-      QAction* sceneLoadAction
+public:
+  ScenesTableView(
+    QWidget* parent,
+    actor_system& actorSystem,
+    Db::Dao* dao,
+    Gj::State::Core* stateCore,
+    SqlWorkerPool* workerPool,
+    QAction* sceneLoadAction
+  )
+  : SqlTableView(
+      parent,
+      actorSystem,
+      dao,
+      stateCore,
+      new ScenesQueryModel(parent, stateCore, QString("ScenesQueryModel"), workerPool)
     )
-    : SqlTableView(
-          parent,
-          actorSystem,
-          dao,
-          gAppState,
-          new ScenesQueryModel(parent, gAppState, QString("ScenesQueryModel"), workerPool)
-      )
-    , sceneLoadAction(sceneLoadAction)
-    {
-      workerPool->connectClient(model);
-      setStyle();
-      refresh();
-    };
+    , sceneLoadAction(sceneLoadAction) {
+    workerPool->connectClient(model);
+    setStyle();
+    refresh();
+  };
 };
-
 } // Gui
 } // Gj
 

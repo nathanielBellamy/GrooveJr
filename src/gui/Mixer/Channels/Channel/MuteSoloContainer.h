@@ -9,7 +9,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
-#include "../../../../state/AppState.h"
+#include "../../../../state/Core.h"
 #include "../../../../Logging.h"
 
 #include "../../../../audio/mixer/ChannelSettings.h"
@@ -39,7 +39,7 @@ public:
 
   ~MuteSoloContainer();
 
-  void hydrateState(const AppStatePacket& appState, ChannelIndex newChannelIdx);
+  void hydrateState(const State::Packet& appState, ChannelIndex newChannelIdx);
 
   void setMute(float val);
 

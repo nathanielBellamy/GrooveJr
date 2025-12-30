@@ -37,7 +37,7 @@
 
 #pragma once
 
-#include "../../../../../../state/AppState.h"
+#include "../../../../../../state/Core.h"
 #include "../../../../../../Logging.h"
 
 #include "./media/audioclient.h"
@@ -55,11 +55,11 @@ namespace Vst {
 namespace AudioHost {
 //------------------------------------------------------------------------
 class App : public EditorHost::IApplication {
-	Gj::AppState* gAppState;
+	Gj::State::Core* stateCore;
 	std::shared_ptr<Gj::Audio::JackClient> jackClient;
 
 public:
-	App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackClient);
+	App(Gj::State::Core* stateCore, std::shared_ptr<Gj::Audio::JackClient> jackClient);
 
 	~App() noexcept override;
 

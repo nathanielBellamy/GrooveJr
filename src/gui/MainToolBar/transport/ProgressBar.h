@@ -28,7 +28,7 @@ public:
 
   void updateProgressBar(sf_count_t frames, sf_count_t newFrameId);
 
-  Result hydrateState(const AppStatePacket& appStatePacket);
+  Result hydrateState(const State::Packet& statePacket);
 
 private:
   sf_count_t frames;

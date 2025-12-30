@@ -43,7 +43,7 @@ public:
 
   void setEqRingBuffer(jack_ringbuffer_t* eqRingBuffer);
 
-  Result hydrateState(const AppStatePacket& appStatePacket);
+  Result hydrateState(const State::Packet& statePacket);
 
 private slots:
   void animationLoop();

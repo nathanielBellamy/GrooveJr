@@ -8,11 +8,11 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
-MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, AppState* gAppState, Audio::Mixer::Core* mixer,
+MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, State::Core* stateCore, Audio::Mixer::Core* mixer,
                          SqlWorkerPool* sqlWorkerPool, QAction* sceneLoadAction)
 : QToolBar(parent)
   , sys(sys)
-  , scenes(this, sys, gAppState, mixer, sqlWorkerPool, sceneLoadAction)
+  , scenes(this, sys, stateCore, mixer, sqlWorkerPool, sceneLoadAction)
   , currentlyPlaying(this, sys, mixer)
   , transportControl(this, sys, mixer)
   , eqGraph(this, mixer) {
@@ -32,17 +32,17 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, AppState* gAppState
   addWidget(&scenes);
 }
 
-int MainToolBar::hydrateState(const AppStatePacket& appStatePacket) {
+int MainToolBar::hydrateState(const State::Packet& statePacket) {
   Logging::write(
     Info,
     "Gui::MainToolbar::hydrateState",
-    "Received app state with playState - " + std::to_string(appStatePacket.playState)
+    "Received app state with playState - " + std::to_string(statePacket.playState)
   );
 
-  currentlyPlaying.hydrateState(appStatePacket);
-  transportControl.hydrateState(appStatePacket);
-  scenes.hydrateState(appStatePacket);
-  eqGraph.hydrateState(appStatePacket);
+  currentlyPlaying.hydrateState(statePacket);
+  transportControl.hydrateState(statePacket);
+  scenes.hydrateState(statePacket);
+  eqGraph.hydrateState(statePacket);
 
   return 0;
 }

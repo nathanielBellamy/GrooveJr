@@ -20,8 +20,8 @@ namespace Db {
 class GenreRepository final : public MusicLibraryRepository{
 
   public:
-    GenreRepository(sqlite3** db, AppState* gAppState)
-      : MusicLibraryRepository(db, gAppState)
+    GenreRepository(sqlite3** db, State::Core* stateCore)
+      : MusicLibraryRepository(db, stateCore)
       {};
 
     std::vector<Genre> getAll() const;

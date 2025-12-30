@@ -5,7 +5,7 @@
 #ifndef QUEUETABLEVIEW_H
 #define QUEUETABLEVIEW_H
 
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../MusicLibraryType.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
@@ -19,7 +19,7 @@ public:
     QWidget* parent,
     actor_system& actorSystem,
     Db::Dao* dao,
-    AppState* gAppState,
+    Gj::State::Core* stateCore,
     MusicLibraryFilters* filters,
     SqlWorkerPool* sqlWorkerPool
   )
@@ -27,8 +27,8 @@ public:
     parent,
     actorSystem,
     dao,
-    gAppState,
-    new QueueQueryModel(parent, gAppState, filters, sqlWorkerPool),
+    stateCore,
+    new QueueQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
   };
@@ -38,10 +38,10 @@ public:
       const SqlQueryModel* model = getModel();
       const ID id = model->index(clickedIndex.row(), AUDIO_FILE_COL_ID).data().toULongLong();
 
-      if (gAppState->getCurrentlyPlaying().audioFile.id == id && !gAppState->queuePlay)
+      if (stateCore->getCurrentlyPlaying().audioFile.id == id && !stateCore->queuePlay)
         return;
 
-      gAppState->queuePlay = true;
+      stateCore->queuePlay = true;
       const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
           dao->audioFileRepository.findDecoratedAudioFileById(id);
 
@@ -62,7 +62,7 @@ public:
         tc_trig_play_file_a_v
       );
 
-      gAppState->setCurrentlyPlaying(decoratedAudioFile.value());
+      stateCore->setCurrentlyPlaying(decoratedAudioFile.value());
       refresh();
     }
   }

@@ -8,7 +8,7 @@
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
 
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
 #include "../../QSql/SqlWorkerPool.h"
@@ -20,13 +20,13 @@ namespace Gj {
 namespace Gui {
 class AlbumQueryModel final : public MusicLibraryQueryModel {
 public:
-  explicit AlbumQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters,
+  explicit AlbumQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
                            SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, gAppState, filters, ALBUM, QString("AlbumQueryModel"), sqlWorkerPool) {
+  : MusicLibraryQueryModel(parent, stateCore, filters, ALBUM, QString("AlbumQueryModel"), sqlWorkerPool) {
     refresh();
   }
 
-  Result hydrateState(const AppStatePacket& appStatePacket) override;
+  Result hydrateState(const State::Packet& statePacket) override;
 
   Result refresh(bool hard = false) override;
 

@@ -9,7 +9,7 @@
 #include <sqlite3.h>
 
 #include "../Logging.h"
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../entity/AppStateEntity.h"
 #include "../entity/mixer/Scene.h"
 
@@ -17,10 +17,10 @@ namespace Gj {
 namespace Db {
 class AppStateRepository {
   sqlite3** db;
-  AppState* gAppState;
+  State::Core* stateCore;
 
 public:
-  explicit AppStateRepository(sqlite3** db, AppState* gAppState);
+  explicit AppStateRepository(sqlite3** db, State::Core* stateCore);
 
   AppStateEntity get() const;
 

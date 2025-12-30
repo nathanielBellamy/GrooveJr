@@ -39,7 +39,7 @@ PluginSlots::~PluginSlots() {
   );
 }
 
-void PluginSlots::hydrateState(const AppStatePacket& appState, const int newChannelIndex) {
+void PluginSlots::hydrateState(const State::Packet& appState, const int newChannelIndex) {
   channelIndex = newChannelIndex;
 
   PluginIndex i = 0;

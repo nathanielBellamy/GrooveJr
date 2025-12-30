@@ -21,8 +21,8 @@ namespace Db {
 class AlbumRepository final : public MusicLibraryRepository {
 
   public:
-    AlbumRepository(sqlite3** db, AppState* gAppState)
-      : MusicLibraryRepository(db, gAppState)
+    AlbumRepository(sqlite3** db, State::Core* stateCore)
+      : MusicLibraryRepository(db, stateCore)
       {};
 
     std::vector<Album> getAll() const;

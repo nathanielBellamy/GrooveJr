@@ -14,7 +14,7 @@
 #include <QWidget>
 #include <QGridLayout>
 
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../../../enums/Result.h"
 #include "../../../audio/mixer/Core.h"
 #include "../../../actors/ActorIds.h"
@@ -29,7 +29,7 @@ using namespace caf;
 
 class Scenes final : public QWidget {
   actor_system& sys;
-  AppState* gAppState;
+  State::Core* stateCore;
   Audio::Mixer::Core* mixer;
   QGridLayout grid;
   QLabel title;
@@ -50,13 +50,13 @@ public:
   Scenes(
     QWidget* parent,
     actor_system& sys,
-    AppState* gAppState,
+    State::Core* stateCore,
     Audio::Mixer::Core* mixer,
     SqlWorkerPool* sqlWorkerPool,
     QAction* sceneLoadAction
   );
 
-  Result hydrateState(const AppStatePacket& appStatePacket);
+  Result hydrateState(const State::Packet& statePacket);
 };
 } // Gui
 } // Gj

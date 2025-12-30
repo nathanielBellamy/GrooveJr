@@ -15,7 +15,7 @@
 #include <QColor>
 #include <QString>
 
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../../enums/Result.h"
 
 #include "../QSql/SqlWorkerPool.h"
@@ -31,7 +31,7 @@ class SqlWorkerPool;
 class MusicLibraryQueryModel : public SqlQueryModel {
 protected:
   QString id;
-  AppState* gAppState;
+  State::Core* stateCore;
   MusicLibraryType type;
   MusicLibraryFilters* filters;
 
@@ -47,15 +47,15 @@ protected:
 public:
   MusicLibraryQueryModel(
     QObject* parent,
-    AppState* gAppState,
+    State::Core* stateCore,
     MusicLibraryFilters* filters,
     const MusicLibraryType type,
     const QString& id,
     SqlWorkerPool* sqlWorkerPool
   )
-  : SqlQueryModel(parent, gAppState, id, sqlWorkerPool)
+  : SqlQueryModel(parent, stateCore, id, sqlWorkerPool)
     , id(id)
-    , gAppState(gAppState)
+    , stateCore(stateCore)
     , type(type)
     , filters(filters) {
   }

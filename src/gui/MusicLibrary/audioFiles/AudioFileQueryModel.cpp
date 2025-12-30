@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-Result AudioFileQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
+Result AudioFileQueryModel::hydrateState(const State::Packet& statePacket) {
   Logging::write(
       Info,
       "Gui::AudioFileQueryModel::hydrateState",
@@ -78,7 +78,7 @@ Result AudioFileQueryModel::setHeaders() {
 
 bool AudioFileQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
   const ID id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
-  return gAppState->getCurrentlyPlaying().audioFile.id == id && !gAppState->queuePlay;
+  return stateCore->getCurrentlyPlaying().audioFile.id == id && !stateCore->queuePlay;
 }
 
 } // Gui

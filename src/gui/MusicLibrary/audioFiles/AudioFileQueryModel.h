@@ -12,7 +12,7 @@
 #include "../../QSql/SqlWorkerPool.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
 #include "../Constants.h"
@@ -21,16 +21,16 @@ namespace Gj {
 namespace Gui {
 class AudioFileQueryModel final : public MusicLibraryQueryModel {
 public:
-  explicit AudioFileQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters,
+  explicit AudioFileQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
                                SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, gAppState, filters, AUDIO_FILE, QString("AudioFileQueryModel"), sqlWorkerPool) {
+  : MusicLibraryQueryModel(parent, stateCore, filters, AUDIO_FILE, QString("AudioFileQueryModel"), sqlWorkerPool) {
     refresh();
   }
 
   // SqlQueryModel
   QVariant data(const QModelIndex& item, int role) const override;
 
-  Result hydrateState(const AppStatePacket& appStatePacket) override;
+  Result hydrateState(const State::Packet& statePacket) override;
 
   Result refresh(bool hard = false) override;
 

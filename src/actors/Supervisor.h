@@ -45,7 +45,7 @@ struct SupervisorState {
 
   SupervisorState(
     Supervisor::pointer self,
-    AppState* gAppState,
+    State::Core* stateCore,
     Audio::Mixer::Core* mixer,
     Audio::AudioCore* audioCore,
     void (*shutdown_handler)(int)
@@ -55,7 +55,7 @@ struct SupervisorState {
     auto playback = self->system().spawn(
       actor_from_state<PlaybackState>,
       actor_cast<strong_actor_ptr>(self),
-      gAppState,
+      stateCore,
       mixer,
       audioCore
     );
@@ -64,7 +64,7 @@ struct SupervisorState {
     auto appStateManager = self->system().spawn(
       actor_from_state<AppStateManagerState>,
       actor_cast<strong_actor_ptr>(self),
-      gAppState,
+      stateCore,
       mixer,
       mixer->dao,
       audioCore
@@ -79,7 +79,7 @@ struct SupervisorState {
       actor_from_state<DisplayState>,
       actor_cast<strong_actor_ptr>(self),
       mixer,
-      gAppState,
+      stateCore,
       shutdown_handler
     );
     displayPtr = actor_cast<strong_actor_ptr>(display);
@@ -88,7 +88,7 @@ struct SupervisorState {
       actor_from_state<MusicLibraryManagerState>,
       actor_cast<strong_actor_ptr>(self),
       mixer,
-      gAppState
+      stateCore
     );
     musicLibraryManagerPtr = actor_cast<strong_actor_ptr>(musicLibraryManager);
 

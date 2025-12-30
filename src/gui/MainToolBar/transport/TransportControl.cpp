@@ -24,15 +24,15 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mi
 }
 
 
-int TransportControl::hydrateState(const AppStatePacket& appStatePacket) {
+int TransportControl::hydrateState(const State::Packet& statePacket) {
   Logging::write(
     Info,
     "Gui::TransportControl::hydrateState",
-    "Received app state with playState - " + std::to_string(appStatePacket.playState)
+    "Received app state with playState - " + std::to_string(statePacket.playState)
   );
 
-  progressBar.hydrateState(appStatePacket);
-  setPlayState(intToPs(appStatePacket.playState));
+  progressBar.hydrateState(statePacket);
+  setPlayState(intToPs(statePacket.playState));
   return 0;
 }
 

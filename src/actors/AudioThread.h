@@ -14,7 +14,7 @@
 #include "../messaging/atoms.h"
 #include "./AppStateManager.h"
 #include "./Playback.h"
-#include "../state/AppState.h"
+#include "../state/Core.h"
 
 #include "../audio/AudioCore.h"
 #include "../audio/AudioPlayer.h"
@@ -39,18 +39,18 @@ struct AudioThreadState {
   static long id;
 
   AudioThread::pointer self;
-  AppState* gAppState;
+  State::Core* stateCore;
   Audio::Mixer::Core* mixer;
   Audio::AudioCore* audioCore;
 
   AudioThreadState(
     AudioThread::pointer self,
     strong_actor_ptr supervisor,
-    AppState* gAppState,
+    State::Core* stateCore,
     Audio::Mixer::Core* mixer,
     Audio::AudioCore* audioCore
   ) : self(self)
-      , gAppState(gAppState)
+      , stateCore(stateCore)
       , mixer(mixer)
       , audioCore(audioCore) {
     self->link_to(supervisor);
@@ -65,7 +65,7 @@ struct AudioThreadState {
           "Instantiating AudioPlayer"
         );
         try {
-          if (Audio::AudioPlayer audioPlayer(self->system(), audioCore, mixer, gAppState); audioPlayer.run() == ERROR)
+          if (Audio::AudioPlayer audioPlayer(self->system(), audioCore, mixer, stateCore); audioPlayer.run() == ERROR)
             Logging::write(
               Error,
               "Act::AudioThread::audio_thread_init_a",
@@ -79,7 +79,7 @@ struct AudioThreadState {
           );
         }
 
-        gAppState->setAudioRunning(false);
+        stateCore->setAudioRunning(false);
         Logging::write(
           Info,
           "Act::AudioThread::audio_thread_init_a",

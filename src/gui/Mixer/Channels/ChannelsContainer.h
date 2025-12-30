@@ -22,7 +22,7 @@
 #include <QWidget>
 
 #include "../../../Logging.h"
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../../../enums/Result.h"
 
 #include "../../Color.h"
@@ -51,7 +51,7 @@ public:
     std::atomic<float>* vuPtr
   );
 
-  void hydrateState(const AppStatePacket& appState);
+  void hydrateState(const State::Packet& appState);
 
   void setMute(ChannelIndex channelIdx, float val) const;
 

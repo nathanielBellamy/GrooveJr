@@ -15,8 +15,8 @@ namespace Db {
 class QueueRepository final : public MusicLibraryRepository {
 
   public:
-    QueueRepository(sqlite3** db, AppState* gAppState)
-      : MusicLibraryRepository(db, gAppState)
+    QueueRepository(sqlite3** db, State::Core* stateCore)
+      : MusicLibraryRepository(db, stateCore)
       {};
 
     ID save(const Queue& queue) const;

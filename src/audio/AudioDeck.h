@@ -11,7 +11,7 @@
 
 #include "Cassette.h"
 
-#include "../state/AppState.h"
+#include "../state/Core.h"
 #include "../Logging.h"
 #include "../enums/Result.h"
 #include "../enums/PlayState.h"
@@ -26,7 +26,7 @@ constexpr sf_count_t MIN_FADE_OUT = 500;
 struct AudioDeck {
   DeckIndex deckIndex;
   PlayState playState = STOP;
-  AppState* gAppState;
+  State::Core* stateCore;
   mutable sf_count_t frameId = 0;
   sf_count_t frames = 0; // total # of frames
   sf_count_t frameAdvance;
@@ -35,10 +35,10 @@ struct AudioDeck {
   Cassette* cassette;
   std::optional<Db::DecoratedAudioFile> decoratedAudioFile;
 
-  AudioDeck(const DeckIndex deckIndex, AppState* gAppState)
+  AudioDeck(const DeckIndex deckIndex, State::Core* stateCore)
   : deckIndex(deckIndex)
-    , gAppState(gAppState)
-    , cassette(new Cassette(gAppState))
+    , stateCore(stateCore)
+    , cassette(new Cassette(stateCore))
     , decoratedAudioFile(std::optional<Db::DecoratedAudioFile>()) {
   }
 
@@ -59,7 +59,7 @@ struct AudioDeck {
   Result setCassetteFromDecoratedAudioFile(const Db::DecoratedAudioFile& newDecoratedAudioFile) {
     decoratedAudioFile = std::optional(newDecoratedAudioFile);
     delete cassette;
-    cassette = new Cassette(gAppState, decoratedAudioFile->audioFile.filePath.c_str());
+    cassette = new Cassette(stateCore, decoratedAudioFile->audioFile.filePath.c_str());
     frames = cassette->sfInfo.frames;
     inputBuffers[0] = cassette->inputBuffers[0];
     inputBuffers[1] = cassette->inputBuffers[1];
@@ -73,19 +73,19 @@ struct AudioDeck {
   }
 
   bool isCrossfadeStart() const {
-    return frameId < gAppState->getCrossfade();
+    return frameId < stateCore->getCrossfade();
   }
 
   bool isCrossfadeEnd() const {
-    return frameId > frames - gAppState->getCrossfade();
+    return frameId > frames - stateCore->getCrossfade();
   }
 
   bool isFadeIn() const {
-    return frameId < std::max(gAppState->getCrossfade(), MIN_FADE_IN);
+    return frameId < std::max(stateCore->getCrossfade(), MIN_FADE_IN);
   }
 
   bool isFadeOut() const {
-    return frameId > std::min(frames - gAppState->getCrossfade(), frames - MIN_FADE_OUT);
+    return frameId > std::min(frames - stateCore->getCrossfade(), frames - MIN_FADE_OUT);
   }
 
   bool hasValidCassetteLoaded() const {

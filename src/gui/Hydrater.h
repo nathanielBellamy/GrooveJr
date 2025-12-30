@@ -7,7 +7,7 @@
 
 #include "QObject"
 
-#include "../state/AppState.h"
+#include "../state/Core.h"
 
 namespace Gj {
 namespace Gui {
@@ -20,7 +20,7 @@ public:
   };
 
 signals:
-  void hydrate(const AppStatePacket& appStatePacket);
+  void hydrate(const State::Packet& statePacket);
 };
 } // Gui
 } // Gj

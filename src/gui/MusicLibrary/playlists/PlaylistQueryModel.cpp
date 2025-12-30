@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-Result PlaylistQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
+Result PlaylistQueryModel::hydrateState(const State::Packet& statePacket) {
   Logging::write(
       Info,
       "Gui::PlaylistQueryModel::hydrateState",

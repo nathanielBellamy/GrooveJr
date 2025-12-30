@@ -10,8 +10,8 @@ namespace Plugins {
 namespace Vst3 {
 using namespace Steinberg;
 
-Plugin::Plugin(const AtomicStr& path, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
-: gAppState(gAppState)
+Plugin::Plugin(const AtomicStr& path, State::Core* stateCore, std::shared_ptr<JackClient> jackClient)
+: stateCore(stateCore)
   , path(path) {
 	Steinberg::ResizableMemoryIBStream state;
 
@@ -42,7 +42,7 @@ Plugin::Plugin(const AtomicStr& path, AppState* gAppState, std::shared_ptr<JackC
 
 	try {
 		audioHost = new AudioHost::App(
-			gAppState,
+			stateCore,
 			jackClient
 		);
 		audioHost->setModule(module);
@@ -63,8 +63,8 @@ Plugin::Plugin(const AtomicStr& path, AppState* gAppState, std::shared_ptr<JackC
 	);
 }
 
-Plugin::Plugin(const Db::Plugin& pluginEntity, AppState* gAppState, std::shared_ptr<JackClient> jackClient)
-: gAppState(gAppState)
+Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shared_ptr<JackClient> jackClient)
+: stateCore(stateCore)
   , path(pluginEntity.filePath) {
 	Logging::write(
 		Info,
@@ -93,7 +93,7 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, AppState* gAppState, std::shared_
 
 	try {
 		audioHost = new AudioHost::App(
-			gAppState,
+			stateCore,
 			jackClient
 		);
 		audioHost->setModule(module);

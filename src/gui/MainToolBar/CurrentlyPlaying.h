@@ -13,7 +13,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../../audio/mixer/Core.h"
 
 namespace Gj {
@@ -24,7 +24,7 @@ class CurrentlyPlaying final : public QWidget {
 public:
   explicit CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer);
 
-  void hydrateState(const AppStatePacket& appStatePacket) const;
+  void hydrateState(const State::Packet& statePacket) const;
 
 private:
   actor_system& actorSystem;

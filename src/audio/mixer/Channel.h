@@ -16,7 +16,7 @@
 #include "../plugins/vst3/Plugin.h"
 #include "ChannelSettings.h"
 #include "ChannelProcessData.h"
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../../enums/Result.h"
 #include "../../db/entity/mixer/Plugin.h"
 #include "../Logging.h"
@@ -30,7 +30,7 @@ namespace Mixer {
 class Channel {
   // NOTE:
   // fx0:inputBuffers->buffersA, fx1:buffersA->buffersB, fx2:buffersB->buffersA, fx3:buffersA->buffersB, ...
-  AppState* gAppState;
+  State::Core* stateCore;
   std::shared_ptr<JackClient> jackClient;
   ID id{0};
   ChannelIndex index;
@@ -50,13 +50,13 @@ public:
   ChannelSettings settings;
 
   Channel(
-    AppState* gAppState,
+    State::Core* stateCore,
     std::shared_ptr<JackClient> jackClient,
     ChannelIndex index
   );
 
   Channel(
-    AppState* gAppState,
+    State::Core* stateCore,
     std::shared_ptr<JackClient> jackClient,
     const Db::ChannelEntity& channelEntity
   );

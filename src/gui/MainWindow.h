@@ -23,7 +23,7 @@
 #include "./MusicLibrary/MusicLibraryWindow.h"
 #include "./MainToolBar/MainToolBar.h"
 
-#include "../state/AppState.h"
+#include "../state/Core.h"
 #include "../audio/mixer/Core.h"
 #include "Hydrater.h"
 
@@ -45,7 +45,7 @@ public:
   explicit MainWindow(
     actor_system& actorSystem,
     Audio::Mixer::Core* mixer,
-    AppState* gAppState,
+    State::Core* stateCore,
     void (*shutdown_handler)(int)
   );
 
@@ -59,16 +59,16 @@ public:
 
   void connectHydrater(const Hydrater& hydrater) {
     const auto hydraterConnection =
-        connect(&hydrater, &Hydrater::hydrate, this, [&](const AppStatePacket& packet) {
+        connect(&hydrater, &Hydrater::hydrate, this, [&](const State::Packet& packet) {
           hydrateState(packet);
         });
   };
 
 public slots:
-  Result hydrateState(const AppStatePacket& appStatePacket);
+  Result hydrateState(const State::Packet& statePacket);
 
 private:
-  AppState* gAppState;
+  State::Core* stateCore;
   actor_system& actorSystem;
   Audio::Mixer::Core* mixer;
 

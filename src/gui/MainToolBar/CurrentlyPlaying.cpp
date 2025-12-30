@@ -53,10 +53,10 @@ void CurrentlyPlaying::setStyle() {
   );
 }
 
-void CurrentlyPlaying::hydrateState(const AppStatePacket& appStatePacket) const {
-  track->setText(QString(appStatePacket.currentlyPlayingTrackTitle.c_str()));
-  album->setText(QString(appStatePacket.currentlyPlayingAlbumTitle.c_str()));
-  artist->setText(QString(appStatePacket.currentlyPlayingArtistName.c_str()));
+void CurrentlyPlaying::hydrateState(const State::Packet& statePacket) const {
+  track->setText(QString(statePacket.currentlyPlayingTrackTitle.c_str()));
+  album->setText(QString(statePacket.currentlyPlayingAlbumTitle.c_str()));
+  artist->setText(QString(statePacket.currentlyPlayingArtistName.c_str()));
 }
 } // Gui
 } // Gj

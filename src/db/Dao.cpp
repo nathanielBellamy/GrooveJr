@@ -6,21 +6,21 @@
 
 namespace Gj {
 namespace Db {
-Dao::Dao(AppState* gAppState)
+Dao::Dao(State::Core* stateCore)
 : db(nullptr)
-  , gAppState(gAppState)
-  , appStateRepository(&db, gAppState)
-  , channelRepository(&db, gAppState)
-  , pluginRepository(&db, gAppState)
-  , sceneRepository(&db, gAppState)
-  , albumRepository(&db, gAppState)
-  , artistRepository(&db, gAppState)
-  , audioFileRepository(&db, gAppState)
-  , cacheRepository(&db, gAppState)
-  , genreRepository(&db, gAppState)
-  , playlistRepository(&db, gAppState)
-  , queueRepository(&db, gAppState)
-  , trackRepository(&db, gAppState) {
+  , stateCore(stateCore)
+  , appStateRepository(&db, stateCore)
+  , channelRepository(&db, stateCore)
+  , pluginRepository(&db, stateCore)
+  , sceneRepository(&db, stateCore)
+  , albumRepository(&db, stateCore)
+  , artistRepository(&db, stateCore)
+  , audioFileRepository(&db, stateCore)
+  , cacheRepository(&db, stateCore)
+  , genreRepository(&db, stateCore)
+  , playlistRepository(&db, stateCore)
+  , queueRepository(&db, stateCore)
+  , trackRepository(&db, stateCore) {
   if (initDb() == 0) {
     if (initSchema() == 0) {
       Logging::write(

@@ -20,7 +20,7 @@
 #include "ThreadStatics.h"
 #include "BufferIndeces.h"
 
-#include "../state/AppState.h"
+#include "../state/Core.h"
 #include "../enums/Result.h"
 
 namespace Gj {
@@ -36,7 +36,7 @@ struct AudioPlayer {
 
   Mixer::Core* mixer;
 
-  AppState* gAppState;
+  State::Core* stateCore;
 
   std::shared_ptr<JackClient> jackClient;
 
@@ -58,12 +58,12 @@ struct AudioPlayer {
 
   Mixer::ChannelProcessData mixerChannelsProcessData[MAX_MIXER_CHANNELS]{};
 
-  AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer::Core* mixer, AppState* gAppState)
+  AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer::Core* mixer, State::Core* stateCore)
   : threadId(ThreadStatics::incrThreadId())
     , actorSystem(actorSystem)
     , audioCore(audioCore)
     , mixer(mixer)
-    , gAppState(gAppState)
+    , stateCore(stateCore)
     , jackClient(mixer->getGjJackClient()) {
     audioCore->clearBuffers();
     populateMixerChannelsProcessData();
@@ -156,7 +156,7 @@ struct AudioPlayer {
     ThreadStatics::setFrames(audioCore->currentDeck().frames);
 
     audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
-    audioCore->crossfade = gAppState->getCrossfade();
+    audioCore->crossfade = stateCore->getCrossfade();
 
     Logging::write(
       Info,
@@ -244,7 +244,7 @@ struct AudioPlayer {
     const Mixer::Channel* channel,
     const PluginIndex pluginIdx
   ) const {
-    const auto audioFramesPerBuffer = static_cast<int32_t>(gAppState->getAudioFramesPerBuffer());
+    const auto audioFramesPerBuffer = static_cast<int32_t>(stateCore->getAudioFramesPerBuffer());
 
     // - each channel gets processed into it's mixerChannelWriteOut
     // - the channels are then summed down into the processBuffers
@@ -351,7 +351,7 @@ struct AudioPlayer {
     playbackSettingsToAudioThread[BfrIdx::PSTAT::USER_SETTING_FRAME_ID_FLAG] = 0;
     playbackSettingsToAudioThread[BfrIdx::PSTAT::NEW_FRAME_ID] = 0;
     playbackSettingsToAudioThread[BfrIdx::PSTAT::PLAYBACK_SPEED] = static_cast<sf_count_t>(
-      std::floor(gAppState->getScene().playbackSpeed * 100.0f));
+      std::floor(stateCore->getScene().playbackSpeed * 100.0f));
 
     if (ThreadStatics::getUserSettingFrameId()) {
       const sf_count_t newFrameId = ThreadStatics::getFrameId();
@@ -503,7 +503,7 @@ struct AudioPlayer {
     );
 
     audioCore->decks[audioCore->deckIndex].playState = PLAY;
-    gAppState->setAudioRunning(true);
+    stateCore->setAudioRunning(true);
 
     while (continueRun()) {
       // std::cout << "audioplayer run playb " << audioCore->playbackBuffers[0][100] << std::endl;
@@ -560,7 +560,7 @@ struct AudioPlayer {
       }
     }
 
-    gAppState->setAudioRunning(false);
+    stateCore->setAudioRunning(false);
     jackClientIsActive = false;
 
     if (ThreadStatics::getPlayState() == STOP) {
@@ -569,7 +569,7 @@ struct AudioPlayer {
       mixer->getSetVuRingBufferFunc()(nullptr);
     }
 
-    gAppState->setAudioRunning(false);
+    stateCore->setAudioRunning(false);
     mixer->deletePluginsToDelete();
 
     Logging::write(

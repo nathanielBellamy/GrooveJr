@@ -81,8 +81,8 @@ add_definitions(-DQT_NO_VERSION_TAGGING)
 add_executable(GrooveJr
         main.h
         main.cpp
-        state/AppState.h
-        state/AppState.cpp
+        state/Core.h
+        state/Core.cpp
         Logging.h
         Logging.cpp
         actors/ActorIds.h

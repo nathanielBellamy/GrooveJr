@@ -6,9 +6,9 @@
 
 namespace Gj {
 namespace Db {
-SceneRepository::SceneRepository(sqlite3** db, AppState* gAppState)
+SceneRepository::SceneRepository(sqlite3** db, State::Core* stateCore)
 : db(db)
-  , gAppState(gAppState) {
+  , stateCore(stateCore) {
 }
 
 std::vector<Scene> SceneRepository::getAll() const {

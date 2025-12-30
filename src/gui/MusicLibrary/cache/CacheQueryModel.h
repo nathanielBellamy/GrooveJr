@@ -12,7 +12,7 @@
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
 
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
 #include "../Constants.h"
@@ -23,13 +23,13 @@ class CacheQueryModel final : public MusicLibraryQueryModel {
   bool isSelected(const QModelIndex& item) const;
 
 public:
-  explicit CacheQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters,
+  explicit CacheQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
                            SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, gAppState, filters, CACHE, QString("Cache"), sqlWorkerPool) {
+  : MusicLibraryQueryModel(parent, stateCore, filters, CACHE, QString("Cache"), sqlWorkerPool) {
     refresh();
   }
 
-  Result hydrateState(const AppStatePacket& appStatePacket) override;
+  Result hydrateState(const State::Packet& statePacket) override;
 
   Result refresh(bool hard = false) override;
 

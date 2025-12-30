@@ -93,7 +93,7 @@ Result Body::vuWorkerStop() {
   return OK;
 }
 
-void Body::hydrateState(const AppStatePacket& appState) {
+void Body::hydrateState(const State::Packet& appState) {
   mainChannelContainer.hydrateState(appState);
   channelsContainer.hydrateState(appState);
 

@@ -16,7 +16,7 @@
 #include <QWidget>
 
 #include "../../Logging.h"
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../../actors/ActorIds.h"
 #include "../../messaging/atoms.h"
 #include "../../messaging/EnvelopeQtPtr.h"
@@ -39,13 +39,13 @@ public:
   MainToolBar(
     QWidget* parent,
     actor_system& sys,
-    AppState* gAppState,
+    State::Core* stateCore,
     Audio::Mixer::Core* mixer,
     SqlWorkerPool* sqlWorkerPool,
     QAction* sceneLoadAction
   );
 
-  int hydrateState(const AppStatePacket& appStatePacket);
+  int hydrateState(const State::Packet& statePacket);
 
 private:
   actor_system& sys;

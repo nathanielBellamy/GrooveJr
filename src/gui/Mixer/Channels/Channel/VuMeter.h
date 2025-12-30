@@ -48,7 +48,7 @@ public:
 
   ~VuMeter();
 
-  Result hydrateState(const AppStatePacket& appStatePacket);
+  Result hydrateState(const State::Packet& statePacket);
 
 private slots:
   void animationLoop();

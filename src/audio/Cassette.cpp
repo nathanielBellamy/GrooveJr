@@ -2,8 +2,8 @@
 
 namespace Gj {
 namespace Audio {
-Cassette::Cassette(AppState* gAppState, const char* filePath)
-: gAppState(gAppState)
+Cassette::Cassette(State::Core* stateCore, const char* filePath)
+: stateCore(stateCore)
   , filePath(filePath)
   , sfInfo() {
   if (const int initRes = init(); initRes > 0) {
@@ -24,13 +24,13 @@ Cassette::Cassette(AppState* gAppState, const char* filePath)
   );
 }
 
-Cassette::Cassette(AppState* gAppState)
+Cassette::Cassette(State::Core* stateCore)
 : filePath("BLANK")
-  , gAppState(gAppState)
+  , stateCore(stateCore)
   , sfInfo() {
   Logging::write(
     Info,
-    "Audio::Cassette::Cassette(gAppState)",
+    "Audio::Cassette::Cassette(stateCore)",
     "Blank Cassette initialized"
   );
 }

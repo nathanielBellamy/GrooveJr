@@ -13,7 +13,7 @@
 #include "public.sdk/source/vst/utility/memoryibstream.h"
 
 #include "../../../Logging.h"
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../../../db/entity/mixer/Plugin.h"
 #include "../../../enums/Result.h"
 #include "../../JackClient.h"
@@ -30,7 +30,7 @@ namespace Vst3 {
 using namespace Steinberg;
 
 struct Plugin {
-  AppState* gAppState;
+  State::Core* stateCore;
   AtomicStr name;
   AtomicStr path;
   VST3::Hosting::Module::Ptr module;
@@ -41,13 +41,13 @@ struct Plugin {
 
   Plugin(
     const AtomicStr& path,
-    AppState* gAppState,
+    State::Core* stateCore,
     std::shared_ptr<JackClient> jackClient
   );
 
   Plugin(
     const Db::Plugin& pluginEntity,
-    AppState* gAppState,
+    State::Core* stateCore,
     std::shared_ptr<JackClient> jackClient
   );
 

@@ -7,7 +7,7 @@
 
 #include "caf/actor_system.hpp"
 
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
 #include "../MusicLibraryType.h"
@@ -21,7 +21,7 @@ public:
     QWidget* parent,
     actor_system& actorSystem,
     Db::Dao* dao,
-    AppState* gAppState,
+    Gj::State::Core* stateCore,
     MusicLibraryFilters* filters,
     SqlWorkerPool* sqlWorkerPool
   )
@@ -29,8 +29,8 @@ public:
     parent,
     actorSystem,
     dao,
-    gAppState,
-    new GenreQueryModel(parent, gAppState, filters, sqlWorkerPool),
+    stateCore,
+    new GenreQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
   };

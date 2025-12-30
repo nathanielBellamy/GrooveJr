@@ -7,7 +7,7 @@
 namespace Gj {
 namespace Gui {
 
-Result GenreQueryModel::hydrateState(const AppStatePacket& appStatePacket) {
+Result GenreQueryModel::hydrateState(const State::Packet& statePacket) {
   Logging::write(
       Info,
       "Gui::GenreQueryModel::hydrateState",
@@ -66,7 +66,7 @@ Result GenreQueryModel::setHeaders() {
 
 bool GenreQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
   const ID id = index(item.row(), GENRE_COL_ID).data().toULongLong();
-  return gAppState->getCurrentlyPlaying().genre.id == id;
+  return stateCore->getCurrentlyPlaying().genre.id == id;
 }
 
 } // Gui

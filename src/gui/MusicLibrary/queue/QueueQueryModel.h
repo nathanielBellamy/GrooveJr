@@ -12,7 +12,7 @@
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
 
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
 #include "../../QSql/SqlWorkerPool.h"
@@ -24,13 +24,13 @@ class QueueQueryModel final : public MusicLibraryQueryModel {
   bool isSelected(const QModelIndex& item) const;
 
 public:
-  explicit QueueQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters,
+  explicit QueueQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
                            SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, gAppState, filters, AUDIO_FILE, QString("QueueQueryModel"), sqlWorkerPool) {
+  : MusicLibraryQueryModel(parent, stateCore, filters, AUDIO_FILE, QString("QueueQueryModel"), sqlWorkerPool) {
     refresh();
   }
 
-  Result hydrateState(const AppStatePacket& appStatePacket) override;
+  Result hydrateState(const State::Packet& statePacket) override;
 
   Result refresh(bool hard = false) override;
 

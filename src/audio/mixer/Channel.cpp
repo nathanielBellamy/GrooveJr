@@ -14,11 +14,11 @@ namespace Mixer {
 using namespace Steinberg;
 
 Channel::Channel(
-	AppState* gAppState,
+	State::Core* stateCore,
 	std::shared_ptr<JackClient> jackClient,
 	const ChannelIndex index
 )
-: gAppState(gAppState)
+: stateCore(stateCore)
   , jackClient(jackClient)
   , index(index) {
 	Logging::write(
@@ -29,11 +29,11 @@ Channel::Channel(
 }
 
 Channel::Channel(
-	AppState* gAppState,
+	State::Core* stateCore,
 	std::shared_ptr<JackClient> jackClient,
 	const Db::ChannelEntity& channelEntity
 )
-: gAppState(gAppState)
+: stateCore(stateCore)
   , jackClient(jackClient)
   , index(channelEntity.channelIndex)
   , name(channelEntity.name) {
@@ -97,7 +97,7 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> pluginIdxOpt, 
 
 	const auto plugin = new Plugins::Vst3::Plugin(
 		pluginPath,
-		gAppState,
+		stateCore,
 		jackClient
 	);
 
@@ -111,13 +111,13 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> pluginIdxOpt, 
 	// int latencySamples = processor->getLatencySamples();
 	// incorporateLatencySamples(latencySamples);
 
-	const auto gAppStateAudioFramesPerBuffer = static_cast<int32>(gAppState->getAudioFramesPerBuffer());
-	if (!processor->canProcessSampleSize(gAppStateAudioFramesPerBuffer)) {
+	const auto stateCoreAudioFramesPerBuffer = static_cast<int32>(stateCore->getAudioFramesPerBuffer());
+	if (!processor->canProcessSampleSize(stateCoreAudioFramesPerBuffer)) {
 		Logging::write(
 			Warning,
 			"Audio::Mixer::Channel::addReplacePlugin",
 			"Processor for " + pluginPath + " on channel " + std::to_string(index) + " cannot process sample size " +
-			std::to_string(gAppState->audioFramesPerBuffer)
+			std::to_string(stateCore->audioFramesPerBuffer)
 		);
 		return WARNING;
 	}
@@ -168,7 +168,7 @@ Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 		std::to_string(pluginEntity.pluginIndex)
 	);
 
-	const auto plugin = new Plugins::Vst3::Plugin(pluginEntity, gAppState, jackClient);
+	const auto plugin = new Plugins::Vst3::Plugin(pluginEntity, stateCore, jackClient);
 
 	Logging::write(
 		Info,
@@ -181,12 +181,12 @@ Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 	// int latencySamples = processor->getLatencySamples();
 	// incorporateLatencySamples(latencySamples);
 
-	if (!processor->canProcessSampleSize(gAppState->getAudioFramesPerBuffer())) {
+	if (!processor->canProcessSampleSize(stateCore->getAudioFramesPerBuffer())) {
 		Logging::write(
 			Warning,
 			"Audio::Mixer::Channel::loadPlugin",
 			"Processor for " + pluginEntity.filePath + " on channel " + std::to_string(index) + " cannot process sample size "
-			+ std::to_string(gAppState->audioFramesPerBuffer)
+			+ std::to_string(stateCore->audioFramesPerBuffer)
 		);
 		return ERROR;
 	}

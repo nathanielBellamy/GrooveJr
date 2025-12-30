@@ -9,8 +9,8 @@ namespace Audio {
 namespace Mixer {
 using namespace Steinberg;
 
-Core::Core(AppState* gAppState, Db::Dao* dao)
-: gAppState(gAppState)
+Core::Core(State::Core* stateCore, Db::Dao* dao)
+: stateCore(stateCore)
   , jackClient(new JackClient(this))
   , dao(dao) {
   Logging::write(
@@ -19,7 +19,7 @@ Core::Core(AppState* gAppState, Db::Dao* dao)
     "Instantiating Mixer..."
   );
 
-  loadScene(gAppState->getSceneDbId());
+  loadScene(stateCore->getSceneDbId());
 
   jackClient->initialize("GrooveJr");
 
@@ -101,7 +101,7 @@ Result Core::addChannel() {
 
   channels[firstOpenIndex.value()] =
       new Channel(
-        gAppState,
+        stateCore,
         jackClient,
         firstOpenIndex.value()
       );
@@ -110,7 +110,7 @@ Result Core::addChannel() {
 
 Result Core::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) {
   bool warning = false;
-  gAppState->setAudioFramesPerBuffer(framesPerBuffer);
+  stateCore->setAudioFramesPerBuffer(framesPerBuffer);
 
   const auto setRes = forEachChannel(
     [this, &framesPerBuffer, &warning](Channel* channel, ChannelIndex index) {
@@ -134,7 +134,7 @@ Result Core::addChannelFromEntity(const Db::ChannelEntity& channelEntity) {
   delete channels[channelEntity.channelIndex].value_or(nullptr);
   channels[channelEntity.channelIndex] =
       new Channel(
-        gAppState,
+        stateCore,
         jackClient,
         channelEntity
       );
@@ -155,11 +155,11 @@ Result Core::setSampleRate(const uint32_t sampleRate) {
 }
 
 void Core::incorporateLatencySamples(const int latencySamples) const {
-  if (gAppState->audioFramesPerBuffer > latencySamples) return;
+  if (stateCore->audioFramesPerBuffer > latencySamples) return;
 
   const double exponent = std::log2(latencySamples);
 
-  gAppState->audioFramesPerBuffer = static_cast<int>(std::pow(2, std::ceil(exponent)));
+  stateCore->audioFramesPerBuffer = static_cast<int>(std::pow(2, std::ceil(exponent)));
 }
 
 Result Core::addPluginToChannel(const ChannelIndex channelIndex, const PluginPath& pluginPath) {
@@ -333,7 +333,7 @@ Result Core::loadScene(const ID sceneDbId) {
     "Audio::Mixer::Core::loadScene",
     "Loading Scene: " + scene.toStdString()
   );
-  gAppState->setScene(scene);
+  stateCore->setScene(scene);
 
   const std::vector<Db::ChannelEntity> channels = dao->sceneRepository.getChannels(scene.id);
   const bool channelsWasEmpty = channels.empty();
@@ -475,7 +475,7 @@ Result Core::saveScene() {
     "Audio::Mixer::Core::saveScene",
     "Saving scene."
   );
-  const auto scene = dao->sceneRepository.update(gAppState->getScene());
+  const auto scene = dao->sceneRepository.update(stateCore->getScene());
   if (!scene) {
     Logging::write(
       Error,
@@ -485,7 +485,7 @@ Result Core::saveScene() {
     return ERROR;
   }
 
-  gAppState->setScene(scene.value());
+  stateCore->setScene(scene.value());
 
   if (const int persistRes = dao->appStateRepository.persistAndSet(); persistRes != 0) {
     Logging::write(
@@ -512,7 +512,7 @@ Result Core::saveScene() {
 
 Result Core::saveChannels() {
   Result result = OK;
-  const auto scene = gAppState->getScene();
+  const auto scene = stateCore->getScene();
   const auto saveRes = forEachChannel(
     [this, &scene, &result](Channel* channel, ChannelIndex channelIndex) {
       if (!dao->channelRepository.save(channel->toEntity())) {

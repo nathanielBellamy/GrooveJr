@@ -8,7 +8,7 @@
 
 #include "./Constants.h"
 #include "./ThreadStatics.h"
-#include "../state/AppState.h"
+#include "../state/Core.h"
 #include "../enums/Result.h"
 #include "Logging.h"
 
@@ -16,7 +16,7 @@ namespace Gj {
 namespace Audio {
 class Cassette {
   long initialFrameId;
-  AppState* gAppState;
+  State::Core* stateCore;
   float* buffer{nullptr};
   SNDFILE* file{};
   float* inputBuffer{nullptr};
@@ -40,9 +40,9 @@ public:
   SF_INFO sfInfo;
   float* inputBuffers[2]{nullptr, nullptr}; // full song audio data
 
-  Cassette(AppState* gAppState, const char* filePath);
+  Cassette(State::Core* stateCore, const char* filePath);
 
-  Cassette(AppState* gAppState);
+  Cassette(State::Core* stateCore);
 
   ~Cassette();
 

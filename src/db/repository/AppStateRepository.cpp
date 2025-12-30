@@ -7,9 +7,9 @@
 namespace Gj {
 namespace Db {
 
-AppStateRepository::AppStateRepository(sqlite3** db, AppState* gAppState)
+AppStateRepository::AppStateRepository(sqlite3** db, State::Core* stateCore)
   : db(db)
-  , gAppState(gAppState)
+  , stateCore(stateCore)
   {}
 
 AppStateEntity AppStateRepository::get() const {
@@ -63,9 +63,9 @@ ID AppStateRepository::save() const {
     return 0;
   }
 
-  sqlite3_bind_int(stmt, 1, gAppState->getAudioFramesPerBuffer());
-  sqlite3_bind_int(stmt, 2, gAppState->getSceneDbId());
-  sqlite3_bind_int(stmt, 3, gAppState->getCrossfade());
+  sqlite3_bind_int(stmt, 1, stateCore->getAudioFramesPerBuffer());
+  sqlite3_bind_int(stmt, 2, stateCore->getSceneDbId());
+  sqlite3_bind_int(stmt, 3, stateCore->getCrossfade());
 
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     Logging::write(
@@ -92,12 +92,12 @@ Result AppStateRepository::persistAndSet() const {
     const auto appStateEntity = get();
     const Scene scene = findScene(appStateEntity.sceneId).value_or(Scene::base());
 
-    gAppState->setFromEntityAndScene(appStateEntity, scene);
+    stateCore->setFromEntityAndScene(appStateEntity, scene);
 
     Logging::write(
       Info,
       "Db::AppStateRepository::persistAndSet",
-      "Persisted AppState: " + gAppState->toString()
+      "Persisted AppState: " + stateCore->toString()
     );
 
     return OK;

@@ -11,7 +11,7 @@ using namespace Steinberg::Vst;
 
 namespace Gj {
 Audio::Plugins::Vst3::Host::App* pluginContext;
-AppState* gAppState;
+State::Core* stateCore;
 Audio::Mixer::Core* mixer;
 Db::Dao* dao;
 Audio::AudioCore* audioCore;
@@ -30,11 +30,11 @@ void shutdown_handler(const int sig) {
     "Deleted Mixer"
   );
 
-  delete gAppState;
+  delete stateCore;
   Logging::write(
     Info,
     "shutdown_handler",
-    "Deleted gAppState"
+    "Deleted stateCore"
   );
 
   delete dao;
@@ -102,8 +102,8 @@ int main(int argc, char* argv[]) {
   );
 
   // setup Sql
-  gAppState = new AppState;
-  dao = new Db::Dao(gAppState);
+  stateCore = new State::Core;
+  dao = new Db::Dao(stateCore);
   if (const auto appStateEntity = dao->appStateRepository.get(); appStateEntity.id == 0) {
     // no appState in Db, init one
     const SceneID sceneId = dao->sceneRepository.create(Db::Scene::base());
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
       );
       throw std::runtime_error("Unable to init Scene");
     }
-    gAppState->setScene(scene.value());
+    stateCore->setScene(scene.value());
     if (dao->appStateRepository.save() == 0) {
       Logging::write(
         Error,
@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
 
   const auto appStateEntityReloaded = dao->appStateRepository.get();
   const auto scene = dao->sceneRepository.findOrCreate(appStateEntityReloaded.sceneId);
-  gAppState->setFromEntityAndScene(
+  stateCore->setFromEntityAndScene(
     appStateEntityReloaded,
     scene
   );
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
   Logging::write(
     Info,
     "main",
-    "Loaded gAppState: " + gAppState->toString()
+    "Loaded stateCore: " + stateCore->toString()
   );
 
   if (initVst3PluginContext() == OK) {
@@ -156,14 +156,14 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  audioCore = new Audio::AudioCore(gAppState);
+  audioCore = new Audio::AudioCore(stateCore);
   Logging::write(
     Info,
     "main",
     "Instantiated audioCore"
   );
 
-  mixer = new Audio::Mixer::Core(gAppState, dao);
+  mixer = new Audio::Mixer::Core(stateCore, dao);
   Logging::write(
     Info,
     "main",
@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
 
   auto supervisor = sys.spawn(
     actor_from_state<Act::SupervisorState>,
-    gAppState,
+    stateCore,
     mixer,
     audioCore,
     shutdown_handler

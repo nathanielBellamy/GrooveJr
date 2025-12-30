@@ -10,17 +10,17 @@
 #include <sqlite3.h>
 
 #include "../../Logging.h"
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../../entity/mixer/Plugin.h"
 
 namespace Gj {
 namespace Db {
 class PluginRepository {
   sqlite3** db;
-  AppState* gAppState;
+  State::Core* stateCore;
 
 public:
-  explicit PluginRepository(sqlite3** db, AppState* gAppState);
+  explicit PluginRepository(sqlite3** db, State::Core* stateCore);
 
   std::vector<Plugin> getAll() const;
 

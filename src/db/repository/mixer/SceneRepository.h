@@ -11,7 +11,7 @@
 #include <sqlite3.h>
 
 #include "../../Logging.h"
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 
 #include "../../entity/mixer/Scene.h"
 #include "../../entity/mixer/Plugin.h"
@@ -22,10 +22,10 @@ namespace Gj {
 namespace Db {
 class SceneRepository {
   sqlite3** db;
-  AppState* gAppState;
+  State::Core* stateCore;
 
 public:
-  SceneRepository(sqlite3** db, AppState* appState);
+  SceneRepository(sqlite3** db, State::Core* appState);
 
   std::vector<Scene> getAll() const;
 

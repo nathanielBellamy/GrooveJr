@@ -21,7 +21,7 @@
 #include "../../../messaging/DecksState.h"
 #include "../../../actors/ActorIds.h"
 #include "../../../enums/Result.h"
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "../../../db/entity/musicLibrary/Cache.h"
 
 #include "../MusicLibraryFilters.h"
@@ -39,7 +39,7 @@ public:
   AudioFileTableView(
     QWidget* parent,
     actor_system& actorSystem,
-    AppState* gAppState,
+    Gj::State::Core* stateCore,
     Db::Dao* dao,
     MusicLibraryFilters* filters,
     SqlWorkerPool* sqlWorkerPool
@@ -48,8 +48,8 @@ public:
     parent,
     actorSystem,
     dao,
-    gAppState,
-    new AudioFileQueryModel(parent, gAppState, filters, sqlWorkerPool),
+    stateCore,
+    new AudioFileQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
   };

@@ -10,10 +10,10 @@ using namespace caf;
 
 namespace Gj {
 namespace Gui {
-MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer::Core* mixer, AppState* gAppState,
+MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer::Core* mixer, State::Core* stateCore,
                        void (*shutdown_handler)(int))
 : SqlWorkerPoolHost(nullptr)
-  , gAppState(gAppState)
+  , stateCore(stateCore)
   , actorSystem(actorSystem)
   , mixer(mixer)
   , shutdown_handler(shutdown_handler)
@@ -21,9 +21,9 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer::Core* mixer, App
   , container(this)
   , menuBar(new MenuBar(actorSystem, this))
   , sceneLoadAction(QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen), tr("&Select Scene"), this)
-  , mainToolBar(this, actorSystem, gAppState, mixer, sqlWorkerPool, &sceneLoadAction)
+  , mainToolBar(this, actorSystem, stateCore, mixer, sqlWorkerPool, &sceneLoadAction)
   , grid(&container)
-  , musicLibraryWindow(&container, actorSystem, gAppState, mixer->dao, sqlWorkerPool)
+  , musicLibraryWindow(&container, actorSystem, stateCore, mixer->dao, sqlWorkerPool)
   , mixerWindow(&container, actorSystem, mixer) {
   Logging::write(
     Info,
@@ -62,17 +62,17 @@ SqlWorkerPool* MainWindow::initQSql() {
   return sqlWorkerPool;
 }
 
-Result MainWindow::hydrateState(const AppStatePacket& appStatePacket) {
+Result MainWindow::hydrateState(const State::Packet& statePacket) {
   Logging::write(
     Info,
     "Gui::MainWindow::hydrateState",
-    "Hydrating app state to Gui: id: " + std::to_string(appStatePacket.id) + " sceneId: " + std::to_string(
-      appStatePacket.sceneId)
+    "Hydrating app state to Gui: id: " + std::to_string(statePacket.id) + " sceneId: " + std::to_string(
+      statePacket.sceneId)
   );
 
-  mainToolBar.hydrateState(appStatePacket);
-  mixerWindow.hydrateState(appStatePacket);
-  musicLibraryWindow.hydrateState(appStatePacket);
+  mainToolBar.hydrateState(statePacket);
+  mixerWindow.hydrateState(statePacket);
+  musicLibraryWindow.hydrateState(statePacket);
 
   Logging::write(
     Info,
@@ -149,7 +149,7 @@ void MainWindow::setPlugins() {
 
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
-    if (const int sceneDbId = sceneLoadAction.data().toULongLong(); gAppState->getSceneDbId() != sceneDbId) {
+    if (const int sceneDbId = sceneLoadAction.data().toULongLong(); stateCore->getSceneDbId() != sceneDbId) {
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",

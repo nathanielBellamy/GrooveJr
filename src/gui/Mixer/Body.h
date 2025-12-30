@@ -16,7 +16,7 @@
 #include "./Channels/MainChannelContainer.h"
 #include "Channels/ChannelsContainer.h"
 
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../../audio/mixer/Core.h"
 #include "../Color.h"
 
@@ -31,7 +31,7 @@ public:
 
   ~Body();
 
-  void hydrateState(const AppStatePacket& appStatePacket);
+  void hydrateState(const State::Packet& statePacket);
 
   void setChannels();
 

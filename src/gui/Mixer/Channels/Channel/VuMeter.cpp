@@ -160,8 +160,8 @@ void VuMeter::animationStop() {
   animationTimer.stop();
 }
 
-Result VuMeter::hydrateState(const AppStatePacket& appStatePacket) {
-  switch (appStatePacket.playState) {
+Result VuMeter::hydrateState(const State::Packet& statePacket) {
+  switch (statePacket.playState) {
     case PLAY:
       runAnimation.store(true);
       break;

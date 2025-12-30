@@ -56,8 +56,8 @@ void ProgressBar::mousePressEvent(QMouseEvent* event) {
   update();
 }
 
-Result ProgressBar::hydrateState(const AppStatePacket& appStatePacket) {
-  if (appStatePacket.playState == STOP)
+Result ProgressBar::hydrateState(const State::Packet& statePacket) {
+  if (statePacket.playState == STOP)
     updateProgressBar(1, 0);
 
   return OK;

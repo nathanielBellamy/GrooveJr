@@ -17,7 +17,7 @@
 
 #include "public.sdk/source/vst/utility/memoryibstream.h"
 
-#include "../../state/AppState.h"
+#include "../../state/Core.h"
 #include "../../enums/Result.h"
 #include "../../Logging.h"
 #include "../../db/Dao.h"
@@ -38,7 +38,7 @@ class JackClient;
 
 namespace Mixer {
 class Core {
-  AppState* gAppState;
+  State::Core* stateCore;
   std::shared_ptr<JackClient> jackClient;
   // main channel is channels.front()
   std::optional<Channel*> channels[MAX_MIXER_CHANNELS];
@@ -54,7 +54,7 @@ class Core {
 public:
   Db::Dao* dao;
 
-  explicit Core(AppState*, Db::Dao*);
+  explicit Core(State::Core*, Db::Dao*);
 
   ~Core();
 
@@ -68,7 +68,7 @@ public:
   }
 
   Result safeDeleteOldPlugins() {
-    if (gAppState->isAudioRunning())
+    if (stateCore->isAudioRunning())
       return setProcessDataChangeFlag(ProcessDataChangeFlag::ACKNOWLEDGE);
 
     return deletePluginsToDelete();
@@ -147,14 +147,14 @@ public:
   }
 
   Result setPlaybackSpeed(const int newPlaybackSpeed) const {
-    auto scene = gAppState->scene.load();
+    auto scene = stateCore->scene.load();
     scene.playbackSpeed = static_cast<float>(newPlaybackSpeed) / 100.0f;
-    gAppState->scene.store(scene);
+    stateCore->scene.store(scene);
     return OK;
   }
 
   sf_count_t getPlaybackSpeed() const {
-    return std::floor(gAppState->scene.load().playbackSpeed * 100.0f);
+    return std::floor(stateCore->scene.load().playbackSpeed * 100.0f);
   }
 
   [[nodiscard]]
@@ -232,7 +232,7 @@ public:
 
   Result setSampleRate(uint32_t sampleRate);
 
-  jack_nframes_t getAudioFramesPerBuffer() const { return gAppState->getAudioFramesPerBuffer(); };
+  jack_nframes_t getAudioFramesPerBuffer() const { return stateCore->getAudioFramesPerBuffer(); };
 
   Result setAudioFramesPerBuffer(jack_nframes_t framesPerBuffer);
 

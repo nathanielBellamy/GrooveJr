@@ -12,21 +12,22 @@
 
 namespace Gj {
 namespace Db {
-
 class TrackRepository final : public MusicLibraryRepository {
-  public:
-    TrackRepository(sqlite3** db, AppState* gAppState)
-      : MusicLibraryRepository(db, gAppState)
-      {};
+public:
+  TrackRepository(sqlite3** db, State::Core* stateCore)
+  : MusicLibraryRepository(db, stateCore) {
+  };
 
-    std::vector<Track> getAll() const;
-    ID save(const Track& track) const;
-    Track findByAlbumIdAndTrackNumber(ID albumId, TrackNumber trackNumber) const;
-    Result loadAll(const std::map<ID, Track>& tracks) const;
-    Result join(const Track& track, const Artist& artist) const;
+  std::vector<Track> getAll() const;
 
+  ID save(const Track& track) const;
+
+  Track findByAlbumIdAndTrackNumber(ID albumId, TrackNumber trackNumber) const;
+
+  Result loadAll(const std::map<ID, Track>& tracks) const;
+
+  Result join(const Track& track, const Artist& artist) const;
 };
-
 } // Db
 } // Gj
 

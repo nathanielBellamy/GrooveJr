@@ -12,7 +12,7 @@
 #include <QStyle>
 #include <QVariant>
 
-#include "../../../../../state/AppState.h"
+#include "../../../../../state/Core.h"
 #include "../../../../../Logging.h"
 
 namespace Gj {
@@ -25,7 +25,7 @@ public:
 
   ~ReplacePluginButton() override;
 
-  void hydrateState(const AppStatePacket& appState, int newChannelIdx);
+  void hydrateState(const State::Packet& appState, int newChannelIdx);
 
 private:
   ChannelIndex channelIndex;

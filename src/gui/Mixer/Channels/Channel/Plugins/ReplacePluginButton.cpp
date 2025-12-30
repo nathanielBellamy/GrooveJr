@@ -32,7 +32,7 @@ ReplacePluginButton::~ReplacePluginButton() {
   );
 }
 
-void ReplacePluginButton::hydrateState(const AppStatePacket& appState, int newChannelIdx) {
+void ReplacePluginButton::hydrateState(const State::Packet& appState, int newChannelIdx) {
   channelIndex = newChannelIdx;
 }
 

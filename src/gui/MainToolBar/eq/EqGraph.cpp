@@ -191,8 +191,8 @@ void EqGraph::mousePressEvent(QMouseEvent* event) {
   update();
 }
 
-Result EqGraph::hydrateState(const AppStatePacket& appStatePacket) {
-  switch (appStatePacket.playState) {
+Result EqGraph::hydrateState(const State::Packet& statePacket) {
+  switch (statePacket.playState) {
     case PLAY:
       if (!running) {
         running = true;

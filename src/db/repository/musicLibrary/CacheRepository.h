@@ -18,8 +18,8 @@ namespace Db {
 class CacheRepository final : public MusicLibraryRepository {
 
   public:
-    CacheRepository(sqlite3** db, AppState* gAppState)
-      : MusicLibraryRepository(db, gAppState)
+    CacheRepository(sqlite3** db, State::Core* stateCore)
+      : MusicLibraryRepository(db, stateCore)
       {};
 
     Result save(const std::vector<Cache>& caches) const;

@@ -14,7 +14,7 @@
 #include "./ActorIds.h"
 #include "../messaging/atoms.h"
 #include "./Playback.h"
-#include "../state/AppState.h"
+#include "../state/Core.h"
 #include "../gui/MainWindow.h"
 #include "../gui/Hydrater.h"
 
@@ -25,7 +25,7 @@ namespace Act {
 struct DisplayTrait {
   using signatures = type_list<
     result<void>(strong_actor_ptr, hydrate_display_a),
-    result<void>(strong_actor_ptr, AppStatePacket, current_state_a)
+    result<void>(strong_actor_ptr, State::Packet, current_state_a)
   >;
 };
 
@@ -42,14 +42,14 @@ struct DisplayState {
     Display::pointer self,
     strong_actor_ptr supervisor,
     Audio::Mixer::Core* mixer,
-    AppState* gAppState,
+    State::Core* stateCore,
     void (*shutdown_handler)(int)
   )
   : self(self) {
     self->link_to(supervisor);
     self->system().registry().put(DISPLAY, actor_cast<strong_actor_ptr>(self));
 
-    mainWindow = new Gui::MainWindow{self->system(), mixer, gAppState, shutdown_handler};
+    mainWindow = new Gui::MainWindow{self->system(), mixer, stateCore, shutdown_handler};
     mainWindow->connectHydrater(hydrater);
     mainWindow->show();
     mainWindow->setChannels();
@@ -80,13 +80,13 @@ struct DisplayState {
           read_state_a_v
         );
       },
-      [this](strong_actor_ptr replyToPtr, AppStatePacket appStatePacket, current_state_a) {
+      [this](strong_actor_ptr replyToPtr, State::Packet statePacket, current_state_a) {
         Logging::write(
           Info,
           "Act::Display::current_state_a",
           "Received current state, will trigger hydrate display."
         );
-        emit hydrater.hydrate(appStatePacket);
+        emit hydrater.hydrate(statePacket);
         Logging::write(
           Info,
           "Act::Display::current_state_a",

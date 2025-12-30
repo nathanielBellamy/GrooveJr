@@ -22,7 +22,7 @@
 #include "../messaging/atoms.h"
 #include "../messaging/DecksState.h"
 #include "../enums/PlayState.h"
-#include "../state/AppState.h"
+#include "../state/Core.h"
 #include "../audio/AudioCore.h"
 #include "../audio/mixer/Core.h"
 
@@ -67,7 +67,7 @@ using AppStateManager = typed_actor<AppStateManagerTrait>;
 
 struct AppStateManagerState {
   AppStateManager::pointer self;
-  AppState* gAppState;
+  State::Core* stateCore;
   Audio::Mixer::Core* mixer;
   Audio::AudioCore* audioCore;
   Db::Dao* dao;
@@ -85,7 +85,7 @@ struct AppStateManagerState {
     self->anon_send(
       actor_cast<actor>(displayPtr),
       actor_cast<strong_actor_ptr>(self),
-      gAppState->toPacket(),
+      stateCore->toPacket(),
       current_state_a_v
     );
   };
@@ -93,13 +93,13 @@ struct AppStateManagerState {
   AppStateManagerState(
     AppStateManager::pointer self,
     strong_actor_ptr supervisor,
-    AppState* gAppState,
+    State::Core* stateCore,
     Audio::Mixer::Core* mixer,
     Db::Dao* dao,
     Audio::AudioCore* audioCore
   )
   : self(self)
-    , gAppState(gAppState)
+    , stateCore(stateCore)
     , mixer(mixer)
     , audioCore(audioCore)
     , dao(dao) {
@@ -205,7 +205,7 @@ struct AppStateManagerState {
         self->anon_send(
           actor_cast<actor>(replyTo),
           actor_cast<strong_actor_ptr>(self),
-          gAppState->toPacket(),
+          stateCore->toPacket(),
           current_state_a_v
         );
       },
@@ -230,9 +230,9 @@ struct AppStateManagerState {
         );
 
         if (success) {
-          gAppState->setPlayState(PLAY);
+          stateCore->setPlayState(PLAY);
         } else {
-          gAppState->setPlayState(STOP);
+          stateCore->setPlayState(STOP);
         }
 
         Logging::write(
@@ -250,7 +250,7 @@ struct AppStateManagerState {
           "Received TC Pause Trig"
         );
 
-        gAppState->setPlayState(PAUSE);
+        stateCore->setPlayState(PAUSE);
 
         self->anon_send(
           actor_cast<actor>(playback),
@@ -266,9 +266,9 @@ struct AppStateManagerState {
         );
 
         if (success) {
-          gAppState->setPlayState(PAUSE);
+          stateCore->setPlayState(PAUSE);
         } else {
-          gAppState->setPlayState(STOP);
+          stateCore->setPlayState(STOP);
         }
 
         Logging::write(
@@ -299,7 +299,7 @@ struct AppStateManagerState {
           "Received TC Stop Trig Response - status: " + std::to_string(success)
         );
 
-        gAppState->setPlayState(STOP);
+        stateCore->setPlayState(STOP);
 
         Logging::write(
           Info,
@@ -330,9 +330,9 @@ struct AppStateManagerState {
         );
 
         if (success) {
-          gAppState->setPlayState(RW);
+          stateCore->setPlayState(RW);
         } else {
-          gAppState->setPlayState(STOP);
+          stateCore->setPlayState(STOP);
         }
 
         Logging::write(
@@ -364,9 +364,9 @@ struct AppStateManagerState {
         );
 
         if (success) {
-          gAppState->setPlayState(FF);
+          stateCore->setPlayState(FF);
         } else {
-          gAppState->setPlayState(STOP);
+          stateCore->setPlayState(STOP);
         }
 
         Logging::write(
@@ -385,7 +385,7 @@ struct AppStateManagerState {
           "Received TC Trig Play File AudioFileId: " + std::to_string(audioFileId)
         );
 
-        gAppState->queuePlay = queuePlay;
+        stateCore->queuePlay = queuePlay;
         Db::DecoratedAudioFile decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT];
         for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
           const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
@@ -413,7 +413,7 @@ struct AppStateManagerState {
         }
         audioCore->deckIndex = decksState.currentDeckIdx;
         audioCore->deckIndexNext = decksState.currentDeckIdx;
-        gAppState->setCurrentlyPlaying(audioCore->currentDeck().decoratedAudioFile.value());
+        stateCore->setCurrentlyPlaying(audioCore->currentDeck().decoratedAudioFile.value());
 
         Logging::write(
           Info,

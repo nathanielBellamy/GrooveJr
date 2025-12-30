@@ -13,7 +13,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
-#include "../../../state/AppState.h"
+#include "../../../state/Core.h"
 #include "Channel/Channel.h"
 #include "../../../audio/mixer/Core.h"
 #include "../../Color.h"
@@ -38,7 +38,7 @@ public:
     std::atomic<float>* vuPtr
   );
 
-  void hydrateState(const AppStatePacket& appState) const;
+  void hydrateState(const State::Packet& appState) const;
 
   void setMute(const float val) const {
     mainChannel->setMute(val);
