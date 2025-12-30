@@ -14,7 +14,7 @@
 #include <QWidget>
 #include <QGridLayout>
 
-#include "../../../AppState.h"
+#include "../../../state/AppState.h"
 #include "../../../enums/Result.h"
 #include "../../../audio/mixer/Core.h"
 #include "../../../actors/ActorIds.h"

@@ -23,7 +23,7 @@
 #include "./MusicLibrary/MusicLibraryWindow.h"
 #include "./MainToolBar/MainToolBar.h"
 
-#include "../AppState.h"
+#include "../state/AppState.h"
 #include "../audio/mixer/Core.h"
 #include "Hydrater.h"
 

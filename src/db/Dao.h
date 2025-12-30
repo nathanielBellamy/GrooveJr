@@ -11,7 +11,7 @@
 #include <sqlite3.h>
 
 #include "Logging.h"
-#include "../AppState.h"
+#include "../state/AppState.h"
 
 #include "repository/mixer/ChannelRepository.h"
 #include "repository/mixer/PluginRepository.h"
@@ -28,35 +28,34 @@
 
 namespace Gj {
 namespace Db {
-
 class Dao {
   sqlite3* db;
   AppState* gAppState;
 
-  public:
-    AppStateRepository appStateRepository;
-    ChannelRepository channelRepository;
-    PluginRepository pluginRepository;
-    SceneRepository sceneRepository;
-    AlbumRepository albumRepository;
-    ArtistRepository artistRepository;
-    AudioFileRepository audioFileRepository;
-    CacheRepository cacheRepository;
-    GenreRepository genreRepository;
-    PlaylistRepository playlistRepository;
-    QueueRepository queueRepository;
-    TrackRepository trackRepository;
+public:
+  AppStateRepository appStateRepository;
+  ChannelRepository channelRepository;
+  PluginRepository pluginRepository;
+  SceneRepository sceneRepository;
+  AlbumRepository albumRepository;
+  ArtistRepository artistRepository;
+  AudioFileRepository audioFileRepository;
+  CacheRepository cacheRepository;
+  GenreRepository genreRepository;
+  PlaylistRepository playlistRepository;
+  QueueRepository queueRepository;
+  TrackRepository trackRepository;
 
-    Dao(AppState* gAppState);
-    ~Dao();
-    int initDb();
-    int initSchema() const;
+  Dao(AppState* gAppState);
+
+  ~Dao();
+
+  int initDb();
+
+  int initSchema() const;
 };
-
 } // Db
 } // Gj
-
-
 
 
 #endif //DATABASE_H

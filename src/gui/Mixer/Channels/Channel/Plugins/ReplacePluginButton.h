@@ -12,7 +12,7 @@
 #include <QStyle>
 #include <QVariant>
 
-#include "../../../../../AppState.h"
+#include "../../../../../state/AppState.h"
 #include "../../../../../Logging.h"
 
 namespace Gj {

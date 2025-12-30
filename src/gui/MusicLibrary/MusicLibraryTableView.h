@@ -11,7 +11,7 @@
 #include "caf/actor_system.hpp"
 
 #include "../../enums/Result.h"
-#include "../../AppState.h"
+#include "../../state/AppState.h"
 #include "../../db/Dao.h"
 
 #include "../QSql/SqlTableView.h"
@@ -21,30 +21,28 @@
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class MusicLibraryTableView : public SqlTableView {
-  protected:
-    QMenu* menu;
-    MusicLibraryFilters* filters;
+protected:
+  QMenu* menu;
+  MusicLibraryFilters* filters;
 
-  public:
-    MusicLibraryTableView(
-      QWidget* parent,
-      actor_system& actorSystem,
-      Db::Dao* dao,
-      AppState* gAppState,
-      SqlQueryModel* model,
-      MusicLibraryFilters* filters
-    )
-    : SqlTableView(parent, actorSystem, dao, gAppState, model)
+public:
+  MusicLibraryTableView(
+    QWidget* parent,
+    actor_system& actorSystem,
+    Db::Dao* dao,
+    AppState* gAppState,
+    SqlQueryModel* model,
+    MusicLibraryFilters* filters
+  )
+  : SqlTableView(parent, actorSystem, dao, gAppState, model)
     , menu(nullptr)
     , filters(filters) {
-      setEditTriggers(NoEditTriggers);
-    };
+    setEditTriggers(NoEditTriggers);
+  };
 };
-
 } // Gui
 } // Gj
 

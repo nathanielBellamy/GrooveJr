@@ -16,7 +16,7 @@
 #include "./Channels/MainChannelContainer.h"
 #include "Channels/ChannelsContainer.h"
 
-#include "../../AppState.h"
+#include "../../state/AppState.h"
 #include "../../audio/mixer/Core.h"
 #include "../Color.h"
 

@@ -20,7 +20,7 @@
 #include "ThreadStatics.h"
 #include "BufferIndeces.h"
 
-#include "../AppState.h"
+#include "../state/AppState.h"
 #include "../enums/Result.h"
 
 namespace Gj {

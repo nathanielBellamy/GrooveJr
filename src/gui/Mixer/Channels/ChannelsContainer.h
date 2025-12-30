@@ -22,7 +22,7 @@
 #include <QWidget>
 
 #include "../../../Logging.h"
-#include "../../../AppState.h"
+#include "../../../state/AppState.h"
 #include "../../../enums/Result.h"
 
 #include "../../Color.h"

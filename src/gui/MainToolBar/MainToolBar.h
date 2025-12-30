@@ -16,7 +16,7 @@
 #include <QWidget>
 
 #include "../../Logging.h"
-#include "../../AppState.h"
+#include "../../state/AppState.h"
 #include "../../actors/ActorIds.h"
 #include "../../messaging/atoms.h"
 #include "../../messaging/EnvelopeQtPtr.h"

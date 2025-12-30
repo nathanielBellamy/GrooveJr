@@ -7,7 +7,7 @@
 
 #include "caf/actor_system.hpp"
 
-#include "../../../AppState.h"
+#include "../../../state/AppState.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
 #include "../MusicLibraryType.h"
@@ -15,31 +15,28 @@
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class AlbumTableView final : public MusicLibraryTableView {
-
-  public:
-    AlbumTableView(
-      QWidget* parent,
-      actor_system& actorSystem,
-      Db::Dao* dao,
-      AppState* gAppState,
-      MusicLibraryFilters* filters,
-      SqlWorkerPool* sqlWorkerPool
-    )
-    : MusicLibraryTableView(
-        parent,
-        actorSystem,
-        dao,
-        gAppState,
-        new AlbumQueryModel(parent, gAppState, filters, sqlWorkerPool),
-        filters
-      )
-    {};
+public:
+  AlbumTableView(
+    QWidget* parent,
+    actor_system& actorSystem,
+    Db::Dao* dao,
+    AppState* gAppState,
+    MusicLibraryFilters* filters,
+    SqlWorkerPool* sqlWorkerPool
+  )
+  : MusicLibraryTableView(
+    parent,
+    actorSystem,
+    dao,
+    gAppState,
+    new AlbumQueryModel(parent, gAppState, filters, sqlWorkerPool),
+    filters
+  ) {
+  };
 };
-
 } // Gui
 } // Gj
 

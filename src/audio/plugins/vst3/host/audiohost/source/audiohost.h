@@ -37,7 +37,7 @@
 
 #pragma once
 
-#include "../../../../../../AppState.h"
+#include "../../../../../../state/AppState.h"
 #include "../../../../../../Logging.h"
 
 #include "./media/audioclient.h"
@@ -53,20 +53,24 @@
 namespace Steinberg {
 namespace Vst {
 namespace AudioHost {
-
 //------------------------------------------------------------------------
-class App : public EditorHost::IApplication
-{
+class App : public EditorHost::IApplication {
 	Gj::AppState* gAppState;
 	std::shared_ptr<Gj::Audio::JackClient> jackClient;
 
 public:
 	App(Gj::AppState* gAppState, std::shared_ptr<Gj::Audio::JackClient> jackClient);
-	~App () noexcept override;
-	void init (const std::vector<std::string>& cmdArgs) override;
-	void terminate () override;
-	IPtr<PlugProvider> plugProvider {nullptr};
+
+	~App() noexcept override;
+
+	void init(const std::vector<std::string>& cmdArgs) override;
+
+	void terminate() override;
+
+	IPtr<PlugProvider> plugProvider{nullptr};
+
 	void setModule(VST3::Hosting::Module::Ptr module);
+
 	OPtr<IComponent> component;
 	OPtr<IEditController> editController;
 	AudioClientPtr audioClient;
@@ -87,14 +91,13 @@ public:
 	};
 
 private:
-	enum OpenFlags
-	{};
+	enum OpenFlags {
+	};
 
-	void startAudioClient (const std::string& path, VST3::Optional<VST3::UID> effectID,
-	                       uint32 flags);
+	void startAudioClient(const std::string& path, VST3::Optional<VST3::UID> effectID,
+	                      uint32 flags);
 
-	VST3::Hosting::Module::Ptr module {nullptr};
-
+	VST3::Hosting::Module::Ptr module{nullptr};
 };
 
 //------------------------------------------------------------------------

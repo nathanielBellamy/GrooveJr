@@ -13,7 +13,7 @@
 #include "public.sdk/source/vst/utility/memoryibstream.h"
 
 #include "../../../Logging.h"
-#include "../../../AppState.h"
+#include "../../../state/AppState.h"
 #include "../../../db/entity/mixer/Plugin.h"
 #include "../../../enums/Result.h"
 #include "../../JackClient.h"

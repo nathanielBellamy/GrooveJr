@@ -17,7 +17,7 @@
 
 #include "public.sdk/source/vst/utility/memoryibstream.h"
 
-#include "../../AppState.h"
+#include "../../state/AppState.h"
 #include "../../enums/Result.h"
 #include "../../Logging.h"
 #include "../../db/Dao.h"

@@ -9,7 +9,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
-#include "../../../../AppState.h"
+#include "../../../../state/AppState.h"
 #include "../../../../Logging.h"
 
 #include "../../../../audio/mixer/ChannelSettings.h"

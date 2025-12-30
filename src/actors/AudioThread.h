@@ -14,7 +14,7 @@
 #include "../messaging/atoms.h"
 #include "./AppStateManager.h"
 #include "./Playback.h"
-#include "../AppState.h"
+#include "../state/AppState.h"
 
 #include "../audio/AudioCore.h"
 #include "../audio/AudioPlayer.h"

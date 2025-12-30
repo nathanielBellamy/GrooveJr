@@ -12,32 +12,33 @@
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryQueryModel.h"
 
-#include "../../../AppState.h"
+#include "../../../state/AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
 #include "../Constants.h"
 
 namespace Gj {
 namespace Gui {
-
 class CacheQueryModel final : public MusicLibraryQueryModel {
   bool isSelected(const QModelIndex& item) const;
 
 public:
-  explicit CacheQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, SqlWorkerPool* sqlWorkerPool)
-    : MusicLibraryQueryModel(parent, gAppState, filters, CACHE, QString("Cache"), sqlWorkerPool)
-    {
+  explicit CacheQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters,
+                           SqlWorkerPool* sqlWorkerPool)
+  : MusicLibraryQueryModel(parent, gAppState, filters, CACHE, QString("Cache"), sqlWorkerPool) {
     refresh();
   }
 
   Result hydrateState(const AppStatePacket& appStatePacket) override;
+
   Result refresh(bool hard = false) override;
+
   Result setHeaders() override;
+
   bool isCurrentlyPlaying(const QModelIndex& item) const override;
 
-  QVariant data(const QModelIndex &item, int role) const override;
+  QVariant data(const QModelIndex& item, int role) const override;
 };
-
 } // Gui
 } // Gj
 

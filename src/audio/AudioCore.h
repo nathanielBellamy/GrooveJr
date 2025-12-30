@@ -16,7 +16,7 @@
 #include <jack/ringbuffer.h>
 
 #include "Cassette.h"
-#include "../AppState.h"
+#include "../state/AppState.h"
 #include "../Logging.h"
 #include "../enums/Result.h"
 

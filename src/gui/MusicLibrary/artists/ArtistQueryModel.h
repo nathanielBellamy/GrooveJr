@@ -8,7 +8,7 @@
 #include <QtSql/qsqlquerymodel.h>
 #include <QVariant>
 
-#include "../../../AppState.h"
+#include "../../../state/AppState.h"
 #include "../../../Logging.h"
 #include "../../../enums/Result.h"
 #include "../../QSql/SqlWorkerPool.h"
@@ -19,24 +19,24 @@
 
 namespace Gj {
 namespace Gui {
-
 class ArtistQueryModel final : public MusicLibraryQueryModel {
-
 public:
-  explicit ArtistQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters, SqlWorkerPool* sqlWorkerPool)
-    : MusicLibraryQueryModel(parent, gAppState, filters, ARTIST, QString("ArtistQueryModel"), sqlWorkerPool)
-    {
+  explicit ArtistQueryModel(QObject* parent, AppState* gAppState, MusicLibraryFilters* filters,
+                            SqlWorkerPool* sqlWorkerPool)
+  : MusicLibraryQueryModel(parent, gAppState, filters, ARTIST, QString("ArtistQueryModel"), sqlWorkerPool) {
     refresh();
   }
 
   Result hydrateState(const AppStatePacket& appStatePacket) override;
+
   Result refresh(bool hard = false) override;
+
   Result setHeaders() override;
+
   bool isCurrentlyPlaying(const QModelIndex& item) const override;
 
   QVariant data(const QModelIndex& item, int role) const override;
 };
-
 } // Gui
 } // Gj
 

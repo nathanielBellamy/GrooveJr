@@ -14,7 +14,7 @@
 #include "./ActorIds.h"
 #include "../messaging/atoms.h"
 #include "./Playback.h"
-#include "../AppState.h"
+#include "../state/AppState.h"
 #include "../gui/MainWindow.h"
 #include "../gui/Hydrater.h"
 

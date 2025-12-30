@@ -7,27 +7,21 @@
 
 #include "QObject"
 
-#include "../AppState.h"
+#include "../state/AppState.h"
 
 namespace Gj {
 namespace Gui {
-
 class Hydrater : public QObject {
   Q_OBJECT
 
 public:
   explicit Hydrater()
-    : QObject(nullptr)
-    {};
-  // todo:
-  // - instantiate in main window
-  // - move to Display Actor Thread
-  // - emit the trigger
+  : QObject(nullptr) {
+  };
 
-  signals:
-    void hydrate(const AppStatePacket& appStatePacket);
+signals:
+  void hydrate(const AppStatePacket& appStatePacket);
 };
-
 } // Gui
 } // Gj
 

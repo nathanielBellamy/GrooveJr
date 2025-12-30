@@ -13,7 +13,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 
-#include "../../AppState.h"
+#include "../../state/AppState.h"
 #include "../../audio/mixer/Core.h"
 
 namespace Gj {

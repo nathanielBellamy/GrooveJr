@@ -17,7 +17,7 @@
 #include "../messaging/EnvelopeQtPtr.h"
 #include "./AudioThread.h"
 
-#include "../AppState.h"
+#include "../state/AppState.h"
 #include "../audio/mixer/Core.h"
 #include "../audio/AudioCore.h"
 #include "../enums/PlayState.h"

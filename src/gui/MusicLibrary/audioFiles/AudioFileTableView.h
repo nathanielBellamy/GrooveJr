@@ -21,7 +21,7 @@
 #include "../../../messaging/DecksState.h"
 #include "../../../actors/ActorIds.h"
 #include "../../../enums/Result.h"
-#include "../../../AppState.h"
+#include "../../../state/AppState.h"
 #include "../../../db/entity/musicLibrary/Cache.h"
 
 #include "../MusicLibraryFilters.h"
@@ -32,11 +32,9 @@
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class AudioFileTableView final : public MusicLibraryTableView {
-
 public:
   AudioFileTableView(
     QWidget* parent,
@@ -47,21 +45,21 @@ public:
     SqlWorkerPool* sqlWorkerPool
   )
   : MusicLibraryTableView(
-      parent,
-      actorSystem,
-      dao,
-      gAppState,
-      new AudioFileQueryModel(parent, gAppState, filters, sqlWorkerPool),
-      filters
-    )
-  {};
+    parent,
+    actorSystem,
+    dao,
+    gAppState,
+    new AudioFileQueryModel(parent, gAppState, filters, sqlWorkerPool),
+    filters
+  ) {
+  };
 
   void mousePressEvent(QMouseEvent* event) override;
-  void mouseDoubleClickEvent(QMouseEvent *event) override;
+
+  void mouseDoubleClickEvent(QMouseEvent* event) override;
 
   Result saveCache() const;
 };
-
 } // Gui
 } // Gj
 

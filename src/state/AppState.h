@@ -11,13 +11,13 @@
 #include <sndfile.h>
 #include <jack/jack.h>
 
-#include "./enums/PlayState.h"
+#include "../enums/PlayState.h"
 
-#include "./db/entity/AppStateEntity.h"
-#include "./db/entity/mixer/Scene.h"
-#include "./db/dto/musicLibrary/DecoratedAudioFile.h"
-#include "types/Types.h"
-#include "types/AtomicStr.h"
+#include "../db/entity/AppStateEntity.h"
+#include "../db/entity/mixer/Scene.h"
+#include "../db/dto/musicLibrary/DecoratedAudioFile.h"
+#include "../types/Types.h"
+#include "../types/AtomicStr.h"
 
 namespace Gj {
 struct AppStatePacket {

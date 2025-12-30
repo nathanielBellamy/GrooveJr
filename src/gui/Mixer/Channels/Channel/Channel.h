@@ -20,7 +20,7 @@
 #include <QWidget>
 #include <QUrl>
 
-#include "../../../../AppState.h"
+#include "../../../../state/AppState.h"
 
 #include "../../../../audio/mixer/Core.h"
 #include "../../../../audio/Math.h"

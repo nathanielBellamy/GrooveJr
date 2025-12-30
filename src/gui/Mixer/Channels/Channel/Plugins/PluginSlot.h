@@ -16,7 +16,7 @@
 #include <QLabel>
 #include <QWidget>
 
-#include "../../../../../AppState.h"
+#include "../../../../../state/AppState.h"
 #include "RemovePluginButton.h"
 #include "ReplacePluginButton.h"
 #include "../../../../Shared/VstSelect.h"

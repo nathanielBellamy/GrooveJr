@@ -14,7 +14,7 @@
 #include <QWidget>
 
 #include "../../../../../Logging.h"
-#include "../../../../../AppState.h"
+#include "../../../../../state/AppState.h"
 #include "AddPluginButton.h"
 #include "PluginSlot.h"
 #include "../../../../../audio/mixer/Core.h"

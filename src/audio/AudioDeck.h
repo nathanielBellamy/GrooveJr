@@ -11,7 +11,7 @@
 
 #include "Cassette.h"
 
-#include "../AppState.h"
+#include "../state/AppState.h"
 #include "../Logging.h"
 #include "../enums/Result.h"
 #include "../enums/PlayState.h"
@@ -20,28 +20,27 @@
 
 namespace Gj {
 namespace Audio {
-
 constexpr sf_count_t MIN_FADE_IN = 500;
 constexpr sf_count_t MIN_FADE_OUT = 500;
 
 struct AudioDeck {
-  DeckIndex                             deckIndex;
-  PlayState                             playState = STOP;
-  AppState*                             gAppState;
-  mutable sf_count_t                    frameId = 0;
-  sf_count_t                            frames = 0; // total # of frames
-  sf_count_t                            frameAdvance;
-  float                                 gain = 1.0f;
-  float*                                inputBuffers[2]{nullptr, nullptr};
-  Cassette*                             cassette;
+  DeckIndex deckIndex;
+  PlayState playState = STOP;
+  AppState* gAppState;
+  mutable sf_count_t frameId = 0;
+  sf_count_t frames = 0; // total # of frames
+  sf_count_t frameAdvance;
+  float gain = 1.0f;
+  float* inputBuffers[2]{nullptr, nullptr};
+  Cassette* cassette;
   std::optional<Db::DecoratedAudioFile> decoratedAudioFile;
 
   AudioDeck(const DeckIndex deckIndex, AppState* gAppState)
-    : deckIndex(deckIndex)
+  : deckIndex(deckIndex)
     , gAppState(gAppState)
     , cassette(new Cassette(gAppState))
-    , decoratedAudioFile(std::optional<Db::DecoratedAudioFile>())
-    {}
+    , decoratedAudioFile(std::optional<Db::DecoratedAudioFile>()) {
+  }
 
   ~AudioDeck() {
     Logging::write(
@@ -74,7 +73,7 @@ struct AudioDeck {
   }
 
   bool isCrossfadeStart() const {
-      return frameId < gAppState->getCrossfade();
+    return frameId < gAppState->getCrossfade();
   }
 
   bool isCrossfadeEnd() const {
@@ -96,21 +95,20 @@ struct AudioDeck {
     const bool nonZeroFrames = frames > 0 && frames == cassette->sfInfo.frames;
     // const bool nonBlankCassette = cassette->filePath != "BLANK";
     const bool nonNullInputBuffers =
-         inputBuffers[0] != nullptr
-      && inputBuffers[1] != nullptr
-      && inputBuffers[0] == cassette->inputBuffers[0]
-      && inputBuffers[1] == cassette->inputBuffers[1];
+        inputBuffers[0] != nullptr
+        && inputBuffers[1] != nullptr
+        && inputBuffers[0] == cassette->inputBuffers[0]
+        && inputBuffers[1] == cassette->inputBuffers[1];
 
     return nonZeroFrames
-      // && nonBlankCassette
-      && nonNullInputBuffers;
+           // && nonBlankCassette
+           && nonNullInputBuffers;
   }
 
   bool isPlaying() const {
     return hasValidCassetteLoaded() && playState == PLAY;
   }
 };
-
 } // Audio
 } // Gj
 

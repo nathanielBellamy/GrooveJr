@@ -13,7 +13,7 @@
 #include <QGridLayout>
 #include <QWidget>
 
-#include "../../../AppState.h"
+#include "../../../state/AppState.h"
 #include "Channel/Channel.h"
 #include "../../../audio/mixer/Core.h"
 #include "../../Color.h"

@@ -7,23 +7,21 @@
 
 #include <sqlite3.h>
 
-#include "../../../AppState.h"
+#include "../../../state/AppState.h"
 #include "../../Logging.h"
 #include "../../entity/mixer/ChannelEntity.h"
 
 namespace Gj {
 namespace Db {
-
 class ChannelRepository {
   sqlite3** db;
   AppState* gAppState;
 
-  public:
-    explicit ChannelRepository(sqlite3** db, AppState* gAppState);
-    int save(const ChannelEntity& channelEntity) const;
+public:
+  explicit ChannelRepository(sqlite3** db, AppState* gAppState);
+
+  int save(const ChannelEntity& channelEntity) const;
 };
-
-
 } // Gj
 } // Db
 

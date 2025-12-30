@@ -12,14 +12,13 @@
 #include "caf/actor_system.hpp"
 
 #include "../../enums/Result.h"
-#include "../../AppState.h"
+#include "../../state/AppState.h"
 #include "../../db/Dao.h"
 
 #include "SqlQueryModel.h"
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class SqlTableView : public QTableView {
@@ -30,42 +29,41 @@ class SqlTableView : public QTableView {
     return OK;
   }
 
-  protected:
-    actor_system& actorSystem;
-    Db::Dao* dao;
-    AppState* gAppState;
-    SqlQueryModel* model;
+protected:
+  actor_system& actorSystem;
+  Db::Dao* dao;
+  AppState* gAppState;
+  SqlQueryModel* model;
 
-  public:
-    SqlTableView(
-      QWidget* parent,
-      actor_system& actorSystem,
-      Db::Dao* dao,
-      AppState* gAppState,
-      SqlQueryModel* model
-    );
+public:
+  SqlTableView(
+    QWidget* parent,
+    actor_system& actorSystem,
+    Db::Dao* dao,
+    AppState* gAppState,
+    SqlQueryModel* model
+  );
 
-    ~SqlTableView() override {
-      delete model;
-      QTableView::~QTableView();
-    }
+  ~SqlTableView() override {
+    delete model;
+    QTableView::~QTableView();
+  }
 
-    SqlQueryModel* getModel() const {
-      return model;
-    }
+  SqlQueryModel* getModel() const {
+    return model;
+  }
 
-    Result hydrateState(const AppStatePacket& appStatePacket) const {
-      model->hydrateState(appStatePacket);
-      refresh();
-      return OK;
-    }
+  Result hydrateState(const AppStatePacket& appStatePacket) const {
+    model->hydrateState(appStatePacket);
+    refresh();
+    return OK;
+  }
 
-    Result refresh(const bool hard = false) const {
-      model->refresh(hard);
-      return OK;
-    }
+  Result refresh(const bool hard = false) const {
+    model->refresh(hard);
+    return OK;
+  }
 };
-
 } // Gui
 } // Gj
 

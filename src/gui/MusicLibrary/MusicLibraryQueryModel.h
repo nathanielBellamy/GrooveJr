@@ -15,7 +15,7 @@
 #include <QColor>
 #include <QString>
 
-#include "../../AppState.h"
+#include "../../state/AppState.h"
 #include "../../enums/Result.h"
 
 #include "../QSql/SqlWorkerPool.h"
@@ -26,51 +26,49 @@
 
 namespace Gj {
 namespace Gui {
-  class SqlWorkerPool;
+class SqlWorkerPool;
 
-  class MusicLibraryQueryModel : public SqlQueryModel {
+class MusicLibraryQueryModel : public SqlQueryModel {
+protected:
+  QString id;
+  AppState* gAppState;
+  MusicLibraryType type;
+  MusicLibraryFilters* filters;
 
-  protected:
-    QString id;
-    AppState* gAppState;
-    MusicLibraryType type;
-    MusicLibraryFilters* filters;
+  bool isCurrentFilter(const QModelIndex& item, const size_t idCol) const {
+    std::vector<ID> ids = filters->filters.at(type).ids;
+    return std::find(
+             ids.begin(),
+             ids.end(),
+             index(item.row(), idCol).data()
+           ) != ids.end();
+  };
 
-    bool isCurrentFilter(const QModelIndex& item, const size_t idCol) const {
-      std::vector<ID> ids = filters->filters.at(type).ids;
-      return std::find(
-          ids.begin(),
-          ids.end(),
-          index(item.row(), idCol).data()
-          ) != ids.end();
-    };
-
-  public:
-    MusicLibraryQueryModel(
-      QObject* parent,
-      AppState* gAppState,
-      MusicLibraryFilters* filters,
-      const MusicLibraryType type,
-      const QString& id,
-      SqlWorkerPool* sqlWorkerPool
-    )
-    : SqlQueryModel(parent, gAppState, id, sqlWorkerPool)
+public:
+  MusicLibraryQueryModel(
+    QObject* parent,
+    AppState* gAppState,
+    MusicLibraryFilters* filters,
+    const MusicLibraryType type,
+    const QString& id,
+    SqlWorkerPool* sqlWorkerPool
+  )
+  : SqlQueryModel(parent, gAppState, id, sqlWorkerPool)
     , id(id)
     , gAppState(gAppState)
     , type(type)
-    , filters(filters)
-    {}
+    , filters(filters) {
+  }
 
-    virtual bool isCurrentlyPlaying(const QModelIndex& item) const = 0;
+  virtual bool isCurrentlyPlaying(const QModelIndex& item) const = 0;
 
-    QVariant data(const QModelIndex& item, const int role) const {
-      if (role == Qt::BackgroundRole && isCurrentlyPlaying(item))
-        return QVariant::fromValue(QColor(CURRENTLY_PLAYING_COLOR));
+  QVariant data(const QModelIndex& item, const int role) const {
+    if (role == Qt::BackgroundRole && isCurrentlyPlaying(item))
+      return QVariant::fromValue(QColor(CURRENTLY_PLAYING_COLOR));
 
-      return {};
-    }
+    return {};
+  }
 };
-
 } // Gui
 } // Gj
 

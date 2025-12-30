@@ -2,7 +2,7 @@
 #ifndef ATOMS_H
 #define ATOMS_H
 
-#include "../AppState.h"
+#include "../state/AppState.h"
 #include "./EnvelopeQtPtr.h"
 #include "./DecksState.h"
 

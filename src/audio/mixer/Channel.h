@@ -16,7 +16,7 @@
 #include "../plugins/vst3/Plugin.h"
 #include "ChannelSettings.h"
 #include "ChannelProcessData.h"
-#include "../../AppState.h"
+#include "../../state/AppState.h"
 #include "../../enums/Result.h"
 #include "../../db/entity/mixer/Plugin.h"
 #include "../Logging.h"

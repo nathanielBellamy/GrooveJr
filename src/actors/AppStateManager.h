@@ -22,7 +22,7 @@
 #include "../messaging/atoms.h"
 #include "../messaging/DecksState.h"
 #include "../enums/PlayState.h"
-#include "../AppState.h"
+#include "../state/AppState.h"
 #include "../audio/AudioCore.h"
 #include "../audio/mixer/Core.h"
 
