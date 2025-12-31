@@ -11,12 +11,12 @@
 namespace Gj {
 namespace State {
 namespace Mixer {
-
-struct PluginPacket {
-  AtomicStr name;
-  PluginPath path;
+struct PluginSlotPacket {
+  bool hasValue = false;
+  PluginIndex pluginIndex = 0;
+  AtomicStr name = AtomicStr(" - ");
+  PluginPath path = AtomicStr(" - ");
 };
-
 } // Mixer
 } // State
 } // Gj

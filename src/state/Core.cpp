@@ -28,7 +28,7 @@ Core::Core() {
   crossfade.store(appState.crossfade);
 }
 
-Packet Core::toPacket() {
+Packet Core::toPacket(const Mixer::Packet& mixerPacket) {
   const Db::DecoratedAudioFile daf = getCurrentlyPlaying();
   AtomicStr currPlayAlbumTitle, currPlayArtistName, currPlayTrackTitle;
   if (!daf.isValid()) {
@@ -50,7 +50,8 @@ Packet Core::toPacket() {
     daf.audioFile.id,
     currPlayAlbumTitle,
     currPlayArtistName,
-    currPlayTrackTitle
+    currPlayTrackTitle,
+    mixerPacket
   };
 }
 

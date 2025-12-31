@@ -15,6 +15,7 @@
 #include "../db/dto/musicLibrary/DecoratedAudioFile.h"
 #include "../types/Types.h"
 #include "../types/AtomicStr.h"
+#include "mixer/Packet.h"
 
 namespace Gj {
 namespace State {
@@ -28,6 +29,7 @@ struct Packet {
   AtomicStr currentlyPlayingAlbumTitle;
   AtomicStr currentlyPlayingArtistName;
   AtomicStr currentlyPlayingTrackTitle;
+  Mixer::Packet mixerPacket;
 };
 
 template<class Inspector>

@@ -85,7 +85,7 @@ struct AppStateManagerState {
     self->anon_send(
       actor_cast<actor>(displayPtr),
       actor_cast<strong_actor_ptr>(self),
-      stateCore->toPacket(),
+      stateCore->toPacket(mixer->toPacket()),
       current_state_a_v
     );
   };
@@ -205,7 +205,7 @@ struct AppStateManagerState {
         self->anon_send(
           actor_cast<actor>(replyTo),
           actor_cast<strong_actor_ptr>(self),
-          stateCore->toPacket(),
+          stateCore->toPacket(mixer->toPacket()),
           current_state_a_v
         );
       },

@@ -13,7 +13,8 @@ namespace Gj {
 namespace State {
 namespace Mixer {
 struct ChannelPacket {
-  PluginPacket plugins[Audio::MAX_PLUGINS_PER_CHANNEL];
+  ChannelIndex channelIndex;
+  PluginSlotPacket plugins[Audio::MAX_PLUGINS_PER_CHANNEL];
 };
 } // Mixer
 } // State

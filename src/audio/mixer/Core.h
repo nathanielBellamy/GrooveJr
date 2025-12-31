@@ -18,6 +18,7 @@
 #include "public.sdk/source/vst/utility/memoryibstream.h"
 
 #include "../../state/Core.h"
+#include "../../state/mixer/Packet.h"
 #include "../../enums/Result.h"
 #include "../../Logging.h"
 #include "../../db/Dao.h"
@@ -280,6 +281,33 @@ public:
   Result saveScene();
 
   Result saveChannels();
+
+  State::Mixer::Packet toPacket() {
+    State::Mixer::Packet packet;
+
+    forEachChannel([&packet](Channel* channel, const ChannelIndex channelIdx) {
+      State::Mixer::ChannelPacket channelPacket;
+      channelPacket.channelIndex = channelIdx;
+      channel->forEachPluginSlot(
+        [&channelPacket](const std::optional<Plugins::Vst3::Plugin*> plugin, const PluginIndex pluginIdx) {
+          if (!plugin) {
+            State::Mixer::PluginSlotPacket emptyPacket;
+            emptyPacket.hasValue = false;
+            channelPacket.plugins[pluginIdx] = emptyPacket;
+          } else {
+            channelPacket.plugins[pluginIdx] = {
+              true,
+              pluginIdx,
+              plugin.value()->name,
+              plugin.value()->path,
+            };
+          }
+        });
+      packet.channels[channelIdx] = channelPacket;
+    });
+
+    return packet;
+  }
 };
 } // Mixer
 } // Audio

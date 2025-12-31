@@ -34,7 +34,6 @@ struct Core {
   std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
   std::atomic<bool> queuePlay = false;
   std::atomic<TrackNumber> queueIndex = 0;
-  std::atomic<Mixer::Packet> mixer = {};
 
   Core();
 
@@ -46,7 +45,7 @@ struct Core {
     sf_count_t crossfade
   );
 
-  Packet toPacket();
+  Packet toPacket(const Mixer::Packet& mixerPacket);
 
   static Core fromAppStateEntity(const Db::AppStateEntity& appStateEntity);
 
