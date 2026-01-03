@@ -35,7 +35,7 @@ public:
 
   void setChannels();
 
-  void setPlugins();
+  // void setPlugins();
 
   void setVuRingBuffer(jack_ringbuffer_t* ringBuffer) { vuRingBuffer = ringBuffer; }
 

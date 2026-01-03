@@ -53,7 +53,7 @@ struct DisplayState {
     mainWindow->connectHydrater(hydrater);
     mainWindow->show();
     mainWindow->setChannels();
-    mainWindow->setPlugins();
+    // mainWindow->setPlugins();
   }
 
   ~DisplayState() {

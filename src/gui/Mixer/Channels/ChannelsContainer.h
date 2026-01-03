@@ -71,7 +71,7 @@ public:
 
   void clearChannels();
 
-  void setPlugins() const;
+  // void setPlugins() const;
 
   void setChannels();
 

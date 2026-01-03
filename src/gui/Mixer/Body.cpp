@@ -125,17 +125,17 @@ void Body::setupGrid() {
   setLayout(&grid);
 }
 
-void Body::setPlugins() {
-  Logging::write(
-    Info,
-    "Gui::Body::setPlugins",
-    "Setting plugins."
-  );
-
-  mainChannelContainer.setPlugins();
-  channelsContainer.setPlugins();
-}
-
+// void Body::setPlugins() {
+//   Logging::write(
+//     Info,
+//     "Gui::Body::setPlugins",
+//     "Setting plugins."
+//   );
+//
+//   mainChannelContainer.setPlugins();
+//   channelsContainer.setPlugins();
+// }
+//
 
 void Body::connectActions() {
   auto muteChannelConnection = connect(&muteChannelAction, &QAction::triggered, [&]() {

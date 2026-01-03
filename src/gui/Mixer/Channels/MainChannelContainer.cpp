@@ -61,14 +61,14 @@ void MainChannelContainer::setupGrid() {
   grid.addWidget(mainChannel.get(), 0, 0, -1, -1);
 }
 
-void MainChannelContainer::setPlugins() const {
-  Logging::write(
-    Info,
-    "Gui::MainChannelContainer::setPlugins",
-    "Setting plugins."
-  );
-  return mainChannel->setPlugins();
-}
+// void MainChannelContainer::setPlugins() const {
+//   Logging::write(
+//     Info,
+//     "Gui::MainChannelContainer::setPlugins",
+//     "Setting plugins."
+//   );
+//   return mainChannel->setPlugins();
+// }
 
 void MainChannelContainer::setChannel() {
   Logging::write(

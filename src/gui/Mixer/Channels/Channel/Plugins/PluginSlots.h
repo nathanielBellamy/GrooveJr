@@ -30,7 +30,7 @@ public:
     QWidget* parent,
     actor_system& actorSystem,
     Audio::Mixer::Core* mixer,
-    int channelIndex,
+    ChannelIndex channelIndex,
     QAction* replacePluginAction,
     QAction* removePluginAction
   );
@@ -39,14 +39,14 @@ public:
 
   void removeSlot();
 
-  void hydrateState(const State::Packet& appState, int newChannelIndex);
+  void hydrateState(const State::Packet& statePacket, int newChannelIndex);
 
   void reset();
 
 private:
   actor_system& actorSystem;
   Audio::Mixer::Core* mixer;
-  int channelIndex;
+  ChannelIndex channelIndex;
   QGridLayout grid;
   PluginSlot* pluginSlots[Audio::MAX_PLUGINS_PER_CHANNEL]{};
   QAction* replacePluginAction;

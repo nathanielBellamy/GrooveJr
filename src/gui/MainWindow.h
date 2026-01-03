@@ -55,7 +55,7 @@ public:
 
   void setChannels();
 
-  void setPlugins();
+  // void setPlugins();
 
   void connectHydrater(const Hydrater& hydrater) {
     const auto hydraterConnection =
@@ -82,7 +82,7 @@ private:
   MainToolBar mainToolBar;
   QGridLayout grid;
   MusicLibraryWindow musicLibraryWindow;
-  Mixer::Body mixerWindow;
+  Mixer::Body mixerBody;
 
   void setupGrid();
 

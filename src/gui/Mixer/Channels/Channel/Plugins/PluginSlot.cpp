@@ -42,26 +42,11 @@ PluginSlot::~PluginSlot() {
   );
 }
 
-void PluginSlot::hydrateState(const State::Packet& appState, const ChannelIndex newChannelIndex,
+void PluginSlot::hydrateState(const State::Packet& statePacket, const ChannelIndex newChannelIndex,
                               const PluginIndex newPluginIndex) {
   channelIndex = newChannelIndex;
   pluginIndex = newPluginIndex;
-  const auto res = mixer->runAgainstChannel(
-    channelIndex,
-    [this, &appState](Audio::Mixer::Channel* channel) {
-      const auto plugin = channel->getPluginAtIdx(pluginIndex);
-      if (!plugin) return;
-      pluginName.setText(plugin.value()->name.c_str());
-
-      update();
-    });
-
-  if (res != OK)
-    Logging::write(
-      res == WARNING ? Warning : Error,
-      "Gui::PluginSlot::hydrateState",
-      "An error occurred hydrating state against mixer channelIndex: " + std::to_string(channelIndex)
-    );
+  pluginName.setText(statePacket.mixerPacket.channels[channelIndex].plugins[pluginIndex].name.c_str());
 }
 
 void PluginSlot::setStyle() {

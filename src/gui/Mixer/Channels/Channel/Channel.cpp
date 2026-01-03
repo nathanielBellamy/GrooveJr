@@ -60,7 +60,7 @@ Channel::Channel(
     soloChannelAction, soloLChannelAction, soloRChannelAction
   ) {
   if (channelIndex > 1 || mixer->getChannelsCount() > 1) {
-    // can't remove main, must have at least one non-main plugins channel
+    // can't remove main, must have at least one non-main channel
     removeChannelButton.show();
   } else {
     removeChannelButton.hide();
@@ -73,7 +73,6 @@ Channel::Channel(
 
   connectActions();
   setupTitle();
-
 
   const auto res = mixer->runAgainstChannel(channelIndex, [this](const Audio::Mixer::Channel* channel) {
     setupGainSlider(channel->settings.gain.load());
@@ -347,26 +346,26 @@ void Channel::setupPanRSlider(const float panR) {
   });
 }
 
-void Channel::setPlugins() {
-  Logging::write(
-    Info,
-    "Gui::Channel::setPlugins",
-    "Setting plugins on channelIndex: " + std::to_string(channelIndex)
-  );
-
-  pluginSlots.reset();
-  if (channelIndex > mixer->getChannelsCount())
-    return;
-
-  for (PluginIndex i = 0; i < mixer->getPluginsOnChannelCount(channelIndex); i++)
-    addPlugin(std::optional(i));
-
-  Logging::write(
-    Info,
-    "Gui::Channel::setPlugins",
-    "Done setting plugins on channelIndex: " + std::to_string(channelIndex)
-  );
-}
+// void Channel::setPlugins() {
+//   Logging::write(
+//     Info,
+//     "Gui::Channel::setPlugins",
+//     "Setting plugins on channelIndex: " + std::to_string(channelIndex)
+//   );
+//
+//   pluginSlots.reset();
+//   if (channelIndex > mixer->getChannelsCount())
+//     return;
+//
+//   for (PluginIndex i = 0; i < mixer->getPluginsOnChannelCount(channelIndex); i++)
+//     addPlugin(std::optional(i));
+//
+//   Logging::write(
+//     Info,
+//     "Gui::Channel::setPlugins",
+//     "Done setting plugins on channelIndex: " + std::to_string(channelIndex)
+//   );
+// }
 
 void Channel::addPlugin(const std::optional<PluginIndex> pluginIndex) {
   const PluginIndex newPluginIndex = pluginIndex.value_or(

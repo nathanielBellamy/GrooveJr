@@ -24,7 +24,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer::Core* mixer, Sta
   , mainToolBar(this, actorSystem, stateCore, mixer, sqlWorkerPool, &sceneLoadAction)
   , grid(&container)
   , musicLibraryWindow(&container, actorSystem, stateCore, mixer->dao, sqlWorkerPool)
-  , mixerWindow(&container, actorSystem, mixer) {
+  , mixerBody(&container, actorSystem, mixer) {
   Logging::write(
     Info,
     "Gui::MainWindow::MainWindow()",
@@ -71,7 +71,7 @@ Result MainWindow::hydrateState(const State::Packet& statePacket) {
   );
 
   mainToolBar.hydrateState(statePacket);
-  mixerWindow.hydrateState(statePacket);
+  mixerBody.hydrateState(statePacket);
   musicLibraryWindow.hydrateState(statePacket);
 
   Logging::write(
@@ -88,7 +88,7 @@ void MainWindow::setupGrid() {
   grid.setColumnStretch(0, 1);
 
   grid.addWidget(&musicLibraryWindow, 0, 0, 1, -1);
-  grid.addWidget(&mixerWindow, 1, 0, -1, -1);
+  grid.addWidget(&mixerBody, 1, 0, -1, -1);
   for (int i = 0; i < 2; i++) {
     grid.setRowMinimumHeight(i, 200);
     grid.setRowStretch(i, 1);
@@ -115,7 +115,7 @@ void MainWindow::setChannels() {
     "Setting channels."
   );
 
-  mixerWindow.setChannels();
+  mixerBody.setChannels();
 
   Logging::write(
     Info,
@@ -124,28 +124,28 @@ void MainWindow::setChannels() {
   );
 }
 
-void MainWindow::setPlugins() {
-  Logging::write(
-    Info,
-    "Gui::MainWindow::setPlugins",
-    "Setting plugins."
-  );
-
-  mixerWindow.setPlugins();
-
-  const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-  const scoped_actor self{actorSystem};
-  self->anon_send(
-    actor_cast<actor>(appStateManagerPtr),
-    hydrate_display_a_v
-  );
-
-  Logging::write(
-    Info,
-    "Gui::MainWindow::setPlugins",
-    "Done setting plugins."
-  );
-}
+// void MainWindow::setPlugins() {
+//   Logging::write(
+//     Info,
+//     "Gui::MainWindow::setPlugins",
+//     "Setting plugins."
+//   );
+//
+//   // mixerWindow.setPlugins();
+//
+//   const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+//   const scoped_actor self{actorSystem};
+//   self->anon_send(
+//     actor_cast<actor>(appStateManagerPtr),
+//     hydrate_display_a_v
+//   );
+//
+//   Logging::write(
+//     Info,
+//     "Gui::MainWindow::setPlugins",
+//     "Done setting plugins."
+//   );
+// }
 
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
@@ -158,7 +158,7 @@ void MainWindow::connectActions() {
 
       mixer->loadScene(sceneDbId);
       setChannels();
-      setPlugins();
+      // setPlugins();
 
       Logging::write(
         Info,

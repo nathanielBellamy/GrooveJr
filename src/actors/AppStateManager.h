@@ -81,11 +81,13 @@ struct AppStateManagerState {
       "Will send state to display"
     );
 
+    State::Packet statePacket = stateCore->toPacket(mixer->toPacket());
+    std::cout << "statePacket " << statePacket.mixerPacket.channels[1].plugins[0].name.c_str() << std::endl;
     strong_actor_ptr displayPtr = self->system().registry().get(DISPLAY);
     self->anon_send(
       actor_cast<actor>(displayPtr),
       actor_cast<strong_actor_ptr>(self),
-      stateCore->toPacket(mixer->toPacket()),
+      statePacket,
       current_state_a_v
     );
   };

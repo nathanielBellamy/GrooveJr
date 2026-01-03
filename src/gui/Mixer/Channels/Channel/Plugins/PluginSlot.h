@@ -43,7 +43,7 @@ public:
 
   ~PluginSlot() override;
 
-  void hydrateState(const State::Packet& appState, ChannelIndex newChannelIndex, PluginIndex newPluginIndex);
+  void hydrateState(const State::Packet& statePacket, ChannelIndex newChannelIndex, PluginIndex newPluginIndex);
 
 private:
   actor_system& actorSystem;

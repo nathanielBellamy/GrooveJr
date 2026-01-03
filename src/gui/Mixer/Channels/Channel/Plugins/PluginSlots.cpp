@@ -10,7 +10,7 @@ namespace Mixer {
 PluginSlots::PluginSlots(QWidget* parent,
                          actor_system& actorSystem,
                          Audio::Mixer::Core* mixer,
-                         const int channelIndex,
+                         const ChannelIndex channelIndex,
                          QAction* replacePluginAction,
                          QAction* removePluginAction)
 : QWidget(parent)
@@ -39,15 +39,41 @@ PluginSlots::~PluginSlots() {
   );
 }
 
-void PluginSlots::hydrateState(const State::Packet& appState, const int newChannelIndex) {
+void PluginSlots::hydrateState(const State::Packet& statePacket, const int newChannelIndex) {
   channelIndex = newChannelIndex;
 
   PluginIndex i = 0;
+  for (const auto pluginPacket: statePacket.mixerPacket.channels[channelIndex].plugins) {
+    std::cout << "ps::hs - pluginPacket " << pluginPacket.pluginIndex << std::endl;
+    if (!pluginPacket.hasValue) {
+      std::cout << "ps::hs - pluginPacket no val" << std::endl;
+      delete pluginSlots[pluginPacket.pluginIndex];
+      pluginSlots[pluginPacket.pluginIndex] = nullptr;
+    } else {
+      std::cout << "ps::hs - pluginPacket has val - name " << pluginPacket.name.c_str() << std::endl;
+      if (pluginSlots[pluginPacket.pluginIndex] == nullptr) {
+        pluginSlots[pluginPacket.pluginIndex] =
+            new PluginSlot(
+              this,
+              actorSystem,
+              mixer,
+              channelIndex,
+              pluginPacket.pluginIndex,
+              true,
+              replacePluginAction,
+              removePluginAction
+            );
+      }
+    }
+  }
+
   for (const auto& pluginSlot: pluginSlots) {
     if (pluginSlot == nullptr) continue;
-    pluginSlot->hydrateState(appState, channelIndex, i);
+    pluginSlot->hydrateState(statePacket, channelIndex, i);
     ++i;
   }
+
+  setupGrid();
 }
 
 void PluginSlots::setupGrid() {

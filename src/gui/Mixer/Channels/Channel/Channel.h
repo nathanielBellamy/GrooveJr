@@ -74,7 +74,7 @@ public:
 
   void setSoloR(float val);
 
-  void setPlugins();
+  // void setPlugins();
 
   void addPlugin(std::optional<PluginIndex> pluginIndex);
 

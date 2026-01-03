@@ -185,15 +185,15 @@ void ChannelsContainer::setChannels() {
   );
 }
 
-void ChannelsContainer::setPlugins() const {
-  Logging::write(
-    Info,
-    "Gui::ChannelsContainer::setPlugins",
-    "Setting plugins"
-  );
-  for (const auto& channel: channels)
-    channel->setPlugins();
-}
+// void ChannelsContainer::setPlugins() const {
+//   Logging::write(
+//     Info,
+//     "Gui::ChannelsContainer::setPlugins",
+//     "Setting plugins"
+//   );
+//   for (const auto& channel: channels)
+//     channel->setPlugins();
+// }
 
 void ChannelsContainer::connectActions() {
   auto addChannelConnection = connect(&addChannelAction, &QAction::triggered, [&]() {
