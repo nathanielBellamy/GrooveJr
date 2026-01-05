@@ -40,6 +40,7 @@ PluginSlots::~PluginSlots() {
 }
 
 void PluginSlots::hydrateState(const State::Packet& statePacket, const int newChannelIndex) {
+  std::cout << "PluginSlots::hydrateState" << std::endl;
   channelIndex = newChannelIndex;
 
   PluginIndex i = 0;

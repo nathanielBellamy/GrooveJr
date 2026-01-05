@@ -69,6 +69,11 @@ public:
   }
 
   Result safeDeleteOldPlugins() {
+    Logging::write(
+      Info,
+      "Audio::Mixer::Core::safeDeleteOldPlugins",
+      "Safe delete old plugins"
+    );
     if (stateCore->isAudioRunning())
       return setProcessDataChangeFlag(ProcessDataChangeFlag::ACKNOWLEDGE);
 
@@ -200,7 +205,12 @@ public:
   }
 
   Result deletePluginsToDelete() {
-    return forEachChannel([](Channel* channel, const ChannelIndex idx) {
+    Logging::write(
+      Info,
+      "Audio::Mixer::deletePluginsToDelete",
+      "Deleting plugins."
+    );
+    return forEachChannel([](Channel* channel, const ChannelIndex) {
       channel->deletePluginsToDelete();
     });
   }
@@ -283,9 +293,11 @@ public:
   Result saveChannels();
 
   State::Mixer::Packet toPacket() {
-    State::Mixer::Packet packet;
+    std::cout << "[Audio::Mixer::toPacket] 0" << std::endl;
+    State::Mixer::Packet packet{};
 
     forEachChannel([&packet](Channel* channel, const ChannelIndex channelIdx) {
+      std::cout << "[Audio::Mixer::toPacket] channelIdx " << std::to_string(channelIdx) << std::endl;
       State::Mixer::ChannelPacket channelPacket;
       channelPacket.channelIndex = channelIdx;
       channel->forEachPluginSlot(
@@ -306,6 +318,7 @@ public:
       packet.channels[channelIdx] = channelPacket;
     });
 
+    std::cout << " Mixer::toPacket " << packet.std_str() << std::endl;
     return packet;
   }
 };

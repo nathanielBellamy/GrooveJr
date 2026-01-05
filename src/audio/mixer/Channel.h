@@ -41,8 +41,14 @@ class Channel {
 
 public:
   Result deletePluginsToDelete() {
-    for (const auto plugin: pluginsToDelete)
+    Logging::write(
+      Info,
+      "Audio::Channel::deletePluginsToDelete",
+      "Deleting plugins marked for deletion."
+    );
+    for (const auto plugin: pluginsToDelete) {
       delete plugin;
+    }
     pluginsToDelete.clear();
     return OK;
   }

@@ -93,7 +93,6 @@ int main(int argc, char* argv[]) {
   sigIntHandler.sa_flags = 0;
   sigaction(SIGINT, &sigIntHandler, nullptr);
 
-  // setup logging
   Logging::init();
   Logging::write(
     Info,
@@ -101,7 +100,6 @@ int main(int argc, char* argv[]) {
     "== GrooveJr =="
   );
 
-  // setup Sql
   stateCore = new State::Core;
   dao = new Db::Dao(stateCore);
   if (const auto appStateEntity = dao->appStateRepository.get(); appStateEntity.id == 0) {

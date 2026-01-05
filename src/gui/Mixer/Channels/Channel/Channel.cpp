@@ -410,6 +410,7 @@ void Channel::connectActions() {
         "Adding plugin: " + pluginPath + " to channel " + std::to_string(channelIndex)
       );
 
+      std::cout << "Gui::Channel::addPluginAction " << std::endl;
       appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
       const scoped_actor self{actorSystem};
       self->anon_send(

@@ -13,11 +13,11 @@ namespace Audio {
 static constexpr unsigned int AUDIO_CORE_DECK_COUNT = 3;
 static constexpr size_t RING_BUFFER_PADDING = 64; //128;
 
-static constexpr unsigned int MAX_MIXER_CHANNELS = 50;
+static constexpr unsigned int MAX_MIXER_CHANNELS = 4;
 static constexpr unsigned int MAX_MIXER_CHANNELS_SETTINGS_COUNT = MAX_MIXER_CHANNELS * 4;
 // * 4 comes from factorLL, factorLR, factorRL, factorRR
 static constexpr unsigned int VU_RING_BUFFER_SIZE = 2 * MAX_MIXER_CHANNELS;
-static constexpr unsigned int MAX_PLUGINS_PER_CHANNEL = 50;
+static constexpr unsigned int MAX_PLUGINS_PER_CHANNEL = 4;
 static constexpr unsigned int AUDIO_CHANNEL_COUNT = 2;
 static constexpr unsigned int AUDIO_FRAMES_PER_BUFFER_MAX = 2048;
 static constexpr unsigned int AUDIO_FRAMES_PER_BUFFER_DEFAULT = 256;
