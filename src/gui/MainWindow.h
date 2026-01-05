@@ -74,15 +74,15 @@ private:
 
   void (*shutdown_handler)(int);
 
-  QThread sqlWorkerPoolThread;
+  QThread* sqlWorkerPoolThread;
   SqlWorkerPool* sqlWorkerPool;
-  QWidget container;
+  QWidget* container;
   MenuBar* menuBar;
-  QAction sceneLoadAction;
-  MainToolBar mainToolBar;
-  QGridLayout grid;
-  MusicLibraryWindow musicLibraryWindow;
-  Mixer::Body mixerBody;
+  QAction* sceneLoadAction;
+  MainToolBar* mainToolBar;
+  QGridLayout* grid;
+  MusicLibraryWindow* musicLibraryWindow;
+  Mixer::Body* mixerBody;
 
   void setupGrid();
 

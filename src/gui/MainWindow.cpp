@@ -17,28 +17,29 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer::Core* mixer, Sta
   , actorSystem(actorSystem)
   , mixer(mixer)
   , shutdown_handler(shutdown_handler)
+  , sqlWorkerPoolThread(new QThread())
   , sqlWorkerPool(initQSql())
-  , container(this)
+  , container(new QWidget(this))
   , menuBar(new MenuBar(actorSystem, this))
-  , sceneLoadAction(QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen), tr("&Select Scene"), this)
-  , mainToolBar(this, actorSystem, stateCore, mixer, sqlWorkerPool, &sceneLoadAction)
-  , grid(&container)
-  , musicLibraryWindow(&container, actorSystem, stateCore, mixer->dao, sqlWorkerPool)
-  , mixerBody(&container, actorSystem, mixer) {
+  , sceneLoadAction(new QAction(QIcon::fromTheme(QIcon::ThemeIcon::FolderOpen), tr("&Select Scene"), this))
+  , mainToolBar(new MainToolBar(this, actorSystem, stateCore, mixer, sqlWorkerPool, sceneLoadAction))
+  , grid(new QGridLayout(container))
+  , musicLibraryWindow(new MusicLibraryWindow(container, actorSystem, stateCore, mixer->dao, sqlWorkerPool))
+  , mixerBody(new Mixer::Body(container, actorSystem, mixer)) {
   Logging::write(
     Info,
     "Gui::MainWindow::MainWindow()",
     "Initialized QSql."
   );
 
-  container.setMinimumSize(QSize(1300, 700));
-  setCentralWidget(&container);
+  container->setMinimumSize(QSize(1300, 700));
+  setCentralWidget(container);
   setupGrid();
   setStyleSheet(
     "font-weight: 900;"
   );
   connectActions();
-  addToolBar(Qt::TopToolBarArea, &mainToolBar);
+  addToolBar(Qt::TopToolBarArea, mainToolBar);
   setUnifiedTitleAndToolBarOnMac(true);
   setWindowTitle("GrooveJr");
 
@@ -50,14 +51,23 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer::Core* mixer, Sta
 }
 
 MainWindow::~MainWindow() {
-  sqlWorkerPoolThread.quit();
+  delete mixerBody;
+  delete musicLibraryWindow;
+  delete grid;
+  delete mainToolBar;
+  delete sceneLoadAction;
+  delete menuBar;
+  delete container;
+
+  sqlWorkerPoolThread->quit();
   delete sqlWorkerPool;
+  delete sqlWorkerPoolThread;
 }
 
 SqlWorkerPool* MainWindow::initQSql() {
   const auto sqlWorkerPool = new SqlWorkerPool(this);
-  sqlWorkerPool->moveToThread(&sqlWorkerPoolThread);
-  sqlWorkerPoolThread.start();
+  sqlWorkerPool->moveToThread(sqlWorkerPoolThread);
+  sqlWorkerPoolThread->start();
   emit initSqlWorkerPool();
   return sqlWorkerPool;
 }
@@ -70,9 +80,9 @@ Result MainWindow::hydrateState(const State::Packet& statePacket) {
       statePacket.sceneId)
   );
 
-  mainToolBar.hydrateState(statePacket);
-  mixerBody.hydrateState(statePacket);
-  musicLibraryWindow.hydrateState(statePacket);
+  mainToolBar->hydrateState(statePacket);
+  mixerBody->hydrateState(statePacket);
+  musicLibraryWindow->hydrateState(statePacket);
 
   Logging::write(
     Info,
@@ -84,19 +94,19 @@ Result MainWindow::hydrateState(const State::Packet& statePacket) {
 }
 
 void MainWindow::setupGrid() {
-  grid.setVerticalSpacing(1);
-  grid.setColumnStretch(0, 1);
+  grid->setVerticalSpacing(1);
+  grid->setColumnStretch(0, 1);
 
-  grid.addWidget(&musicLibraryWindow, 0, 0, 1, -1);
-  grid.addWidget(&mixerBody, 1, 0, -1, -1);
+  grid->addWidget(musicLibraryWindow, 0, 0, 1, -1);
+  grid->addWidget(mixerBody, 1, 0, -1, -1);
   for (int i = 0; i < 2; i++) {
-    grid.setRowMinimumHeight(i, 200);
-    grid.setRowStretch(i, 1);
+    grid->setRowMinimumHeight(i, 200);
+    grid->setRowStretch(i, 1);
   }
 
-  container.setLayout(&grid);
+  container->setLayout(grid);
   std::string styleString = "background-color: " + Color::toHex(GjC::DARK_400) + "; ";
-  container.setStyleSheet(styleString.data());
+  container->setStyleSheet(styleString.data());
 }
 
 void MainWindow::closeEvent(QCloseEvent* e) {
@@ -115,7 +125,7 @@ void MainWindow::setChannels() {
     "Setting channels."
   );
 
-  mixerBody.setChannels();
+  mixerBody->setChannels();
 
   Logging::write(
     Info,
@@ -148,8 +158,8 @@ void MainWindow::setChannels() {
 // }
 
 void MainWindow::connectActions() {
-  const auto sceneLoadConnection = connect(&sceneLoadAction, &QAction::triggered, [&] {
-    if (const int sceneDbId = sceneLoadAction.data().toULongLong(); stateCore->getSceneDbId() != sceneDbId) {
+  const auto sceneLoadConnection = connect(sceneLoadAction, &QAction::triggered, [&] {
+    if (const int sceneDbId = sceneLoadAction->data().toULongLong(); stateCore->getSceneDbId() != sceneDbId) {
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",
