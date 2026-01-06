@@ -6,16 +6,9 @@
 
 namespace Gj {
 namespace Gui {
-
 FolderSelect::FolderSelect(QWidget* parent)
-  : QFileDialog(parent)
-  {
-
-  setFileMode(QFileDialog::Directory);
+: QFileDialog(parent) {
+  setFileMode(Directory);
 }
-
-FolderSelect::~FolderSelect() {
-}
-
 } // Gui
 } // Gj

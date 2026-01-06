@@ -10,19 +10,12 @@
 
 namespace Gj {
 namespace Gui {
-
 class FolderSelect final : public QFileDialog {
-
-  public:
-    explicit FolderSelect(QWidget* parent);
-    ~FolderSelect() override;
+public:
+  explicit FolderSelect(QWidget* parent);
 };
-
 } // Gui
 } // Gj
-
-
-
 
 
 #endif //FOLDERSELECT_H

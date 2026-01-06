@@ -19,21 +19,19 @@
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class FileMenu final : public QMenu {
-
   actor_system& actorSystem;
-  QAction renderAction;
+  QAction* renderAction;
 
-  public:
-    FileMenu(actor_system& actorSystem, QWidget* parent);
+public:
+  FileMenu(actor_system& actorSystem, QWidget* parent);
+
+  ~FileMenu();
 };
-
 } // Gui
 } // Gj
-
 
 
 #endif //FILEMENU_H

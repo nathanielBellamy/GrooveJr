@@ -48,26 +48,27 @@ class MusicLibraryWindow final : public QWidget {
   actor_system& actorSystem;
   State::Core* stateCore;
   Db::Dao* dao;
-  QGridLayout grid;
+
+  QGridLayout* grid;
   MusicLibraryWindowMainSection mainSection = AUDIO_FILES_VIEW;
-  QPushButton cacheButton;
-  QPushButton filesButton;
-  QPushButton queueButton;
-  QLabel filtersHeader;
-  QPushButton clearFiltersButton;
-  QLabel albumHeader;
+  QPushButton* cacheButton;
+  QPushButton* filesButton;
+  QPushButton* queueButton;
+  QLabel* filtersHeader;
+  QPushButton* clearFiltersButton;
+  QLabel* albumHeader;
   AlbumTableView* albumTableView;
-  QPushButton albumClearFilterButton;
-  QLabel artistHeader;
+  QPushButton* albumClearFilterButton;
+  QLabel* artistHeader;
   ArtistTableView* artistTableView;
-  QPushButton artistClearFilterButton;
+  QPushButton* artistClearFilterButton;
   AudioFileTableView* audioFileTableView;
-  QLabel genreHeader;
+  QLabel* genreHeader;
   GenreTableView* genreTableView;
-  QPushButton genreClearFilterButton;
-  QLabel playlistHeader;
+  QPushButton* genreClearFilterButton;
+  QLabel* playlistHeader;
   PlaylistTableView* playlistTableView;
-  QPushButton playlistClearFilterButton;
+  QPushButton* playlistClearFilterButton;
   QueueTableView* queueTableView;
   CacheTableView* cacheTableView;
 
@@ -129,27 +130,27 @@ private:
     mainSection = newMainSection;
     switch (newMainSection) {
       case CACHE_VIEW:
-        cacheButton.setStyleSheet(STYLE_STR_BTN_SELECTED);
+        cacheButton->setStyleSheet(STYLE_STR_BTN_SELECTED);
         cacheTableView->show();
-        filesButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
+        filesButton->setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
         audioFileTableView->hide();
-        queueButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
+        queueButton->setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
         queueTableView->hide();
         break;
       case QUEUE_VIEW:
-        cacheButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
+        cacheButton->setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
         cacheTableView->hide();
-        filesButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
+        filesButton->setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
         audioFileTableView->hide();
-        queueButton.setStyleSheet(STYLE_STR_BTN_SELECTED);
+        queueButton->setStyleSheet(STYLE_STR_BTN_SELECTED);
         queueTableView->show();
         break;
       default: // case FILES:
-        cacheButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
+        cacheButton->setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
         cacheTableView->hide();
-        filesButton.setStyleSheet(STYLE_STR_BTN_SELECTED);
+        filesButton->setStyleSheet(STYLE_STR_BTN_SELECTED);
         audioFileTableView->show();
-        queueButton.setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
+        queueButton->setStyleSheet(STYLE_STR_BTN_NOT_SELECTED);
         queueTableView->hide();
     }
 

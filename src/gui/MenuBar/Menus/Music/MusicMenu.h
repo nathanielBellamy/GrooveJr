@@ -30,20 +30,17 @@
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class MusicMenu final : public QMenu {
-
   actor_system& actorSystem;
-  QAction addFolderToLibraryAction;
-  FolderSelect folderSelect;
+  QAction* addFolderToLibraryAction;
+  FolderSelect* folderSelect;
   QUrl folderUrl;
 
-  public:
-    MusicMenu(actor_system& actorSystem, QWidget* parent);
+public:
+  MusicMenu(actor_system& actorSystem, QWidget* parent);
 };
-
 } // Gui
 } // Gj
 

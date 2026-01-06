@@ -12,15 +12,14 @@
 
 namespace Gj {
 namespace Gui {
-
 class VstSelect final : public QFileDialog {
-  QUrl defaultUrl;
+  QUrl* defaultUrl;
 
 public:
-  explicit VstSelect(QWidget *parent);
+  explicit VstSelect(QWidget* parent);
+
   ~VstSelect() override;
 };
-
 } // Gui
 } // GJ
 

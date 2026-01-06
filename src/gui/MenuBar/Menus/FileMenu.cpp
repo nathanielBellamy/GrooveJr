@@ -8,21 +8,21 @@
 
 namespace Gj {
 namespace Gui {
-
 FileMenu::FileMenu(actor_system& actorSystem, QWidget* parent)
-  : QMenu("&File", parent)
+: QMenu("&File", parent)
   , actorSystem(actorSystem)
-  , renderAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Render"), this)
-  {
+  , renderAction(new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Render"), this)) {
+  renderAction->setStatusTip(tr("Render Audio"));
 
-  renderAction.setStatusTip(tr("Render Audio"));
-
-  addAction(&renderAction);
-  connect(&renderAction, &QAction::triggered, [&]() {
+  addAction(renderAction);
+  connect(renderAction, &QAction::triggered, [&]() {
     // TODO
     std::cout << " kOffline Render Audio " << std::endl;
   });
 }
 
+FileMenu::~FileMenu() {
+  delete renderAction;
+}
 } // Gui
 } // Gj

@@ -23,19 +23,18 @@
 
 namespace Gj {
 namespace Gui {
-
 using namespace caf;
 
 class MenuBar final : QMenuBar {
-
   actor_system& actorSystem;
-  FileMenu fileMenu;
-  MusicMenu musicMenu;
+  FileMenu* fileMenu;
+  MusicMenu* musicMenu;
 
-  public:
-    explicit MenuBar(actor_system&, QWidget* parent = nullptr);
+public:
+  explicit MenuBar(actor_system&, QWidget* parent = nullptr);
+
+  ~MenuBar();
 };
-
 } // Gui
 } // Gj
 
