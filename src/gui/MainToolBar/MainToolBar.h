@@ -45,15 +45,17 @@ public:
     QAction* sceneLoadAction
   );
 
-  int hydrateState(const State::Packet& statePacket);
+  ~MainToolBar();
+
+  Result hydrateState(const State::Packet& statePacket) const;
 
 private:
   actor_system& sys;
-  QLabel title;
-  Scenes scenes;
-  CurrentlyPlaying currentlyPlaying;
-  TransportControl transportControl;
-  EqGraph eqGraph;
+  QLabel* title;
+  Scenes* scenes;
+  CurrentlyPlaying* currentlyPlaying;
+  TransportControl* transportControl;
+  EqGraph* eqGraph;
 };
 } // Gui
 } // Gj

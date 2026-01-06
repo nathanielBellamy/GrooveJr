@@ -31,14 +31,14 @@ class Scenes final : public QWidget {
   actor_system& sys;
   State::Core* stateCore;
   Audio::Mixer::Core* mixer;
-  QGridLayout grid;
-  QLabel title;
+  QGridLayout* grid;
+  QLabel* title;
   ScenesTableView* tableView = nullptr;
-  QAction sceneNewAction;
-  SceneButton sceneNewButton;
-  QAction sceneSaveAction;
-  SceneButton sceneSaveButton;
-  QAction sceneLoadAction;
+  QAction* sceneNewAction;
+  SceneButton* sceneNewButton;
+  QAction* sceneSaveAction;
+  SceneButton* sceneSaveButton;
+  QAction* sceneLoadAction;
 
   void connectActions();
 
@@ -55,6 +55,8 @@ public:
     SqlWorkerPool* sqlWorkerPool,
     QAction* sceneLoadAction
   );
+
+  ~Scenes();
 
   Result hydrateState(const State::Packet& statePacket);
 };

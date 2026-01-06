@@ -12,18 +12,17 @@
 
 namespace Gj {
 namespace Gui {
-
 class TransportControlButton final : public QPushButton {
-  public:
-    TransportControlButton(QWidget* parent, QAction* action, QIcon icon);
+public:
+  TransportControlButton(QWidget* parent, QAction* action, QIcon icon);
 
-  private:
-    int channelIndex;
-    QAction* action;
-    void setStyle();
-    void mousePressEvent(QMouseEvent* event) override;
+private:
+  QAction* action;
+
+  void setStyle();
+
+  void mousePressEvent(QMouseEvent* event) override;
 };
-
 } // Gui
 } // Gj
 

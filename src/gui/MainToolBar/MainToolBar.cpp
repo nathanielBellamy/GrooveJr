@@ -12,39 +12,53 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, State::Core* stateC
                          SqlWorkerPool* sqlWorkerPool, QAction* sceneLoadAction)
 : QToolBar(parent)
   , sys(sys)
-  , scenes(this, sys, stateCore, mixer, sqlWorkerPool, sceneLoadAction)
-  , currentlyPlaying(this, sys, mixer)
-  , transportControl(this, sys, mixer)
-  , eqGraph(this, mixer) {
-  title.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-  title.setText("GrooveJr");
-  title.setFont({title.font().family(), 18});
-  title.setStyleSheet("text-align: center;");
+  , scenes(new Scenes(this, sys, stateCore, mixer, sqlWorkerPool, sceneLoadAction))
+  , currentlyPlaying(new CurrentlyPlaying(this, sys, mixer))
+  , transportControl(new TransportControl(this, sys, mixer))
+  , eqGraph(new EqGraph(this, mixer)) {
+  title->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+  title->setText("GrooveJr");
+  title->setFont({title->font().family(), 18});
+  title->setStyleSheet("text-align: center;");
 
-  addWidget(&title);
+  addWidget(title);
   addSeparator();
-  addWidget(&currentlyPlaying);
+  addWidget(currentlyPlaying);
   addSeparator();
-  addWidget(&transportControl);
+  addWidget(transportControl);
   addSeparator();
-  addWidget(&eqGraph);
+  addWidget(eqGraph);
   addSeparator();
-  addWidget(&scenes);
+  addWidget(scenes);
+
+  // TODO: make it here
+  Logging::write(
+    Info,
+    "Gui::MainToolBar::MainToolBar",
+    "Instantiated MainToolBar."
+  );
 }
 
-int MainToolBar::hydrateState(const State::Packet& statePacket) {
+MainToolBar::~MainToolBar() {
+  delete title;
+  delete currentlyPlaying;
+  delete transportControl;
+  delete eqGraph;
+}
+
+Result MainToolBar::hydrateState(const State::Packet& statePacket) const {
   Logging::write(
     Info,
     "Gui::MainToolbar::hydrateState",
     "Received app state with playState - " + std::to_string(statePacket.playState)
   );
 
-  currentlyPlaying.hydrateState(statePacket);
-  transportControl.hydrateState(statePacket);
-  scenes.hydrateState(statePacket);
-  eqGraph.hydrateState(statePacket);
+  currentlyPlaying->hydrateState(statePacket);
+  transportControl->hydrateState(statePacket);
+  scenes->hydrateState(statePacket);
+  eqGraph->hydrateState(statePacket);
 
-  return 0;
+  return OK;
 }
 } // Gui
 } // Gj

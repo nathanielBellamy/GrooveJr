@@ -24,6 +24,8 @@ class CurrentlyPlaying final : public QWidget {
 public:
   explicit CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer);
 
+  ~CurrentlyPlaying();
+
   void hydrateState(const State::Packet& statePacket) const;
 
 private:
@@ -35,7 +37,7 @@ private:
   QScrollArea* albumScrollArea;
   QLabel* artist;
   QScrollArea* artistScrollArea;
-  QGridLayout grid;
+  QGridLayout* grid;
 
   void setupGrid();
 

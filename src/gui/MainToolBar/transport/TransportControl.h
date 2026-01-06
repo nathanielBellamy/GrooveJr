@@ -35,6 +35,8 @@ class TransportControl final : public QWidget {
 public:
   TransportControl(QWidget* parent, actor_system& sys, Audio::Mixer::Core* mixer);
 
+  ~TransportControl();
+
   int hydrateState(const State::Packet& statePacket);
 
   void setPlayState(PlayState state);
@@ -42,20 +44,21 @@ public:
 private:
   actor_system& sys;
   PlayState playState;
-  QGridLayout grid;
 
-  ProgressBar progressBar;
-  PlaybackSpeedSlider playbackSpeedSlider;
-  TransportControlButton playButton;
-  TransportControlButton pauseButton;
-  TransportControlButton stopButton;
-  TransportControlButton rwButton;
-  TransportControlButton ffButton;
-  QAction playTrigAction{style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay), "", this};
-  QAction pauseTrigAction{style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause), "", this};
-  QAction stopTrigAction{style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop), "", this};
-  QAction rwTrigAction{style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipBackward), "", this};
-  QAction ffTrigAction{style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipForward), "", this};
+  QGridLayout* grid;
+  ProgressBar* progressBar;
+  PlaybackSpeedSlider* playbackSpeedSlider;
+
+  QAction* playTrigAction;
+  QAction* pauseTrigAction;
+  QAction* stopTrigAction;
+  QAction* rwTrigAction;
+  QAction* ffTrigAction;
+  TransportControlButton* playButton;
+  TransportControlButton* pauseButton;
+  TransportControlButton* stopButton;
+  TransportControlButton* rwButton;
+  TransportControlButton* ffButton;
 
   void connectActions();
 

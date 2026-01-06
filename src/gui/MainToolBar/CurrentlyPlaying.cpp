@@ -16,7 +16,7 @@ CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, A
   , albumScrollArea(new QScrollArea(this))
   , artist(new QLabel)
   , artistScrollArea(new QScrollArea(this))
-  , grid(this) {
+  , grid(new QGridLayout(this)) {
   track->setWordWrap(false);
   album->setWordWrap(false);
   artist->setWordWrap(false);
@@ -36,14 +36,31 @@ CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, A
 
   setupGrid();
   setStyle();
+
+  Logging::write(
+    Info,
+    "Gui::CurrentlyPlaying::CurrentlyPlaying()",
+    "Constructed CurrentlyPlaying"
+  );
 }
 
-void CurrentlyPlaying::setupGrid() {
-  grid.addWidget(trackScrollArea, 0, 0, 1, -1);
-  grid.addWidget(artistScrollArea, 1, 0, 1, -1);
-  grid.addWidget(albumScrollArea, 2, 0, 1, -1);
+CurrentlyPlaying::~CurrentlyPlaying() {
+  delete grid;
+  delete artistScrollArea;
+  delete artist;
+  delete albumScrollArea;
+  delete album;
+  delete trackScrollArea;
+  delete track;
+}
 
-  setLayout(&grid);
+
+void CurrentlyPlaying::setupGrid() {
+  grid->addWidget(trackScrollArea, 0, 0, 1, -1);
+  grid->addWidget(artistScrollArea, 1, 0, 1, -1);
+  grid->addWidget(albumScrollArea, 2, 0, 1, -1);
+
+  setLayout(grid);
 }
 
 void CurrentlyPlaying::setStyle() {
