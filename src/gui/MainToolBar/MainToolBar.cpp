@@ -37,7 +37,6 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, State::Core* stateC
   addSeparator();
   addWidget(scenes);
 
-  // TODO: make it here
   Logging::write(
     Info,
     "Gui::MainToolBar::MainToolBar",
