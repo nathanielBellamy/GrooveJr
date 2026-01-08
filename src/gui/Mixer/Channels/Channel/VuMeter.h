@@ -57,7 +57,7 @@ private:
   ChannelIndex channelIndex;
   int w = 40;
   jack_ringbuffer_t* vuRingBuffer = nullptr;
-  float vertices[12]{0.0f};
+  float vertices[12]{};
   GLuint vao, vbo;
   int colorLocation;
   QOpenGLShaderProgram* program;

@@ -42,25 +42,25 @@ public:
 private:
   actor_system& actorSystem;
   Audio::Mixer::Core* mixer;
-  QAction muteChannelAction;
-  QAction muteLChannelAction;
-  QAction muteRChannelAction;
-  QAction soloChannelAction;
-  QAction soloLChannelAction;
-  QAction soloRChannelAction;
-  QGridLayout grid;
-  QLabel title;
-  MainChannelContainer mainChannelContainer;
-  ChannelsContainer channelsContainer;
+  QAction* muteChannelAction;
+  QAction* muteLChannelAction;
+  QAction* muteRChannelAction;
+  QAction* soloChannelAction;
+  QAction* soloLChannelAction;
+  QAction* soloRChannelAction;
+  QGridLayout* grid;
+  QLabel* title;
+  MainChannelContainer* mainChannelContainer;
+  ChannelsContainer* channelsContainer;
 
   std::thread vuWorker;
   std::atomic<bool> vuWorkerRunning = false;
   std::atomic<bool> stopVuWorker;
   jack_ringbuffer_t* vuRingBuffer;
-  float vuBufferIn[Audio::VU_RING_BUFFER_SIZE]{0.0f};
+  float vuBufferIn[Audio::VU_RING_BUFFER_SIZE]{};
   int vuAvgIndex = 0;
-  float vuBufferAvg[VU_METER_AVG_SIZE][Audio::VU_RING_BUFFER_SIZE]{-100.0f};
-  std::atomic<float> vuBuffer[Audio::VU_RING_BUFFER_SIZE]{-100.0f};
+  float vuBufferAvg[VU_METER_AVG_SIZE][Audio::VU_RING_BUFFER_SIZE]{};
+  std::atomic<float> vuBuffer[Audio::VU_RING_BUFFER_SIZE]{};
 
   Result vuWorkerStart();
 

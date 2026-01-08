@@ -147,6 +147,8 @@ void VuMeter::animationLoop() {
   vuVals[0] = vuPtr[0].load();
   vuVals[1] = vuPtr[1].load();
 
+  std::cout << "vuMeter chan " << channelIndex << " - " << vuVals[0] << " - " << vuVals[1] << std::endl;
+
   update();
 }
 
