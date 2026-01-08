@@ -12,10 +12,16 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, State::Core* stateC
                          SqlWorkerPool* sqlWorkerPool, QAction* sceneLoadAction)
 : QToolBar(parent)
   , sys(sys)
+  , title(new QLabel(this))
   , scenes(new Scenes(this, sys, stateCore, mixer, sqlWorkerPool, sceneLoadAction))
   , currentlyPlaying(new CurrentlyPlaying(this, sys, mixer))
   , transportControl(new TransportControl(this, sys, mixer))
   , eqGraph(new EqGraph(this, mixer)) {
+  Logging::write(
+    Info,
+    "Gui::MainToolBar::MainToolBar()",
+    "Instantiated widgets"
+  );
   title->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
   title->setText("GrooveJr");
   title->setFont({title->font().family(), 18});
