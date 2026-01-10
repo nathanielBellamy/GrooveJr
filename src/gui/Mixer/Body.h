@@ -57,10 +57,10 @@ private:
   std::atomic<bool> vuWorkerRunning = false;
   std::atomic<bool> stopVuWorker;
   jack_ringbuffer_t* vuRingBuffer;
-  float vuBufferIn[Audio::VU_RING_BUFFER_SIZE]{};
+  float vuBufferIn[Audio::VU_BUFFER_SIZE]{};
   int vuAvgIndex = 0;
-  float vuBufferAvg[VU_METER_AVG_SIZE][Audio::VU_RING_BUFFER_SIZE]{};
-  std::atomic<float> vuBuffer[Audio::VU_RING_BUFFER_SIZE]{};
+  float vuBufferAvg[VU_METER_AVG_SIZE][Audio::VU_BUFFER_SIZE]{};
+  std::atomic<float> vuBuffer[Audio::VU_BUFFER_SIZE]{};
 
   Result vuWorkerStart();
 

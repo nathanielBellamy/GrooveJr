@@ -52,7 +52,7 @@ struct AudioPlayer {
 
   jack_ringbuffer_t* fft_eq_ring_buffer_out;
 
-  float vu_buffer[VU_RING_BUFFER_SIZE]{};
+  float vu_buffer[VU_BUFFER_SIZE]{};
 
   jack_ringbuffer_t* vu_ring_buffer_out;
 
@@ -293,19 +293,19 @@ struct AudioPlayer {
 
   Result updateRingBuffers() {
     // read vu_ring_buffer
-    if (jack_ringbuffer_read_space(audioCore->vu_ring_buffer) > VU_RING_BUFFER_SIZE - 2) {
+    if (jack_ringbuffer_read_space(audioCore->vu_ring_buffer) > VU_BUFFER_SIZE - 2) {
       jack_ringbuffer_read(
         audioCore->vu_ring_buffer,
         reinterpret_cast<char*>(vu_buffer),
-        VU_RING_BUFFER_SIZE
+        VU_BUFFER_SIZE
       );
     }
 
-    if (jack_ringbuffer_write_space(vu_ring_buffer_out) > VU_RING_BUFFER_SIZE - 2) {
+    if (jack_ringbuffer_write_space(vu_ring_buffer_out) > VU_BUFFER_SIZE - 2) {
       jack_ringbuffer_write(
         vu_ring_buffer_out,
         reinterpret_cast<char*>(vu_buffer),
-        VU_RING_BUFFER_SIZE
+        VU_BUFFER_SIZE
       );
     }
 
@@ -489,7 +489,7 @@ struct AudioPlayer {
     fft_eq_ring_buffer_out = jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE);
     mixer->getSetEqRingBufferFunc()(fft_eq_ring_buffer_out);
 
-    vu_ring_buffer_out = jack_ringbuffer_create(2 * MAX_MIXER_CHANNELS);
+    vu_ring_buffer_out = jack_ringbuffer_create(VU_RING_BUFFER_SIZE);
     mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
 
     return OK;

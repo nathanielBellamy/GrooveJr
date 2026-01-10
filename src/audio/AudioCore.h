@@ -45,8 +45,8 @@ struct AudioCore {
   float fft_pv_phase_prev_init[AUDIO_CHANNEL_COUNT][FFT_PV_FREQ_SIZE]{};
   fftwf_plan fft_pv_plan_r2c;
   fftwf_plan fft_pv_plan_c2r;
-  float vu_buffer_in[VU_RING_BUFFER_SIZE]{};
-  float vu_buffer[VU_RING_BUFFER_SIZE]{};
+  float vu_buffer_in[VU_BUFFER_SIZE]{};
+  float vu_buffer[VU_BUFFER_SIZE]{};
   jack_ringbuffer_t* vu_ring_buffer{nullptr};
   float processBuffersBuffer[AUDIO_FRAMES_PER_BUFFER_MAX * AUDIO_CHANNEL_COUNT]{};
   float* processBuffers[AUDIO_CHANNEL_COUNT]{nullptr, nullptr};
@@ -72,7 +72,7 @@ struct AudioCore {
   AudioCore(State::Core* stateCore)
   : stateCore(stateCore)
     , fft_eq_ring_buffer(jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE))
-    , vu_ring_buffer(jack_ringbuffer_create(AUDIO_CHANNEL_COUNT * MAX_MIXER_CHANNELS))
+    , vu_ring_buffer(jack_ringbuffer_create(VU_RING_BUFFER_SIZE))
     , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(BfrIdx::PSTAT::RB_SIZE))
     , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(BfrIdx::PSFAT::RB_SIZE))
     , mixerChannelsProcessDataRB(jack_ringbuffer_create(BfrIdx::MixerChannel::ProcessData::RB_SIZE))
