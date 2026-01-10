@@ -39,7 +39,7 @@ public:
 
   void removeSlot();
 
-  void hydrateState(const State::Packet& statePacket, int newChannelIndex);
+  void hydrateState(const State::Packet& statePacket, ChannelIndex newChannelIndex);
 
   void reset();
 

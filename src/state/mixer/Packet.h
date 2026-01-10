@@ -18,7 +18,6 @@ struct Packet {
   ChannelPacket channels[Audio::MAX_MIXER_CHANNELS]{};
 
   Packet() {
-    std::cout << "MixPacket::Packet()" << std::endl;
     std::fill_n(channels, Audio::MAX_MIXER_CHANNELS, ChannelPacket());
   }
 

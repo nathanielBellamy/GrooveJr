@@ -19,7 +19,6 @@ struct ChannelPacket {
   PluginSlotPacket plugins[Audio::MAX_PLUGINS_PER_CHANNEL]{};
 
   ChannelPacket() {
-    std::cout << "ChanPacket::Packet()" << std::endl;
     std::fill_n(plugins, Audio::MAX_PLUGINS_PER_CHANNEL, PluginSlotPacket());
   }
 

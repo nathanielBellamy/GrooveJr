@@ -39,19 +39,14 @@ PluginSlots::~PluginSlots() {
   );
 }
 
-void PluginSlots::hydrateState(const State::Packet& statePacket, const int newChannelIndex) {
-  std::cout << "PluginSlots::hydrateState" << std::endl;
+void PluginSlots::hydrateState(const State::Packet& statePacket, const ChannelIndex newChannelIndex) {
   channelIndex = newChannelIndex;
 
-  PluginIndex i = 0;
   for (const auto pluginPacket: statePacket.mixerPacket.channels[channelIndex].plugins) {
-    std::cout << "ps::hs - pluginPacket " << pluginPacket.pluginIndex << std::endl;
     if (!pluginPacket.hasValue) {
-      std::cout << "ps::hs - pluginPacket no val" << std::endl;
       delete pluginSlots[pluginPacket.pluginIndex];
       pluginSlots[pluginPacket.pluginIndex] = nullptr;
     } else {
-      std::cout << "ps::hs - pluginPacket has val - name " << pluginPacket.name.c_str() << std::endl;
       if (pluginSlots[pluginPacket.pluginIndex] == nullptr) {
         pluginSlots[pluginPacket.pluginIndex] =
             new PluginSlot(
@@ -64,13 +59,17 @@ void PluginSlots::hydrateState(const State::Packet& statePacket, const int newCh
               replacePluginAction,
               removePluginAction
             );
+
+        pluginSlots[pluginPacket.pluginIndex]->hydrateState(statePacket, channelIndex, pluginPacket.pluginIndex);
+        grid.addWidget(pluginSlots[pluginPacket.pluginIndex], 0, 0, 1, 1);
       }
     }
   }
 
-  for (const auto& pluginSlot: pluginSlots) {
-    if (pluginSlot == nullptr) continue;
-    pluginSlot->hydrateState(statePacket, channelIndex, i);
+  PluginIndex i = 0;
+  for (PluginIndex plugIdx = 0; plugIdx < Audio::MAX_PLUGINS_PER_CHANNEL; ++plugIdx) {
+    if (pluginSlots[plugIdx] == nullptr) continue;
+    pluginSlots[plugIdx]->hydrateState(statePacket, channelIndex, i);
     ++i;
   }
 
@@ -81,11 +80,13 @@ void PluginSlots::setupGrid() {
   grid.setVerticalSpacing(4);
 
   int row = 0;
-  for (const auto pluginSlot: pluginSlots) {
-    if (pluginSlot == nullptr) continue;
-    grid.addWidget(pluginSlot, row, 0, 1, 1);
+  for (PluginIndex plugIdx = 0; plugIdx < Audio::MAX_PLUGINS_PER_CHANNEL; ++plugIdx) {
+    if (pluginSlots[plugIdx] == nullptr) continue;
+    grid.addWidget(pluginSlots[plugIdx], row, 0, 1, 1);
     ++row;
   }
+
+  setLayout(&grid);
 }
 
 void PluginSlots::reset() {

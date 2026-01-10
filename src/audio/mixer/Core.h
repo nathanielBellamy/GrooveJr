@@ -293,11 +293,9 @@ public:
   Result saveChannels();
 
   State::Mixer::Packet toPacket() {
-    std::cout << "[Audio::Mixer::toPacket] 0" << std::endl;
     State::Mixer::Packet packet{};
 
     forEachChannel([&packet](Channel* channel, const ChannelIndex channelIdx) {
-      std::cout << "[Audio::Mixer::toPacket] channelIdx " << std::to_string(channelIdx) << std::endl;
       State::Mixer::ChannelPacket channelPacket;
       channelPacket.channelIndex = channelIdx;
       channel->forEachPluginSlot(
@@ -305,6 +303,7 @@ public:
           if (!plugin) {
             State::Mixer::PluginSlotPacket emptyPacket;
             emptyPacket.hasValue = false;
+            emptyPacket.pluginIndex = pluginIdx;
             channelPacket.plugins[pluginIdx] = emptyPacket;
           } else {
             channelPacket.plugins[pluginIdx] = {
@@ -318,7 +317,6 @@ public:
       packet.channels[channelIdx] = channelPacket;
     });
 
-    std::cout << " Mixer::toPacket " << packet.std_str() << std::endl;
     return packet;
   }
 };

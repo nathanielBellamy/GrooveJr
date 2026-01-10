@@ -52,7 +52,7 @@ void PluginSlot::hydrateState(const State::Packet& statePacket, const ChannelInd
 void PluginSlot::setStyle() {
   setFixedSize(QSize(150, 70));
   setStyleSheet(
-    ("border: 2px solid white; background-color: " + Color::toHex(GjC::LIGHT_200) + "; ").data()
+    ("border: 2px solid white; background-color: " + Color::toHex(GjC::DARK_200) + "; ").data()
   );
 }
 
