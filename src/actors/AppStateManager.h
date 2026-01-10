@@ -76,7 +76,6 @@ struct AppStateManagerState {
   strong_actor_ptr display;
 
   void hydrateStateToDisplay() {
-    std::cout << "HydrateStateToDisplay" << std::endl;
     Logging::write(
       Info,
       "Act::AppStateManagerState::hydrateStateToDisplay",
@@ -84,7 +83,7 @@ struct AppStateManagerState {
     );
 
     State::Packet statePacket = stateCore->toPacket(mixer->toPacket());
-    std::cout << "stateMixerPacket " << statePacket.mixerPacket.std_str() << std::endl;
+    // std::cout << "stateMixerPacket " << statePacket.mixerPacket.std_str() << std::endl;
     strong_actor_ptr displayPtr = self->system().registry().get(DISPLAY);
     self->anon_send(
       actor_cast<actor>(displayPtr),
@@ -155,7 +154,6 @@ struct AppStateManagerState {
             "Unable to add plugin: " + pluginPath + " to channel " + std::to_string(channelIdx)
           );
         }
-        std::cout << " AppStateMan - added plugin to channel" << std::endl;
         hydrateStateToDisplay();
       },
       [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, PluginPath pluginPath,

@@ -82,7 +82,7 @@ void ChannelsContainer::addChannel() {
     this, actorSystem, mixer, channelIndex, &removeChannelAction,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction,
-    &vuPtr[2 * channelIndex]
+    &vuPtr[Audio::BfrIdx::VU::left(channelIndex)]
   );
   channels.push_back(channel);
 
