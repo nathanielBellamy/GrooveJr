@@ -36,8 +36,8 @@ class Channel {
   ChannelIndex index;
   AtomicStr name{"Channel"};
 
-  std::optional<Plugins::Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {std::nullopt};
-  std::vector<Plugins::Vst3::Plugin*> pluginsToDelete;
+  std::optional<Plugins::Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {};
+  std::vector<Plugins::Vst3::Plugin*> pluginsToDelete = {};
 
 public:
   Result deletePluginsToDelete() {

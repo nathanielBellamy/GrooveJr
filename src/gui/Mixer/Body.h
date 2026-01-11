@@ -31,7 +31,7 @@ public:
 
   ~Body();
 
-  void hydrateState(const State::Packet& statePacket);
+  Result hydrateState(const State::Packet& statePacket);
 
   void setChannels();
 

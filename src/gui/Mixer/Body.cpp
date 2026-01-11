@@ -112,16 +112,18 @@ Result Body::vuWorkerStop() {
   return OK;
 }
 
-void Body::hydrateState(const State::Packet& appState) {
-  mainChannelContainer->hydrateState(appState);
-  channelsContainer->hydrateState(appState);
+Result Body::hydrateState(const State::Packet& statePacket) {
+  mainChannelContainer->hydrateState(statePacket);
+  channelsContainer->hydrateState(statePacket);
 
-  if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW) {
+  if (statePacket.playState == PLAY || statePacket.playState == FF || statePacket.playState == RW) {
     if (!vuWorkerRunning)
       vuWorkerStart();
   } else {
     vuWorkerStop();
   }
+
+  return OK;
 }
 
 void Body::setStyle() {

@@ -57,6 +57,9 @@ PluginsContainer::~PluginsContainer() {
 void PluginsContainer::connectActions() {
   const auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
     const PluginIndex pluginIndex = selectVstWindowAction.data().toULongLong();
+    if (vstWindows.size() == 0 || pluginIndex > vstWindows.size())
+      return;
+
     vstWindows.at(pluginIndex)->activateWindow();
     vstWindows.at(pluginIndex)->raise();
     activateWindow();
@@ -65,6 +68,9 @@ void PluginsContainer::connectActions() {
 
   const auto removePluginActionConnection = connect(removePluginAction, &QAction::triggered, [&]() {
     const PluginIndex pluginIndex = removePluginAction->data().toULongLong();
+    if (vstWindows.size() == 0 || pluginIndex > vstWindows.size())
+      return;
+
     vstWindows.at(pluginIndex)->hide();
     vstWindows.erase(vstWindows.begin() + pluginIndex);
     vstWindowSelectButtons.at(pluginIndex)->hide();
