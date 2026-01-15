@@ -171,6 +171,8 @@ Plugin::~Plugin() {
 		, "Audio::Plugin::~Plugin",
 		"Destroying Plugin: " + name
 	);
+
+	// TODO: debug
 	audioHost->terminate();
 
 	Logging::write(

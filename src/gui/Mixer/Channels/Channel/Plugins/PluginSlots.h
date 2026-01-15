@@ -37,11 +37,9 @@ public:
 
   ~PluginSlots() override;
 
-  void removeSlot();
+  Result hydrateState(const State::Packet& statePacket, ChannelIndex newChannelIndex);
 
-  void hydrateState(const State::Packet& statePacket, ChannelIndex newChannelIndex);
-
-  void reset();
+  Result reset();
 
 private:
   actor_system& actorSystem;

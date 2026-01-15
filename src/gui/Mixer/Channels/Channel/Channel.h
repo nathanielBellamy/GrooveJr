@@ -58,7 +58,7 @@ public:
 
   ~Channel() override;
 
-  void hydrateState(const State::Packet& statePacket, ChannelIndex newChannelIndex);
+  Result hydrateState(const State::Packet& statePacket, ChannelIndex newChannelIndex);
 
   void updateShowRemoveChannelButton(bool val);
 

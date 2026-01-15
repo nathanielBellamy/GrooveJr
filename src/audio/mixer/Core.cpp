@@ -251,7 +251,7 @@ PluginIndex Core::getPluginsOnChannelCount(const ChannelIndex idx) {
 }
 
 Result Core::initEditorHostsOnChannel(const ChannelIndex idx,
-                                      std::vector<std::shared_ptr<Gui::Mixer::VstWindow> >& vstWindows) {
+                                      const std::shared_ptr<Gui::Mixer::VstWindow>* vstWindows) {
   if (!indexHasValidChannel(idx)) {
     Logging::write(
       Warning,
@@ -260,7 +260,14 @@ Result Core::initEditorHostsOnChannel(const ChannelIndex idx,
     );
     return WARNING;
   }
-  return channels[idx].value()->initEditorHosts(vstWindows);
+
+  const auto res = channels[idx].value()->initEditorHosts(vstWindows);
+  Logging::write(
+    res == OK ? Info : Warning,
+    "Audio::Mixer::Core::initEditorHostsOnChannel",
+    "Initialized editor hosts on channel " + std::to_string(idx) + "."
+  );
+  return res;
 }
 
 Result Core::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex newPluginIndex,

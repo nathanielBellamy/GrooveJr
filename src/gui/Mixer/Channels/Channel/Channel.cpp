@@ -108,7 +108,7 @@ Channel::~Channel() {
   );
 }
 
-void Channel::hydrateState(const State::Packet& statePacket, const ChannelIndex newChannelIndex) {
+Result Channel::hydrateState(const State::Packet& statePacket, const ChannelIndex newChannelIndex) {
   Logging::write(
     Info,
     "Gui::Channel::hydrateState",
@@ -121,10 +121,12 @@ void Channel::hydrateState(const State::Packet& statePacket, const ChannelIndex 
     removeChannelButton.hydrateState(statePacket, channelIndex);
 
   pluginSlots.hydrateState(statePacket, channelIndex);
+  pluginsContainer.hydrateState(statePacket, channelIndex);
   vuMeter.hydrateState(statePacket);
 
   setupTitle();
   // setupGrid();
+  return OK;
 }
 
 void Channel::updateShowRemoveChannelButton(const bool val) {

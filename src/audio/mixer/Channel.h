@@ -47,6 +47,11 @@ public:
       "Deleting plugins marked for deletion."
     );
     for (const auto plugin: pluginsToDelete) {
+      Logging::write(
+        Info,
+        "Audio::Channel::deletePluginsToDelete",
+        "Deleting plugin: " + plugin->getName().std_str()
+      );
       delete plugin;
     }
     pluginsToDelete.clear();
@@ -259,7 +264,7 @@ public:
 
   PluginIndex pluginCount();
 
-  Result initEditorHosts(const std::vector<std::shared_ptr<Gui::Mixer::VstWindow> >& vstWindows);
+  Result initEditorHosts(const std::shared_ptr<Gui::Mixer::VstWindow>* vstWindows);
 
   Result initEditorHost(PluginIndex pluginIndex, std::shared_ptr<Gui::Mixer::VstWindow> vstWindow) const;
 

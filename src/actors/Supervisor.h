@@ -92,6 +92,11 @@ struct SupervisorState {
     );
     musicLibraryManagerPtr = actor_cast<strong_actor_ptr>(musicLibraryManager);
 
+    self->anon_send(
+      actor_cast<actor>(appStateManagerPtr),
+      hydrate_display_a_v
+    );
+
     // NOTE:
     // - QApplication::exec: Must be called from the main thread
     // - *** Assertion failure in -[NSMenu _setMenuName:], NSMenu.m:777

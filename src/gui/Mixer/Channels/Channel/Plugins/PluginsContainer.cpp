@@ -44,8 +44,11 @@ PluginsContainer::~PluginsContainer() {
   clearButtonsAndLabels();
   if (isVisible())
     mixer->terminateEditorHostsOnChannel(channelIndex);
-  for (const auto& vstWindow: vstWindows)
-    vstWindow->close();
+
+  for (PluginIndex i = 0; i < Audio::MAX_PLUGINS_PER_CHANNEL; ++i) {
+    if (hasPluginAt(i))
+      vstWindows[i]->close();
+  }
 
   Logging::write(
     Info,
@@ -54,29 +57,48 @@ PluginsContainer::~PluginsContainer() {
   );
 }
 
+Result PluginsContainer::hydrateState(const State::Packet& statePacket, const ChannelIndex newChannelIndex) {
+  channelIndex = newChannelIndex;
+
+  for (const auto pluginPacket: statePacket.mixerPacket.channels[channelIndex].plugins) {
+    if (!pluginPacket.hasValue) {
+      if (vstWindows[pluginPacket.pluginIndex] != nullptr)
+        vstWindows[pluginPacket.pluginIndex]->hide();
+      vstWindows[pluginPacket.pluginIndex] = nullptr;
+    } else if (vstWindows[pluginPacket.pluginIndex] == nullptr) {
+      addPlugin(pluginPacket.pluginIndex, pluginPacket.name);
+    }
+  }
+
+  setupGrid();
+
+  return OK;
+}
+
 void PluginsContainer::connectActions() {
   const auto selectVstWindowConnection = connect(&selectVstWindowAction, &QAction::triggered, [&]() {
     const PluginIndex pluginIndex = selectVstWindowAction.data().toULongLong();
-    if (vstWindows.size() == 0 || pluginIndex > vstWindows.size())
+
+    if (!hasPluginAt(pluginIndex))
       return;
 
-    vstWindows.at(pluginIndex)->activateWindow();
-    vstWindows.at(pluginIndex)->raise();
+    vstWindows[pluginIndex]->activateWindow();
+    vstWindows[pluginIndex]->raise();
     activateWindow();
     raise();
   });
 
   const auto removePluginActionConnection = connect(removePluginAction, &QAction::triggered, [&]() {
     const PluginIndex pluginIndex = removePluginAction->data().toULongLong();
-    if (vstWindows.size() == 0 || pluginIndex > vstWindows.size())
+    if (!hasPluginAt(pluginIndex))
       return;
 
-    vstWindows.at(pluginIndex)->hide();
-    vstWindows.erase(vstWindows.begin() + pluginIndex);
-    vstWindowSelectButtons.at(pluginIndex)->hide();
-    vstWindowSelectButtons.erase(vstWindowSelectButtons.begin() + pluginIndex);
-    vstWindowSelectLabels.at(pluginIndex)->hide();
-    vstWindowSelectLabels.erase(vstWindowSelectLabels.begin() + pluginIndex);
+    vstWindows[pluginIndex]->hide();
+    vstWindows[pluginIndex] = nullptr;
+    vstWindowSelectButtons[pluginIndex]->hide();
+    vstWindowSelectButtons[pluginIndex] = nullptr;
+    vstWindowSelectLabels[pluginIndex]->hide();
+    vstWindowSelectLabels[pluginIndex] = nullptr;
   });
 }
 
@@ -92,10 +114,13 @@ void PluginsContainer::setupGrid() {
   grid.setVerticalSpacing(10);
 
   int j = 0;
-  for (int i = 0; i < vstWindowSelectButtons.size(); i++) {
+  for (PluginIndex i = 0; i < Audio::MAX_PLUGINS_PER_CHANNEL; i++) {
+    if (!hasPluginAt(i))
+      continue;
+
     grid.setRowMinimumHeight(i, 50);
-    grid.addWidget(vstWindowSelectLabels.at(i), i, 0, 1, 1);
-    grid.addWidget(vstWindowSelectButtons.at(i), i, 1, 1, 1);
+    grid.addWidget(vstWindowSelectLabels[i].get(), i, 0, 1, 1);
+    grid.addWidget(vstWindowSelectButtons[i].get(), i, 1, 1, 1);
     j++;
   }
   grid.setRowMinimumHeight(j, 50);
@@ -120,6 +145,7 @@ void PluginsContainer::showEvent(QShowEvent* event) {
     );
 
   for (auto&& vstWindow: vstWindows) {
+    if (vstWindow == nullptr) continue;
     vstWindow->activateWindow();
     vstWindow->raise();
     vstWindow->show();
@@ -133,14 +159,16 @@ void PluginsContainer::showEvent(QShowEvent* event) {
 
 void PluginsContainer::addPlugin(const PluginIndex newPluginIndex, const AtomicStr& pluginName) {
   auto vstWindow = std::make_shared<VstWindow>(nullptr, channelIndex, newPluginIndex, pluginName);
-  vstWindows.push_back(std::move(vstWindow));
-  vstWindowSelectButtons.push_back(new VstWindowSelectButton(this, newPluginIndex, pluginName, &selectVstWindowAction));
-  const auto label = new QLabel(this);
-  label->setText((std::to_string(newPluginIndex + 1) + ".").data());
-  vstWindowSelectLabels.push_back(label);
+  vstWindows[newPluginIndex] = std::move(vstWindow);
+  vstWindowSelectButtons[newPluginIndex] = std::make_unique<VstWindowSelectButton>(
+    this, newPluginIndex, pluginName, &selectVstWindowAction
+  );
+
+  vstWindowSelectLabels[newPluginIndex] = std::make_unique<QLabel>(this);
+  vstWindowSelectLabels[newPluginIndex]->setText((std::to_string(newPluginIndex + 1) + ".").data());
 
   if (isVisible()) {
-    mixer->initEditorHostOnChannel(channelIndex, newPluginIndex, vstWindows.back());
+    mixer->initEditorHostOnChannel(channelIndex, newPluginIndex, vstWindows[newPluginIndex]);
     setupGrid();
     resize(width(), height() + 40);
     activateWindow();
@@ -149,20 +177,18 @@ void PluginsContainer::addPlugin(const PluginIndex newPluginIndex, const AtomicS
 }
 
 void PluginsContainer::clearButtonsAndLabels() {
-  for (const auto button: vstWindowSelectButtons)
-    delete button;
-
-  vstWindowSelectButtons.clear();
-
-  for (const auto label: vstWindowSelectLabels)
-    delete label;
-  vstWindowSelectLabels.clear();
+  for (PluginIndex i; i < Audio::MAX_PLUGINS_PER_CHANNEL; ++i) {
+    vstWindowSelectButtons[i] = nullptr;
+    vstWindowSelectLabels[i] = nullptr;
+  }
 }
 
 void PluginsContainer::hideEvent(QHideEvent* event) {
   mixer->terminateEditorHostsOnChannel(channelIndex);
-  for (auto vstWindow: vstWindows)
+  for (auto vstWindow: vstWindows) {
+    if (vstWindow == nullptr) continue;
     vstWindow->close();
+  }
 }
 } // Mixer
 } // Gui

@@ -269,20 +269,41 @@ PluginIndex Channel::pluginCount() {
 	return res;
 }
 
-Result Channel::initEditorHosts(const std::vector<std::shared_ptr<Gui::Mixer::VstWindow> >& vstWindows) {
+Result Channel::initEditorHosts(const std::shared_ptr<Gui::Mixer::VstWindow>* vstWindows) {
 	Logging::write(
 		Info,
 		"Audio::Mixer::Channel::initEditorHosts",
 		"Initializing Editor Hosts on channel " + std::to_string(index)
 	);
-	return forEachPlugin([this, &vstWindows](Plugins::Vst3::Plugin* plugin, const PluginIndex pluginIndex) {
-		plugin->initEditorHost(vstWindows.at(pluginIndex));
+
+	const auto res = forEachPlugin([this, &vstWindows](Plugins::Vst3::Plugin* plugin, const PluginIndex pluginIndex) {
+		plugin->initEditorHost(vstWindows[pluginIndex]);
 	});
+
+	Logging::write(
+		Info,
+		"Audio::Mixer::Channel::initEditorHosts",
+		"Initialized Editor Hosts on channel " + std::to_string(index)
+	);
+	return res;
 }
 
 Result Channel::initEditorHost(const PluginIndex pluginIndex, std::shared_ptr<Gui::Mixer::VstWindow> vstWindow) const {
-	if (const auto pluginOpt = getPluginAtIdx(pluginIndex); pluginOpt.has_value())
+	if (const auto pluginOpt = getPluginAtIdx(pluginIndex); pluginOpt.has_value()) {
 		pluginOpt.value()->initEditorHost(vstWindow);
+
+		Logging::write(
+			Info,
+			"Audio::Mixer::Channel::initEditorHost",
+			"Initialized Editor Host on channel " + std::to_string(index) + " at pluginIndex " + std::to_string(pluginIndex)
+		);
+	}
+
+	Logging::write(
+		Info,
+		"Audio::Mixer::Channel::initEditorHost",
+		"No plugin present for channel " + std::to_string(index) + " at pluginIndex " + std::to_string(pluginIndex)
+	);
 
 	return OK;
 }

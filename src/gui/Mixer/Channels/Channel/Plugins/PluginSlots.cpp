@@ -39,30 +39,28 @@ PluginSlots::~PluginSlots() {
   );
 }
 
-void PluginSlots::hydrateState(const State::Packet& statePacket, const ChannelIndex newChannelIndex) {
+Result PluginSlots::hydrateState(const State::Packet& statePacket, const ChannelIndex newChannelIndex) {
   channelIndex = newChannelIndex;
 
   for (const auto pluginPacket: statePacket.mixerPacket.channels[channelIndex].plugins) {
     if (!pluginPacket.hasValue) {
       delete pluginSlots[pluginPacket.pluginIndex];
       pluginSlots[pluginPacket.pluginIndex] = nullptr;
-    } else {
-      if (pluginSlots[pluginPacket.pluginIndex] == nullptr) {
-        pluginSlots[pluginPacket.pluginIndex] =
-            new PluginSlot(
-              this,
-              actorSystem,
-              mixer,
-              channelIndex,
-              pluginPacket.pluginIndex,
-              true,
-              replacePluginAction,
-              removePluginAction
-            );
+    } else if (pluginSlots[pluginPacket.pluginIndex] == nullptr) {
+      pluginSlots[pluginPacket.pluginIndex] =
+          new PluginSlot(
+            this,
+            actorSystem,
+            mixer,
+            channelIndex,
+            pluginPacket.pluginIndex,
+            true,
+            replacePluginAction,
+            removePluginAction
+          );
 
-        pluginSlots[pluginPacket.pluginIndex]->hydrateState(statePacket, channelIndex, pluginPacket.pluginIndex);
-        grid.addWidget(pluginSlots[pluginPacket.pluginIndex], 0, 0, 1, 1);
-      }
+      pluginSlots[pluginPacket.pluginIndex]->hydrateState(statePacket, channelIndex, pluginPacket.pluginIndex);
+      grid.addWidget(pluginSlots[pluginPacket.pluginIndex], 0, 0, 1, 1);
     }
   }
 
@@ -74,6 +72,8 @@ void PluginSlots::hydrateState(const State::Packet& statePacket, const ChannelIn
   }
 
   setupGrid();
+
+  return OK;
 }
 
 void PluginSlots::setupGrid() {
@@ -89,7 +89,7 @@ void PluginSlots::setupGrid() {
   setLayout(&grid);
 }
 
-void PluginSlots::reset() {
+Result PluginSlots::reset() {
   Logging::write(
     Info,
     "Gui::PluginSlots::reset",
@@ -104,6 +104,7 @@ void PluginSlots::reset() {
     "Gui::PluginSlots::reset",
     "Done resetting PluginSlots on channel " + std::to_string(channelIndex)
   );
+  return OK;
 }
 } // Mixer
 } // Gui

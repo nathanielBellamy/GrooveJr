@@ -74,8 +74,9 @@ public:
       "Audio::Mixer::Core::safeDeleteOldPlugins",
       "Safe delete old plugins"
     );
-    if (stateCore->isAudioRunning())
+    if (stateCore->isAudioRunning()) {
       return setProcessDataChangeFlag(ProcessDataChangeFlag::ACKNOWLEDGE);
+    }
 
     return deletePluginsToDelete();
   }
@@ -234,7 +235,7 @@ public:
 
   Result removePluginFromChannel(ChannelIndex channelIdx, PluginIndex pluginIdx);
 
-  Result initEditorHostsOnChannel(ChannelIndex idx, std::vector<std::shared_ptr<Gui::Mixer::VstWindow> >& vstWindows);
+  Result initEditorHostsOnChannel(ChannelIndex idx, const std::shared_ptr<Gui::Mixer::VstWindow>* vstWindows);
 
   Result initEditorHostOnChannel(ChannelIndex idx, PluginIndex newPluginIndex,
                                  std::shared_ptr<Gui::Mixer::VstWindow> vstWindow);

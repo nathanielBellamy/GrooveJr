@@ -6,7 +6,6 @@
 #define GJGUIMIXERPLUGINSCONTAINER_H
 
 #include<memory>
-#include<vector>
 
 #include <QAction>
 #include <QLabel>
@@ -20,6 +19,7 @@
 #include "VstWindowSelectButton.h"
 #include "AddPluginButton.h"
 #include "../../../../../audio/mixer/Core.h"
+#include "../../../../../audio/Constants.h"
 #include "../../../../../Logging.h"
 #include "../../../../../types/AtomicStr.h"
 #include "../../../../../types/Types.h"
@@ -39,6 +39,8 @@ public:
 
   ~PluginsContainer() override;
 
+  Result hydrateState(const State::Packet& statePacket, ChannelIndex newChannelIndex);
+
   void addPlugin(PluginIndex newPluginIndex, const AtomicStr& pluginName);
 
 private:
@@ -48,10 +50,10 @@ private:
   AddPluginButton addPluginButton;
   QAction* removePluginAction;
   QGridLayout grid;
-  std::vector<std::shared_ptr<VstWindow> > vstWindows{};
+  std::shared_ptr<VstWindow> vstWindows[Audio::MAX_PLUGINS_PER_CHANNEL]{};
   QAction selectVstWindowAction;
-  std::vector<VstWindowSelectButton*> vstWindowSelectButtons{};
-  std::vector<QLabel*> vstWindowSelectLabels{};
+  std::unique_ptr<VstWindowSelectButton> vstWindowSelectButtons[Audio::MAX_PLUGINS_PER_CHANNEL]{};
+  std::unique_ptr<QLabel> vstWindowSelectLabels[Audio::MAX_PLUGINS_PER_CHANNEL]{};
 
   void connectActions();
 
@@ -64,6 +66,11 @@ private:
   void showEvent(QShowEvent* event) override;
 
   void hideEvent(QHideEvent* event) override;
+
+  bool hasPluginAt(PluginIndex pluginIndex) const {
+    return pluginIndex < Audio::MAX_PLUGINS_PER_CHANNEL
+           && vstWindows[pluginIndex] != nullptr;
+  };
 };
 } // Mixer
 } // Gui
