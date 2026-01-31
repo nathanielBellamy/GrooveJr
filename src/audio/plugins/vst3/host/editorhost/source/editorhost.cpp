@@ -49,46 +49,42 @@
 
 //------------------------------------------------------------------------
 namespace Steinberg {
-
 //------------------------------------------------------------------------
-inline bool operator== (const ViewRect& r1, const ViewRect& r2)
-{
-	return memcmp (&r1, &r2, sizeof (ViewRect)) == 0;
+inline bool operator==(const ViewRect& r1, const ViewRect& r2) {
+	return memcmp(&r1, &r2, sizeof(ViewRect)) == 0;
 }
 
 //------------------------------------------------------------------------
-inline bool operator!= (const ViewRect& r1, const ViewRect& r2)
-{
+inline bool operator!=(const ViewRect& r1, const ViewRect& r2) {
 	return !(r1 == r2);
 }
 
 namespace Vst {
 namespace EditorHost {
-
 // static AppInit gInit (std::make_unique<App> ());
 
 App::App(WindowPtr window)
-	: window(window)
-	{}
-
-//------------------------------------------------------------------------
-App::~App () noexcept
-{
-	terminate ();
-}
-
-void App::setModule (VST3::Hosting::Module::Ptr module_) {
-  module = module_;
+: window(window) {
 }
 
 //------------------------------------------------------------------------
-void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectID, uint32 flags)
-{
+App::~App() noexcept {
+	std::cout << " plugin dtor 3 - editorhostapp" << std::endl;
+	terminate();
+	std::cout << " plugin dtor 4 - editorhostapp" << std::endl;
+}
+
+void App::setModule(VST3::Hosting::Module::Ptr module_) {
+	module = module_;
+}
+
+//------------------------------------------------------------------------
+void App::openEditor(const std::string& path, VST3::Optional<VST3::UID> effectID, uint32 flags) {
 	std::string error;
 
-	auto factory = module->getFactory ();
-	if (auto factoryHostContext = IPlatform::instance ().getPluginFactoryContext ())
-		factory.setHostContext (factoryHostContext);
+	auto factory = module->getFactory();
+	if (auto factoryHostContext = IPlatform::instance().getPluginFactoryContext())
+		factory.setHostContext(factoryHostContext);
 
 	Gj::Audio::Logging::write(
 		Gj::Audio::LogSeverityLevel::Info,
@@ -96,8 +92,7 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 		"Retrived factory from module"
 	);
 
-	if (!plugProvider)
-	{
+	if (!plugProvider) {
 		Gj::Audio::Logging::write(
 			Gj::Audio::LogSeverityLevel::Error,
 			"EditorHost::openEditor",
@@ -105,29 +100,27 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 		);
 		if (effectID)
 			error =
-			    "No VST3 Audio Module Class with UID " + effectID->toString () + " found in file ";
+					"No VST3 Audio Module Class with UID " + effectID->toString() + " found in file ";
 		else
 			error = "No VST3 Audio Module Class found in file ";
 		error += path;
-		IPlatform::instance ().kill (-1, error);
+		IPlatform::instance().kill(-1, error);
 	}
 
-	if (!editController)
-	{
+	if (!editController) {
 		Gj::Audio::Logging::write(
 			Gj::Audio::LogSeverityLevel::Error,
 			"EditorHost::openEditor",
 			"No VST3 editController."
 		);
 		error = "No EditController found (needed for allowing editor) in file " + path;
-		IPlatform::instance ().kill (-1, error);
+		IPlatform::instance().kill(-1, error);
 	}
-	editController->release (); // plugProvider does an addRef
+	editController->release(); // plugProvider does an addRef
 
 	// if (flags & kSetComponentHandler)
-	if (true)
-	{
-		editController->setComponentHandler (&gComponentHandler);
+	if (true) {
+		editController->setComponentHandler(&gComponentHandler);
 
 		Gj::Audio::Logging::write(
 			Gj::Audio::LogSeverityLevel::Info,
@@ -139,13 +132,12 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 		Vst::IConnectionPoint* iConnectionPointComponent = nullptr;
 		Vst::IConnectionPoint* iConnectionPointController = nullptr;
 
-		processorComponent->queryInterface (Vst::IConnectionPoint::iid, (void**)&iConnectionPointComponent);
-		editController->queryInterface (Vst::IConnectionPoint::iid, (void**)&iConnectionPointController);
+		processorComponent->queryInterface(Vst::IConnectionPoint::iid, (void**) &iConnectionPointComponent);
+		editController->queryInterface(Vst::IConnectionPoint::iid, (void**) &iConnectionPointController);
 
-		if (iConnectionPointComponent && iConnectionPointController)
-		{
-			iConnectionPointComponent->connect (iConnectionPointController);
-			iConnectionPointController->connect (iConnectionPointComponent);
+		if (iConnectionPointComponent && iConnectionPointController) {
+			iConnectionPointComponent->connect(iConnectionPointController);
+			iConnectionPointController->connect(iConnectionPointComponent);
 
 			Gj::Audio::Logging::write(
 				Gj::Audio::LogSeverityLevel::Info,
@@ -166,7 +158,7 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 	}
 
 	// SMTG_DBPRT1 ("Open Editor for %s...\n", path.c_str ());
-	createViewAndShow (editController);
+	createViewAndShow(editController);
 
 	Gj::Audio::Logging::write(
 		Gj::Audio::LogSeverityLevel::Info,
@@ -174,57 +166,52 @@ void App::openEditor (const std::string& path, VST3::Optional<VST3::UID> effectI
 		"Created view and showed"
 	);
 
-	if (flags & kSecondWindow)
-	{
+	if (flags & kSecondWindow) {
 		// SMTG_DBPRT0 ("Open 2cd Editor...\n");
-		createViewAndShow (editController);
+		createViewAndShow(editController);
 	}
 }
 
 //------------------------------------------------------------------------
-void App::createViewAndShow (IEditController* controller)
-{
-	auto view = owned (controller->createView (ViewType::kEditor));
-	if (!view)
-	{
+void App::createViewAndShow(IEditController* controller) {
+	auto view = owned(controller->createView(ViewType::kEditor));
+	if (!view) {
 		Gj::Audio::Logging::write(
 			Gj::Audio::LogSeverityLevel::Error,
 			"EditorHost::createViewAndShow",
 			"Could not create view"
 		);
-		IPlatform::instance ().kill (-1, "EditController does not provide its own editor");
+		IPlatform::instance().kill(-1, "EditController does not provide its own editor");
 	}
 
-	ViewRect plugViewSize {};
-	auto result = view->getSize (&plugViewSize);
-	if (result != kResultTrue)
-	{
+	ViewRect plugViewSize{};
+	auto result = view->getSize(&plugViewSize);
+	if (result != kResultTrue) {
 		Gj::Audio::Logging::write(
 			Gj::Audio::LogSeverityLevel::Error,
 			"EditorHost::createViewAndShow",
 			"Could not get view size"
 		);
-		IPlatform::instance ().kill (-1, "Could not get editor view size");
+		IPlatform::instance().kill(-1, "Could not get editor view size");
 	}
 
-	auto viewRect = ViewRectToRect (plugViewSize);
+	auto viewRect = ViewRectToRect(plugViewSize);
 	Gj::Audio::Logging::write(
 		Gj::Audio::LogSeverityLevel::Info,
 		"EditorHost::createViewAndShow",
 		"Retrieved view rect"
 	);
 
-	windowController = std::make_shared<WindowController> (view);
-		// IPlatform::instance ().createWindow (
-	 //    "Gj Editor", viewRect.size, view->canResize () == kResultTrue, windowController);
-	if (!window)
-	{
+	windowController = std::make_shared<WindowController>(view);
+	// IPlatform::instance ().createWindow (
+	//    "Gj Editor", viewRect.size, view->canResize () == kResultTrue, windowController);
+	if (!window) {
 		Gj::Audio::Logging::write(
 			Gj::Audio::LogSeverityLevel::Error,
 			"EditorHost::createViewAndShow",
 			"Could not create window"
 		);
-		IPlatform::instance ().kill (-1, "Could not create window");
+		IPlatform::instance().kill(-1, "Could not create window");
 	}
 
 	Gj::Audio::Logging::write(
@@ -232,7 +219,7 @@ void App::createViewAndShow (IEditController* controller)
 		"EditorHost::createViewAndShow",
 		"Will call window->show()"
 	);
-	window->show ();
+	window->show();
 
 	try {
 		windowController->onShow(*window.get());
@@ -251,22 +238,19 @@ void App::createViewAndShow (IEditController* controller)
 }
 
 //------------------------------------------------------------------------
-void App::init (const std::vector<std::string>& cmdArgs)
-{
+void App::init(const std::vector<std::string>& cmdArgs) {
 	VST3::Optional<VST3::UID> uid;
-	uint32 flags {};
-	for (auto it = cmdArgs.begin (), end = cmdArgs.end (); it != end; ++it)
-	{
+	uint32 flags{};
+	for (auto it = cmdArgs.begin(), end = cmdArgs.end(); it != end; ++it) {
 		if (*it == "--componentHandler")
 			flags |= kSetComponentHandler;
 		else if (*it == "--secondWindow")
 			flags |= kSecondWindow;
-		else if (*it == "--uid")
-		{
+		else if (*it == "--uid") {
 			if (++it != end)
-				uid = VST3::UID::fromString (*it);
+				uid = VST3::UID::fromString(*it);
 			if (!uid)
-				IPlatform::instance ().kill (-1, "wrong argument to --uid");
+				IPlatform::instance().kill(-1, "wrong argument to --uid");
 		}
 	}
 
@@ -275,8 +259,7 @@ void App::init (const std::vector<std::string>& cmdArgs)
 		"EditorHost::init",
 		"cmdArgs: " + cmdArgs.back()
 	);
-	if (cmdArgs.empty () || cmdArgs.back ().find (".vst3") == std::string::npos)
-	{
+	if (cmdArgs.empty() || cmdArgs.back().find(".vst3") == std::string::npos) {
 		auto helpText = R"(
 usage: EditorHost [options] pluginPath
 
@@ -292,7 +275,7 @@ options:
 	use effect class with unique class ID==UID
 )";
 
-		IPlatform::instance ().kill (0, helpText);
+		IPlatform::instance().kill(0, helpText);
 	}
 
 	Gj::Audio::Logging::write(
@@ -300,45 +283,41 @@ options:
 		"Audio::Steinberg::Vst::EditorHost::init",
 		"Handled cmdArgs - will call openEditor"
 	);
-	openEditor (cmdArgs.back (), std::move (uid), flags);
+	openEditor(cmdArgs.back(), std::move(uid), flags);
 }
 
 //------------------------------------------------------------------------
-void App::terminate ()
-{
+void App::terminate() {
 	Gj::Audio::Logging::write(
 		Gj::Audio::LogSeverityLevel::Info,
 		"Audio::Steinberg::Vst::EditorHost::terminate",
 		"Terminating editorhost."
 	);
 
-	PluginContextFactory::instance().setPluginContext (nullptr);
+	PluginContextFactory::instance().setPluginContext(nullptr);
 	if (windowController)
-		windowController->closePlugView ();
-	windowController.reset ();
-	plugProvider.reset ();
-	module.reset ();
+		windowController->closePlugView();
+	windowController.reset();
+	plugProvider.reset();
+	module.reset();
 
 	Gj::Audio::Logging::write(
 		Gj::Audio::LogSeverityLevel::Info,
 		"Audio::Steinberg::Vst::EditorHost::terminate",
-		"Done terminating editorhost."
+		"Done terminating editorHost."
 	);
 }
 
 //------------------------------------------------------------------------
-WindowController::WindowController (const IPtr<IPlugView>& plugView) : plugView (plugView)
-{
+WindowController::WindowController(const IPtr<IPlugView>& plugView) : plugView(plugView) {
 }
 
 //------------------------------------------------------------------------
-WindowController::~WindowController () noexcept
-{
+WindowController::~WindowController() noexcept {
 }
 
 //------------------------------------------------------------------------
-void WindowController::onShow (IWindow& w)
-{
+void WindowController::onShow(IWindow& w) {
 	window = &w;
 	if (!plugView) {
 		Gj::Audio::Logging::write(
@@ -349,15 +328,14 @@ void WindowController::onShow (IWindow& w)
 		return;
 	}
 
-	auto platformWindow = window->getNativePlatformWindow ();
-	if (plugView->isPlatformTypeSupported (platformWindow.type) != kResultTrue)
-	{
-		IPlatform::instance ().kill (-1, std::string ("PlugView does not support platform type: ") +
-		                                     platformWindow.type);
+	auto platformWindow = window->getNativePlatformWindow();
+	if (plugView->isPlatformTypeSupported(platformWindow.type) != kResultTrue) {
+		IPlatform::instance().kill(-1, std::string("PlugView does not support platform type: ") +
+		                               platformWindow.type);
 	}
 
 	try {
-		plugView->setFrame (this);
+		plugView->setFrame(this);
 	} catch (...) {
 		Gj::Audio::Logging::write(
 			Gj::Audio::LogSeverityLevel::Error,
@@ -372,8 +350,8 @@ void WindowController::onShow (IWindow& w)
 	);
 
 	try {
-		if (plugView->attached (std::move(platformWindow.ptr), platformWindow.type) != kResultTrue) {
-			IPlatform::instance ().kill (-1, "Attaching PlugView failed");
+		if (plugView->attached(std::move(platformWindow.ptr), platformWindow.type) != kResultTrue) {
+			IPlatform::instance().kill(-1, "Attaching PlugView failed");
 			Gj::Audio::Logging::write(
 				Gj::Audio::LogSeverityLevel::Error,
 				"WindowController::onShow",
@@ -395,14 +373,11 @@ void WindowController::onShow (IWindow& w)
 }
 
 //------------------------------------------------------------------------
-void WindowController::closePlugView ()
-{
-	if (plugView)
-	{
-		plugView->setFrame (nullptr);
-		if (plugView->removed () != kResultTrue)
-		{
-			IPlatform::instance ().kill (-1, "Removing PlugView failed");
+void WindowController::closePlugView() {
+	if (plugView) {
+		plugView->setFrame(nullptr);
+		if (plugView->removed() != kResultTrue) {
+			IPlatform::instance().kill(-1, "Removing PlugView failed");
 		}
 		plugView = nullptr;
 	}
@@ -410,43 +385,38 @@ void WindowController::closePlugView ()
 }
 
 //------------------------------------------------------------------------
-void WindowController::onClose (IWindow& w)
-{
+void WindowController::onClose(IWindow& w) {
 	// SMTG_DBPRT1 ("onClose called (%p)\n", (void*)&w);
 
-	closePlugView ();
+	closePlugView();
 
 	// TODO maybe quit only when the last window is closed
-	IPlatform::instance ().quit ();
+	IPlatform::instance().quit();
 }
 
 //------------------------------------------------------------------------
-void WindowController::onResize (IWindow& w, Size newSize)
-{
+void WindowController::onResize(IWindow& w, Size newSize) {
 	// SMTG_DBPRT1 ("onResize called (%p)\n", (void*)&w);
 
-	if (plugView)
-	{
-		ViewRect r {};
+	if (plugView) {
+		ViewRect r{};
 		r.right = newSize.width;
 		r.bottom = newSize.height;
-		ViewRect r2 {};
-		if (plugView->getSize (&r2) == kResultTrue && r != r2)
-			plugView->onSize (&r);
+		ViewRect r2{};
+		if (plugView->getSize(&r2) == kResultTrue && r != r2)
+			plugView->onSize(&r);
 	}
 }
 
 //------------------------------------------------------------------------
-Size WindowController::constrainSize (IWindow& w, Size requestedSize)
-{
+Size WindowController::constrainSize(IWindow& w, Size requestedSize) {
 	// SMTG_DBPRT1 ("constrainSize called (%p)\n", (void*)&w);
 
-	ViewRect r {};
+	ViewRect r{};
 	r.right = requestedSize.width;
 	r.bottom = requestedSize.height;
-	if (plugView && plugView->checkSizeConstraint (&r) != kResultTrue)
-	{
-		plugView->getSize (&r);
+	if (plugView && plugView->checkSizeConstraint(&r) != kResultTrue) {
+		plugView->getSize(&r);
 	}
 	requestedSize.width = r.right - r.left;
 	requestedSize.height = r.bottom - r.top;
@@ -454,19 +424,16 @@ Size WindowController::constrainSize (IWindow& w, Size requestedSize)
 }
 
 //------------------------------------------------------------------------
-void WindowController::onContentScaleFactorChanged (IWindow& w, float newScaleFactor)
-{
+void WindowController::onContentScaleFactorChanged(IWindow& w, float newScaleFactor) {
 	// SMTG_DBPRT1 ("onContentScaleFactorChanged called (%p)\n", (void*)&w);
 
-	if (auto css = U::cast<IPlugViewContentScaleSupport> (plugView))
-	{
-		css->setContentScaleFactor (newScaleFactor);
+	if (auto css = U::cast<IPlugViewContentScaleSupport>(plugView)) {
+		css->setContentScaleFactor(newScaleFactor);
 	}
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API WindowController::resizeView (IPlugView* view, ViewRect* newSize)
-{
+tresult PLUGIN_API WindowController::resizeView(IPlugView* view, ViewRect* newSize) {
 	// SMTG_DBPRT1 ("resizeView called (%p)\n", (void*)view);
 
 	if (newSize == nullptr || view == nullptr || view != plugView)
@@ -476,19 +443,19 @@ tresult PLUGIN_API WindowController::resizeView (IPlugView* view, ViewRect* newS
 	if (resizeViewRecursionGard)
 		return kResultFalse;
 	ViewRect r;
-	if (plugView->getSize (&r) != kResultTrue)
+	if (plugView->getSize(&r) != kResultTrue)
 		return kInternalError;
 	if (r == *newSize)
 		return kResultTrue;
 
 	resizeViewRecursionGard = true;
-	Size size {newSize->right - newSize->left, newSize->bottom - newSize->top};
-	window->resize (size);
+	Size size{newSize->right - newSize->left, newSize->bottom - newSize->top};
+	window->resize(size);
 	resizeViewRecursionGard = false;
-	if (plugView->getSize (&r) != kResultTrue)
+	if (plugView->getSize(&r) != kResultTrue)
 		return kInternalError;
 	if (r != *newSize)
-		plugView->onSize (newSize);
+		plugView->onSize(newSize);
 	return kResultTrue;
 }
 

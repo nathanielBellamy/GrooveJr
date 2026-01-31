@@ -71,6 +71,9 @@ struct PlaybackState {
       audioThread->quit();
       audioThread = nullptr;
     }
+    stateCore->setAudioRunning(false);
+    mixer->getGjJackClient()->deactivate();
+    mixer->safeDeleteOldPlugins();
   }
 
   Playback::behavior_type make_behavior() {

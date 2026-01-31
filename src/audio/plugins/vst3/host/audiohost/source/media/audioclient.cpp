@@ -196,7 +196,9 @@ float AudioClient::SILENCE_BUFFER[Gj::Audio::AUDIO_FRAMES_PER_BUFFER_MAX] = {0.0
 
 //------------------------------------------------------------------------
 AudioClient::~AudioClient() {
+  std::cout << "plugin dtor - audioclient 0" << std::endl;
   terminate();
+  std::cout << "plugin dtor - audioclient 1" << std::endl;
 }
 
 //------------------------------------------------------------------------
@@ -213,14 +215,6 @@ void AudioClient::initProcessContext() {
 }
 
 //------------------------------------------------------------------------
-// void AudioClient::createLocalMediaServer (const Name& name)
-// {
-// 	mediaServer = createMediaServer (name);
-// 	mediaServer->registerAudioClient (this);
-// 	mediaServer->registerMidiClient (this);
-// }
-
-//------------------------------------------------------------------------
 bool AudioClient::initialize(const Name& name, IComponent* _component, IMidiMapping* midiMapping,
                              IMediaServerPtr jackClient) {
   component = _component;
@@ -232,23 +226,21 @@ bool AudioClient::initialize(const Name& name, IComponent* _component, IMidiMapp
 
   if (midiMapping)
     midiCCMapping = initMidiCtrlerAssignment(component, midiMapping);
-  mediaServer = jackClient;
-
-
-  // createLocalMediaServer (name);
   return true;
 }
 
 //------------------------------------------------------------------------
 void AudioClient::terminate() {
-  mediaServer = nullptr;
+  std::cout << "audioClient terminate 1" << std::endl;
 
   FUnknownPtr<IAudioProcessor> processor = component;
   if (!processor)
     return;
 
+  std::cout << "audioClient terminate 2" << std::endl;
   processor->setProcessing(false);
   component->setActive(false);
+  std::cout << "audioClient terminate 3" << std::endl;
 }
 
 //------------------------------------------------------------------------

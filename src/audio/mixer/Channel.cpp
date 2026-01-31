@@ -65,6 +65,11 @@ Channel::~Channel() {
 	);
 
 	if (forEachPlugin([this](const Plugins::Vst3::Plugin* plugin, const PluginIndex) {
+		Logging::write(
+			Info,
+			"Audio::Mixer::Channel::dtor",
+			"Destroying plugin: " + plugin->getName().std_str() + "on ChannelIndex" + std::to_string(index)
+		);
 		delete plugin;
 	}) != OK)
 		Logging::write(
@@ -222,7 +227,7 @@ Result Channel::setSampleRate(const double sampleRate) {
 	bool warning = false;
 	const Result setResult = forEachPlugin(
 		[this, &sampleRate, &warning](Plugins::Vst3::Plugin* plugin, PluginIndex pluginIndex) {
-			if (!plugin->audioHost->audioClient->setSamplerate(sampleRate)) {
+			if (!plugin->audioHost.audioClient->setSamplerate(sampleRate)) {
 				Logging::write(
 					Warning,
 					"Audio::Mixer::Channel::setSampleRate",
@@ -243,7 +248,7 @@ Result Channel::setBlockSize(const jack_nframes_t blockSize) {
 	const auto blockSize32 = static_cast<int32>(blockSize);
 	const auto setResult = forEachPlugin(
 		[this, &blockSize32, &warning](Plugins::Vst3::Plugin* plugin, PluginIndex pluginIndex) {
-			if (!plugin->audioHost->audioClient->setBlockSize(blockSize32)) {
+			if (!plugin->audioHost.audioClient->setBlockSize(blockSize32)) {
 				Logging::write(
 					Warning,
 					"Audio::Mixer::Channel::setBlockSize",
@@ -315,7 +320,7 @@ Result Channel::terminateEditorHosts() {
 		"Terminating Editor Hosts on channel " + std::to_string(index)
 	);
 
-	if (forEachPlugin([this](const Plugins::Vst3::Plugin* plugin, const PluginIndex) {
+	if (forEachPlugin([this](Plugins::Vst3::Plugin* plugin, const PluginIndex) {
 		plugin->terminateEditorHost();
 	}) != OK) {
 		Logging::write(

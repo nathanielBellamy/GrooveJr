@@ -20,7 +20,7 @@ App::App() {
 }
 
 tresult App::terminate() {
-  this->release();
+  // this->release();
   return kResultOk;
 }
 

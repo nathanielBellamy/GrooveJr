@@ -30,7 +30,11 @@ class App : public IHostApplication {
 public:
   App();
 
-  virtual ~App() noexcept { FUNKNOWN_DTOR}
+  virtual ~App() noexcept {
+    std::cout << "Vst3::Host::App::~App()" << std::endl;
+    FUNKNOWN_DTOR
+    std::cout << "DONE Vst3::Host::App::~App()" << std::endl;
+  }
 
   tresult terminate();
 

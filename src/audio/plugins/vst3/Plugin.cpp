@@ -12,7 +12,8 @@ using namespace Steinberg;
 
 Plugin::Plugin(const AtomicStr& path, State::Core* stateCore, std::shared_ptr<JackClient> jackClient)
 : stateCore(stateCore)
-  , path(path) {
+  , path(path)
+  , audioHost(stateCore, jackClient) {
 	Steinberg::ResizableMemoryIBStream state;
 
 	Logging::write(
@@ -41,12 +42,8 @@ Plugin::Plugin(const AtomicStr& path, State::Core* stateCore, std::shared_ptr<Ja
 	const auto& cmdArgs = std::vector{path.std_str()};
 
 	try {
-		audioHost = new AudioHost::App(
-			stateCore,
-			jackClient
-		);
-		audioHost->setModule(module);
-		audioHost->init(cmdArgs);
+		audioHost.setModule(module);
+		audioHost.init(cmdArgs);
 	} catch (...) {
 		Logging::write(
 			Error,
@@ -65,7 +62,8 @@ Plugin::Plugin(const AtomicStr& path, State::Core* stateCore, std::shared_ptr<Ja
 
 Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shared_ptr<JackClient> jackClient)
 : stateCore(stateCore)
-  , path(pluginEntity.filePath) {
+  , path(pluginEntity.filePath)
+  , audioHost(stateCore, jackClient) {
 	Logging::write(
 		Info,
 		"Audio::Plugin::Plugin::entity",
@@ -92,14 +90,10 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shar
 	const auto& cmdArgs = std::vector{path.std_str()};
 
 	try {
-		audioHost = new AudioHost::App(
-			stateCore,
-			jackClient
-		);
-		audioHost->setModule(module);
-		audioHost->init(cmdArgs);
+		audioHost.setModule(module);
+		audioHost.init(cmdArgs);
 
-		const auto audioHostComponentState = std::make_unique<ResizableMemoryIBStream>();
+		const auto audioHostComponentState = owned(new ResizableMemoryIBStream());
 		int audioHostComponentStateBytes = pluginEntity.audioHostComponentStateBlob.size();
 		int audioHostComponentStateBytesWritten = 0;
 
@@ -109,7 +103,7 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shar
 			&audioHostComponentStateBytesWritten
 		);
 
-		const auto audioHostControllerState = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+		const auto audioHostControllerState = owned(new ResizableMemoryIBStream());
 		int audioHostControllerStateBytes = pluginEntity.audioHostControllerStateBlob.size();
 		int audioHostControllerStateBytesWritten = 0;
 
@@ -121,7 +115,7 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shar
 
 		if (audioHostComponentStateBytesWritten == audioHostComponentStateBytes
 		    && audioHostControllerStateBytesWritten == audioHostControllerStateBytes) {
-			audioHost->setState(audioHostComponentState.get(), audioHostControllerState.get());
+			audioHost.setState(audioHostComponentState.get(), audioHostControllerState.get());
 		} else {
 			Logging::write(
 				Error,
@@ -130,7 +124,7 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shar
 			);
 		}
 
-		editorHostComponentStateStream = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+		editorHostComponentStateStream = owned(new ResizableMemoryIBStream());
 		int editorHostComponentStateBytes = pluginEntity.audioHostComponentStateBlob.size();
 		int editorHostComponentStateBytesWritten = 0;
 
@@ -140,7 +134,7 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shar
 			&editorHostComponentStateBytesWritten
 		);
 
-		editorHostControllerStateStream = std::make_unique<Steinberg::ResizableMemoryIBStream>();
+		editorHostControllerStateStream = owned(new ResizableMemoryIBStream());
 		int editorHostControllerStateBytes = pluginEntity.audioHostControllerStateBlob.size();
 		int editorHostControllerStateBytesWritten = 0;
 
@@ -153,7 +147,7 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shar
 		Logging::write(
 			Error,
 			"Audio::Plugin::Plugin",
-			"An error occurred while initialiazing audioHost for " + path
+			"An error occurred while initializing audioHost for " + path
 		);
 		return;
 	}
@@ -165,39 +159,6 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shar
 	);
 }
 
-Plugin::~Plugin() {
-	Logging::write(
-		Info
-		, "Audio::Plugin::~Plugin",
-		"Destroying Plugin: " + name
-	);
-
-	// TODO: debug
-	audioHost->terminate();
-
-	Logging::write(
-		Info,
-		"Audio::Plugin::~Plugin",
-		"Destroyed audioHost for Plugin: " + name
-	);
-	//
-	// if (editorHost != nullptr) {
-	// 	delete editorHost;
-	//
-	// 	Logging::write(
-	// 		Info,
-	// 		"Audio::Plugin::~Plugin",
-	// 		"Destroyed editorHost for Plugin: " + name
-	// 	);
-	// }
-
-	Logging::write(
-		Info,
-		"Audio::Plugin::~Plugin",
-		"Destroyed Plugin: " + name
-	);
-}
-
 void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 	try {
 		Logging::write(
@@ -206,11 +167,11 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 			"Initializing editorHost for " + this->path
 		);
 		const auto& cmdArgs = std::vector{path.std_str()};
-		editorHost = new EditorHost::App(window);
+		editorHost = std::make_unique<EditorHost::App>(window);
 		editorHost->setModule(module);
-		editorHost->plugProvider = audioHost->plugProvider;
-		editorHost->editController = audioHost->editController;
-		editorHost->processorComponent = audioHost->component;
+		editorHost->plugProvider = audioHost.plugProvider;
+		editorHost->editController = audioHost.editController;
+		editorHost->processorComponent = audioHost.component;
 		editorHost->init(cmdArgs);
 
 		editorHost->setState(editorHostComponentStateStream.get(), editorHostComponentStateStream.get());
@@ -218,7 +179,7 @@ void Plugin::initEditorHost(EditorHost::WindowPtr window) {
 		Logging::write(
 			Warning,
 			"Audio::Plugin::Plugin",
-			"An error occured while initiating editorhost for " + path
+			"An error occurred while initiating editorHost for " + path
 		);
 		return;
 	}
@@ -315,7 +276,7 @@ Result Plugin::populateEditorHostStateBuffers(std::vector<uint8_t>& componentSta
 }
 
 
-Result Plugin::terminateEditorHost() const {
+Result Plugin::terminateEditorHost() {
 	Logging::write(
 		Info,
 		"Audio::Plugins::Vst3::Plugin::terminateEditorHost",
@@ -341,6 +302,7 @@ Result Plugin::terminateEditorHost() const {
 	};
 
 	editorHost->terminate();
+	editorHost.reset();
 
 	Logging::write(
 		Info,

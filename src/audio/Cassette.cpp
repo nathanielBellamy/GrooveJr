@@ -25,8 +25,8 @@ Cassette::Cassette(State::Core* stateCore, const char* filePath)
 }
 
 Cassette::Cassette(State::Core* stateCore)
-: filePath("BLANK")
-  , stateCore(stateCore)
+: stateCore(stateCore)
+  , filePath("BLANK")
   , sfInfo() {
   Logging::write(
     Info,
@@ -89,6 +89,7 @@ int Cassette::init() {
   // https://svn.ict.usc.edu/svn_vh_public/trunk/lib/vhcl/libsndfile/doc/api.html
   // > When opening a file for read, the format field should be set to zero before calling sf_open().
   sfInfo.format = 0;
+  // debug
   file = sf_open(filePath, SFM_READ, &sfInfo);
 
   if (file == nullptr) {

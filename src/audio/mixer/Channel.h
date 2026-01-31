@@ -44,16 +44,25 @@ public:
     Logging::write(
       Info,
       "Audio::Channel::deletePluginsToDelete",
-      "Deleting plugins marked for deletion."
+      "Deleting plugins marked for deletion. ChannelIndex: " + std::to_string(index)
     );
+    std::cout << "plugins To Delete size" << pluginsToDelete.size() << std::endl;
     for (const auto plugin: pluginsToDelete) {
       Logging::write(
         Info,
         "Audio::Channel::deletePluginsToDelete",
-        "Deleting plugin: " + plugin->getName().std_str()
+        "Deleting plugin: " + plugin->getName().std_str() + " ChannelIndex: " + std::to_string(index)
       );
       delete plugin;
+      Logging::write(
+        Info,
+        "Audio::Channel::deletePluginsToDelete",
+        "Deleted plugin. ChannelIndex: " + std::to_string(index)
+      );
     }
+    std::cout << "wowz 1" << std::endl;
+    std::cout << "wowz 1" << std::endl;
+    std::cout << "wowz 1" << std::endl;
     pluginsToDelete.clear();
     return OK;
   }

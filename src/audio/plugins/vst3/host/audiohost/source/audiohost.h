@@ -65,7 +65,8 @@ public:
 
 	void init(const std::vector<std::string>& cmdArgs) override;
 
-	void terminate() override;
+	void terminate() override {
+	};
 
 	IPtr<PlugProvider> plugProvider{nullptr};
 

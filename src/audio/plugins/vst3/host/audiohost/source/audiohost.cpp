@@ -58,52 +58,44 @@
 
 //------------------------------------------------------------------------
 namespace Steinberg {
-
 namespace Vst {
 namespace AudioHost {
 // static AudioHost::AppInit gInit (std::make_unique<App> (128));
 
-void App::setModule (VST3::Hosting::Module::Ptr module_) {
-  module = module_;
+void App::setModule(VST3::Hosting::Module::Ptr module_) {
+	module = module_;
 }
 
 App::App(Gj::State::Core* stateCore, std::shared_ptr<Gj::Audio::JackClient> jackClient)
-	: stateCore(stateCore)
-	, jackClient(jackClient)
-	{
+: stateCore(stateCore)
+  , jackClient(jackClient) {
 }
 
 //------------------------------------------------------------------------
-App::~App () noexcept
-{
+App::~App() noexcept {
+	std::cout << "plugin dtor 2 - audiohostapp" << std::endl;
 }
 
 //------------------------------------------------------------------------
-void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> effectID,
-                            uint32 flags)
-{
-
+void App::startAudioClient(const std::string& path, VST3::Optional<VST3::UID> effectID,
+                           uint32 flags) {
 	std::string error;
-	const auto factory = module->getFactory ();
-	for (auto& classInfo : factory.classInfos ())
-	{
-		if (classInfo.category () == kVstAudioEffectClass)
-		{
-			if (effectID)
-			{
-				if (*effectID != classInfo.ID ())
+	const auto factory = module->getFactory();
+	for (auto& classInfo: factory.classInfos()) {
+		if (classInfo.category() == kVstAudioEffectClass) {
+			if (effectID) {
+				if (*effectID != classInfo.ID())
 					continue;
 			}
-			plugProvider = owned (new PlugProvider (factory, classInfo, true));
+			plugProvider = owned(new PlugProvider(factory, classInfo, true));
 			break;
 		}
 	}
-	if (!plugProvider)
-	{
+	if (!plugProvider) {
 		std::string error;
 		if (effectID)
 			error =
-			    "No VST3 Audio Module Class with UID " + effectID->toString () + " found in file ";
+					"No VST3 Audio Module Class with UID " + effectID->toString() + " found in file ";
 		else
 			error = "No VST3 Audio Module Class found in file ";
 		error += path;
@@ -116,22 +108,20 @@ void App::startAudioClient (const std::string& path, VST3::Optional<VST3::UID> e
 		// );
 
 		// EditorHost::IPlatform::instance ().kill (-1, error);
-        return;
+		return;
 	}
 
-	component = plugProvider->getComponent ();
-	editController = plugProvider->getController ();
-	const auto midiMapping = U::cast<IMidiMapping> (editController);
+	component = plugProvider->getComponent();
+	editController = plugProvider->getController();
+	const auto midiMapping = U::cast<IMidiMapping>(editController);
 
-	std::string name = plugProvider->getClassInfo().name();
-	audioClient = AudioClient::create (name, component, midiMapping, jackClient);
+	const std::string name = plugProvider->getClassInfo().name();
+	audioClient = AudioClient::create(name, component, midiMapping, jackClient);
 }
 
 //------------------------------------------------------------------------
-void App::init (const std::vector<std::string>& cmdArgs)
-{
-	if (cmdArgs.empty ())
-	{
+void App::init(const std::vector<std::string>& cmdArgs) {
+	if (cmdArgs.empty()) {
 		/*auto helpText = R"(
 		usage: AudioHost pluginPath
 		)";
@@ -140,15 +130,9 @@ void App::init (const std::vector<std::string>& cmdArgs)
 	}
 
 	VST3::Optional<VST3::UID> uid;
-	uint32 flags {};
+	uint32 flags{};
 
-	startAudioClient (cmdArgs.back (), std::move (uid), flags);
-}
-
-//------------------------------------------------------------------------
-void App::terminate ()
-{
-	delete this;
+	startAudioClient(cmdArgs.back(), std::move(uid), flags);
 }
 
 //------------------------------------------------------------------------

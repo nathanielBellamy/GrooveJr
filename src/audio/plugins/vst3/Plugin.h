@@ -33,11 +33,11 @@ struct Plugin {
   State::Core* stateCore;
   AtomicStr name;
   AtomicStr path;
+  AudioHost::App audioHost;
+  std::unique_ptr<EditorHost::App> editorHost;
+  IPtr<ResizableMemoryIBStream> editorHostComponentStateStream;
+  IPtr<ResizableMemoryIBStream> editorHostControllerStateStream;
   VST3::Hosting::Module::Ptr module;
-  AudioHost::App* audioHost;
-  EditorHost::App* editorHost;
-  std::unique_ptr<ResizableMemoryIBStream> editorHostComponentStateStream;
-  std::unique_ptr<ResizableMemoryIBStream> editorHostControllerStateStream;
 
   Plugin(
     const AtomicStr& path,
@@ -51,15 +51,31 @@ struct Plugin {
     std::shared_ptr<JackClient> jackClient
   );
 
-  ~Plugin();
+  ~Plugin() {
+    Logging::write(
+      Info,
+      "Audio::Plugins::Vst3::Plugin::~Plugin()",
+      "Destroying plugin " + name.std_str()
+    );
+
+    audioHost.setModule(nullptr);
+    if (editorHost)
+      editorHost->setModule(nullptr);
+    std::cout << "plugin dtor 0" << std::endl;
+    Logging::write(
+      Info,
+      "Audio::Plugins::Vst3::Plugin::~Plugin()",
+      "Destroyed plugin " + name.std_str()
+    );
+  }
 
   [[nodiscard]]
   FUnknownPtr<IAudioProcessor> getProcesser() const {
-    return audioHost->audioClient->getComponent();
+    return audioHost.audioClient->getComponent();
   }
 
   Result setupProcessing() {
-    if (!audioHost->setupProcessing())
+    if (!audioHost.setupProcessing())
       return ERROR;
 
     return OK;
@@ -75,7 +91,7 @@ struct Plugin {
                                         std::vector<uint8_t>& controllerStateBuffer) const;
 
   [[nodiscard]]
-  Result terminateEditorHost() const;
+  Result terminateEditorHost();
 
   [[nodiscard]]
   AtomicStr getName() const { return name; };
@@ -86,7 +102,7 @@ struct Plugin {
     ResizableMemoryIBStream* editorHostComponentState,
     ResizableMemoryIBStream* editorHostControllerState
   ) const {
-    audioHost->setState(audioHostComponentState, audioHostControllerState);
+    audioHost.setState(audioHostComponentState, audioHostControllerState);
     if (editorHost != nullptr)
       editorHost->setState(editorHostComponentState, editorHostControllerState);
   }
@@ -104,7 +120,7 @@ struct Plugin {
     ResizableMemoryIBStream* editorHostComponentState,
     ResizableMemoryIBStream* editorHostControllerState
   ) const {
-    audioHost->getState(audioHostComponentState, audioHostControllerState);
+    audioHost.getState(audioHostComponentState, audioHostControllerState);
     if (editorHost != nullptr)
       editorHost->getState(editorHostComponentState, editorHostControllerState);
   }

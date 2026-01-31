@@ -75,9 +75,11 @@ public:
       "Safe delete old plugins"
     );
     if (stateCore->isAudioRunning()) {
+      std::cout << "safeDeleteOldPlugins audioRunning" << std::endl;
       return setProcessDataChangeFlag(ProcessDataChangeFlag::ACKNOWLEDGE);
     }
 
+    std::cout << "safeDeleteOldPlugins audio NOT Running" << std::endl;
     return deletePluginsToDelete();
   }
 
@@ -211,9 +213,22 @@ public:
       "Audio::Mixer::deletePluginsToDelete",
       "Deleting plugins."
     );
-    return forEachChannel([](Channel* channel, const ChannelIndex) {
-      channel->deletePluginsToDelete();
-    });
+    jackClient->deactivate();
+    // const auto res = forEachChannel([](Channel* channel, const ChannelIndex) {
+    //   channel->deletePluginsToDelete();
+    // });
+    channels[1].value()->deletePluginsToDelete();
+    std::cout << "wowza 22222" << std::endl;
+    std::cout << "wowza 22222" << std::endl;
+    std::cout << "wowza 22222" << std::endl;
+    std::cout << "wowza 22222" << std::endl;
+
+    Logging::write(
+      Info,
+      "Audio::Mixer::deletePluginsToDelete",
+      "Deleted old plugins."
+    );
+    return OK;
   }
 
   std::optional<ChannelIndex> firstOpenChannelIndex() const;

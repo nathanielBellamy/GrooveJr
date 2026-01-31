@@ -192,7 +192,6 @@ struct AudioPlayer {
     }
 
     if (playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] == ProcessDataChangeFlag::ROGER) {
-      mixer->deletePluginsToDelete();
       playbackSettingsToAudioThread[BfrIdx::PSTAT::PROCESS_DATA_CHANGE_FLAG] = ProcessDataChangeFlag::BASE;
       mixer->setProcessDataChangeFlag(ProcessDataChangeFlag::BASE);
     }
@@ -208,10 +207,10 @@ struct AudioPlayer {
               getPluginBuffers(ch, pluginIdx);
 
           if (const auto plugin = pluginOpt.value_or(nullptr);
-            plugin != nullptr && plugin->audioHost != nullptr && plugin->audioHost->audioClient) {
+            plugin != nullptr && plugin->audioHost.audioClient) {
             processData.processFuncs[pluginIdx] =
-                [audioClient = plugin->audioHost->audioClient](IAudioClient::Buffers& buffers,
-                                                               const jack_nframes_t nFrames) {
+                [audioClient = plugin->audioHost.audioClient](IAudioClient::Buffers& buffers,
+                                                              const jack_nframes_t nFrames) {
                   return audioClient->process(
                     buffers,
                     nFrames
@@ -568,9 +567,6 @@ struct AudioPlayer {
       mixer->getSetEqRingBufferFunc()(nullptr);
       mixer->getSetVuRingBufferFunc()(nullptr);
     }
-
-    stateCore->setAudioRunning(false);
-    mixer->deletePluginsToDelete();
 
     Logging::write(
       Info,
