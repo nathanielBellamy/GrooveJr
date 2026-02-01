@@ -124,8 +124,10 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> pluginIdxOpt, 
 		plugins[idxToPut.value()] = std::move(plugin);
 	} else {
 		const auto pluginIdxToSet = pluginIdxOpt.value();
-		if (plugins[pluginIdxToSet])
-			pluginsToDelete.push_back(std::move(plugins[pluginIdxToSet]));
+		if (stateCore->isAudioRunning()) {
+			if (plugins[pluginIdxToSet])
+				pluginsToDelete.push_back(std::move(plugins[pluginIdxToSet]));
+		}
 		plugins[pluginIdxToSet] = std::move(plugin);
 	}
 
@@ -330,8 +332,12 @@ Result Channel::removePlugin(const PluginIndex pluginIdx) {
 		return ERROR;
 	}
 
-	if (plugins[pluginIdx])
-		pluginsToDelete.push_back(std::move(plugins[pluginIdx]));
+	if (stateCore->isAudioRunning()) {
+		if (plugins[pluginIdx])
+			pluginsToDelete.push_back(std::move(plugins[pluginIdx]));
+	} else {
+		plugins[pluginIdx] = nullptr;
+	}
 
 	return OK;
 }
