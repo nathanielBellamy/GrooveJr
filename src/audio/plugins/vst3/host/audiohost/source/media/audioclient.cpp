@@ -196,9 +196,7 @@ float AudioClient::SILENCE_BUFFER[Gj::Audio::AUDIO_FRAMES_PER_BUFFER_MAX] = {0.0
 
 //------------------------------------------------------------------------
 AudioClient::~AudioClient() {
-  std::cout << "plugin dtor - audioclient 0" << std::endl;
   terminate();
-  std::cout << "plugin dtor - audioclient 1" << std::endl;
 }
 
 //------------------------------------------------------------------------
@@ -231,16 +229,12 @@ bool AudioClient::initialize(const Name& name, IComponent* _component, IMidiMapp
 
 //------------------------------------------------------------------------
 void AudioClient::terminate() {
-  std::cout << "audioClient terminate 1" << std::endl;
-
   FUnknownPtr<IAudioProcessor> processor = component;
   if (!processor)
     return;
 
-  std::cout << "audioClient terminate 2" << std::endl;
   processor->setProcessing(false);
   component->setActive(false);
-  std::cout << "audioClient terminate 3" << std::endl;
 }
 
 //------------------------------------------------------------------------

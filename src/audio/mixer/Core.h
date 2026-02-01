@@ -42,7 +42,7 @@ class Core {
   State::Core* stateCore;
   std::shared_ptr<JackClient> jackClient;
   // main channel is channels.front()
-  std::optional<Channel*> channels[MAX_MIXER_CHANNELS];
+  std::unique_ptr<Channel> channels[MAX_MIXER_CHANNELS];
   std::function<void(sf_count_t, sf_count_t)> updateProgressBarFunc;
   std::function<void(jack_ringbuffer_t* eqRingBuffer)> setEqRingBufferFunc;
   std::function<void(jack_ringbuffer_t* vuRingBuffer)> setVuRingBufferFunc;
@@ -84,9 +84,9 @@ public:
   }
 
 
-  bool indexHasValidChannel(ChannelIndex idx) {
-    if (!channels[idx] || channels[idx].value() == nullptr) {
-      channels[idx].reset();
+  bool indexHasValidChannel(const ChannelIndex idx) {
+    if (!channels[idx]) {
+      channels[idx] = nullptr;
       return false;
     }
     return true;
@@ -100,7 +100,7 @@ public:
         continue;
 
       try {
-        func(channels[channelIndex].value(), channelIndex);
+        func(channels[channelIndex], channelIndex);
       } catch (...) {
         Logging::write(
           Error,
@@ -115,7 +115,7 @@ public:
   }
 
   template<typename F>
-  Result runAgainstChannel(ChannelIndex channelIndex, F&& func) {
+  Result runAgainstChannel(const ChannelIndex channelIndex, F&& func) {
     if (!indexHasValidChannel(channelIndex)) {
       Logging::write(
         Warning,
@@ -126,7 +126,7 @@ public:
     }
 
     try {
-      func(channels[channelIndex].value());
+      func(channels[channelIndex]);
     } catch (...) {
       Logging::write(
         Error,
@@ -147,7 +147,7 @@ public:
 
   Result setupProcessing() {
     Result res = OK;
-    const auto setupRes = forEachChannel([this, &res](Channel* channel, const ChannelIndex idx) {
+    const auto setupRes = forEachChannel([this, &res](const std::unique_ptr<Channel>& channel, const ChannelIndex idx) {
       if (channel->setupProcessing() != OK)
         res = WARNING;
     });
@@ -167,7 +167,7 @@ public:
   }
 
   [[nodiscard]]
-  std::optional<Channel*>* getChannels() {
+  std::unique_ptr<Channel>* getChannels() {
     return channels;
   }
 
@@ -183,7 +183,7 @@ public:
       return std::nullopt;
     }
     return indexHasValidChannel(index)
-             ? channels[index]
+             ? std::optional(channels[index].get())
              : std::nullopt;
   }
 
@@ -213,22 +213,16 @@ public:
       "Audio::Mixer::deletePluginsToDelete",
       "Deleting plugins."
     );
-    jackClient->deactivate();
-    // const auto res = forEachChannel([](Channel* channel, const ChannelIndex) {
-    //   channel->deletePluginsToDelete();
-    // });
-    channels[1].value()->deletePluginsToDelete();
-    std::cout << "wowza 22222" << std::endl;
-    std::cout << "wowza 22222" << std::endl;
-    std::cout << "wowza 22222" << std::endl;
-    std::cout << "wowza 22222" << std::endl;
+    const auto res = forEachChannel([](const std::unique_ptr<Channel>& channel, const ChannelIndex) {
+      channel->deletePluginsToDelete();
+    });
 
     Logging::write(
       Info,
       "Audio::Mixer::deletePluginsToDelete",
       "Deleted old plugins."
     );
-    return OK;
+    return res;
   }
 
   std::optional<ChannelIndex> firstOpenChannelIndex() const;
@@ -289,7 +283,7 @@ public:
       );
       return AtomicStr(" - ");
     }
-    return channels[channelIdx].value()->getPluginName(pluginIndex);
+    return channels[channelIdx]->getPluginName(pluginIndex);
   };
 
   Result deleteChannels();
@@ -311,11 +305,12 @@ public:
   State::Mixer::Packet toPacket() {
     State::Mixer::Packet packet{};
 
-    forEachChannel([&packet](Channel* channel, const ChannelIndex channelIdx) {
+    forEachChannel([&packet](const std::unique_ptr<Channel>& channel, const ChannelIndex channelIdx) {
       State::Mixer::ChannelPacket channelPacket;
       channelPacket.channelIndex = channelIdx;
       channel->forEachPluginSlot(
-        [&channelPacket](const std::optional<Plugins::Vst3::Plugin*> plugin, const PluginIndex pluginIdx) {
+        [&channelPacket](const std::unique_ptr<Plugins::Vst3::Plugin>& plugin,
+                         const PluginIndex pluginIdx) {
           if (!plugin) {
             State::Mixer::PluginSlotPacket emptyPacket;
             emptyPacket.hasValue = false;
@@ -325,8 +320,8 @@ public:
             channelPacket.plugins[pluginIdx] = {
               true,
               pluginIdx,
-              plugin.value()->name,
-              plugin.value()->path,
+              plugin->name,
+              plugin->path,
             };
           }
         });

@@ -162,14 +162,15 @@ void Body::connectActions() {
   auto muteChannelConnection = connect(muteChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = muteChannelAction->data().toULongLong();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
-      const float newMute = channel->toggleMute();
-      if (channelIdx == 0) {
-        mainChannelContainer->setMute(newMute);
-      } else {
-        channelsContainer->setMute(channelIdx, newMute);
-      }
-    });
+    const auto res = mixer->runAgainstChannel(
+      channelIdx, [this, &channelIdx](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+        const float newMute = channel->toggleMute();
+        if (channelIdx == 0) {
+          mainChannelContainer->setMute(newMute);
+        } else {
+          channelsContainer->setMute(channelIdx, newMute);
+        }
+      });
 
     if (res != OK)
       Logging::write(
@@ -182,14 +183,15 @@ void Body::connectActions() {
   auto muteLChannelConnection = connect(muteLChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = muteLChannelAction->data().toULongLong();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
-      const float newMute = channel->toggleMuteL();
-      if (channelIdx == 0) {
-        mainChannelContainer->setMuteL(newMute);
-      } else {
-        channelsContainer->setMuteL(channelIdx, newMute);
-      }
-    });
+    const auto res = mixer->runAgainstChannel(
+      channelIdx, [this, &channelIdx](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+        const float newMute = channel->toggleMuteL();
+        if (channelIdx == 0) {
+          mainChannelContainer->setMuteL(newMute);
+        } else {
+          channelsContainer->setMuteL(channelIdx, newMute);
+        }
+      });
 
     if (res != OK)
       Logging::write(
@@ -202,14 +204,15 @@ void Body::connectActions() {
   auto muteRChannelConnection = connect(muteRChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = muteRChannelAction->data().toULongLong();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
-      const float newMute = channel->toggleMuteR();
-      if (channelIdx == 0) {
-        mainChannelContainer->setMuteR(newMute);
-      } else {
-        channelsContainer->setMuteR(channelIdx, newMute);
-      }
-    });
+    const auto res = mixer->runAgainstChannel(
+      channelIdx, [this, &channelIdx](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+        const float newMute = channel->toggleMuteR();
+        if (channelIdx == 0) {
+          mainChannelContainer->setMuteR(newMute);
+        } else {
+          channelsContainer->setMuteR(channelIdx, newMute);
+        }
+      });
 
     if (res != OK)
       Logging::write(
@@ -222,14 +225,15 @@ void Body::connectActions() {
   auto soloChannelConnection = connect(soloChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = soloChannelAction->data().toULongLong();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
-      const float newSolo = channel->toggleSolo();
-      if (channelIdx == 0) {
-        mainChannelContainer->setSolo(newSolo);
-      } else {
-        channelsContainer->setSolo(channelIdx, newSolo);
-      }
-    });
+    const auto res = mixer->runAgainstChannel(
+      channelIdx, [this, &channelIdx](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+        const float newSolo = channel->toggleSolo();
+        if (channelIdx == 0) {
+          mainChannelContainer->setSolo(newSolo);
+        } else {
+          channelsContainer->setSolo(channelIdx, newSolo);
+        }
+      });
 
     if (res != OK)
       Logging::write(
@@ -242,14 +246,15 @@ void Body::connectActions() {
   auto soloLChannelConnection = connect(soloLChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = soloLChannelAction->data().toULongLong();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
-      const float newSolo = channel->toggleSoloL();
-      if (channelIdx == 0) {
-        mainChannelContainer->setSoloL(newSolo);
-      } else {
-        channelsContainer->setSoloL(channelIdx, newSolo);
-      }
-    });
+    const auto res = mixer->runAgainstChannel(
+      channelIdx, [this, &channelIdx](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+        const float newSolo = channel->toggleSoloL();
+        if (channelIdx == 0) {
+          mainChannelContainer->setSoloL(newSolo);
+        } else {
+          channelsContainer->setSoloL(channelIdx, newSolo);
+        }
+      });
 
     if (res != OK)
       Logging::write(
@@ -262,16 +267,15 @@ void Body::connectActions() {
   auto soloRChannelConnection = connect(soloRChannelAction, &QAction::triggered, [&]() {
     const ChannelIndex channelIdx = soloRChannelAction->data().toInt();
 
-    const auto res = mixer->runAgainstChannel(channelIdx, [this, &channelIdx](Audio::Mixer::Channel* channel) {
-      if (const auto channel = mixer->getChannel(channelIdx); channel) {
-        const float newSolo = channel.value()->toggleSoloR();
+    const auto res = mixer->runAgainstChannel(
+      channelIdx, [this, &channelIdx](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+        const float newSolo = channel->toggleSoloR();
         if (channelIdx == 0) {
           mainChannelContainer->setSoloR(newSolo);
         } else {
           channelsContainer->setSoloR(channelIdx, newSolo);
         }
-      }
-    });
+      });
 
     if (res != OK)
       Logging::write(

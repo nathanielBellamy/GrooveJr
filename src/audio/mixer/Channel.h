@@ -36,8 +36,8 @@ class Channel {
   ChannelIndex index;
   AtomicStr name{"Channel"};
 
-  std::optional<Plugins::Vst3::Plugin*> plugins[MAX_PLUGINS_PER_CHANNEL] = {};
-  std::vector<Plugins::Vst3::Plugin*> pluginsToDelete = {};
+  std::unique_ptr<Plugins::Vst3::Plugin> plugins[MAX_PLUGINS_PER_CHANNEL] = {};
+  std::vector<std::unique_ptr<Plugins::Vst3::Plugin> > pluginsToDelete = {};
 
 public:
   Result deletePluginsToDelete() {
@@ -46,24 +46,9 @@ public:
       "Audio::Channel::deletePluginsToDelete",
       "Deleting plugins marked for deletion. ChannelIndex: " + std::to_string(index)
     );
-    std::cout << "plugins To Delete size" << pluginsToDelete.size() << std::endl;
-    for (const auto plugin: pluginsToDelete) {
-      Logging::write(
-        Info,
-        "Audio::Channel::deletePluginsToDelete",
-        "Deleting plugin: " + plugin->getName().std_str() + " ChannelIndex: " + std::to_string(index)
-      );
-      delete plugin;
-      Logging::write(
-        Info,
-        "Audio::Channel::deletePluginsToDelete",
-        "Deleted plugin. ChannelIndex: " + std::to_string(index)
-      );
-    }
-    std::cout << "wowz 1" << std::endl;
-    std::cout << "wowz 1" << std::endl;
-    std::cout << "wowz 1" << std::endl;
+    std::cout << "plugins To Delete size BEFORE " << pluginsToDelete.size() << std::endl;
     pluginsToDelete.clear();
+    std::cout << "plugins To Delete size AFTER " << pluginsToDelete.size() << std::endl;
     return OK;
   }
 
@@ -81,13 +66,11 @@ public:
     const Db::ChannelEntity& channelEntity
   );
 
-  ~Channel();
-
   Result setupProcessing() const {
     Result res = OK;
 
     for (const auto& plugin: plugins) {
-      if (plugin.has_value() && plugin.value()->setupProcessing() != OK)
+      if (plugin && plugin->setupProcessing() != OK)
         res = ERROR;
     }
 
@@ -102,7 +85,10 @@ public:
     if (idx > MAX_PLUGINS_PER_CHANNEL)
       return std::nullopt;
 
-    return plugins[idx];
+    if (!plugins[idx])
+      return std::nullopt;
+
+    return std::optional(plugins[idx].get());
   };
 
   float getGain() const {
@@ -293,11 +279,11 @@ public:
     // run against all valid plugins
     bool warning = false;
     for (PluginIndex pluginIndex = 0; pluginIndex < MAX_PLUGINS_PER_CHANNEL; ++pluginIndex) {
-      if (!plugins[pluginIndex] || plugins[pluginIndex].value() == nullptr)
+      if (!plugins[pluginIndex])
         continue;
 
       try {
-        func(plugins[pluginIndex].value(), pluginIndex);
+        func(plugins[pluginIndex], pluginIndex);
       } catch (...) {
         Logging::write(
           Error,

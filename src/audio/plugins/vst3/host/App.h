@@ -31,9 +31,7 @@ public:
   App();
 
   virtual ~App() noexcept {
-    std::cout << "Vst3::Host::App::~App()" << std::endl;
     FUNKNOWN_DTOR
-    std::cout << "DONE Vst3::Host::App::~App()" << std::endl;
   }
 
   tresult terminate();

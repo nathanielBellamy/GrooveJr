@@ -69,9 +69,7 @@ App::App(WindowPtr window)
 
 //------------------------------------------------------------------------
 App::~App() noexcept {
-	std::cout << " plugin dtor 3 - editorhostapp" << std::endl;
 	terminate();
-	std::cout << " plugin dtor 4 - editorhostapp" << std::endl;
 }
 
 void App::setModule(VST3::Hosting::Module::Ptr module_) {
@@ -297,9 +295,9 @@ void App::terminate() {
 	PluginContextFactory::instance().setPluginContext(nullptr);
 	if (windowController)
 		windowController->closePlugView();
-	windowController.reset();
-	plugProvider.reset();
-	module.reset();
+	setModule(nullptr);
+	windowController = nullptr;
+	plugProvider = nullptr;
 
 	Gj::Audio::Logging::write(
 		Gj::Audio::LogSeverityLevel::Info,

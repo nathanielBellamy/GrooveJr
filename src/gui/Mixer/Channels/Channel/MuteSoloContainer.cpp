@@ -32,7 +32,7 @@ MuteSoloContainer::MuteSoloContainer(
   , plugins(this, openPluginsContainer) {
   const auto res = mixer->runAgainstChannel(
     channelIndex,
-    [this, &channelIndex](const Audio::Mixer::Channel* channel) {
+    [this, &channelIndex](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
       mute.setMute(channel->settings.mute.load());
       muteL.setMute(channel->settings.muteL.load());
       muteR.setMute(channel->settings.muteR.load());

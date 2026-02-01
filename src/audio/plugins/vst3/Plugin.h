@@ -30,6 +30,7 @@ namespace Vst3 {
 using namespace Steinberg;
 
 struct Plugin {
+  VST3::Hosting::Module::Ptr module;
   State::Core* stateCore;
   AtomicStr name;
   AtomicStr path;
@@ -37,7 +38,6 @@ struct Plugin {
   std::unique_ptr<EditorHost::App> editorHost;
   IPtr<ResizableMemoryIBStream> editorHostComponentStateStream;
   IPtr<ResizableMemoryIBStream> editorHostControllerStateStream;
-  VST3::Hosting::Module::Ptr module;
 
   Plugin(
     const AtomicStr& path,
@@ -58,10 +58,6 @@ struct Plugin {
       "Destroying plugin " + name.std_str()
     );
 
-    audioHost.setModule(nullptr);
-    if (editorHost)
-      editorHost->setModule(nullptr);
-    std::cout << "plugin dtor 0" << std::endl;
     Logging::write(
       Info,
       "Audio::Plugins::Vst3::Plugin::~Plugin()",

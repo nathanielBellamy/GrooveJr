@@ -59,6 +59,12 @@ class App : public EditorHost::IApplication {
 	std::shared_ptr<Gj::Audio::JackClient> jackClient;
 
 public:
+	IPtr<PlugProvider> plugProvider{nullptr};
+	OPtr<IComponent> component;
+	OPtr<IEditController> editController;
+	AudioClientPtr audioClient;
+	int channelCount = {2}; // TODO: access info from libsndfile
+
 	App(Gj::State::Core* stateCore, std::shared_ptr<Gj::Audio::JackClient> jackClient);
 
 	~App() noexcept override;
@@ -66,16 +72,14 @@ public:
 	void init(const std::vector<std::string>& cmdArgs) override;
 
 	void terminate() override {
+		audioClient = nullptr;
+		plugProvider = nullptr;
+		setModule(nullptr);
+		editController = nullptr;
 	};
-
-	IPtr<PlugProvider> plugProvider{nullptr};
 
 	void setModule(VST3::Hosting::Module::Ptr module);
 
-	OPtr<IComponent> component;
-	OPtr<IEditController> editController;
-	AudioClientPtr audioClient;
-	int channelCount = {2}; // TODO: access info from libsndfile
 	bool setupProcessing() {
 		return audioClient->setupProcessing();
 	}

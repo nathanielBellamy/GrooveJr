@@ -74,14 +74,15 @@ Channel::Channel(
   connectActions();
   setupTitle();
 
-  const auto res = mixer->runAgainstChannel(channelIndex, [this](const Audio::Mixer::Channel* channel) {
-    setupGainSlider(channel->settings.gain.load());
-    setupGainLSlider(channel->settings.gainL.load());
-    setupGainRSlider(channel->settings.gainR.load());
-    setupPanSlider(channel->settings.pan.load());
-    setupPanLSlider(channel->settings.panL.load());
-    setupPanRSlider(channel->settings.panR.load());
-  });
+  const auto res = mixer->runAgainstChannel(channelIndex,
+                                            [this](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+                                              setupGainSlider(channel->settings.gain.load());
+                                              setupGainLSlider(channel->settings.gainL.load());
+                                              setupGainRSlider(channel->settings.gainR.load());
+                                              setupPanSlider(channel->settings.pan.load());
+                                              setupPanLSlider(channel->settings.panL.load());
+                                              setupPanRSlider(channel->settings.panR.load());
+                                            });
 
   if (res != OK)
     Logging::write(
@@ -213,11 +214,12 @@ void Channel::setupGainSlider(const float gain) {
   );
   gainSlider.setTickPosition(QSlider::NoTicks);
   auto gainSliderConnection = connect(&gainSlider, &QSlider::valueChanged, [this](const int newGain) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGain](Audio::Mixer::Channel* channel) {
-      channel->setGain(
-        Audio::Math::uInt127ToFloat(newGain) * GAIN_FACTOR
-      );
-    });
+    const auto res = mixer->runAgainstChannel(channelIndex,
+                                              [this, &newGain](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+                                                channel->setGain(
+                                                  Audio::Math::uInt127ToFloat(newGain) * GAIN_FACTOR
+                                                );
+                                              });
 
     if (res != OK)
       Logging::write(
@@ -237,11 +239,12 @@ void Channel::setupGainLSlider(const float gainL) {
   );
   gainLSlider.setTickPosition(QSlider::NoTicks);
   auto gainSliderConnection = connect(&gainLSlider, &QSlider::valueChanged, [this](const int newGainL) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGainL](Audio::Mixer::Channel* channel) {
-      channel->setGainL(
-        Audio::Math::uInt127ToFloat(newGainL) * GAIN_FACTOR
-      );
-    });
+    const auto res = mixer->runAgainstChannel(channelIndex,
+                                              [this, &newGainL](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+                                                channel->setGainL(
+                                                  Audio::Math::uInt127ToFloat(newGainL) * GAIN_FACTOR
+                                                );
+                                              });
 
     if (res != OK)
       Logging::write(
@@ -261,11 +264,12 @@ void Channel::setupGainRSlider(const float gainR) {
   );
   gainRSlider.setTickPosition(QSlider::NoTicks);
   const auto gainRSliderConnection = connect(&gainRSlider, &QSlider::valueChanged, [this](const int newGainR) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newGainR](Audio::Mixer::Channel* channel) {
-      channel->setGainR(
-        Audio::Math::uInt127ToFloat(newGainR) * GAIN_FACTOR
-      );
-    });
+    const auto res = mixer->runAgainstChannel(channelIndex,
+                                              [this, &newGainR](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+                                                channel->setGainR(
+                                                  Audio::Math::uInt127ToFloat(newGainR) * GAIN_FACTOR
+                                                );
+                                              });
 
     if (res != OK)
       Logging::write(
@@ -285,11 +289,12 @@ void Channel::setupPanSlider(const float pan) {
   );
   panSlider.setTickPosition(QSlider::NoTicks);
   auto panSliderConnection = connect(&panSlider, &QSlider::valueChanged, [this](const int newPan) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPan](Audio::Mixer::Channel* channel) {
-      channel->setPan(
-        Audio::Math::int127ToFloat(newPan)
-      );
-    });
+    const auto res = mixer->runAgainstChannel(channelIndex,
+                                              [this, &newPan](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+                                                channel->setPan(
+                                                  Audio::Math::int127ToFloat(newPan)
+                                                );
+                                              });
 
     if (res != OK)
       Logging::write(
@@ -309,11 +314,12 @@ void Channel::setupPanLSlider(const float panL) {
   );
   panLSlider.setTickPosition(QSlider::NoTicks);
   auto panSliderConnection = connect(&panLSlider, &QSlider::valueChanged, [this](const int newPanL) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPanL](Audio::Mixer::Channel* channel) {
-      channel->setPanL(
-        Audio::Math::int127ToFloat(newPanL)
-      );
-    });
+    const auto res = mixer->runAgainstChannel(channelIndex,
+                                              [this, &newPanL](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+                                                channel->setPanL(
+                                                  Audio::Math::int127ToFloat(newPanL)
+                                                );
+                                              });
 
     if (res != OK)
       Logging::write(
@@ -333,11 +339,12 @@ void Channel::setupPanRSlider(const float panR) {
   );
   panRSlider.setTickPosition(QSlider::NoTicks);
   auto panSliderConnection = connect(&panRSlider, &QSlider::valueChanged, [this](const int newPanR) {
-    const auto res = mixer->runAgainstChannel(channelIndex, [this, &newPanR](Audio::Mixer::Channel* channel) {
-      channel->setPanR(
-        Audio::Math::int127ToFloat(newPanR)
-      );
-    });
+    const auto res = mixer->runAgainstChannel(channelIndex,
+                                              [this, &newPanR](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
+                                                channel->setPanR(
+                                                  Audio::Math::int127ToFloat(newPanR)
+                                                );
+                                              });
 
     if (res != OK)
       Logging::write(

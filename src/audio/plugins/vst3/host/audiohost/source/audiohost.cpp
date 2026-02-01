@@ -73,7 +73,7 @@ App::App(Gj::State::Core* stateCore, std::shared_ptr<Gj::Audio::JackClient> jack
 
 //------------------------------------------------------------------------
 App::~App() noexcept {
-	std::cout << "plugin dtor 2 - audiohostapp" << std::endl;
+	terminate();
 }
 
 //------------------------------------------------------------------------

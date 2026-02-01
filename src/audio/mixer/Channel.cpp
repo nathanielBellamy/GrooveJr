@@ -57,34 +57,6 @@ Channel::Channel(
 	);
 }
 
-Channel::~Channel() {
-	Logging::write(
-		Info,
-		"Audio::Mixer::Channel::dtor",
-		"Destroying MixerChannel: " + std::to_string(index)
-	);
-
-	if (forEachPlugin([this](const Plugins::Vst3::Plugin* plugin, const PluginIndex) {
-		Logging::write(
-			Info,
-			"Audio::Mixer::Channel::dtor",
-			"Destroying plugin: " + plugin->getName().std_str() + "on ChannelIndex" + std::to_string(index)
-		);
-		delete plugin;
-	}) != OK)
-		Logging::write(
-			Warning,
-			"Audio::Mixer::Channel::dtor",
-			"An Warning or Error occurred while destroying a plugin on ChannelIndex: " + std::to_string(index)
-		);
-
-	Logging::write(
-		Info,
-		"Audio::Mixer::Channel::dtor",
-		"Destroyed Channel: " + std::to_string(index)
-	);
-}
-
 std::optional<PluginIndex> Channel::firstOpenPluginIndex() const {
 	for (PluginIndex i = 0; i < MAX_PLUGINS_PER_CHANNEL; ++i) {
 		if (!plugins[i])
@@ -97,10 +69,10 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> pluginIdxOpt, 
 	Logging::write(
 		Info,
 		"Audio::Mixer::Channel::addReplacePlugin",
-		"Adding plugin: " + pluginPath + " to channel " + std::to_string(index)
+		"Adding plugin: " + pluginPath.std_str() + " to channel " + std::to_string(index)
 	);
 
-	const auto plugin = new Plugins::Vst3::Plugin(
+	auto plugin = std::make_unique<Plugins::Vst3::Plugin>(
 		pluginPath,
 		stateCore,
 		jackClient
@@ -149,11 +121,12 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> pluginIdxOpt, 
 			);
 			return WARNING;
 		}
-		plugins[idxToPut.value()] = plugin;
+		plugins[idxToPut.value()] = std::move(plugin);
 	} else {
 		const auto pluginIdxToSet = pluginIdxOpt.value();
-		pluginsToDelete.push_back(plugins[pluginIdxToSet].value_or(nullptr));
-		plugins[pluginIdxToSet] = plugin;
+		if (plugins[pluginIdxToSet])
+			pluginsToDelete.push_back(std::move(plugins[pluginIdxToSet]));
+		plugins[pluginIdxToSet] = std::move(plugin);
 	}
 
 	Logging::write(
@@ -173,7 +146,7 @@ Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 		std::to_string(pluginEntity.pluginIndex)
 	);
 
-	const auto plugin = new Plugins::Vst3::Plugin(pluginEntity, stateCore, jackClient);
+	auto plugin = std::make_unique<Plugins::Vst3::Plugin>(pluginEntity, stateCore, jackClient);
 
 	Logging::write(
 		Info,
@@ -209,14 +182,13 @@ Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 	};
 	processor->setupProcessing(setup);
 
-	delete plugins[pluginEntity.pluginIndex].value_or(nullptr);
-	plugins[pluginEntity.pluginIndex] = std::optional(plugin);
+	plugins[pluginEntity.pluginIndex] = std::move(plugin);
 
 	Logging::write(
 		Info,
 		"Audio::Mixer::Channel::loadPlugin",
-		"Plugin " + plugin->path + " added on channel " + std::to_string(index) + " at pluginIndex " + std::to_string(
-			pluginEntity.pluginIndex)
+		"Instantiated plugin on channel " + std::to_string(index) + " at pluginIndex " +
+		std::to_string(pluginEntity.pluginIndex)
 	);
 
 	return OK;
@@ -226,7 +198,7 @@ Result Channel::loadPlugin(const Db::Plugin& pluginEntity) {
 Result Channel::setSampleRate(const double sampleRate) {
 	bool warning = false;
 	const Result setResult = forEachPlugin(
-		[this, &sampleRate, &warning](Plugins::Vst3::Plugin* plugin, PluginIndex pluginIndex) {
+		[this, &sampleRate, &warning](const std::unique_ptr<Plugins::Vst3::Plugin>& plugin, PluginIndex pluginIndex) {
 			if (!plugin->audioHost.audioClient->setSamplerate(sampleRate)) {
 				Logging::write(
 					Warning,
@@ -247,7 +219,7 @@ Result Channel::setBlockSize(const jack_nframes_t blockSize) {
 	bool warning = false;
 	const auto blockSize32 = static_cast<int32>(blockSize);
 	const auto setResult = forEachPlugin(
-		[this, &blockSize32, &warning](Plugins::Vst3::Plugin* plugin, PluginIndex pluginIndex) {
+		[this, &blockSize32, &warning](const std::unique_ptr<Plugins::Vst3::Plugin>& plugin, PluginIndex pluginIndex) {
 			if (!plugin->audioHost.audioClient->setBlockSize(blockSize32)) {
 				Logging::write(
 					Warning,
@@ -267,7 +239,7 @@ Result Channel::setBlockSize(const jack_nframes_t blockSize) {
 PluginIndex Channel::pluginCount() {
 	PluginIndex res = 0;
 
-	forEachPlugin([&res](Plugins::Vst3::Plugin*, PluginIndex) {
+	forEachPlugin([&res](const std::unique_ptr<Plugins::Vst3::Plugin>&, PluginIndex) {
 		res += 1;
 	});
 
@@ -281,9 +253,10 @@ Result Channel::initEditorHosts(const std::shared_ptr<Gui::Mixer::VstWindow>* vs
 		"Initializing Editor Hosts on channel " + std::to_string(index)
 	);
 
-	const auto res = forEachPlugin([this, &vstWindows](Plugins::Vst3::Plugin* plugin, const PluginIndex pluginIndex) {
-		plugin->initEditorHost(vstWindows[pluginIndex]);
-	});
+	const auto res = forEachPlugin(
+		[this, &vstWindows](const std::unique_ptr<Plugins::Vst3::Plugin>& plugin, const PluginIndex pluginIndex) {
+			plugin->initEditorHost(vstWindows[pluginIndex]);
+		});
 
 	Logging::write(
 		Info,
@@ -320,7 +293,7 @@ Result Channel::terminateEditorHosts() {
 		"Terminating Editor Hosts on channel " + std::to_string(index)
 	);
 
-	if (forEachPlugin([this](Plugins::Vst3::Plugin* plugin, const PluginIndex) {
+	if (forEachPlugin([this](const std::unique_ptr<Plugins::Vst3::Plugin>& plugin, const PluginIndex) {
 		plugin->terminateEditorHost();
 	}) != OK) {
 		Logging::write(
@@ -357,8 +330,8 @@ Result Channel::removePlugin(const PluginIndex pluginIdx) {
 		return ERROR;
 	}
 
-	pluginsToDelete.push_back(plugins[pluginIdx].value_or(nullptr));
-	plugins[pluginIdx].reset();
+	if (plugins[pluginIdx])
+		pluginsToDelete.push_back(std::move(plugins[pluginIdx]));
 
 	return OK;
 }

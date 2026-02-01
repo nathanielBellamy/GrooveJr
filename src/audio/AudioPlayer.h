@@ -196,18 +196,17 @@ struct AudioPlayer {
       mixer->setProcessDataChangeFlag(ProcessDataChangeFlag::BASE);
     }
 
-    const auto res = mixer->forEachChannel([this](Mixer::Channel* ch, ChannelIndex chIdx) {
+    const auto res = mixer->forEachChannel([this](const std::unique_ptr<Mixer::Channel>& ch, ChannelIndex chIdx) {
       Mixer::ChannelProcessData processData{};
       processData.pluginCount = ch->pluginCount();
 
       ch->forEachPluginSlot(
-        [this, &ch, &chIdx, &processData](const std::optional<Plugins::Vst3::Plugin*> pluginOpt,
+        [this, &ch, &chIdx, &processData](const std::unique_ptr<Plugins::Vst3::Plugin>& plugin,
                                           const PluginIndex pluginIdx) {
           processData.buffers[pluginIdx] =
               getPluginBuffers(ch, pluginIdx);
 
-          if (const auto plugin = pluginOpt.value_or(nullptr);
-            plugin != nullptr && plugin->audioHost.audioClient) {
+          if (plugin && plugin->audioHost.audioClient) {
             processData.processFuncs[pluginIdx] =
                 [audioClient = plugin->audioHost.audioClient](IAudioClient::Buffers& buffers,
                                                               const jack_nframes_t nFrames) {
@@ -240,7 +239,7 @@ struct AudioPlayer {
   }
 
   IAudioClient::Buffers getPluginBuffers(
-    const Mixer::Channel* channel,
+    const std::unique_ptr<Mixer::Channel>& channel,
     const PluginIndex pluginIdx
   ) const {
     const auto audioFramesPerBuffer = static_cast<int32_t>(stateCore->getAudioFramesPerBuffer());

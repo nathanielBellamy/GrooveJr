@@ -100,7 +100,7 @@ Result Core::addChannel() {
   }
 
   channels[firstOpenIndex.value()] =
-      new Channel(
+      std::make_unique<Channel>(
         stateCore,
         jackClient,
         firstOpenIndex.value()
@@ -113,7 +113,7 @@ Result Core::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) {
   stateCore->setAudioFramesPerBuffer(framesPerBuffer);
 
   const auto setRes = forEachChannel(
-    [this, &framesPerBuffer, &warning](Channel* channel, ChannelIndex index) {
+    [this, &framesPerBuffer, &warning](const std::unique_ptr<Channel>& channel, ChannelIndex index) {
       if (channel->setBlockSize(framesPerBuffer) != OK) {
         Logging::write(
           Warning,
@@ -131,9 +131,8 @@ Result Core::setAudioFramesPerBuffer(const jack_nframes_t framesPerBuffer) {
 
 
 Result Core::addChannelFromEntity(const Db::ChannelEntity& channelEntity) {
-  delete channels[channelEntity.channelIndex].value_or(nullptr);
   channels[channelEntity.channelIndex] =
-      new Channel(
+      std::make_unique<Channel>(
         stateCore,
         jackClient,
         channelEntity
@@ -142,14 +141,14 @@ Result Core::addChannelFromEntity(const Db::ChannelEntity& channelEntity) {
 }
 
 Result Core::removeChannel(const ChannelIndex idx) {
-  delete channels[idx].value_or(nullptr);
+  channels[idx] = nullptr;
   return OK;
 }
 
 Result Core::setSampleRate(const uint32_t sampleRate) {
   const auto sampleRateD = static_cast<double>(sampleRate);
   return forEachChannel(
-    [this, &sampleRateD](Channel* channel, ChannelIndex) {
+    [this, &sampleRateD](const std::unique_ptr<Channel>& channel, ChannelIndex) {
       channel->setSampleRate(sampleRateD);
     });
 }
@@ -178,9 +177,11 @@ Result Core::addPluginToChannel(const ChannelIndex channelIndex, const PluginPat
     return ERROR;
   }
 
-  const auto res = channels[channelIndex].value()->addReplacePlugin(std::optional<PluginIndex>(), pluginPath);
+  if (channels[channelIndex])
+    channels[channelIndex]->addReplacePlugin(std::optional<PluginIndex>(), pluginPath);
+
   safeDeleteOldPlugins();
-  return res;
+  return OK;
 }
 
 Result Core::loadPluginOnChannel(const Db::Plugin& plugin) {
@@ -198,7 +199,7 @@ Result Core::loadPluginOnChannel(const Db::Plugin& plugin) {
     return ERROR;
   }
 
-  const auto res = channels[plugin.channelIndex].value()->loadPlugin(plugin);
+  const auto res = channels[plugin.channelIndex]->loadPlugin(plugin);
   safeDeleteOldPlugins();
   return res;
 }
@@ -216,9 +217,18 @@ Result Core::replacePluginOnChannel(const ChannelIndex channelIdx, const PluginI
     return WARNING;
   }
 
-  const auto res = channels[channelIdx].value()->addReplacePlugin(pluginIdx, pluginPath);
-  safeDeleteOldPlugins();
-  return res;
+  if (const auto& channel = channels[channelIdx]; channel) {
+    const auto res = channels[channelIdx]->addReplacePlugin(pluginIdx, pluginPath);
+    safeDeleteOldPlugins();
+    return res;
+  }
+
+  Logging::write(
+    Warning,
+    "Audio::Mixer::Core::replacePluginOnChannel",
+    "Attempting to add plugin but no Channel at ChannelIndex: " + std::to_string(channelIdx)
+  );
+  return ERROR;
 }
 
 Result Core::removePluginFromChannel(const ChannelIndex channelIdx, const PluginIndex pluginIdx) {
@@ -233,9 +243,18 @@ Result Core::removePluginFromChannel(const ChannelIndex channelIdx, const Plugin
     return WARNING;
   }
 
-  const auto res = channels[channelIdx].value()->removePlugin(pluginIdx);
-  safeDeleteOldPlugins();
-  return res;
+  if (const auto& channel = channels[channelIdx]; channel) {
+    const auto res = channels[channelIdx]->removePlugin(pluginIdx);
+    safeDeleteOldPlugins();
+    return res;
+  }
+
+  Logging::write(
+    Warning,
+    "Audio::Mixer::Core::removePluginOnChannel",
+    "Attempting to remove plugin but no Channel at ChannelIndex: " + std::to_string(channelIdx)
+  );
+  return ERROR;
 }
 
 PluginIndex Core::getPluginsOnChannelCount(const ChannelIndex idx) {
@@ -247,7 +266,7 @@ PluginIndex Core::getPluginsOnChannelCount(const ChannelIndex idx) {
     );
     return 0;
   }
-  return channels[idx].value()->pluginCount();
+  return channels[idx]->pluginCount();
 }
 
 Result Core::initEditorHostsOnChannel(const ChannelIndex idx,
@@ -261,7 +280,7 @@ Result Core::initEditorHostsOnChannel(const ChannelIndex idx,
     return WARNING;
   }
 
-  const auto res = channels[idx].value()->initEditorHosts(vstWindows);
+  const auto res = channels[idx]->initEditorHosts(vstWindows);
   Logging::write(
     res == OK ? Info : Warning,
     "Audio::Mixer::Core::initEditorHostsOnChannel",
@@ -280,7 +299,7 @@ Result Core::initEditorHostOnChannel(const ChannelIndex idx, const PluginIndex n
     );
     return WARNING;
   }
-  return channels[idx].value()->initEditorHost(newPluginIndex, vstWindow);
+  return channels[idx]->initEditorHost(newPluginIndex, vstWindow);
 }
 
 Result Core::terminateEditorHostsOnChannel(const ChannelIndex idx) {
@@ -300,7 +319,7 @@ Result Core::terminateEditorHostsOnChannel(const ChannelIndex idx) {
     return WARNING;
   }
 
-  return channels[idx].value()->terminateEditorHosts();
+  return channels[idx]->terminateEditorHosts();
 }
 
 Result Core::setGainOnChannel(const ChannelIndex channelIdx, const float gain) {
@@ -315,7 +334,7 @@ Result Core::setGainOnChannel(const ChannelIndex channelIdx, const float gain) {
     return WARNING;
   }
 
-  return channels[channelIdx].value()->setGain(gain) ? OK : ERROR;
+  return channels[channelIdx]->setGain(gain) ? OK : ERROR;
 }
 
 Result Core::loadScene(const ID sceneDbId) {
@@ -387,9 +406,8 @@ Result Core::deleteChannels() {
     "Deleting channels."
   );
 
-  const auto delRes = forEachChannel([this](Channel* channel, const ChannelIndex channelIdx) {
-    delete channel;
-    channels[channelIdx].reset();
+  const auto delRes = forEachChannel([this](const std::unique_ptr<Channel>& channel, const ChannelIndex channelIdx) {
+    channels[channelIdx] = nullptr;
   });
 
   if (delRes != OK)
@@ -521,7 +539,7 @@ Result Core::saveChannels() {
   Result result = OK;
   const auto scene = stateCore->getScene();
   const auto saveRes = forEachChannel(
-    [this, &scene, &result](Channel* channel, ChannelIndex channelIndex) {
+    [this, &scene, &result](const std::unique_ptr<Channel>& channel, ChannelIndex channelIndex) {
       if (!dao->channelRepository.save(channel->toEntity())) {
         Logging::write(
           Error,
