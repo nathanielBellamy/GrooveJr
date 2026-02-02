@@ -6,12 +6,11 @@
 
 namespace Gj {
 namespace Gui {
-
 Result CacheQueryModel::hydrateState(const State::Packet& statePacket) {
   Logging::write(
-      Info,
-      "Gui::CacheQueryModel::hydrateState",
-      "CacheQueryModel::hydrateState"
+    Info,
+    "Gui::CacheQueryModel::hydrateState",
+    "CacheQueryModel::hydrateState"
   );
   return OK;
 }
@@ -56,10 +55,9 @@ Result CacheQueryModel::refresh(const bool hard) {
   if (filters->filters.at(PLAYLIST).ids.size() > 0)
     queryStr += " and atp.playlistId in " + filters->idSqlArray(PLAYLIST);
 
-  if (hard || queryHasChanged(queryStr.c_str())) {
-    emit runQuery(id, QString(queryStr.c_str()));
-    setPreviousQuery(queryStr);
-  }
+  if (hard || queryHasChanged(queryStr))
+    emit runQuery(id, QString::fromStdString(queryStr));
+
   return OK;
 }
 
@@ -79,6 +77,5 @@ bool CacheQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
   const ID id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
   return stateCore->getCurrentlyPlaying().audioFile.id == id && !stateCore->queuePlay;
 }
-
 } // Gui
 } // Gj

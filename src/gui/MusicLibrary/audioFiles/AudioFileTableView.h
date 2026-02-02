@@ -52,6 +52,7 @@ public:
     new AudioFileQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
+    refresh(true);
   };
 
   void mousePressEvent(QMouseEvent* event) override;

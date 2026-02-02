@@ -32,6 +32,7 @@ public:
     new ArtistQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
+    refresh(true);
   };
 };
 } // Gui

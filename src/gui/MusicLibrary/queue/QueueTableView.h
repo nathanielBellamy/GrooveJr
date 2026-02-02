@@ -31,6 +31,7 @@ public:
     new QueueQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
+    refresh(true);
   };
 
   void mouseDoubleClickEvent(QMouseEvent* event) override {

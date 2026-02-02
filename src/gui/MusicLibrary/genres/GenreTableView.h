@@ -33,6 +33,7 @@ public:
     new GenreQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
+    refresh(true);
   };
 };
 } // Gui

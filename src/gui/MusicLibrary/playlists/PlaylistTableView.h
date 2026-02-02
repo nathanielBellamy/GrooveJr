@@ -33,6 +33,7 @@ public:
     new PlaylistQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
+    refresh(true);
   };
 };
 } // Gui

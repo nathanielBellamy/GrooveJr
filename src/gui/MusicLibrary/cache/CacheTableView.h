@@ -31,6 +31,7 @@ public:
     new CacheQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
+    refresh(true);
   };
 };
 } // Gui

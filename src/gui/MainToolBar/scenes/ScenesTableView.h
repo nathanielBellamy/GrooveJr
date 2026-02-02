@@ -46,7 +46,7 @@ public:
     , sceneLoadAction(sceneLoadAction) {
     workerPool->connectClient(model);
     setStyle();
-    refresh();
+    refresh(true);
   };
 };
 } // Gui

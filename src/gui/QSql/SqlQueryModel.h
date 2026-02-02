@@ -18,7 +18,7 @@ namespace Gui {
 class SqlWorkerPool;
 
 class SqlQueryModel : public SqlWorkerPoolClient {
-  const char* previousQuery = "";
+  std::string previousQuery = "";
 
   Result connectToPool() {
     const auto queryResultsReadyConnection =
@@ -37,7 +37,6 @@ class SqlQueryModel : public SqlWorkerPoolClient {
 
                   setHeaders();
                 });
-
     const auto errorOccurredConnection =
         connect(sqlWorkerPool, &SqlWorkerPool::errorOccurred, this, [&](const QString& error) {
           Logging::write(
@@ -54,18 +53,21 @@ protected:
   SqlWorkerPool* sqlWorkerPool;
   State::Core* stateCore;
 
-  Result setPreviousQuery(const std::string& newQueryString) {
-    previousQuery = newQueryString.c_str();
+  Result setPreviousQuery(std::string newQueryString) {
+    previousQuery = newQueryString;
     return OK;
   };
 
-  bool queryHasChanged(const char* newQuery) {
-    if (previousQuery == nullptr) {
-      setPreviousQuery(std::string(newQuery));
+  bool queryHasChanged(std::string newQuery) {
+    // todo
+    return true;
+
+    if (previousQuery.compare(newQuery) == 0) {
+      setPreviousQuery(newQuery);
       return true;
     }
 
-    return std::strcmp(previousQuery, newQuery) != 0;
+    return false;
   }
 
 public:
@@ -75,10 +77,6 @@ public:
     const QString& id,
     SqlWorkerPool* sqlWorkerPool
   );
-
-  QString initId(const QString& id) {
-    return id;
-  }
 
   virtual Result hydrateState(const State::Packet& statePacket) = 0;
 

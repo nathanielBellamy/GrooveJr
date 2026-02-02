@@ -6,12 +6,11 @@
 
 namespace Gj {
 namespace Gui {
-
 Result AudioFileQueryModel::hydrateState(const State::Packet& statePacket) {
   Logging::write(
-      Info,
-      "Gui::AudioFileQueryModel::hydrateState",
-      "AudioFileQueryModel::hydrateState"
+    Info,
+    "Gui::AudioFileQueryModel::hydrateState",
+    "AudioFileQueryModel::hydrateState"
   );
   refresh();
   return OK;
@@ -57,10 +56,9 @@ Result AudioFileQueryModel::refresh(const bool hard) {
 
   queryStr += " order by art.name asc, alb.year asc, alb.title asc, trk.trackNumber asc";
 
-  if (hard || queryHasChanged(queryStr.c_str())) {
-    emit runQuery(id, QString(queryStr.c_str()));
-    setPreviousQuery(queryStr);
-  }
+  if (hard || queryHasChanged(queryStr))
+    emit runQuery(id, QString::fromStdString(queryStr));
+
   return OK;
 }
 
@@ -80,6 +78,5 @@ bool AudioFileQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
   const ID id = index(item.row(), AUDIO_FILE_COL_ID).data().toULongLong();
   return stateCore->getCurrentlyPlaying().audioFile.id == id && !stateCore->queuePlay;
 }
-
 } // Gui
 } // Gj

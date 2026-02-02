@@ -6,7 +6,6 @@
 
 namespace Gj {
 namespace Gui {
-
 bool ScenesQueryModel::isCurrentScene(const QModelIndex& item) const {
   const ID id = index(item.row(), SCENES_COL_ID).data().toULongLong();
   return stateCore->getScene().id == id;
@@ -30,8 +29,8 @@ Result ScenesQueryModel::refresh(const bool hard) {
       " group by sc.sceneId"
       " order by sc.sceneId asc";
 
-  if (hard || queryHasChanged(queryStr.c_str())) {
-    emit runQuery(id, QString(queryStr.c_str()));
+  if (hard || queryHasChanged(queryStr)) {
+    emit runQuery(id, QString::fromStdString(queryStr));
     setPreviousQuery(queryStr);
   }
   return OK;
@@ -44,6 +43,5 @@ Result ScenesQueryModel::setHeaders() {
   setHeaderData(SCENES_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
   return OK;
 }
-
 } // Gui
 } // Gj

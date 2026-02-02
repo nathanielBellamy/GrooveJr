@@ -6,12 +6,11 @@
 
 namespace Gj {
 namespace Gui {
-
 Result GenreQueryModel::hydrateState(const State::Packet& statePacket) {
   Logging::write(
-      Info,
-      "Gui::GenreQueryModel::hydrateState",
-      "GenreQueryModel::hydrateState"
+    Info,
+    "Gui::GenreQueryModel::hydrateState",
+    "GenreQueryModel::hydrateState"
   );
   return OK;
 }
@@ -25,18 +24,18 @@ QVariant GenreQueryModel::data(const QModelIndex& item, const int role) const {
 
 Result GenreQueryModel::refresh(const bool hard) {
   std::string queryStr =
-    " select g.name, g.id from genres g"
-    " left outer join track_to_genres ttg"
-    " on g.id = ttg.genreId"
-    " left outer join tracks trk"
-    " on trk.id = ttg.trackId"
-    " left outer join track_to_artists tta"
-    " on trk.id = tta.trackId"
-    " left outer join audioFiles af"
-    " on af.trackId = trk.id"
-    " left outer join audioFile_to_playlists atp"
-    " on af.id = atp.audioFileId"
-    " where true";
+      " select g.name, g.id from genres g"
+      " left outer join track_to_genres ttg"
+      " on g.id = ttg.genreId"
+      " left outer join tracks trk"
+      " on trk.id = ttg.trackId"
+      " left outer join track_to_artists tta"
+      " on trk.id = tta.trackId"
+      " left outer join audioFiles af"
+      " on af.trackId = trk.id"
+      " left outer join audioFile_to_playlists atp"
+      " on af.id = atp.audioFileId"
+      " where true";
 
   if (filters->filters.at(ALBUM).ids.size() > 0)
     queryStr += " and trk.albumId in " + filters->idSqlArray(ALBUM);
@@ -48,13 +47,12 @@ Result GenreQueryModel::refresh(const bool hard) {
     queryStr += " and atp.playlistId in " + filters->idSqlArray(PLAYLIST);
 
   queryStr +=
-    " group by g.id"
-    " order by g.name";
+      " group by g.id"
+      " order by g.name";
 
-  if (hard || queryHasChanged(queryStr.c_str())) {
-    emit runQuery(id, QString(queryStr.c_str()));
-    setPreviousQuery(queryStr);
-  }
+  if (hard || queryHasChanged(queryStr))
+    emit runQuery(id, QString::fromStdString(queryStr));
+
   return OK;
 }
 
@@ -68,6 +66,5 @@ bool GenreQueryModel::isCurrentlyPlaying(const QModelIndex& item) const {
   const ID id = index(item.row(), GENRE_COL_ID).data().toULongLong();
   return stateCore->getCurrentlyPlaying().genre.id == id;
 }
-
 } // Gui
 } // Gj

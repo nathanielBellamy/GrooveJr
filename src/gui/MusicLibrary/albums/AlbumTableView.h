@@ -35,6 +35,7 @@ public:
     new AlbumQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
+    refresh(true);
   };
 };
 } // Gui
