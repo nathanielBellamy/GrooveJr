@@ -116,10 +116,10 @@ public:
 
 	bool initialize(const Name& name, IComponent* component, IMidiMapping* midiMapping, IMediaServerPtr jackClient);
 
-	//--------------------------------------------------------------------
-private:
 	void terminate();
 
+	//--------------------------------------------------------------------
+private:
 	// void createLocalMediaServer (const Name& name);
 	void updateBusBuffers(Buffers& buffers, HostProcessData& processData);
 

@@ -71,8 +71,12 @@ public:
 
 	void init(const std::vector<std::string>& cmdArgs) override;
 
-	void terminate() override {
+	void releaseAudioClient() {
+		audioClient->terminate();
 		audioClient = nullptr;
+	}
+
+	void terminate() override {
 		plugProvider = nullptr;
 		setModule(nullptr);
 		editController = nullptr;

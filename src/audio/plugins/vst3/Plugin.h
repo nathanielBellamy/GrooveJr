@@ -51,12 +51,15 @@ struct Plugin {
     std::shared_ptr<JackClient> jackClient
   );
 
+
   ~Plugin() {
     Logging::write(
       Info,
       "Audio::Plugins::Vst3::Plugin::~Plugin()",
       "Destroying plugin " + name.std_str()
     );
+
+    audioHost.releaseAudioClient();
 
     Logging::write(
       Info,

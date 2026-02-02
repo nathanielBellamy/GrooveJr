@@ -235,6 +235,8 @@ void AudioClient::terminate() {
 
   processor->setProcessing(false);
   component->setActive(false);
+  processData = {};
+  initProcessData();
 }
 
 //------------------------------------------------------------------------
