@@ -26,6 +26,8 @@ class VstWindow final : public QWidget, public IWindow {
 	PluginIndex pluginIndex;
 	AtomicStr name;
 	QGridLayout grid;
+	std::function<void(float)> vst3ResizeFunc;
+
 
 	void setStyle();
 
@@ -33,6 +35,8 @@ class VstWindow final : public QWidget, public IWindow {
 
 public:
 	explicit VstWindow(QWidget* parent, ChannelIndex channelIndex, PluginIndex pluginIndex, const AtomicStr& name);
+
+	void setVst3ResizeFunc(const std::function<void(float newScaleFactor)>& func) { vst3ResizeFunc = func; }
 
 	~VstWindow() noexcept override;
 

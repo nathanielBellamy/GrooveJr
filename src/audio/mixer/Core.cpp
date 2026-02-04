@@ -275,7 +275,7 @@ Result Core::initEditorHostsOnChannel(const ChannelIndex idx,
     Logging::write(
       Warning,
       "Audio::Mixer::Core::initEditorHostsOnChannel",
-      "Attempting to init Editorhost on ChannelIndex: " + std::to_string(idx) + " but no channel is not valid."
+      "Attempting to init Editorhost on ChannelIndex: " + std::to_string(idx) + " but channel is not valid."
     );
     return WARNING;
   }

@@ -52,23 +52,27 @@
 #include "WindowController.h"
 
 #include "../../../../../../Logging.h"
+
 //------------------------------------------------------------------------
 namespace Steinberg {
 namespace Vst {
 namespace EditorHost {
-
 //------------------------------------------------------------------------
-class App : public IApplication
-{
+class App : public IApplication {
 public:
 	App(WindowPtr window);
-	~App () noexcept override;
-	void init (const std::vector<std::string>& cmdArgs) override;
-	void terminate () override;
+
+	~App() noexcept override;
+
+	void init(const std::vector<std::string>& cmdArgs) override;
+
+	void terminate() override;
+
 	void setModule(VST3::Hosting::Module::Ptr module);
-	OPtr<IEditController> editController {nullptr};
+
+	OPtr<IEditController> editController{nullptr};
 	OPtr<IComponent> processorComponent;
-	IPtr<PlugProvider> plugProvider {nullptr};
+	IPtr<PlugProvider> plugProvider{nullptr};
 
 	void getState(IBStream* componentState, IBStream* controllerState) const {
 		processorComponent->getState(componentState);
@@ -81,16 +85,22 @@ public:
 		editController->setState(controllerState);
 	};
 
+	void resize(const float newScaleFactor) const {
+		std::cout << " editorhost - newScaleFactor: " << newScaleFactor << std::endl;
+		windowController->onContentScaleFactorChanged(*window.get(), newScaleFactor);
+	}
+
 private:
-	enum OpenFlags
-	{
+	enum OpenFlags {
 		kSetComponentHandler = 1 << 0,
 		kSecondWindow = 1 << 1,
 	};
-	void openEditor (const std::string& path, VST3::Optional<VST3::UID> effectID, uint32 flags);
-	void createViewAndShow (IEditController* controller);
 
-	VST3::Hosting::Module::Ptr module {nullptr};
+	void openEditor(const std::string& path, VST3::Optional<VST3::UID> effectID, uint32 flags);
+
+	void createViewAndShow(IEditController* controller);
+
+	VST3::Hosting::Module::Ptr module{nullptr};
 	WindowPtr window;
 	std::shared_ptr<WindowController> windowController;
 };

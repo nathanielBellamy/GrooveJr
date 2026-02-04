@@ -46,9 +46,7 @@ public:
       "Audio::Channel::deletePluginsToDelete",
       "Deleting plugins marked for deletion. ChannelIndex: " + std::to_string(index)
     );
-    std::cout << "plugins To Delete size BEFORE " << pluginsToDelete.size() << std::endl;
     pluginsToDelete.clear();
-    std::cout << "plugins To Delete size AFTER " << pluginsToDelete.size() << std::endl;
     return OK;
   }
 
