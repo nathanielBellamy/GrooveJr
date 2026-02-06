@@ -74,12 +74,9 @@ public:
       "Audio::Mixer::Core::safeDeleteOldPlugins",
       "Safe delete old plugins"
     );
-    if (stateCore->isAudioRunning()) {
-      std::cout << "safeDeleteOldPlugins audioRunning" << std::endl;
+    if (stateCore->isAudioRunning())
       return setProcessDataChangeFlag(ProcessDataChangeFlag::ACKNOWLEDGE);
-    }
 
-    std::cout << "safeDeleteOldPlugins audio NOT Running" << std::endl;
     return deletePluginsToDelete();
   }
 

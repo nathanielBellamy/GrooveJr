@@ -85,9 +85,10 @@ public:
 		editController->setState(controllerState);
 	};
 
-	void resize(const float newScaleFactor) const {
-		std::cout << " editorhost - newScaleFactor: " << newScaleFactor << std::endl;
-		windowController->onContentScaleFactorChanged(*window.get(), newScaleFactor);
+	void resize(const Coord width, const Coord height) const {
+		windowController->onResize(*window.get(), {width, height});
+		windowController->constrainSize(*window.get(), {width, height});
+		// windowController->onContentScaleFactorChanged(*window.get(), newScaleFactor);
 	}
 
 private:

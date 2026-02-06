@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QWindow>
 #include <QGridLayout>
+#include <QResizeEvent>
 
 #include "public.sdk/samples/vst-hosting/editorhost/source/platform/iwindow.h"
 #include "public.sdk/source/vst/hosting/plugprovider.h"
@@ -26,7 +27,7 @@ class VstWindow final : public QWidget, public IWindow {
 	PluginIndex pluginIndex;
 	AtomicStr name;
 	QGridLayout grid;
-	std::function<void(float)> vst3ResizeFunc;
+	std::function<void(Coord, Coord)> vst3ResizeFunc;
 
 
 	void setStyle();
@@ -36,7 +37,7 @@ class VstWindow final : public QWidget, public IWindow {
 public:
 	explicit VstWindow(QWidget* parent, ChannelIndex channelIndex, PluginIndex pluginIndex, const AtomicStr& name);
 
-	void setVst3ResizeFunc(const std::function<void(float newScaleFactor)>& func) { vst3ResizeFunc = func; }
+	void setVst3ResizeFunc(const std::function<void(Coord, Coord)>& func) { vst3ResizeFunc = func; }
 
 	~VstWindow() noexcept override;
 
@@ -44,7 +45,11 @@ public:
 
 	void close() override;
 
-	void resize(Size newSize) override;
+	void resize(Size newSize) override {
+		// todo
+	}
+
+	void resizeEvent(QResizeEvent* event) override;
 
 	Size getContentSize() override;
 

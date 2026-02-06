@@ -260,9 +260,13 @@ Result Channel::initEditorHosts(const std::shared_ptr<Gui::Mixer::VstWindow>* vs
 	const auto res = forEachPlugin(
 		[this, &vstWindows](const std::unique_ptr<Plugins::Vst3::Plugin>& plugin, const PluginIndex pluginIndex) {
 			plugin->initEditorHost(vstWindows[pluginIndex]);
-			vstWindows[pluginIndex]->setVst3ResizeFunc(
-				[editorHost = &plugin->editorHost](const float newScaleFactor) { (*editorHost)->resize(newScaleFactor); }
-			);
+
+			const std::function resizeFunc = [editorHost = &plugin->editorHost](
+				const EditorHost::Coord width, const EditorHost::Coord height) {
+				(*editorHost)->resize(width, height);
+			};
+
+			vstWindows[pluginIndex]->setVst3ResizeFunc(resizeFunc);
 		});
 
 	Logging::write(

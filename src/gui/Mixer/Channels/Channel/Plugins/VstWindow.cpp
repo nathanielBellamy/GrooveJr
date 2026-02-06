@@ -65,10 +65,9 @@ void VstWindow::close() {
   QWidget::close();
 }
 
-void VstWindow::resize(Size newSize) {
-  const float newScaleFactor = static_cast<float>(newSize.width) / 10.0f;
-  std::cout << "gui - newScaleFactor: " << newScaleFactor << std::endl;
-  vst3ResizeFunc(newScaleFactor);
+void VstWindow::resizeEvent(QResizeEvent* event) {
+  if (vst3ResizeFunc)
+    vst3ResizeFunc(event->size().width(), event->size().height());
 }
 
 NativePlatformWindow VstWindow::getNativePlatformWindow() const {
