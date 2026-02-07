@@ -69,8 +69,6 @@ add_library(GjAudio SHARED
         AudioPlayer.h
         Cassette.h
         Cassette.cpp
-        ThreadStatics.h
-        ThreadStatics.cpp
         Math.h
         JackClient.h
         JackClient.cpp

@@ -52,7 +52,7 @@ void ProgressBar::mousePressEvent(QMouseEvent* event) {
   const float percent = x / static_cast<float>(width());
 
   frameId = static_cast<sf_count_t>(std::floor(percent * static_cast<float>(frames)));
-  Audio::Mixer::Core::setFrameId(frameId);
+  mixer->setFrameId(frameId);
   update();
 }
 

@@ -655,8 +655,8 @@ Result Core::setFrameId(const sf_count_t frameId) {
     "Setting frameId: " + std::to_string(frameId)
   );
 
-  ThreadStatics::setFrameId(frameId);
-  ThreadStatics::setUserSettingFrameId(true);
+  stateCore->setFrameId(frameId);
+  stateCore->setUserSettingFrameId(true);
 
   return OK;
 }

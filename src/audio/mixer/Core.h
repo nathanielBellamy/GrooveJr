@@ -30,7 +30,6 @@
 #include "../ProcessDataChangeFlag.h"
 #include "../../gui/Mixer/Channels/Channel/Plugins/VstWindow.h"
 #include "../plugins/vst3/Util.h"
-#include "../ThreadStatics.h"
 
 namespace Gj {
 namespace Audio {
@@ -289,7 +288,7 @@ public:
 
   Result setPlugins(const std::vector<Db::Plugin>& plugins);
 
-  static Result setFrameId(sf_count_t frameId);
+  Result setFrameId(sf_count_t frameId);
 
   Result loadScene(ID sceneDbId);
 

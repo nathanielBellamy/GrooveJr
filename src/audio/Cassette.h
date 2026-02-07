@@ -7,7 +7,6 @@
 #include <sndfile.hh>
 
 #include "./Constants.h"
-#include "./ThreadStatics.h"
 #include "../state/Core.h"
 #include "../enums/Result.h"
 #include "Logging.h"

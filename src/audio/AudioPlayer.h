@@ -17,7 +17,6 @@
 #include "Constants.h"
 #include "ProcessDataChangeFlag.h"
 #include "mixer/Core.h"
-#include "ThreadStatics.h"
 #include "BufferIndeces.h"
 
 #include "../state/Core.h"
@@ -28,8 +27,6 @@ namespace Audio {
 using namespace caf;
 
 struct AudioPlayer {
-  long threadId;
-
   actor_system& actorSystem;
 
   AudioCore* audioCore;
@@ -59,8 +56,7 @@ struct AudioPlayer {
   Mixer::ChannelProcessData mixerChannelsProcessData[MAX_MIXER_CHANNELS]{};
 
   AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer::Core* mixer, State::Core* stateCore)
-  : threadId(ThreadStatics::incrThreadId())
-    , actorSystem(actorSystem)
+  : actorSystem(actorSystem)
     , audioCore(audioCore)
     , mixer(mixer)
     , stateCore(stateCore)
@@ -129,20 +125,10 @@ struct AudioPlayer {
     Logging::write(
       Info,
       "Audio::AudioPlayer::setupAudioCore",
-      "Setting up AudioCore for threadId: " + std::to_string(threadId)
+      "Setting up AudioCore."
     );
 
     createRingBuffers();
-
-    if (threadId != ThreadStatics::getThreadId()) {
-      Logging::write(
-        Warning,
-        "Audio::AudioPlayer::setupAudioCore",
-        "Attempted to create duplicate AudioThread and thus duplicate AudioCore with ThreadID: " +
-        std::to_string(threadId)
-      );
-      return 1;
-    }
 
     // update plugins with info about audio to be processed
     const SF_INFO sfInfo = audioCore->currentDeck().decoratedAudioFile->audioFile.sfInfo;
@@ -152,8 +138,6 @@ struct AudioPlayer {
         "Audio::AudioPlayer::setupAudioCore",
         "Unable to set sample rate: " + std::to_string(sfInfo.samplerate)
       );
-
-    ThreadStatics::setFrames(audioCore->currentDeck().frames);
 
     audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
     audioCore->crossfade = stateCore->getCrossfade();
@@ -351,12 +335,12 @@ struct AudioPlayer {
     playbackSettingsToAudioThread[BfrIdx::PSTAT::PLAYBACK_SPEED] = static_cast<sf_count_t>(
       std::floor(stateCore->getScene().playbackSpeed * 100.0f));
 
-    if (ThreadStatics::getUserSettingFrameId()) {
-      const sf_count_t newFrameId = ThreadStatics::getFrameId();
+    if (stateCore->getUserSettingFrameId()) {
+      const sf_count_t newFrameId = audioCore->currentDeck().frameId;
       playbackSettingsToAudioThread[BfrIdx::PSTAT::USER_SETTING_FRAME_ID_FLAG] = 1;
       playbackSettingsToAudioThread[BfrIdx::PSTAT::NEW_FRAME_ID] = newFrameId;
 
-      ThreadStatics::setUserSettingFrameId(false);
+      // stateCore->setUserSettingFrameId(false);
     }
 
     // write to playbackSettingsToAudioThread ring buffer
@@ -467,7 +451,7 @@ struct AudioPlayer {
   }
 
   bool continueRun() {
-    const PlayState playState = ThreadStatics::getPlayState();
+    const PlayState playState = stateCore->getPlayState();
     if (playState == STOP || playState == PAUSE)
       audioCore->setPlayStateAllDecks(playState);
 
@@ -521,14 +505,6 @@ struct AudioPlayer {
 
       populateMixerChannelsProcessData();
       updateRingBuffers();
-
-      if (audioCore->threadId != ThreadStatics::getThreadId()) {
-        // fadeout, break + cleanup
-        // TODO
-      } else {
-        ThreadStatics::setFrameId(audioCore->currentDeck().frameId);
-      }
-
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
     } // end of while loop
 
@@ -537,15 +513,6 @@ struct AudioPlayer {
       "Audio::AudioPlayer::run",
       "Exited while loop."
     );
-
-    if (audioCore->threadId == ThreadStatics::getThreadId()) {
-      // current audio thread has reached natural end of file
-      // TODO:
-      // if (audioCore->playState == PLAY)
-      //     ThreadStatics::setPlayState(STOP);
-      // else
-      //     ThreadStatics::setPlayState(audioCore->playState);
-    }
 
     if (jackClientIsActive) {
       if (jackClient->deactivate() != OK) {
@@ -561,7 +528,7 @@ struct AudioPlayer {
     stateCore->setAudioRunning(false);
     jackClientIsActive = false;
 
-    if (ThreadStatics::getPlayState() == STOP) {
+    if (stateCore->getPlayState() == STOP) {
       mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, 0);
       mixer->getSetEqRingBufferFunc()(nullptr);
       mixer->getSetVuRingBufferFunc()(nullptr);

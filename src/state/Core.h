@@ -34,6 +34,7 @@ struct Core {
   std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
   std::atomic<bool> queuePlay = false;
   std::atomic<TrackNumber> queueIndex = 0;
+  std::atomic<bool> userSettingFrameId = false;
 
   Core();
 
@@ -128,6 +129,19 @@ struct Core {
 
   Db::DecoratedAudioFile getCurrentlyPlaying() {
     return currentlyPlaying.load();
+  }
+
+  Result setUserSettingFrameId(const bool val) {
+    userSettingFrameId.store(val);
+    return OK;
+  }
+
+  bool getUserSettingFrameId() const {
+    return userSettingFrameId.load();
+  }
+
+  Result setFrameId(sf_count_t newFrameId) {
+    // todo
   }
 };
 } // State

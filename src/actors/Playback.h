@@ -93,17 +93,17 @@ struct PlaybackState {
           return;
         }
 
-        const PlayState playState = Audio::ThreadStatics::getPlayState();
+        const PlayState playState = stateCore->playState.load();
         if (playState == PLAY)
           return;
 
         if (playState == STOP) {
-          Audio::ThreadStatics::setPlayState(STOP);
+          stateCore->setPlayState(STOP);
           clearAudioThread();
         }
 
         bool success = true;
-        Audio::ThreadStatics::setPlayState(PLAY);
+        stateCore->setPlayState(PLAY);
         if (audioThread == nullptr) {
           auto audioThreadActor = self->system().spawn(
             actor_from_state<AudioThreadState>,
@@ -133,7 +133,7 @@ struct PlaybackState {
           "Act::Playback::tc_trig_pause_a",
           "Received TC Pause Trig"
         );
-        Audio::ThreadStatics::setPlayState(PAUSE);
+        stateCore->setPlayState(PAUSE);
 
         clearAudioThread();
         const actor replyToActor = actor_cast<actor>(reply_to);
@@ -152,7 +152,7 @@ struct PlaybackState {
         );
 
         clearAudioThread();
-        Audio::ThreadStatics::setPlayState(STOP);
+        stateCore->setPlayState(STOP);
         const actor replyToActor = actor_cast<actor>(reply_to);
         self->anon_send(
           replyToActor,
@@ -168,8 +168,8 @@ struct PlaybackState {
           "Received TC RW Trig"
         );
 
-        Audio::ThreadStatics::setPlayState(RW);
-        actor replyToActor = actor_cast<actor>(reply_to);
+        stateCore->setPlayState(RW);
+        const actor replyToActor = actor_cast<actor>(reply_to);
         self->anon_send(
           replyToActor,
           actor_cast<strong_actor_ptr>(self),
@@ -184,7 +184,7 @@ struct PlaybackState {
           "Received TC FF Trig"
         );
 
-        Audio::ThreadStatics::setPlayState(FF);
+        stateCore->setPlayState(FF);
         const actor replyToActor = actor_cast<actor>(reply_to);
         self->anon_send(
           replyToActor,
