@@ -87,8 +87,6 @@ public:
 
 	void resize(const Coord width, const Coord height) const {
 		windowController->onResize(*window.get(), {width, height});
-		windowController->constrainSize(*window.get(), {width, height});
-		// windowController->onContentScaleFactorChanged(*window.get(), newScaleFactor);
 	}
 
 private:

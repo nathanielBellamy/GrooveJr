@@ -45,9 +45,7 @@ public:
 
 	void close() override;
 
-	void resize(Size newSize) override {
-		// todo
-	}
+	void resize(Size newSize) override;
 
 	void resizeEvent(QResizeEvent* event) override;
 

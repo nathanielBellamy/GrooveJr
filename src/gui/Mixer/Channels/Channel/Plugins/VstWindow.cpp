@@ -65,6 +65,10 @@ void VstWindow::close() {
   QWidget::close();
 }
 
+void VstWindow::resize(Size newSize) {
+  QWidget::resize(newSize.width, newSize.height);
+}
+
 void VstWindow::resizeEvent(QResizeEvent* event) {
   if (vst3ResizeFunc)
     vst3ResizeFunc(event->size().width(), event->size().height());
