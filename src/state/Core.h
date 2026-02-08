@@ -35,6 +35,7 @@ struct Core {
   std::atomic<bool> queuePlay = false;
   std::atomic<TrackNumber> queueIndex = 0;
   std::atomic<bool> userSettingFrameId = false;
+  std::atomic<sf_count_t> frameId = 0;
 
   Core();
 
@@ -141,7 +142,12 @@ struct Core {
   }
 
   Result setFrameId(sf_count_t newFrameId) {
-    // todo
+    frameId.store(newFrameId);
+    return OK;
+  }
+
+  sf_count_t getFrameId() const {
+    return frameId.load();
   }
 };
 } // State

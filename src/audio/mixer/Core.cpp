@@ -648,10 +648,10 @@ Result Core::saveChannels() {
   return result;
 }
 
-Result Core::setFrameId(const sf_count_t frameId) {
+Result Core::setFrameId(const sf_count_t frameId) const {
   Logging::write(
     Info,
-    "Audio::Mixer::Core::setFramePercent",
+    "Audio::Mixer::Core::setFrameId",
     "Setting frameId: " + std::to_string(frameId)
   );
 

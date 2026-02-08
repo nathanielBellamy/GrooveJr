@@ -336,11 +336,10 @@ struct AudioPlayer {
       std::floor(stateCore->getScene().playbackSpeed * 100.0f));
 
     if (stateCore->getUserSettingFrameId()) {
-      const sf_count_t newFrameId = audioCore->currentDeck().frameId;
       playbackSettingsToAudioThread[BfrIdx::PSTAT::USER_SETTING_FRAME_ID_FLAG] = 1;
-      playbackSettingsToAudioThread[BfrIdx::PSTAT::NEW_FRAME_ID] = newFrameId;
+      playbackSettingsToAudioThread[BfrIdx::PSTAT::NEW_FRAME_ID] = stateCore->getFrameId();
 
-      // stateCore->setUserSettingFrameId(false);
+      stateCore->setUserSettingFrameId(false);
     }
 
     // write to playbackSettingsToAudioThread ring buffer
@@ -455,8 +454,10 @@ struct AudioPlayer {
     if (playState == STOP || playState == PAUSE)
       audioCore->setPlayStateAllDecks(playState);
 
-    if (playState == STOP)
+    if (playState == STOP) {
+      stateCore->setFrameId(0);
       audioCore->setFrameIdAllDecks(0);
+    }
 
     if (!audioCore->currentDeck().hasValidCassetteLoaded())
       return false;

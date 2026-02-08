@@ -288,7 +288,7 @@ public:
 
   Result setPlugins(const std::vector<Db::Plugin>& plugins);
 
-  Result setFrameId(sf_count_t frameId);
+  Result setFrameId(sf_count_t frameId) const;
 
   Result loadScene(ID sceneDbId);
 
