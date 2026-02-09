@@ -6,10 +6,10 @@
 
 #include <sndfile.hh>
 
-#include "./Constants.h"
-#include "../state/Core.h"
-#include "../enums/Result.h"
-#include "Logging.h"
+#include "../Constants.h"
+#include "../../state/Core.h"
+#include "../../enums/Result.h"
+#include "../Logging.h"
 
 namespace Gj {
 namespace Audio {

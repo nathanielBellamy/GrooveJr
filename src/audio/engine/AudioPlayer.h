@@ -14,13 +14,13 @@
 #include "caf/scoped_actor.hpp"
 
 #include "AudioCore.h"
-#include "Constants.h"
+#include "../Constants.h"
 #include "ProcessDataChangeFlag.h"
-#include "mixer/Core.h"
+#include "../mixer/Core.h"
 #include "BufferIndeces.h"
 
-#include "../state/Core.h"
-#include "../enums/Result.h"
+#include "../../state/Core.h"
+#include "../../enums/Result.h"
 
 namespace Gj {
 namespace Audio {

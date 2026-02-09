@@ -64,14 +64,14 @@ find_package(CAF
 
 # compile library
 add_library(GjAudio SHARED
-        AudioCore.h
-        AudioDeck.h
-        AudioPlayer.h
-        Cassette.h
-        Cassette.cpp
-        Math.h
-        JackClient.h
-        JackClient.cpp
+        engine/AudioCore.h
+        engine/AudioDeck.h
+        engine/AudioPlayer.h
+        engine/Cassette.h
+        engine/Cassette.cpp
+        engine/Math.h
+        engine/JackClient.h
+        engine/JackClient.cpp
         Logging.h
         Logging.cpp
         Constants.h

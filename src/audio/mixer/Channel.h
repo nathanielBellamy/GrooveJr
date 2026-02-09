@@ -20,7 +20,7 @@
 #include "../../enums/Result.h"
 #include "../../db/entity/mixer/Plugin.h"
 #include "../Logging.h"
-#include "../JackClient.h"
+#include "../engine/JackClient.h"
 #include "../../types/AtomicStr.h"
 #include "../../types/Types.h"
 

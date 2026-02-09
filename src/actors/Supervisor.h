@@ -23,7 +23,7 @@
 
 #include "../gui/MainWindow.h"
 #include "../audio/mixer/Core.h"
-#include "../audio/AudioCore.h"
+#include "../audio/engine/AudioCore.h"
 
 using namespace caf;
 

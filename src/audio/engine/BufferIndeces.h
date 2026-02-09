@@ -7,7 +7,7 @@
 
 #include <stddef.h>
 
-#include "../types/Types.h"
+#include "../../types/Types.h"
 
 namespace Gj {
 namespace Audio {

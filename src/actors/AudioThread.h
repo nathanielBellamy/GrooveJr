@@ -16,10 +16,10 @@
 #include "./Playback.h"
 #include "../state/Core.h"
 
-#include "../audio/AudioCore.h"
-#include "../audio/AudioPlayer.h"
+#include "../audio/engine/AudioCore.h"
+#include "../audio/engine/AudioPlayer.h"
 #include "../audio/mixer/Core.h"
-#include "../audio/Cassette.h"
+#include "../audio/engine/Cassette.h"
 #include "../Logging.h"
 #include "../enums/Result.h"
 

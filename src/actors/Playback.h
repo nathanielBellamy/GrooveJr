@@ -19,7 +19,7 @@
 
 #include "../state/Core.h"
 #include "../audio/mixer/Core.h"
-#include "../audio/AudioCore.h"
+#include "../audio/engine/AudioCore.h"
 #include "../enums/PlayState.h"
 
 using namespace caf;

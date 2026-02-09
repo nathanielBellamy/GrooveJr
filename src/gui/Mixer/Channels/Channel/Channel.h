@@ -23,7 +23,7 @@
 #include "../../../../state/Core.h"
 
 #include "../../../../audio/mixer/Core.h"
-#include "../../../../audio/Math.h"
+#include "../../../../audio/engine/Math.h"
 #include "Plugins/PluginSlots.h"
 #include "MuteSoloContainer.h"
 #include "RemoveChannelButton.h"

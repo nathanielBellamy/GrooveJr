@@ -27,7 +27,7 @@
 #include "../../db/entity/mixer/Scene.h"
 // #include "JackClient.h"
 #include "Channel.h"
-#include "../ProcessDataChangeFlag.h"
+#include "../engine/ProcessDataChangeFlag.h"
 #include "../../gui/Mixer/Channels/Channel/Plugins/VstWindow.h"
 #include "../plugins/vst3/Util.h"
 

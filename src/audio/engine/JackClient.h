@@ -15,10 +15,11 @@
 #include <jack/midiport.h>
 
 #include "AudioCore.h"
-#include "Logging.h"
-#include "../enums/Result.h"
-#include "Constants.h"
+#include "../Logging.h"
+#include "../../enums/Result.h"
+#include "../Constants.h"
 #include "BufferIndeces.h"
+#include "ProcessDataChangeFlag.h"
 
 namespace Gj {
 namespace Audio {

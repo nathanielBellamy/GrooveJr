@@ -40,7 +40,7 @@
 #include <caf/log/core.hpp>
 #include <caf/log/level.hpp>
 
-#include "mixer/Core.h"
+#include "../mixer/Core.h"
 
 //------------------------------------------------------------------------
 namespace Steinberg {

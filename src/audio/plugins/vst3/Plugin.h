@@ -16,7 +16,7 @@
 #include "../../../state/Core.h"
 #include "../../../db/entity/mixer/Plugin.h"
 #include "../../../enums/Result.h"
-#include "../../JackClient.h"
+#include "../../engine/JackClient.h"
 #include "./host/audiohost/source/audiohost.h"
 #include "./host/editorhost/source/editorhost.h"
 #include "../../../gui/Mixer/Channels/Channel/Plugins/VstWindow.h"

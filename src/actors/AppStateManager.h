@@ -24,7 +24,7 @@
 #include "../enums/PlayState.h"
 #include "../state/Core.h"
 #include "../state/mixer/Packet.h"
-#include "../audio/AudioCore.h"
+#include "../audio/engine/AudioCore.h"
 #include "../audio/mixer/Core.h"
 
 using namespace caf;

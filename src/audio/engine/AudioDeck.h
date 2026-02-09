@@ -11,12 +11,12 @@
 
 #include "Cassette.h"
 
-#include "../state/Core.h"
+#include "../../state/Core.h"
 #include "../Logging.h"
-#include "../enums/Result.h"
-#include "../enums/PlayState.h"
-#include "../db/dto/musicLibrary/DecoratedAudioFile.h"
-#include "../types/Types.h"
+#include "../../enums/Result.h"
+#include "../../enums/PlayState.h"
+#include "../../db/dto/musicLibrary/DecoratedAudioFile.h"
+#include "../../types/Types.h"
 
 namespace Gj {
 namespace Audio {

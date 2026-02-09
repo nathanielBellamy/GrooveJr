@@ -7,18 +7,18 @@
 #include <fftw3.h>
 
 #include <sndfile.hh>
-#include "../enums/PlayState.h"
-#include "mixer/ChannelProcessData.h"
+#include "../../enums/PlayState.h"
+#include "../mixer/ChannelProcessData.h"
 #include "BufferIndeces.h"
-#include "Constants.h"
+#include "../Constants.h"
 #include "AudioDeck.h"
 
 #include <jack/ringbuffer.h>
 
 #include "Cassette.h"
-#include "../state/Core.h"
+#include "../../state/Core.h"
 #include "../Logging.h"
-#include "../enums/Result.h"
+#include "../../enums/Result.h"
 
 namespace Gj {
 namespace Audio {
