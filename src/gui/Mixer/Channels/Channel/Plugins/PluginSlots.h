@@ -31,6 +31,7 @@ public:
     actor_system& actorSystem,
     Audio::Mixer::Core* mixer,
     ChannelIndex channelIndex,
+    QAction* togglePluginAction,
     QAction* replacePluginAction,
     QAction* removePluginAction
   );
@@ -47,6 +48,7 @@ private:
   ChannelIndex channelIndex;
   QGridLayout grid;
   PluginSlot* pluginSlots[Audio::MAX_PLUGINS_PER_CHANNEL]{};
+  QAction* togglePluginAction;
   QAction* replacePluginAction;
   QAction* removePluginAction;
 

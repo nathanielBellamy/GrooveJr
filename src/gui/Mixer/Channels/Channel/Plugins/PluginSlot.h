@@ -17,6 +17,7 @@
 #include <QWidget>
 
 #include "../../../../../state/Core.h"
+#include "TogglePluginButton.h"
 #include "RemovePluginButton.h"
 #include "ReplacePluginButton.h"
 #include "../../../../Shared/VstSelect.h"
@@ -38,6 +39,7 @@ public:
              ChannelIndex channelIndex,
              PluginIndex pluginIndex,
              bool occupied,
+             QAction* togglePluginAction,
              QAction* replacePluginAction,
              QAction* removePluginAction);
 
@@ -53,6 +55,7 @@ private:
   bool occupied;
   QGridLayout grid;
   QLabel title;
+  TogglePluginButton togglePluginButton;
   ReplacePluginButton replacePluginButton;
   RemovePluginButton removePluginButton;
   QUrl vstUrl;

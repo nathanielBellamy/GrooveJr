@@ -93,6 +93,7 @@ private:
   QAction openPluginsContainer;
   VstSelect vstSelect;
   QUrl vstUrl;
+  QAction togglePluginAction;
   QAction replacePluginAction;
   QAction removePluginAction;
   PluginsContainer pluginsContainer;

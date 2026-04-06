@@ -13,6 +13,7 @@ PluginSlot::PluginSlot(QWidget* parent,
                        const ChannelIndex channelIndex,
                        const PluginIndex pluginIndex,
                        const bool occupied,
+                       QAction* togglePluginAction,
                        QAction* replacePluginAction,
                        QAction* removePluginAction)
 : QWidget(parent)
@@ -23,6 +24,7 @@ PluginSlot::PluginSlot(QWidget* parent,
   , occupied(occupied)
   , grid(this)
   , title(this)
+  , togglePluginButton(this, channelIndex, pluginIndex, occupied, togglePluginAction)
   , replacePluginButton(this, channelIndex, pluginIndex, occupied, replacePluginAction)
   , removePluginButton(this, channelIndex, pluginIndex, occupied, removePluginAction)
   , pluginName(this) {
@@ -58,6 +60,7 @@ void PluginSlot::setStyle() {
 
 void PluginSlot::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, 1);
+  grid.addWidget(&togglePluginButton, 0, 1, 1, 1);
   grid.addWidget(&replacePluginButton, 0, 2, 1, 1);
   grid.addWidget(&removePluginButton, 0, 3, 1, 1);
   grid.addWidget(&pluginName, 1, 0, -1, -1);

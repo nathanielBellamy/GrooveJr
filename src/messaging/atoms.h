@@ -37,6 +37,8 @@ CAF_ADD_ATOM(groovejr, mix_remove_channel_a)
 
 CAF_ADD_ATOM(groovejr, mix_add_plugin_to_channel_a)
 
+CAF_ADD_ATOM(groovejr, mix_toggle_plugin_on_channel_a)
+
 CAF_ADD_ATOM(groovejr, mix_replace_plugin_on_channel_a)
 
 CAF_ADD_ATOM(groovejr, mix_remove_plugin_on_channel_a)

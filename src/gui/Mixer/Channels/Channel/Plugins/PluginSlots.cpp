@@ -11,6 +11,7 @@ PluginSlots::PluginSlots(QWidget* parent,
                          actor_system& actorSystem,
                          Audio::Mixer::Core* mixer,
                          const ChannelIndex channelIndex,
+                         QAction* togglePluginAction,
                          QAction* replacePluginAction,
                          QAction* removePluginAction)
 : QWidget(parent)
@@ -18,6 +19,7 @@ PluginSlots::PluginSlots(QWidget* parent,
   , mixer(mixer)
   , channelIndex(channelIndex)
   , grid(this)
+  , togglePluginAction(togglePluginAction)
   , replacePluginAction(replacePluginAction)
   , removePluginAction(removePluginAction) {
   setupGrid();
@@ -55,6 +57,7 @@ Result PluginSlots::hydrateState(const State::Packet& statePacket, const Channel
             channelIndex,
             pluginPacket.pluginIndex,
             true,
+            togglePluginAction,
             replacePluginAction,
             removePluginAction
           );

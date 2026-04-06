@@ -35,6 +35,7 @@ Channel::Channel(
   , addPluginButton(this, &addPluginAction)
   , openPluginsContainer(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Open Plugins"), this)
   , vstSelect(this)
+  , togglePluginAction(QIcon::fromTheme(QIcon::ThemeIcon::ProcessStop), tr("&Dsiable Plugin"), this)
   , replacePluginAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentRevert), tr("&Replace Plugin"), this)
   , removePluginAction(QIcon::fromTheme(QIcon::ThemeIcon::WindowClose), tr("&Remove Plugin"), this)
   , pluginsContainer(nullptr, mixer, channelIndex, &addPluginAction, &removePluginAction)
@@ -53,7 +54,10 @@ Channel::Channel(
   , panRSlider(Qt::Horizontal, this)
   , panRLabel("PanR", this)
   , pluginSlotsScrollArea(this)
-  , pluginSlots(this, actorSystem, mixer, channelIndex, &replacePluginAction, &removePluginAction)
+  , pluginSlots(
+    this, actorSystem, mixer, channelIndex,
+    &togglePluginAction, &replacePluginAction, &removePluginAction
+  )
   , muteSoloContainer(
     this, mixer, channelIndex, &openPluginsContainer,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
@@ -428,6 +432,19 @@ void Channel::connectActions() {
         mix_add_plugin_to_channel_a_v
       );
     }
+  });
+
+  auto togglePluginConnection = connect(&togglePluginAction, &QAction::triggered, [&]() {
+    const PluginIndex pluginIdx = togglePluginAction.data().toULongLong();
+
+    appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    const scoped_actor self{actorSystem};
+    self->anon_send(
+      actor_cast<actor>(appStateManagerPtr),
+      channelIndex,
+      pluginIdx,
+      mix_toggle_plugin_on_channel_a_v
+    );
   });
 
   auto replacePluginConnection = connect(&replacePluginAction, &QAction::triggered, [&]() {

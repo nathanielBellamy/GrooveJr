@@ -68,6 +68,8 @@ qt_add_library(GjGui STATIC
         Mixer/Channels/Channel/RemoveChannelButton.cpp
         Mixer/Channels/Channel/Plugins/AddPluginButton.h
         Mixer/Channels/Channel/Plugins/AddPluginButton.cpp
+        Mixer/Channels/Channel/Plugins/TogglePluginButton.h
+        Mixer/Channels/Channel/Plugins/TogglePluginButton.cpp
         Mixer/Channels/Channel/Plugins/RemovePluginButton.h
         Mixer/Channels/Channel/Plugins/RemovePluginButton.cpp
         Mixer/Channels/Channel/Plugins/ReplacePluginButton.h
