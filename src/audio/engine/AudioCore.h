@@ -122,7 +122,7 @@ struct AudioCore {
     std::memset(fft_pv_freq, 0.0f, sizeof(fft_pv_freq));
     std::memset(fft_pv_freq_shift, 0.0f, sizeof(fft_pv_freq_shift));
 
-    // TODO: debug
+    // TODO: debug phase vocoder
     // for (auto ch = 0; ch < AUDIO_FRAMES_PER_BUFFER_MAX; ++ch) {
     //   std::fill_n(fft_eq_time[ch], FFT_EQ_TIME_SIZE, 0.0f);
     //   std::fill_n(fft_pv_phase_sum[ch], FFT_PV_FREQ_SIZE, 0.0f);
