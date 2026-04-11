@@ -49,6 +49,8 @@ void PluginSlot::hydrateState(const State::Packet& statePacket, const ChannelInd
   channelIndex = newChannelIndex;
   pluginIndex = newPluginIndex;
   pluginName.setText(statePacket.mixerPacket.channels[channelIndex].plugins[pluginIndex].name.c_str());
+
+  togglePluginButton.hydrateState(statePacket, newChannelIndex);
 }
 
 void PluginSlot::setStyle() {

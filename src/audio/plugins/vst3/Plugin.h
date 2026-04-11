@@ -5,6 +5,7 @@
 #ifndef VST3PLUGIN_H
 #define VST3PLUGIN_H
 
+#include <atomic>
 #include <vector>
 #include <memory>
 
@@ -34,7 +35,7 @@ struct Plugin {
   State::Core* stateCore;
   AtomicStr name;
   AtomicStr path;
-  bool enabled;
+  std::atomic<bool> enabled;
   AudioHost::App audioHost;
   std::unique_ptr<EditorHost::App> editorHost;
   IPtr<ResizableMemoryIBStream> editorHostComponentStateStream;

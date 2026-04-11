@@ -317,11 +317,13 @@ public:
           if (!plugin) {
             State::Mixer::PluginSlotPacket emptyPacket;
             emptyPacket.hasValue = false;
+            emptyPacket.enabled = false;
             emptyPacket.pluginIndex = pluginIdx;
             channelPacket.plugins[pluginIdx] = emptyPacket;
           } else {
             channelPacket.plugins[pluginIdx] = {
               true,
+              plugin->enabled,
               pluginIdx,
               plugin->name,
               plugin->path,

@@ -19,13 +19,16 @@ TogglePluginButton::TogglePluginButton(
   , pluginIndex(pluginIndex)
   , occupied(occupied)
   , togglePluginAction(action) {
-  setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
+  setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_DialogYesButton));
   setCursor(Qt::PointingHandCursor);
   setStyle();
 }
 
-void TogglePluginButton::hydrateState(const State::Packet& appState, ChannelIndex newChannelIdx) {
+void TogglePluginButton::hydrateState(const State::Packet& statePacket, const ChannelIndex newChannelIdx) {
   channelIndex = newChannelIdx;
+  enabled = statePacket.mixerPacket.channels[channelIndex].plugins[pluginIndex].enabled;
+
+  setStyle();
 }
 
 void TogglePluginButton::mousePressEvent(QMouseEvent* event) {
@@ -33,10 +36,22 @@ void TogglePluginButton::mousePressEvent(QMouseEvent* event) {
   togglePluginAction->activate(QAction::Trigger);
 }
 
+std::string TogglePluginButton::styleString() const {
+  std::string styleString = "padding: 2px; border-radius: 5px; border: 2px solid white;";
+  if (enabled) {
+    styleString += " background-color: " + Color::toHex(GjC::ENABLED_GREEN) + "; color: " + Color::toHex(GjC::DARK_400)
+        +
+        "; ";
+  } else {
+    styleString += " background-color: " + Color::toHex(GjC::DARK_300) + "; ";
+  }
+  return styleString;
+};
+
 void TogglePluginButton::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   setMinimumSize(QSize(20, 20));
-  setStyleSheet("padding: 2px;");
+  setStyleSheet(styleString().c_str());
 }
 } // Mixer
 } // Gui

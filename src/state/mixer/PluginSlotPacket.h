@@ -15,6 +15,7 @@ namespace State {
 namespace Mixer {
 struct PluginSlotPacket {
   bool hasValue = false;
+  bool enabled = true;
   PluginIndex pluginIndex = 0;
   AtomicStr name = AtomicStr(" - ");
   PluginPath path = AtomicStr(" - ");
@@ -34,6 +35,7 @@ template<class Inspector>
 bool inspect(Inspector& f, PluginSlotPacket& x) {
   return f.object(x).fields(
     f.field("hasValue", x.hasValue),
+    f.field("enabled", x.enabled),
     f.field("pluginIndex", x.pluginIndex),
     f.field("name", x.name),
     f.field("path", x.path)
