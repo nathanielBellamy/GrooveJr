@@ -34,6 +34,7 @@ struct Plugin {
   State::Core* stateCore;
   AtomicStr name;
   AtomicStr path;
+  bool enabled;
   AudioHost::App audioHost;
   std::unique_ptr<EditorHost::App> editorHost;
   IPtr<ResizableMemoryIBStream> editorHostComponentStateStream;
@@ -94,6 +95,11 @@ struct Plugin {
 
   [[nodiscard]]
   AtomicStr getName() const { return name; };
+
+  Result toggleEnabled() {
+    enabled = !enabled;
+    return OK;
+  };
 
   void setState(
     ResizableMemoryIBStream* audioHostComponentState,

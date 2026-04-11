@@ -221,6 +221,13 @@ public:
     return res;
   }
 
+  Result togglePluginOnChannel(ChannelIndex channelIdx, PluginIndex pluginIndex) {
+    return runAgainstChannel(
+      channelIdx, [&](const std::unique_ptr<Channel>& channel) {
+        channel->togglePlugin(pluginIndex);
+      });
+  }
+
   std::optional<ChannelIndex> firstOpenChannelIndex() const;
 
   Result addChannel();

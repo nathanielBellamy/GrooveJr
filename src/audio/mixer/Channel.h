@@ -265,6 +265,8 @@ public:
 
   Result removePlugin(PluginIndex pluginIdx);
 
+  Result togglePlugin(PluginIndex pluginIdx) const;
+
   AtomicStr getPluginName(const PluginIndex pluginIndex) const {
     const auto plugin = getPluginAtIdx(pluginIndex);
     if (!plugin)

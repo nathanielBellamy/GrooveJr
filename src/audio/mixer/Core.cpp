@@ -235,7 +235,7 @@ Result Core::removePluginFromChannel(const ChannelIndex channelIdx, const Plugin
   if (!indexHasValidChannel(channelIdx)) {
     Logging::write(
       Error,
-      "Audio::Mixer::Core::terminateEditorHostsOnChannel",
+      "Audio::Mixer::Core::removePluginFromChannel",
       "Attempting to remove plugin on channelIndex: " + std::to_string(channelIdx) +
       " but no valid channel found. channelCount: " +
       std::to_string(getTotalChannelsCount())
@@ -244,7 +244,7 @@ Result Core::removePluginFromChannel(const ChannelIndex channelIdx, const Plugin
   }
 
   if (const auto& channel = channels[channelIdx]; channel) {
-    const auto res = channels[channelIdx]->removePlugin(pluginIdx);
+    const auto res = channel->removePlugin(pluginIdx);
     safeDeleteOldPlugins();
     return res;
   }

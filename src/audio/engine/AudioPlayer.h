@@ -190,7 +190,7 @@ struct AudioPlayer {
           processData.buffers[pluginIdx] =
               getPluginBuffers(ch, pluginIdx);
 
-          if (plugin && plugin->audioHost.audioClient) {
+          if (plugin && plugin->enabled && plugin->audioHost.audioClient) {
             processData.processFuncs[pluginIdx] =
                 [audioClient = plugin->audioHost.audioClient](IAudioClient::Buffers& buffers,
                                                               const jack_nframes_t nFrames) {

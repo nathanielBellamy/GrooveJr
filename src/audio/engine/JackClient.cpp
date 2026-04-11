@@ -524,7 +524,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   );
 
   // process channels
-  // main channel is chhannelIdx 0
+  // main channel is channelIdx 0
   const int32_t nframes32t = static_cast<int32_t>(nframes);
   for (ChannelIndex channelIdx = 1; channelIdx < MAX_MIXER_CHANNELS; ++channelIdx) {
     if (auto [processFuncs, buffers, pluginCount] = audioCore->mixerChannelsProcessData[channelIdx];

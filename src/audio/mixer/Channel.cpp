@@ -352,6 +352,20 @@ Result Channel::removePlugin(const PluginIndex pluginIdx) {
 
 	return OK;
 }
+
+Result Channel::togglePlugin(const PluginIndex pluginIdx) const {
+	if (!plugins[pluginIdx]) {
+		Logging::write(
+			Warning,
+			"Audio::Mixer::Channel::togglePlugin",
+			"No plugin found for channel " + std::to_string(index) + " at pluginIndex " + std::to_string(pluginIdx)
+		);
+		return WARNING;
+	}
+
+	plugins[pluginIdx]->toggleEnabled();
+	return OK;
+}
 } // Mixer
 } // Audio
 } // Gj

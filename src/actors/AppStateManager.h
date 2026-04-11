@@ -164,13 +164,13 @@ struct AppStateManagerState {
           "Act::AppStateManager::mix_toggle_plugin_on_channel_a",
           "Toggling plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx)
         );
-        // if (mixer->togglePluginOnChannel(channelIdx, pluginIdx) != OK) {
-        //   Logging::write(
-        //     Error,
-        //     "Act::AppStateManager::mix_replace_plugin_on_channel_a",
-        //     "Unable to toggle plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx)
-        //   );
-        // }
+        if (mixer->togglePluginOnChannel(channelIdx, pluginIdx) != OK) {
+          Logging::write(
+            Error,
+            "Act::AppStateManager::mix_replace_plugin_on_channel_a",
+            "Unable to toggle plugin " + std::to_string(pluginIdx) + " on channel " + std::to_string(channelIdx)
+          );
+        }
         hydrateStateToDisplay();
       },
       [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, PluginPath pluginPath,

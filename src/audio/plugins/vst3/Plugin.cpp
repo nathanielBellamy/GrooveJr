@@ -13,6 +13,7 @@ using namespace Steinberg;
 Plugin::Plugin(const AtomicStr& path, State::Core* stateCore, std::shared_ptr<JackClient> jackClient)
 : stateCore(stateCore)
   , path(path)
+  , enabled(true)
   , audioHost(stateCore, jackClient) {
 	Steinberg::ResizableMemoryIBStream state;
 
@@ -63,6 +64,7 @@ Plugin::Plugin(const AtomicStr& path, State::Core* stateCore, std::shared_ptr<Ja
 Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shared_ptr<JackClient> jackClient)
 : stateCore(stateCore)
   , path(pluginEntity.filePath)
+  , enabled(true)
   , audioHost(stateCore, jackClient) {
 	Logging::write(
 		Info,
