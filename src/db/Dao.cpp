@@ -122,6 +122,7 @@ int Dao::initSchema() const {
       name text not null,
       channelIndex integer not null,
       pluginIndex integer not null,
+      enabled integer not null,
       audioHostComponentState blob,
       audioHostControllerState blob,
       editorHostComponentState blob,

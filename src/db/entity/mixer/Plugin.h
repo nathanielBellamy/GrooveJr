@@ -23,6 +23,7 @@ struct Plugin {
   AtomicStr name;
   ChannelIndex channelIndex;
   PluginIndex pluginIndex;
+  bool enabled;
   Version version;
   std::vector<uint8_t> audioHostComponentStateBlob;
   std::vector<uint8_t> audioHostControllerStateBlob;
@@ -43,7 +44,8 @@ struct Plugin {
     const AtomicStr& format,
     const AtomicStr& name,
     ChannelIndex channelIndex,
-    PluginIndex effectIndex,
+    PluginIndex pluginIndex,
+    bool enabled,
     std::vector<uint8_t> audioHostComponentStateBlob,
     std::vector<uint8_t> audioHostControllerStateBlob,
     std::vector<uint8_t> editorHostComponentStateBlob,
@@ -56,6 +58,7 @@ struct Plugin {
     const AtomicStr& name,
     ChannelIndex channelIndex,
     PluginIndex pluginIdx,
+    bool enabled,
     std::vector<uint8_t> audioHostComponentStateBlob,
     std::vector<uint8_t> audioHostControllerStateBlob,
     std::vector<uint8_t> editorHostComponentStateBlob,

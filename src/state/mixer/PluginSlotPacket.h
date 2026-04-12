@@ -15,7 +15,7 @@ namespace State {
 namespace Mixer {
 struct PluginSlotPacket {
   bool hasValue = false;
-  bool enabled = true;
+  bool enabled = false;
   PluginIndex pluginIndex = 0;
   AtomicStr name = AtomicStr(" - ");
   PluginPath path = AtomicStr(" - ");

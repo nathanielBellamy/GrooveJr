@@ -627,6 +627,7 @@ Result Core::saveChannels() {
           plugin.value()->name,
           channelIndex,
           i,
+          plugin.value()->enabled,
           audioHostComponentBuffer,
           audioHostControllerBuffer,
           editorHostComponentBuffer,

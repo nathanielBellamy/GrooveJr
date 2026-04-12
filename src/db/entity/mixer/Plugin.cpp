@@ -13,6 +13,7 @@ Plugin::Plugin(
   const AtomicStr& name,
   const ChannelIndex channelIndex,
   const PluginIndex pluginIndex,
+  const bool enabled,
   std::vector<uint8_t> audioHostComponentStateBlob,
   std::vector<uint8_t> audioHostControllerStateBlob,
   std::vector<uint8_t> editorHostComponentStateBlob,
@@ -24,6 +25,7 @@ Plugin::Plugin(
   , name(name)
   , channelIndex(channelIndex)
   , pluginIndex(pluginIndex)
+  , enabled(enabled)
   , audioHostComponentStateBlob(audioHostComponentStateBlob)
   , audioHostControllerStateBlob(audioHostControllerStateBlob)
   , editorHostComponentStateBlob(editorHostComponentStateBlob)
@@ -36,6 +38,7 @@ Plugin::Plugin(
   const AtomicStr& name,
   const ChannelIndex channelIndex,
   const PluginIndex pluginIdx,
+  const bool enabled,
   std::vector<uint8_t> audioHostComponentStateBlob,
   std::vector<uint8_t> audioHostControllerStateBlob,
   std::vector<uint8_t> editorHostComponentStateBlob,
@@ -46,6 +49,7 @@ Plugin::Plugin(
   , name(name)
   , channelIndex(channelIndex)
   , pluginIndex(pluginIdx)
+  , enabled(enabled)
   , audioHostComponentStateBlob(audioHostComponentStateBlob)
   , audioHostControllerStateBlob(audioHostControllerStateBlob)
   , editorHostComponentStateBlob(editorHostComponentStateBlob)
@@ -65,14 +69,15 @@ Plugin Plugin::deser(sqlite3_stmt* stmt) {
   const unsigned char* name = sqlite3_column_text(stmt, 3);
   const ChannelIndex channelIndex = sqlite3_column_int(stmt, 4);
   const PluginIndex pluginIndex = sqlite3_column_int(stmt, 5);
-  const int audioHostComponentStateBlobSize = sqlite3_column_bytes(stmt, 6);
-  const void* audioHostComponentStateBlobRaw = sqlite3_column_blob(stmt, 6);
-  const int audioHostControllerStateBlobSize = sqlite3_column_bytes(stmt, 7);
-  const void* audioHostControllerStateBlobRaw = sqlite3_column_blob(stmt, 7);
-  const int editorHostComponentStateBlobSize = sqlite3_column_bytes(stmt, 8);
-  const void* editorHostComponentStateBlobRaw = sqlite3_column_blob(stmt, 8);
-  const int editorHostControllerStateBlobSize = sqlite3_column_bytes(stmt, 9);
-  const void* editorHostControllerStateBlobRaw = sqlite3_column_blob(stmt, 9);
+  const int enabledInt = sqlite3_column_int(stmt, 6);
+  const int audioHostComponentStateBlobSize = sqlite3_column_bytes(stmt, 7);
+  const void* audioHostComponentStateBlobRaw = sqlite3_column_blob(stmt, 7);
+  const int audioHostControllerStateBlobSize = sqlite3_column_bytes(stmt, 8);
+  const void* audioHostControllerStateBlobRaw = sqlite3_column_blob(stmt, 8);
+  const int editorHostComponentStateBlobSize = sqlite3_column_bytes(stmt, 9);
+  const void* editorHostComponentStateBlobRaw = sqlite3_column_blob(stmt, 9);
+  const int editorHostControllerStateBlobSize = sqlite3_column_bytes(stmt, 10);
+  const void* editorHostControllerStateBlobRaw = sqlite3_column_blob(stmt, 10);
 
   const std::vector audioHostComponentStateBlobDeser(
     static_cast<const uint8_t*>(audioHostComponentStateBlobRaw),
@@ -126,6 +131,7 @@ Plugin Plugin::deser(sqlite3_stmt* stmt) {
     AtomicStr(reinterpret_cast<const char*>(name)),
     channelIndex,
     pluginIndex,
+    enabledInt > 0,
     audioHostComponentStateBlobDeser,
     audioHostControllerStateBlobDeser,
     editorHostComponentStateBlobDeser,

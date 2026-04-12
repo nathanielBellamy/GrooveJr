@@ -7,11 +7,10 @@
 
 namespace Gj {
 namespace Db {
-
 PluginRepository::PluginRepository(sqlite3** db, State::Core* stateCore)
-  : db(db)
-  , stateCore(stateCore)
-  {}
+: db(db)
+  , stateCore(stateCore) {
+}
 
 std::vector<Plugin> PluginRepository::getAll() const {
   std::vector<Plugin> plugins;
@@ -45,12 +44,13 @@ int PluginRepository::save(const Plugin& plugin) const {
       name,
       channelIndex,
       pluginIndex,
+      enabled,
       audioHostComponentState,
       audioHostControllerState,
       editorHostComponentState,
       editorHostControllerState
     )
-    values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   )sql";
 
   sqlite3_stmt* stmt;
@@ -68,30 +68,31 @@ int PluginRepository::save(const Plugin& plugin) const {
   sqlite3_bind_text(stmt, 3, plugin.name.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_int(stmt, 4, plugin.channelIndex);
   sqlite3_bind_int(stmt, 5, plugin.pluginIndex);
+  sqlite3_bind_int(stmt, 6, plugin.enabled);
   sqlite3_bind_blob(
     stmt,
-    6,
+    7,
     plugin.audioHostComponentStateBlob.data(),
     static_cast<int>(plugin.audioHostComponentStateBlob.size()),
     SQLITE_TRANSIENT
   );
   sqlite3_bind_blob(
     stmt,
-    7,
+    8,
     plugin.audioHostControllerStateBlob.data(),
     static_cast<int>(plugin.audioHostControllerStateBlob.size()),
     SQLITE_TRANSIENT
   );
   sqlite3_bind_blob(
     stmt,
-    8,
+    9,
     plugin.editorHostComponentStateBlob.data(),
     static_cast<int>(plugin.editorHostComponentStateBlob.size()),
     SQLITE_TRANSIENT
   );
   sqlite3_bind_blob(
     stmt,
-    9,
+    10,
     plugin.editorHostControllerStateBlob.data(),
     static_cast<int>(plugin.editorHostControllerStateBlob.size()),
     SQLITE_TRANSIENT
@@ -101,13 +102,15 @@ int PluginRepository::save(const Plugin& plugin) const {
     Logging::write(
       Error,
       "Db::PluginRepository::save",
-      "Failed to save Plugin " + plugin.name + " at index " + std::to_string(plugin.pluginIndex) + " on channel " + std::to_string(plugin.channelIndex) + ". Message: " + std::string(sqlite3_errmsg(*db))
+      "Failed to save Plugin " + plugin.name + " at index " + std::to_string(plugin.pluginIndex) + " on channel " +
+      std::to_string(plugin.channelIndex) + ". Message: " + std::string(sqlite3_errmsg(*db))
     );
   } else {
     Logging::write(
       Info,
       "Db::PluginRepository::save",
-      "Saved " + plugin.name + " at index " + std::to_string(plugin.pluginIndex) + " on channel " + std::to_string(plugin.channelIndex)
+      "Saved " + plugin.name + " at index " + std::to_string(plugin.pluginIndex) + " on channel " + std::to_string(
+        plugin.channelIndex)
     );
   }
 
@@ -135,13 +138,15 @@ int PluginRepository::save(const Plugin& plugin) const {
     Logging::write(
       Error,
       "Db::PluginRepository::save",
-      "Failed to join Plugin " + plugin.name + " id: " + std::to_string(pluginId) + " to sceneDbId: " + std::to_string(stateCore->getSceneDbId()) + ". Message: " + std::string(sqlite3_errmsg(*db))
+      "Failed to join Plugin " + plugin.name + " id: " + std::to_string(pluginId) + " to sceneDbId: " +
+      std::to_string(stateCore->getSceneDbId()) + ". Message: " + std::string(sqlite3_errmsg(*db))
     );
   } else {
     Logging::write(
       Info,
       "Db::PluginRepository::save",
-      "Joined Plugin " + plugin.name + " id: " + std::to_string(pluginId) + " to sceneDbId " + std::to_string(stateCore->getSceneDbId())
+      "Joined Plugin " + plugin.name + " id: " + std::to_string(pluginId) + " to sceneDbId " + std::to_string(
+        stateCore->getSceneDbId())
     );
   }
 
@@ -176,6 +181,5 @@ std::vector<Plugin> PluginRepository::getBySceneId(const int sceneId) const {
 
   return plugins;
 }
-
 } // Db
 } // Gj
