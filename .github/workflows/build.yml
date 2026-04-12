@@ -4,7 +4,6 @@ on:
   push:
 
 env:
-  # Update to match the VST3 SDK version your project targets
   VST3_SDK_VERSION: "v3.7.12_build_20"
 
 jobs:
@@ -16,7 +15,7 @@ jobs:
 
       - name: Install dependencies via Homebrew
         run: |
-          brew install boost jack fftw taglib libsndfile sqlite qt caf
+          brew install boost jack fftw taglib libsndfile sqlite qt caf dylibbundler
 
       - name: Cache VST3 SDK build
         id: cache-vst3
@@ -54,10 +53,123 @@ jobs:
       - name: Build GrooveJr
         run: cmake --build src/build --config Release
 
-      - name: Upload artifact
+      - name: Package macOS app bundle
+        run: |
+          set -e
+
+          APP="GrooveJr.app"
+          CONTENTS="$APP/Contents"
+          MACOS="$CONTENTS/MacOS"
+          FWKS="$CONTENTS/Frameworks"
+
+          mkdir -p "$MACOS" "$FWKS" "$CONTENTS/Resources"
+
+          # --- Copy executable ---
+          cp src/build/GrooveJr "$MACOS/"
+
+          # --- Copy custom shared libraries ---
+          find src/build -name '*.dylib' -exec cp {} "$FWKS/" \;
+
+          # --- Create Info.plist ---
+          cat > "$CONTENTS/Info.plist" << 'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+            "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleName</key>
+            <string>GrooveJr</string>
+            <key>CFBundleDisplayName</key>
+            <string>GrooveJr</string>
+            <key>CFBundleExecutable</key>
+            <string>GrooveJr</string>
+            <key>CFBundleIdentifier</key>
+            <string>dev.groovejr.app</string>
+            <key>CFBundleVersion</key>
+            <string>0.0.0</string>
+            <key>CFBundleShortVersionString</key>
+            <string>0.0.0</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>NSHighResolutionCapable</key>
+            <true/>
+            <key>LSMinimumSystemVersion</key>
+            <string>14.0</string>
+          </dict>
+          </plist>
+          PLIST
+
+          # --- Fix install names for custom dylibs ---
+          for dylib in "$FWKS"/*.dylib; do
+            name=$(basename "$dylib")
+            install_name_tool -id "@executable_path/../Frameworks/$name" "$dylib"
+          done
+
+          # Fix executable references to custom dylibs
+          for dylib in "$FWKS"/*.dylib; do
+            name=$(basename "$dylib")
+            old_path=$(otool -L "$MACOS/GrooveJr" | grep "$name" | awk '{print $1}' | head -1)
+            if [ -n "$old_path" ]; then
+              install_name_tool -change "$old_path" \
+                "@executable_path/../Frameworks/$name" "$MACOS/GrooveJr" || true
+            fi
+          done
+
+          # Fix cross-references between custom dylibs
+          for dylib in "$FWKS"/*.dylib; do
+            for ref in "$FWKS"/*.dylib; do
+              ref_name=$(basename "$ref")
+              old_path=$(otool -L "$dylib" | grep "$ref_name" | awk '{print $1}' | head -1)
+              if [ -n "$old_path" ] && \
+                 [ "$old_path" != "@executable_path/../Frameworks/$ref_name" ]; then
+                install_name_tool -change "$old_path" \
+                  "@executable_path/../Frameworks/$ref_name" "$dylib" || true
+              fi
+            done
+          done
+
+          # --- Add rpath so @rpath references resolve ---
+          install_name_tool -add_rpath "@executable_path/../Frameworks" \
+            "$MACOS/GrooveJr" 2>/dev/null || true
+
+          # --- Bundle Qt frameworks and plugins ---
+          QT_DIR="$(brew --prefix qt)"
+          "$QT_DIR/bin/macdeployqt" "$APP" -always-overwrite
+
+          # --- Bundle remaining non-Qt shared library dependencies ---
+          BREW_LIB="$(brew --prefix)/lib"
+
+          dylibbundler -od -b \
+            -x "$MACOS/GrooveJr" \
+            -d "$FWKS/" \
+            -p "@executable_path/../Frameworks/" \
+            -s "$BREW_LIB"
+
+          for dylib in "$FWKS"/*.dylib; do
+            dylibbundler -od -b \
+              -x "$dylib" \
+              -d "$FWKS/" \
+              -p "@executable_path/../Frameworks/" \
+              -s "$BREW_LIB" 2>/dev/null || true
+          done
+
+          # --- Ad-hoc code sign ---
+          codesign --force --deep --sign - "$APP"
+
+          # --- Create DMG ---
+          hdiutil create -volname "GrooveJr" \
+            -srcfolder "$APP" \
+            -ov -format UDZO \
+            "GrooveJr-macos-arm64.dmg"
+
+      - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
           name: GrooveJr-macos-arm64
-          path: |
-            src/build/GrooveJr
-            src/build/**/*.dylib
+          path: GrooveJr-macos-arm64.dmg
+
+      - name: Upload app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: GrooveJr-macos-arm64-app
+          path: GrooveJr.app
