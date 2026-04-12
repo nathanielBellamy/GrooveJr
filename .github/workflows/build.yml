@@ -34,10 +34,11 @@ jobs:
           cd deps/vst3sdk
           mkdir build && cd build
           cmake -DCMAKE_BUILD_TYPE=Release \
-                -DSMTG_ADD_VST3_HOSTING_SAMPLES=OFF \
-                -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF \
+                -DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=OFF \
+                -DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF \
+                -DSMTG_ENABLE_VSTGUI_SUPPORT=OFF \
                 ..
-          cmake --build . --config Release
+          cmake --build . --config Release --target sdk sdk_common sdk_hosting pluginterfaces
 
       - name: Configure GrooveJr
         run: |
