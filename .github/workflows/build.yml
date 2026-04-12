@@ -5,7 +5,7 @@ on:
 
 env:
   # Update to match the VST3 SDK version your project targets
-  VST3_SDK_VERSION: "v3.7.14"
+  VST3_SDK_VERSION: "v3.7.12_build_20"
 
 jobs:
   build-macos:
