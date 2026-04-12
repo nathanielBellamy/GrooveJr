@@ -33,7 +33,10 @@ jobs:
             https://github.com/steinbergmedia/vst3sdk.git deps/vst3sdk
           cd deps/vst3sdk
           mkdir build && cd build
-          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DSMTG_ADD_VST3_HOSTING_SAMPLES=OFF \
+                -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF \
+                ..
           cmake --build . --config Release
 
       - name: Configure GrooveJr
