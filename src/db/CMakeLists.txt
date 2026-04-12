@@ -4,12 +4,13 @@ project(GjDb VERSION 0.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(LLVM_INSTALL_DIR /opt/homebrew/opt/llvm)
 
 # logging
 find_package(Boost REQUIRED COMPONENTS log_setup log)
 # setup SQLite
 find_package(SQLite3 REQUIRED)
+
+find_library(SNDFILE_LIBRARY sndfile REQUIRED)
 
 add_library(GjDb SHARED
         Dao.h
@@ -72,6 +73,5 @@ target_link_libraries(GjDb
         Boost::log
         ${Boost_LIBRARIES}
         SQLite::SQLite3
-        -L${C_LIBS_HOME}/libsndfile/1.2.2/lib
-        -lsndfile
+        ${SNDFILE_LIBRARY}
 )

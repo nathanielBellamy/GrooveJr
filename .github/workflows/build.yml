@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  push:
+
+env:
+  # Update to match the VST3 SDK version your project targets
+  VST3_SDK_VERSION: "v3.7.14"
+
+jobs:
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies via Homebrew
+        run: |
+          brew install boost jack fftw taglib libsndfile sqlite qt caf
+
+      - name: Cache VST3 SDK build
+        id: cache-vst3
+        uses: actions/cache@v4
+        with:
+          path: deps/vst3sdk
+          key: vst3sdk-macos-14-${{ env.VST3_SDK_VERSION }}
+
+      - name: Clone and build VST3 SDK
+        if: steps.cache-vst3.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p deps
+          git clone --recursive --branch ${{ env.VST3_SDK_VERSION }} \
+            https://github.com/steinbergmedia/vst3sdk.git deps/vst3sdk
+          cd deps/vst3sdk
+          mkdir build && cd build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --config Release
+
+      - name: Configure GrooveJr
+        run: |
+          cd src
+          mkdir -p build && cd build
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DGJ_BASE_DIR=${{ github.workspace }}/deps \
+                -DCAF_ROOT=$(brew --prefix caf) \
+                -DCMAKE_PREFIX_PATH="$(brew --prefix qt)" \
+                -DGJ_ENABLE_ASAN=OFF \
+                ..
+
+      - name: Build GrooveJr
+        run: cmake --build src/build --config Release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GrooveJr-macos-arm64
+          path: |
+            src/build/GrooveJr
+            src/build/**/*.dylib

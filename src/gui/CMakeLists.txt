@@ -4,7 +4,6 @@ project(GjGui VERSION 0.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(LLVM_INSTALL_DIR /opt/homebrew/opt/llvm)
 
 list(APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
@@ -21,11 +20,10 @@ find_package(Boost REQUIRED COMPONENTS log_setup log)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Sql)
 qt_standard_project_setup()
 
-set(CAF_ROOT
-        ${GJ_BASE_DIR}/actor-framework/build
-)
-find_package(CAF
-        REQUIRED)
+if(NOT DEFINED CAF_ROOT)
+    set(CAF_ROOT ${GJ_BASE_DIR}/actor-framework/build)
+endif()
+find_package(CAF REQUIRED)
 
 qt_add_library(GjGui STATIC
         Color.h

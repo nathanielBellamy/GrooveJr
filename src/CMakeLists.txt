@@ -1,6 +1,5 @@
 
 cmake_minimum_required(VERSION 3.29.6)
-set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin")
 project(GrooveJr VERSION 0.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -14,26 +13,20 @@ else ()
     message(INFO " \n LLVM FOUND ")
 endif ()
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+option(GJ_ENABLE_ASAN "Enable AddressSanitizer" ON)
+if (GJ_ENABLE_ASAN AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"))
     add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
     add_link_options(-fsanitize=address)
 endif ()
 
 message(INFO " Compiling GrooveJr with CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 
-# TODO: detect OS and set
-# - for linux: -shared
-# - for macOS: -dynamicLib
-set(OS_LIB_FLAG "-dynamicLib")
+# GJ_BASE_DIR: parent directory containing GrooveJr/, vst3sdk/, actor-framework/, qt6-build/.
+# Override via: cmake -DGJ_BASE_DIR=/path/to/parent ..
+if(NOT DEFINED GJ_BASE_DIR)
+    get_filename_component(GJ_BASE_DIR "${CMAKE_SOURCE_DIR}/../.." ABSOLUTE)
+endif()
 
-# TODO: detect OS and set
-# - for linux:
-# - for macO_sonoma: /opt/homebrew/Cellar
-# NOTE:
-#  - on MacOS it may be helpful to use `brew info jack` to view home directory
-set(C_LIBS_HOME "/opt/homebrew/Cellar")
-
-set(GJ_BASE_DIR "/Users/ns/code/")
 set(VST3SDK_HOME "${GJ_BASE_DIR}/vst3sdk")
 
 # logging
@@ -47,39 +40,33 @@ if (Qt6_FOUND)
 endif ()
 
 qt_standard_project_setup()
+
+find_path(SNDFILE_INCLUDE_DIR sndfile.h REQUIRED)
+
 set(INCLUDE_FLAGS
         -I${GJ_BASE_DIR}/actor-framework/libcaf_core
         -I${GJ_BASE_DIR}/actor-framework/libcaf_io
         -I${VST3SDK_HOME}
-        -I${C_LIBS_HOME}/libsndfile/1.2.2/include
+        -I${SNDFILE_INCLUDE_DIR}
 )
 # utilize vst3sdk cmake modules
 list(APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
 
-# setup CAF
-set(CAF_ROOT
-        ${GJ_BASE_DIR}/actor-framework/build
-)
-find_package(CAF
-        REQUIRED)
+# setup CAF — override via: cmake -DCAF_ROOT=/path/to/caf ..
+if(NOT DEFINED CAF_ROOT)
+    set(CAF_ROOT ${GJ_BASE_DIR}/actor-framework/build)
+endif()
+find_package(CAF REQUIRED)
 
 # setup SQLite
 find_package(SQLite3 REQUIRED)
 
 # setup local libraries
-add_subdirectory(
-        ${GJ_BASE_DIR}/GrooveJr/src/audio
-)
-add_subdirectory(
-        ${GJ_BASE_DIR}/GrooveJr/src/gui
-)
-add_subdirectory(
-        ${GJ_BASE_DIR}/GrooveJr/src/db
-)
-add_subdirectory(
-        ${GJ_BASE_DIR}/GrooveJr/src/scanner
-)
+add_subdirectory(audio)
+add_subdirectory(gui)
+add_subdirectory(db)
+add_subdirectory(scanner)
 add_definitions(-DQT_NO_VERSION_TAGGING)
 
 add_executable(GrooveJr
