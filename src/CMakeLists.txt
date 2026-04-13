@@ -80,6 +80,7 @@ add_executable(GrooveJr
         state/mixer/PluginSlotPacket.h
         Logging.h
         Logging.cpp
+        Paths.h
         actors/ActorIds.h
         actors/AppStateManager.h
         actors/AudioThread.h

@@ -4,6 +4,7 @@
 
 #include "SqlWorker.h"
 #include "SqlWorkerPool.h"
+#include "../../Paths.h"
 
 namespace Gj {
 namespace Gui {
@@ -30,7 +31,7 @@ Result SqlWorker::connectActions(const SqlWorkerPool* pool) {
 
 void SqlWorker::init() {
   db = QSqlDatabase::addDatabase("QSQLITE", "gj_gui_musiclibrary_worker_" + QString::number(idx));
-  db.setDatabaseName("/Users/ns/groovejr.db");
+  db.setDatabaseName(QString::fromStdString(Gj::Paths::databasePath().string()));
   if (!db.open()) {
     Logging::write(
         Info,
