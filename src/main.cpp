@@ -23,55 +23,14 @@ void shutdown_handler(const int sig) {
     "Caught Signal: " + std::to_string(sig)
   );
 
-  delete mixer;
-  Logging::write(
-    Info,
-    "shutdown_handler",
-    "Deleted Mixer"
-  );
-
-  delete stateCore;
-  Logging::write(
-    Info,
-    "shutdown_handler",
-    "Deleted stateCore"
-  );
-
-  delete dao;
-  Logging::write(
-    Info,
-    "shutdown_handler",
-    "Deleted Dao"
-  );
-
-  delete audioCore;
-  Logging::write(
-    Info,
-    "shutdown_handler",
-    "Deleted AudioCore"
-  );
-
-  Logging::write(
-    Info,
-    "shutdown_handler",
-    "Done Freeing Resources"
-  );
-
-  pluginContext->terminate();
-  PluginContextFactory::instance().setPluginContext(nullptr);
-  delete pluginContext;
-  Logging::write(
-    Info,
-    "shutdown_handler",
-    "Deleted PluginContext"
-  );
-
-  Logging::write(
-    Info,
-    "shutdown_handler",
-    "== GrooveJr =="
-  );
-  exit(sig);
+  // Just quit the Qt event loop. Resource cleanup happens in main() after
+  // the actor system has fully shut down, avoiding use-after-free races
+  // between the main thread and CAF scheduler threads.
+  if (QApplication::instance()) {
+    QApplication::quit();
+  } else {
+    _exit(sig);
+  }
 }
 
 Result initVst3PluginContext() {
@@ -171,16 +130,42 @@ int main(int argc, char* argv[]) {
   // init actor system
   init_global_meta_objects<id_block::groovejr>();
   core::init_global_meta_objects();
-  actor_system_config cfg;
-  actor_system sys{cfg};
 
-  auto supervisor = sys.spawn(
-    actor_from_state<Act::SupervisorState>,
-    stateCore,
-    mixer,
-    audioCore,
-    shutdown_handler
-  );
+  {
+    actor_system_config cfg;
+    actor_system sys{cfg};
+
+    auto supervisor = sys.spawn(
+      actor_from_state<Act::SupervisorState>,
+      stateCore,
+      mixer,
+      audioCore,
+      shutdown_handler
+    );
+  }
+  // actor_system is now destroyed — all actors have been shut down.
+  // Safe to free shared resources with no concurrent access.
+
+  Logging::write(Info, "main", "Actor system shut down, cleaning up resources");
+
+  delete mixer;
+  Logging::write(Info, "main", "Deleted Mixer");
+
+  delete stateCore;
+  Logging::write(Info, "main", "Deleted stateCore");
+
+  delete dao;
+  Logging::write(Info, "main", "Deleted Dao");
+
+  delete audioCore;
+  Logging::write(Info, "main", "Deleted AudioCore");
+
+  pluginContext->terminate();
+  PluginContextFactory::instance().setPluginContext(nullptr);
+  delete pluginContext;
+  Logging::write(Info, "main", "Deleted PluginContext");
+
+  Logging::write(Info, "main", "== GrooveJr ==");
   return 0;
 }
 } // extern C
