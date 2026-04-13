@@ -115,3 +115,21 @@ target_link_libraries(GrooveJr
 )
 target_compile_options(GrooveJr PRIVATE ${INCLUDE_FLAGS})
 set_target_properties(GrooveJr PROPERTIES LINKER_LANGUAGE CXX)
+
+# macOS app bundle: embed project shared libraries in Frameworks
+if(APPLE)
+    set_target_properties(GrooveJr PROPERTIES MACOSX_BUNDLE TRUE)
+    add_custom_command(TARGET GrooveJr POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_BUNDLE_DIR:GrooveJr>/Contents/Frameworks"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:GjAudio>"
+            "$<TARGET_BUNDLE_DIR:GrooveJr>/Contents/Frameworks/"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:GjDb>"
+            "$<TARGET_BUNDLE_DIR:GrooveJr>/Contents/Frameworks/"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:GjScanner>"
+            "$<TARGET_BUNDLE_DIR:GrooveJr>/Contents/Frameworks/"
+    )
+endif()
