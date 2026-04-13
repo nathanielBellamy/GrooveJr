@@ -58,6 +58,8 @@ jobs:
         run: |
           # Bundle Qt frameworks and fix up dylib references
           macdeployqt src/build/GrooveJr.app
+          # Ad-hoc re-sign so Gatekeeper doesn't flag modified binaries as damaged
+          codesign --force --deep --sign - src/build/GrooveJr.app
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
