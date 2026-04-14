@@ -74,6 +74,10 @@ struct DisplayState {
           "Received hydrate_display_a"
         );
         strong_actor_ptr appStateManager = self->system().registry().get(APP_STATE_MANAGER);
+        if (!appStateManager) {
+          Logging::write(Error, "Act::Display::hydrate_display_a", "AppStateManager actor is not available.");
+          return;
+        }
         self->anon_send(
           actor_cast<actor>(appStateManager),
           actor_cast<strong_actor_ptr>(self),
