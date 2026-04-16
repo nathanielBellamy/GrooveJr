@@ -139,3 +139,10 @@ if(APPLE)
             "$<TARGET_BUNDLE_DIR:GrooveJr>/Contents/Frameworks/"
     )
 endif()
+
+# Testing
+option(GJ_BUILD_TESTS "Build the test suite" OFF)
+if(GJ_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
