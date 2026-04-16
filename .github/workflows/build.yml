@@ -6,6 +6,9 @@ on:
 env:
   # Update to match the VST3 SDK version your project targets
   VST3_SDK_VERSION: "v3.7.12_build_20"
+  # Set to 'true' when signing secrets are configured
+  HAS_SIGNING: ${{ secrets.MACOS_CERTIFICATE != '' }}
+  HAS_NOTARIZATION: ${{ secrets.APPLE_ID != '' }}
 
 jobs:
   build-macos:
@@ -16,7 +19,7 @@ jobs:
 
       - name: Install dependencies via Homebrew
         run: |
-          brew install boost jack fftw taglib libsndfile sqlite qt caf
+          brew install boost jack fftw taglib libsndfile sqlite qt caf create-dmg
 
       - name: Cache VST3 SDK build
         id: cache-vst3
@@ -58,11 +61,93 @@ jobs:
         run: |
           # Bundle Qt frameworks and fix up dylib references
           macdeployqt src/build/GrooveJr.app
-          # Ad-hoc re-sign so Gatekeeper doesn't flag modified binaries as damaged
-          codesign --force --deep --sign - src/build/GrooveJr.app
+
+      - name: Import signing certificate
+        if: env.HAS_SIGNING == 'true'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        run: |
+          echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
+          KEYCHAIN_PWD=$(uuidgen)
+          security create-keychain -p "$KEYCHAIN_PWD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PWD" build.keychain
+          security import certificate.p12 -k build.keychain \
+            -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: \
+            -s -k "$KEYCHAIN_PWD" build.keychain
+          rm certificate.p12
+
+      - name: Sign app bundle
+        env:
+          SIGNING_IDENTITY: ${{ secrets.SIGNING_IDENTITY }}
+        run: |
+          if [ "$HAS_SIGNING" = "true" ]; then
+            echo "Signing with Developer ID: $SIGNING_IDENTITY"
+            codesign --force --deep --options runtime \
+              --sign "$SIGNING_IDENTITY" \
+              --timestamp \
+              src/build/GrooveJr.app
+          else
+            echo "No signing certificate configured — using ad-hoc signature"
+            codesign --force --deep --sign - src/build/GrooveJr.app
+          fi
+
+      - name: Create DMG installer
+        run: |
+          create-dmg \
+            --volname "GrooveJr" \
+            --volicon "src/build/GrooveJr.app/Contents/Resources/appicon.icns" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "GrooveJr.app" 150 200 \
+            --app-drop-link 450 200 \
+            --no-internet-enable \
+            "GrooveJr-macos-arm64.dmg" \
+            "src/build/GrooveJr.app" \
+            || true
+          # create-dmg returns non-zero when --volicon file is missing;
+          # fall back to a plain DMG if the styled one was not created
+          if [ ! -f GrooveJr-macos-arm64.dmg ]; then
+            create-dmg \
+              --volname "GrooveJr" \
+              --window-pos 200 120 \
+              --window-size 600 400 \
+              --icon-size 100 \
+              --icon "GrooveJr.app" 150 200 \
+              --app-drop-link 450 200 \
+              --no-internet-enable \
+              "GrooveJr-macos-arm64.dmg" \
+              "src/build/GrooveJr.app"
+          fi
+
+      - name: Sign DMG
+        if: env.HAS_SIGNING == 'true'
+        env:
+          SIGNING_IDENTITY: ${{ secrets.SIGNING_IDENTITY }}
+        run: |
+          codesign --force --sign "$SIGNING_IDENTITY" \
+            --timestamp \
+            GrooveJr-macos-arm64.dmg
+
+      - name: Notarize DMG
+        if: env.HAS_NOTARIZATION == 'true'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcrun notarytool submit GrooveJr-macos-arm64.dmg \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+          xcrun stapler staple GrooveJr-macos-arm64.dmg
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: GrooveJr-macos-arm64
-          path: src/build/GrooveJr.app
+          path: GrooveJr-macos-arm64.dmg

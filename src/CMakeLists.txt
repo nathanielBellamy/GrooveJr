@@ -118,7 +118,13 @@ set_target_properties(GrooveJr PROPERTIES LINKER_LANGUAGE CXX)
 
 # macOS app bundle: embed project shared libraries in Frameworks
 if(APPLE)
-    set_target_properties(GrooveJr PROPERTIES MACOSX_BUNDLE TRUE)
+    set_target_properties(GrooveJr PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resource/Info.plist.in"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.nathanielbellamy.groovejr"
+    )
     add_custom_command(TARGET GrooveJr POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             "$<TARGET_BUNDLE_DIR:GrooveJr>/Contents/Frameworks"
