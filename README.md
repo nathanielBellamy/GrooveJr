@@ -19,10 +19,7 @@
 - ```bash
   brew install boost cmake jack fftw taglib blackhole-2ch libsndfile sqlite
   git clone git@github.com:nathanielBellamy/GrooveJr.git 
-  cd GrooveJr/src
-  vim CMakeLists.txt
   ```
-  - update `GJ_BASE_DIR` to be the directory containing the `GrooveJr` repo
  
 - it may be helpful to run: 
   ```bash

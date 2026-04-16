@@ -3,6 +3,7 @@
 //
 
 #include "Dao.h"
+#include "../Paths.h"
 
 namespace Gj {
 namespace Db {
@@ -44,8 +45,7 @@ Dao::~Dao() {
 }
 
 int Dao::initDb() {
-  const std::filesystem::path cwd = std::filesystem::current_path();
-  const std::string db_name = cwd.string() + "/groovejr.db";
+  const std::string db_name = Paths::databasePath().string();
 
   if (sqlite3_open(db_name.c_str(), &db)) {
     Logging::write(
