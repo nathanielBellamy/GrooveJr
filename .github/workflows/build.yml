@@ -83,16 +83,22 @@ jobs:
         env:
           SIGNING_IDENTITY: ${{ secrets.SIGNING_IDENTITY }}
         run: |
+          APP="src/build/GrooveJr.app"
           if [ "$HAS_SIGNING" = "true" ]; then
-            echo "Signing with Developer ID: $SIGNING_IDENTITY"
-            codesign --force --deep --options runtime \
-              --sign "$SIGNING_IDENTITY" \
-              --timestamp \
-              src/build/GrooveJr.app
+            SIGN_ARGS="--sign $SIGNING_IDENTITY --timestamp --options runtime"
           else
             echo "No signing certificate configured — using ad-hoc signature"
-            codesign --force --deep --sign - src/build/GrooveJr.app
+            SIGN_ARGS="--sign -"
           fi
+
+          # Sign every dylib and framework inside-out so Gatekeeper
+          # can verify each component individually
+          find "$APP/Contents/Frameworks" \
+            \( -name '*.dylib' -o -name '*.framework' \) \
+            -exec codesign --force $SIGN_ARGS {} \;
+
+          # Sign the main executable last
+          codesign --force $SIGN_ARGS "$APP"
 
       - name: Create DMG installer
         run: |

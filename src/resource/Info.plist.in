@@ -19,7 +19,7 @@
 	<key>CFBundleVersion</key>
 	<string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2024-2026 Nathaniel Bellamy. All rights reserved.</string>
+	<string>Copyright © 2024-2026 Nate Schieber. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSHighResolutionCapable</key>
