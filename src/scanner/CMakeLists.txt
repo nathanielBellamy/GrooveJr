@@ -4,7 +4,6 @@ project(GjScanner VERSION 0.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(LLVM_INSTALL_DIR /opt/homebrew/opt/llvm)
 
 # logging
 find_package(Boost REQUIRED COMPONENTS log_setup log)

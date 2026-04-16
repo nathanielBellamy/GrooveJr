@@ -24,9 +24,14 @@ if (NOT ${LIBJACK_FOUND})
     message(INFO " --GjAudio--LIBJACK--NOT--FOUND--")
 endif ()
 
+find_path(SNDFILE_INCLUDE_DIR sndfile.h REQUIRED)
+find_library(SNDFILE_LIBRARY sndfile REQUIRED)
+find_path(FFTW3_INCLUDE_DIR fftw3.h REQUIRED)
+find_library(FFTW3F_LIBRARY fftw3f REQUIRED)
+
 set(C_LIBS_INCLUDE_FLAGS
-        -I${C_LIBS_HOME}/libsndfile/1.2.2/include
-        -I${C_LIBS_HOME}/fftw/3.3.10_2/include
+        -I${SNDFILE_INCLUDE_DIR}
+        -I${FFTW3_INCLUDE_DIR}
 )
 
 set(CXX_LIBS_INCLUDE_FLAGS
@@ -39,16 +44,14 @@ set(INCLUDE_FLAGS
 )
 
 set(LINK_FLAGS
-        -L${C_LIBS_HOME}/libsndfile/1.2.2/lib
-        -lsndfile
+        ${SNDFILE_LIBRARY}
         -L${VST3SDK_HOME}/build/lib/Release
         -lsdk
         -L${VST3SDK_HOME}/build/lib/Release
         -lsdk_hosting
         -L${VST3SDK_HOME}/build/lib/Release
         -lpluginterfaces
-        -L${C_LIBS_HOME}/fftw/3.3.10_2/lib
-        -lfftw3f
+        ${FFTW3F_LIBRARY}
 )
 
 # compile vst3 audiohost
@@ -56,11 +59,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${VST3SDK_HOME}/cmake/modules)
 add_subdirectory(plugins/vst3/host)
 
 # make caf available
-set(CAF_ROOT
-        /Users/ns/code/actor-framework/build
-)
-find_package(CAF
-        REQUIRED)
+if(NOT DEFINED CAF_ROOT)
+    set(CAF_ROOT ${GJ_BASE_DIR}/actor-framework/build)
+endif()
+find_package(CAF REQUIRED)
 
 # compile library
 add_library(GjAudio SHARED

@@ -3,6 +3,7 @@
 //
 
 #include "Logging.h"
+#include "Paths.h"
 
 namespace Gj {
 
@@ -14,7 +15,7 @@ void Logging::init() {
   boost::log::register_simple_formatter_factory< Db::LogSeverityLevel, char >("DbSeverity");
   boost::log::register_simple_formatter_factory< Scanner::LogSeverityLevel, char >("ScannerSeverity");
   boost::log::add_file_log(
-      boost::log::keywords::file_name = "/Users/ns/code/GrooveJr/logs/groove_jr_%N.log",
+      boost::log::keywords::file_name = (Paths::logDir() / "groove_jr_%N.log").string(),
       boost::log::keywords::rotation_size = 10 * 1024 * 1024,
       boost::log::keywords::auto_flush = true,
       boost::log::keywords::format = "[%TimeStamp%] :: %Severity%%AudioSeverity%%DbSeverity%%ScannerSeverity% :: %Caller% :: %Message%"
