@@ -11,7 +11,11 @@ env:
   HAS_NOTARIZATION: ${{ secrets.APPLE_ID != '' }}
 
 jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
   build-macos:
+    needs: test
     runs-on: macos-14
     steps:
       - name: Checkout
