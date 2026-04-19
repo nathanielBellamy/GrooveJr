@@ -15,7 +15,6 @@ namespace Gj {
 namespace Audio {
 class Cassette {
   long initialFrameId;
-  State::Core* stateCore;
   float* buffer{nullptr};
   SNDFILE* file{};
   float* inputBuffer{nullptr};
@@ -31,17 +30,14 @@ class Cassette {
   [[nodiscard]]
   Result deleteBuffers() const;
 
-  Cassette() {
-  };
-
 public:
   char const* filePath;
   SF_INFO sfInfo;
   float* inputBuffers[2]{nullptr, nullptr}; // full song audio data
 
-  Cassette(State::Core* stateCore, const char* filePath);
+  Cassette(const char* filePath);
 
-  Cassette(State::Core* stateCore);
+  Cassette();
 
   ~Cassette();
 

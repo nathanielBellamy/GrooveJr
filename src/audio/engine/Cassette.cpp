@@ -2,9 +2,8 @@
 
 namespace Gj {
 namespace Audio {
-Cassette::Cassette(State::Core* stateCore, const char* filePath)
-: stateCore(stateCore)
-  , filePath(filePath)
+Cassette::Cassette(const char* filePath)
+: filePath(filePath)
   , sfInfo() {
   if (const int initRes = init(); initRes > 0) {
     Logging::write(
@@ -24,9 +23,8 @@ Cassette::Cassette(State::Core* stateCore, const char* filePath)
   );
 }
 
-Cassette::Cassette(State::Core* stateCore)
-: stateCore(stateCore)
-  , filePath("BLANK")
+Cassette::Cassette()
+: filePath("BLANK")
   , sfInfo() {
   Logging::write(
     Info,
