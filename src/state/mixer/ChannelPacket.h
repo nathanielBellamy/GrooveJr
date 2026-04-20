@@ -16,10 +16,10 @@ namespace State {
 namespace Mixer {
 struct ChannelPacket {
   ChannelIndex channelIndex = 0;
-  PluginSlotPacket plugins[Audio::MAX_PLUGINS_PER_CHANNEL]{};
+  PluginSlotPacket plugins[Gj::Audio::MAX_PLUGINS_PER_CHANNEL]{};
 
   ChannelPacket() {
-    std::fill_n(plugins, Audio::MAX_PLUGINS_PER_CHANNEL, PluginSlotPacket());
+    std::fill_n(plugins, Gj::Audio::MAX_PLUGINS_PER_CHANNEL, PluginSlotPacket());
   }
 
   std::string std_str() const {

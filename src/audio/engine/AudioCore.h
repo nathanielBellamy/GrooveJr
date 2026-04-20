@@ -285,9 +285,9 @@ struct AudioCore {
       "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
       filePath
     );
-    const DeckIndex nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
-    deckIndex = nextDeckIndex;
-    deckIndexNext = nextDeckIndex;
+    // const DeckIndex nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    // deckIndex = nextDeckIndex;
+    // deckIndexNext = nextDeckIndex;
     if (decks[deckIndex].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
       Logging::write(
         Error,
@@ -355,14 +355,23 @@ struct AudioCore {
       "Updating deckIndex " + std::to_string(deckIndex) + " to next deckIndexNext " + std::to_string(deckIndexNext)
     );
 
+    auto audioCoreShadow = stateCore->audioCoreShadow.load();
+
     decks[deckIndex].playState = STOP;
+    audioCoreShadow.decks[deckIndex].playState = STOP;
     if (decks[deckIndexNext].decoratedAudioFile) {
       stateCore->setCurrentlyPlaying(decks[deckIndexNext].decoratedAudioFile.value());
       decks[deckIndexNext].playState = PLAY;
+      audioCoreShadow.decks[deckIndexNext].playState = PLAY;
     } else {
       decks[deckIndexNext].playState = STOP;
+      audioCoreShadow.decks[deckIndexNext].playState = STOP;
     }
     deckIndex = deckIndexNext;
+    audioCoreShadow.deckIndex = deckIndex;
+    audioCoreShadow.deckIndexNext = deckIndex;
+    stateCore->audioCoreShadow.store(audioCoreShadow);
+
     return OK;
   }
 

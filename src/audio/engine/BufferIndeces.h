@@ -16,12 +16,14 @@ namespace BfrIdx {
 
 // playbackSettingsFromAudioThread
 namespace PSFAT {
-constexpr size_t SIZE = 3;
+constexpr size_t SIZE = 5;
 constexpr size_t RB_SIZE = sizeof(sf_count_t) * SIZE;
 static constexpr size_t DEBUG_VALUE = 0;
 
 static constexpr size_t CURRENT_FRAME_ID = 1;
 static constexpr size_t PROCESS_DATA_CHANGE_FLAG = 2;
+static constexpr size_t AUDIO_CORE_DECK_INDEX = 3;
+static constexpr size_t AUDIO_CORE_DECK_INDEX_NEXT = 4;
 } // PSFAT
 
 // playbackSettingsToAudioThread
