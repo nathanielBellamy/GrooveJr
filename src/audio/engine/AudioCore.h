@@ -23,7 +23,6 @@
 namespace Gj {
 namespace Audio {
 struct AudioCore {
-  long threadId;
   State::Core* stateCore;
   sf_count_t crossfade = 0;
   AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0, stateCore), AudioDeck(1, stateCore), AudioDeck(2, stateCore)};

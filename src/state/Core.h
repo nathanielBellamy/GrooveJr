@@ -18,6 +18,7 @@
 #include "../db/dto/musicLibrary/DecoratedAudioFile.h"
 #include "../types/Types.h"
 #include "../types/AtomicStr.h"
+#include "./audio/CoreShadow.h"
 
 #include "Packet.h"
 #include "mixer/Packet.h"
@@ -36,6 +37,9 @@ struct Core {
   std::atomic<TrackNumber> queueIndex = 0;
   std::atomic<bool> userSettingFrameId = false;
   std::atomic<sf_count_t> frameId = 0;
+  std::atomic<Audio::CoreShadow> audioCoreShadow;
+
+  std::atomic<bool> requestingDeckUpdate = false;
 
   Core();
 
