@@ -19,7 +19,7 @@ namespace State {
 namespace Audio {
 struct CoreShadow {
   DeckShadow decks[Gj::Audio::AUDIO_CORE_DECK_COUNT]{
-    {0, STOP, std::nullopt}, {0, STOP, std::nullopt}, {0, STOP, std::nullopt}
+    {0, STOP, std::nullopt}, {1, STOP, std::nullopt}, {2, STOP, std::nullopt}
   };
   DeckIndex deckIndex = 0;
   DeckIndex deckIndexNext = 0;
