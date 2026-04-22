@@ -6,7 +6,7 @@
 #
 # Usage:
 #   ./lifecycle/build.sh              # interactive
-#   ./lifecycle/build.sh -y           # accept all defaults (Debug build)
+#   ./lifecycle/build.sh -y           # accept all defaults (Debug build, system compiler)
 
 # ─── Setup ───────────────────────────────────────────────────────────
 
@@ -161,12 +161,16 @@ prompt_build_config() {
         ENABLE_ASAN="OFF"
     fi
 
+    COMPILER=$(prompt_choice "Compiler" "system" \
+        "system" "gcc" "clang" "llvm")
+
     BUILD_DIR=$(prompt_input "Build directory" "$DEFAULT_BUILD_DIR")
 
     echo ""
     info "Summary:"
     step "Build type:  ${BOLD}$BUILD_TYPE${RESET}"
     step "ASan:        ${BOLD}$ENABLE_ASAN${RESET}"
+    step "Compiler:    ${BOLD}$COMPILER${RESET}"
     step "Build dir:   ${BOLD}$BUILD_DIR${RESET}"
     step "Platform:    ${BOLD}${GJ_OS} (${GJ_ARCH})${RESET}"
     echo ""
@@ -185,6 +189,18 @@ run_cmake_configure() {
         -DGJ_ENABLE_ASAN="$ENABLE_ASAN"
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     )
+
+    case "$COMPILER" in
+        gcc)
+            cmake_args+=(-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++)
+            ;;
+        clang|llvm)
+            cmake_args+=(-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++)
+            ;;
+        system|*)
+            # Let CMake choose the system default — no explicit compiler flags
+            ;;
+    esac
 
     case "$GJ_OS" in
         macos)
