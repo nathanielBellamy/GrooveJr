@@ -38,7 +38,7 @@ struct AudioDeck {
   AudioDeck(const DeckIndex deckIndex, State::Core* stateCore)
   : deckIndex(deckIndex)
     , stateCore(stateCore)
-    , cassette(new Cassette(stateCore))
+    , cassette(new Cassette())
     , decoratedAudioFile(std::optional<Db::DecoratedAudioFile>()) {
   }
 
@@ -61,7 +61,7 @@ struct AudioDeck {
 
     Cassette* newCassette;
     try {
-      newCassette = new Cassette(stateCore, decoratedAudioFile->audioFile.filePath.c_str());
+      newCassette = new Cassette(decoratedAudioFile->audioFile.filePath.c_str());
     } catch (const std::runtime_error& e) {
       Logging::write(
         Error,
