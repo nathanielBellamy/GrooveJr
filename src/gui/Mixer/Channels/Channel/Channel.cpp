@@ -424,6 +424,10 @@ void Channel::connectActions() {
       );
 
       appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+      if (!appStateManagerPtr) {
+        Logging::write(Error, "Gui::Channel::addPluginAction", "AppStateManager actor is not available.");
+        return;
+      }
       const scoped_actor self{actorSystem};
       self->anon_send(
         actor_cast<actor>(appStateManagerPtr),
@@ -438,6 +442,10 @@ void Channel::connectActions() {
     const PluginIndex pluginIdx = togglePluginAction.data().toULongLong();
 
     appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (!appStateManagerPtr) {
+      Logging::write(Error, "Gui::Channel::togglePluginAction", "AppStateManager actor is not available.");
+      return;
+    }
     const scoped_actor self{actorSystem};
     self->anon_send(
       actor_cast<actor>(appStateManagerPtr),
@@ -459,6 +467,10 @@ void Channel::connectActions() {
       );
 
       appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+      if (!appStateManagerPtr) {
+        Logging::write(Error, "Gui::Channel::replacePluginAction", "AppStateManager actor is not available.");
+        return;
+      }
       const scoped_actor self{actorSystem};
       self->anon_send(
         actor_cast<actor>(appStateManagerPtr),
@@ -479,6 +491,10 @@ void Channel::connectActions() {
     );
 
     appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (!appStateManagerPtr) {
+      Logging::write(Error, "Gui::Channel::removePluginAction", "AppStateManager actor is not available.");
+      return;
+    }
     const scoped_actor self{actorSystem};
     self->anon_send(
       actor_cast<actor>(appStateManagerPtr),

@@ -103,6 +103,14 @@ void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent *event) {
       return;
 
     const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (!appStateManagerPtr) {
+      Logging::write(
+        Error,
+        "Gui::AudioFileTableView::mouseDoubleClickEvent",
+        "AppStateManager actor is not available."
+      );
+      return;
+    }
     const scoped_actor self{ actorSystem };
     self->anon_send(
         actor_cast<actor>(appStateManagerPtr),

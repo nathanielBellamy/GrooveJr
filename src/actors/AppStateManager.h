@@ -86,6 +86,10 @@ struct AppStateManagerState {
     State::Packet statePacket = stateCore->toPacket(mixer->toPacket());
     // std::cout << "stateMixerPacket " << statePacket.mixerPacket.std_str() << std::endl;
     strong_actor_ptr displayPtr = self->system().registry().get(DISPLAY);
+    if (!displayPtr) {
+      Logging::write(Error, "Act::AppStateManager::hydrateStateToDisplay", "Display actor is not available.");
+      return;
+    }
     self->anon_send(
       actor_cast<actor>(displayPtr),
       actor_cast<strong_actor_ptr>(self),

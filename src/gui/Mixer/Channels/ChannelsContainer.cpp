@@ -203,6 +203,10 @@ void ChannelsContainer::connectActions() {
       "Adding Channel"
     );
     strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (!appStateManagerPtr) {
+      Logging::write(Error, "Gui::ChannelsContainer::addChannelAction", "AppStateManager actor is not available.");
+      return;
+    }
 
     scoped_actor self{actorSystem};
     self->anon_send(
@@ -225,6 +229,10 @@ void ChannelsContainer::connectActions() {
     removeChannel(channelIdx);
 
     strong_actor_ptr appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (!appStateManagerPtr) {
+      Logging::write(Error, "Gui::ChannelsContainer::removeChannelAction", "AppStateManager actor is not available.");
+      return;
+    }
 
     const scoped_actor self{actorSystem};
     self->anon_send(

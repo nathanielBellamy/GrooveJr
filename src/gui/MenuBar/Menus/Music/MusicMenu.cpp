@@ -28,6 +28,10 @@ MusicMenu::MusicMenu(actor_system& actorSystem, QWidget* parent)
       );
 
       strong_actor_ptr musicLibraryManager = actorSystem.registry().get(Act::ActorIds::MUSIC_LIBRARY_MANAGER);
+      if (!musicLibraryManager) {
+        Logging::write(Error, "Gui::MusicMenu::addFolderToLibraryAction", "MusicLibraryManager actor is not available.");
+        return;
+      }
 
       const scoped_actor self{actorSystem};
       self->anon_send(

@@ -68,10 +68,14 @@ struct MusicLibraryManagerState {
           const Scanner::Scanner scanner(dao);
           scanner.scanDirectoryRecursive(dirPath);
           const auto appStateManagerPtr = self->system().registry().get(APP_STATE_MANAGER);
-          self->anon_send(
-            actor_cast<actor>(appStateManagerPtr),
-            hydrate_display_a_v
-          );
+          if (!appStateManagerPtr) {
+            Logging::write(Error, "Act::MusicLibraryManager::ml_scan_dir_a", "AppStateManager actor is not available.");
+          } else {
+            self->anon_send(
+              actor_cast<actor>(appStateManagerPtr),
+              hydrate_display_a_v
+            );
+          }
         } catch (...) {
           Logging::write(
             Error,
