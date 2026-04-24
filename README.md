@@ -57,6 +57,7 @@ prompting.
 - Source dependencies are placed in `./deps/`
 - App builds default to `./src/build`
 - Test builds default to `./build-test`
+- App icon assets live in `./src/resource/icons/`; CMake bundles the macOS `.icns`, uses the Windows `.ico`, and the Qt app loads the shared PNG at runtime.
 
 ### Useful Non-Interactive Examples
 
