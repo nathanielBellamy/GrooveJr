@@ -497,6 +497,10 @@ struct AudioPlayer {
         audioCore->updateDeckIndexToNext();
 
         const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+        if (!appStateManagerPtr) {
+          Logging::write(Error, "Audio::AudioPlayer", "AppStateManager actor is not available.");
+          continue;
+        }
         const scoped_actor self{actorSystem};
         self->anon_send(
           actor_cast<actor>(appStateManagerPtr),

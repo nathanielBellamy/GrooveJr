@@ -58,8 +58,21 @@ struct AudioDeck {
 
   Result setCassetteFromDecoratedAudioFile(const Db::DecoratedAudioFile& newDecoratedAudioFile) {
     decoratedAudioFile = std::optional(newDecoratedAudioFile);
+
+    Cassette* newCassette;
+    try {
+      newCassette = new Cassette(decoratedAudioFile->audioFile.filePath.c_str());
+    } catch (const std::runtime_error& e) {
+      Logging::write(
+        Error,
+        "Audio::AudioDeck::setCassetteFromDecoratedAudioFile",
+        "Failed to create Cassette for deck " + std::to_string(deckIndex) + ": " + e.what()
+      );
+      return ERROR;
+    }
+
     delete cassette;
-    cassette = new Cassette(decoratedAudioFile->audioFile.filePath.c_str());
+    cassette = newCassette;
     frames = cassette->sfInfo.frames;
     inputBuffers[0] = cassette->inputBuffers[0];
     inputBuffers[1] = cassette->inputBuffers[1];

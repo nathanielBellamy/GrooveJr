@@ -78,6 +78,10 @@ void TransportControl::connectActions() {
       "playTrigAction"
     );
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (!appStateManagerPtr) {
+      Logging::write(Error, "Gui::TransportControl", "AppStateManager actor is not available.");
+      return;
+    }
 
     const scoped_actor self{sys};
     self->anon_send(
@@ -93,6 +97,10 @@ void TransportControl::connectActions() {
       "pauseTrigAction"
     );
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (!appStateManagerPtr) {
+      Logging::write(Error, "Gui::TransportControl", "AppStateManager actor is not available.");
+      return;
+    }
 
     const scoped_actor self{sys};
     self->anon_send(
@@ -108,6 +116,10 @@ void TransportControl::connectActions() {
       "stopTrigAction"
     );
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (!appStateManagerPtr) {
+      Logging::write(Error, "Gui::TransportControl", "AppStateManager actor is not available.");
+      return;
+    }
 
     scoped_actor self{sys};
     self->anon_send(
@@ -123,6 +135,10 @@ void TransportControl::connectActions() {
       "rwTrigAction"
     );
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (!appStateManagerPtr) {
+      Logging::write(Error, "Gui::TransportControl", "AppStateManager actor is not available.");
+      return;
+    }
 
     scoped_actor self{sys};
     self->anon_send(
@@ -138,6 +154,10 @@ void TransportControl::connectActions() {
       "ffTrigAction"
     );
     strong_actor_ptr appStateManagerPtr = sys.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+    if (!appStateManagerPtr) {
+      Logging::write(Error, "Gui::TransportControl", "AppStateManager actor is not available.");
+      return;
+    }
 
     scoped_actor self{sys};
     self->anon_send(
