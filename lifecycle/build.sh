@@ -145,6 +145,109 @@ check_dependencies() {
     return "$missing"
 }
 
+# ─── Compiler Selection ──────────────────────────────────────────────
+
+read_cmake_cache_value() {
+    local cache_file="$1" cache_key="$2"
+    sed -n "s#^${cache_key}:\\(FILEPATH\\|STRING\\|UNINITIALIZED\\)=##p" "$cache_file" | head -n 1
+}
+
+normalize_compiler_path() {
+    local compiler_path="$1"
+    [[ -n "$compiler_path" ]] || return 0
+
+    if [[ "$compiler_path" == /* ]]; then
+        echo "$compiler_path"
+        return 0
+    fi
+
+    command -v "$compiler_path" 2>/dev/null || echo "$compiler_path"
+}
+
+resolve_compiler_selection() {
+    GJ_CMAKE_C_COMPILER=""
+    GJ_CMAKE_CXX_COMPILER=""
+
+    case "$COMPILER" in
+        system)
+            GJ_CMAKE_C_COMPILER="$(command -v cc || true)"
+            GJ_CMAKE_CXX_COMPILER="$(command -v c++ || true)"
+            ;;
+        gcc)
+            if [[ "$GJ_OS" == "macos" ]]; then
+                if ! command -v brew &>/dev/null || ! brew list gcc &>/dev/null 2>&1; then
+                    error "GNU GCC is not installed. Install it with Homebrew: brew install gcc"
+                    exit 1
+                fi
+
+                local gcc_prefix
+                gcc_prefix="$(brew --prefix gcc)"
+                GJ_CMAKE_C_COMPILER="$(find "$gcc_prefix/bin" -maxdepth 1 -type f -name 'gcc-[0-9]*' | sort -V | tail -n 1)"
+                GJ_CMAKE_CXX_COMPILER="$(find "$gcc_prefix/bin" -maxdepth 1 -type f -name 'g++-[0-9]*' | sort -V | tail -n 1)"
+            else
+                GJ_CMAKE_C_COMPILER="$(command -v gcc || true)"
+                GJ_CMAKE_CXX_COMPILER="$(command -v g++ || true)"
+            fi
+            ;;
+        clang)
+            GJ_CMAKE_C_COMPILER="$(command -v clang || true)"
+            GJ_CMAKE_CXX_COMPILER="$(command -v clang++ || true)"
+            ;;
+        llvm)
+            if [[ "$GJ_OS" == "macos" ]]; then
+                if ! command -v brew &>/dev/null || ! brew list llvm &>/dev/null 2>&1; then
+                    error "LLVM is not installed. Install it with Homebrew: brew install llvm"
+                    exit 1
+                fi
+
+                local llvm_prefix
+                llvm_prefix="$(brew --prefix llvm)"
+                GJ_CMAKE_C_COMPILER="$llvm_prefix/bin/clang"
+                GJ_CMAKE_CXX_COMPILER="$llvm_prefix/bin/clang++"
+            else
+                GJ_CMAKE_C_COMPILER="$(command -v clang || true)"
+                GJ_CMAKE_CXX_COMPILER="$(command -v clang++ || true)"
+            fi
+            ;;
+        *)
+            error "Unsupported compiler selection: $COMPILER"
+            exit 1
+            ;;
+    esac
+
+    if [[ -z "$GJ_CMAKE_C_COMPILER" || -z "$GJ_CMAKE_CXX_COMPILER" ]]; then
+        error "Unable to resolve compiler executables for '$COMPILER'."
+        exit 1
+    fi
+
+    if [[ ! -x "$GJ_CMAKE_C_COMPILER" || ! -x "$GJ_CMAKE_CXX_COMPILER" ]]; then
+        error "Resolved compiler executables are not runnable."
+        step "C compiler:   $GJ_CMAKE_C_COMPILER"
+        step "C++ compiler: $GJ_CMAKE_CXX_COMPILER"
+        exit 1
+    fi
+}
+
+reset_cmake_toolchain_cache_if_needed() {
+    local cache_file="$BUILD_DIR/CMakeCache.txt"
+    [[ -f "$cache_file" ]] || return 0
+
+    local cached_c_compiler cached_cxx_compiler
+    cached_c_compiler="$(normalize_compiler_path "$(read_cmake_cache_value "$cache_file" "CMAKE_C_COMPILER")")"
+    cached_cxx_compiler="$(normalize_compiler_path "$(read_cmake_cache_value "$cache_file" "CMAKE_CXX_COMPILER")")"
+
+    if [[ -z "$cached_c_compiler" || -z "$cached_cxx_compiler" ]]; then
+        return 0
+    fi
+
+    if [[ "$cached_c_compiler" != "$GJ_CMAKE_C_COMPILER" || "$cached_cxx_compiler" != "$GJ_CMAKE_CXX_COMPILER" ]]; then
+        warn "Build directory was configured with a different compiler."
+        step "Resetting cached CMake toolchain files in ${BOLD}$BUILD_DIR${RESET}"
+        rm -f "$cache_file"
+        rm -rf "$BUILD_DIR/CMakeFiles"
+    fi
+}
+
 # ─── Build Configuration Prompts ─────────────────────────────────────
 
 prompt_build_config() {
@@ -166,11 +269,15 @@ prompt_build_config() {
 
     BUILD_DIR=$(prompt_input "Build directory" "$DEFAULT_BUILD_DIR")
 
+    resolve_compiler_selection
+
     echo ""
     info "Summary:"
     step "Build type:  ${BOLD}$BUILD_TYPE${RESET}"
     step "ASan:        ${BOLD}$ENABLE_ASAN${RESET}"
     step "Compiler:    ${BOLD}$COMPILER${RESET}"
+    step "C compiler:  ${BOLD}$GJ_CMAKE_C_COMPILER${RESET}"
+    step "C++ compiler:${BOLD}$GJ_CMAKE_CXX_COMPILER${RESET}"
     step "Build dir:   ${BOLD}$BUILD_DIR${RESET}"
     step "Platform:    ${BOLD}${GJ_OS} (${GJ_ARCH})${RESET}"
     echo ""
@@ -182,25 +289,16 @@ run_cmake_configure() {
     header "Configuring (CMake)"
 
     mkdir -p "$BUILD_DIR"
+    reset_cmake_toolchain_cache_if_needed
 
     local cmake_args=(
         -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
         -DGJ_BASE_DIR="$DEPS_DIR"
         -DGJ_ENABLE_ASAN="$ENABLE_ASAN"
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        -DCMAKE_C_COMPILER="$GJ_CMAKE_C_COMPILER"
+        -DCMAKE_CXX_COMPILER="$GJ_CMAKE_CXX_COMPILER"
     )
-
-    case "$COMPILER" in
-        gcc)
-            cmake_args+=(-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++)
-            ;;
-        clang|llvm)
-            cmake_args+=(-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++)
-            ;;
-        system|*)
-            # Let CMake choose the system default — no explicit compiler flags
-            ;;
-    esac
 
     case "$GJ_OS" in
         macos)
