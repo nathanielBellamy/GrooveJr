@@ -23,9 +23,9 @@
 #include "../messaging/DecksState.h"
 #include "../enums/PlayState.h"
 #include "../state/Core.h"
-#include "../state/mixer/Packet.h"
 #include "../audio/engine/AudioCore.h"
 #include "../audio/mixer/Core.h"
+#include "../types/Types.h"
 
 using namespace caf;
 
@@ -100,7 +100,7 @@ struct AppStateManagerState {
 
   AppStateManagerState(
     AppStateManager::pointer self,
-    strong_actor_ptr supervisor,
+    const strong_actor_ptr& supervisor,
     State::Core* stateCore,
     Audio::Mixer::Core* mixer,
     Db::Dao* dao,
@@ -146,7 +146,7 @@ struct AppStateManagerState {
         mixer->removeChannel(channelIdx);
         hydrateStateToDisplay();
       },
-      [this](const ChannelIndex channelIdx, PluginPath pluginPath, mix_add_plugin_to_channel_a) {
+      [this](const ChannelIndex channelIdx, const PluginPath& pluginPath, mix_add_plugin_to_channel_a) {
         Logging::write(
           Info,
           "Act::AppStateManager::mix_add_plugin_to_channel_a",
@@ -177,7 +177,7 @@ struct AppStateManagerState {
         }
         hydrateStateToDisplay();
       },
-      [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, PluginPath pluginPath,
+      [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, const PluginPath& pluginPath,
              mix_replace_plugin_on_channel_a) {
         Logging::write(
           Info,
@@ -220,7 +220,7 @@ struct AppStateManagerState {
         }
         hydrateStateToDisplay();
       },
-      [this](strong_actor_ptr replyTo, read_state_a) {
+      [this](const strong_actor_ptr& replyTo, read_state_a) {
         Logging::write(
           Info,
           "Act::AppStateManager::read_state_a",
@@ -246,7 +246,7 @@ struct AppStateManagerState {
           tc_trig_play_a_v
         );
       },
-      [this](strong_actor_ptr, const bool success, tc_trig_play_ar) {
+      [this](const strong_actor_ptr&, const bool success, tc_trig_play_ar) {
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_play_ar",
@@ -282,7 +282,7 @@ struct AppStateManagerState {
           tc_trig_pause_a_v
         );
       },
-      [this](strong_actor_ptr, const bool success, tc_trig_pause_ar) {
+      [this](const strong_actor_ptr&, const bool success, tc_trig_pause_ar) {
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_pause_a",
@@ -316,7 +316,7 @@ struct AppStateManagerState {
           tc_trig_stop_a_v
         );
       },
-      [this](strong_actor_ptr, const bool success, tc_trig_stop_ar) {
+      [this](const strong_actor_ptr&, const bool success, tc_trig_stop_ar) {
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_stop_ar",
@@ -346,7 +346,7 @@ struct AppStateManagerState {
           tc_trig_rw_a_v
         );
       },
-      [this](strong_actor_ptr, const bool success, tc_trig_rw_ar) {
+      [this](const strong_actor_ptr&, const bool success, tc_trig_rw_ar) {
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_rw_a",
@@ -380,7 +380,7 @@ struct AppStateManagerState {
           tc_trig_ff_a_v
         );
       },
-      [this](strong_actor_ptr, const bool success, tc_trig_ff_ar) {
+      [this](const strong_actor_ptr&, const bool success, tc_trig_ff_ar) {
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_ff_a",
@@ -401,8 +401,8 @@ struct AppStateManagerState {
 
         hydrateStateToDisplay();
       },
-      [this](const bool queuePlay, const DecksState decksState, tc_trig_play_file_a) {
-        const int audioFileId = decksState.audioFileIds[decksState.currentDeckIdx];
+      [this](const bool queuePlay, const DecksState& decksState, tc_trig_play_file_a) {
+        const ID audioFileId = decksState.audioFileIds[decksState.currentDeckIdx];
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_play_file_a",
@@ -443,9 +443,9 @@ struct AppStateManagerState {
   };
 
   Result setStateAudioCoreShadow(
-    DecksState decksState,
+    const DecksState& decksState,
     std::optional<Db::DecoratedAudioFile> decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT]
-  ) {
+  ) const {
     State::Audio::CoreShadow audioCoreShadow{};
     for (DeckIndex deckIndex = 0; deckIndex < Audio::AUDIO_CORE_DECK_COUNT; deckIndex++) {
       audioCoreShadow.decks[deckIndex] = {
@@ -457,12 +457,14 @@ struct AppStateManagerState {
     audioCoreShadow.deckIndex = decksState.currentDeckIdx;
     audioCoreShadow.deckIndexNext = decksState.currentDeckIdx;
     stateCore->audioCoreShadow = audioCoreShadow;
+
+    return OK;
   }
 
   Result requestDeckUpdate(
-    DecksState decksState,
+    const DecksState& decksState,
     std::optional<Db::DecoratedAudioFile> decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT]
-  ) {
+  ) const {
     for (DeckIndex deckIndex = 0; deckIndex < Audio::AUDIO_CORE_DECK_COUNT; ++deckIndex) {
       if (!decoratedAudioFiles[deckIndex])
         Logging::write(
@@ -474,13 +476,16 @@ struct AppStateManagerState {
     setStateAudioCoreShadow(decksState, decoratedAudioFiles);
     auto requestedDeckUpdate = false;
     while (!stateCore->requestingDeckUpdate.compare_exchange_weak(requestedDeckUpdate, true, std::memory_order_release,
-                                                                  std::memory_order_relaxed));
+                                                                  std::memory_order_relaxed)) {
+    };
+
+    return OK;
   }
 
   Result directDeckUpdate(
     const DecksState& decksState,
     std::optional<Db::DecoratedAudioFile> decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT]
-  ) {
+  ) const {
     for (DeckIndex deckIndex = 0; deckIndex < Audio::AUDIO_CORE_DECK_COUNT; deckIndex++) {
       if (!decoratedAudioFiles[deckIndex]) {
         Logging::write(
@@ -511,6 +516,8 @@ struct AppStateManagerState {
       "Act::AppStateManager::tc_trig_play_file_a",
       "Initiated file play. Will HydrateStateToDisplay"
     );
+
+    return OK;
   }
 };
 } // Act
