@@ -81,6 +81,7 @@ prompting.
 - Shared helpers for launching GrooveJr and resolving selectors live in `./tests/squish/suite_groovejr/shared/scripts/`
 - Copy `./tests/squish/suite_groovejr/tst_template/` when creating new UI tests, then add the new testcase name to `suite.conf`
 - Squish itself is not installed by the lifecycle scripts; install it separately and point `./lifecycle/squish.sh` at `squishrunner` with `SQUISH_PREFIX`, `SQUISH_RUNNER`, or `--runner`
+- GitHub Actions E2E runs expect a self-hosted macOS runner with Squish for Qt installed and a repo/org variable named `SQUISH_PREFIX` that points at the Squish installation root
 
 ___
 

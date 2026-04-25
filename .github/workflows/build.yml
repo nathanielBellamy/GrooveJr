@@ -161,3 +161,15 @@ jobs:
         with:
           name: GrooveJr-macos-arm64
           path: GrooveJr-macos-arm64.dmg
+
+      - name: Upload app bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GrooveJr-macos-app-bundle
+          path: src/build/GrooveJr.app
+
+  e2e:
+    needs: build-macos
+    uses: ./.github/workflows/e2e.yml
+    with:
+      build_artifact_name: GrooveJr-macos-app-bundle

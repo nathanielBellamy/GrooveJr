@@ -1,0 +1,144 @@
+name: E2E
+
+on:
+  workflow_call:
+    inputs:
+      build_artifact_name:
+        description: Name of the uploaded GrooveJr app bundle artifact
+        required: true
+        type: string
+  pull_request:
+  workflow_dispatch:
+
+env:
+  VST3_SDK_VERSION: "v3.7.12_build_20"
+
+jobs:
+  e2e-macos-artifact:
+    if: ${{ github.event_name == 'workflow_call' && vars.SQUISH_PREFIX != '' }}
+    runs-on:
+      - self-hosted
+      - macOS
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download GrooveJr app bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.build_artifact_name }}
+          path: src/build
+
+      - name: Start Squish server
+        env:
+          SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
+        run: |
+          "${SQUISH_PREFIX}/bin/squishserver" > /tmp/groovejr-squishserver.log 2>&1 &
+          echo "SQUISHSERVER_PID=$!" >> "$GITHUB_ENV"
+          sleep 5
+
+      - name: Run Squish suite
+        env:
+          SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
+        run: |
+          ./lifecycle/squish.sh -y \
+            --build-dir "${{ github.workspace }}/src/build" \
+            --suite-dir "${{ github.workspace }}/tests/squish/suite_groovejr" \
+            --testcase tst_template
+
+      - name: Upload Squish server log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: squishserver-log
+          path: /tmp/groovejr-squishserver.log
+
+      - name: Stop Squish server
+        if: always()
+        run: |
+          if [[ -n "${SQUISHSERVER_PID:-}" ]]; then
+            kill "${SQUISHSERVER_PID}"
+          fi
+
+  e2e-macos-pr:
+    if: ${{ github.event_name != 'workflow_call' && vars.SQUISH_PREFIX != '' }}
+    runs-on:
+      - self-hosted
+      - macOS
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies via Homebrew
+        run: |
+          brew install boost jack fftw taglib libsndfile sqlite qt caf
+
+      - name: Cache VST3 SDK build
+        id: cache-vst3
+        uses: actions/cache@v4
+        with:
+          path: deps/vst3sdk
+          key: vst3sdk-macos-14-${{ env.VST3_SDK_VERSION }}
+
+      - name: Clone and build VST3 SDK
+        if: steps.cache-vst3.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p deps
+          git clone --recursive --branch ${{ env.VST3_SDK_VERSION }} \
+            https://github.com/steinbergmedia/vst3sdk.git deps/vst3sdk
+          cd deps/vst3sdk
+          mkdir build && cd build
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=OFF \
+                -DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF \
+                -DSMTG_ENABLE_VSTGUI_SUPPORT=OFF \
+                ..
+          cmake --build . --config Release --target sdk sdk_common sdk_hosting pluginterfaces
+
+      - name: Configure GrooveJr
+        run: |
+          cd src
+          mkdir -p build && cd build
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DGJ_BASE_DIR=${{ github.workspace }}/deps \
+                -DCAF_ROOT=$(brew --prefix caf) \
+                -DCMAKE_PREFIX_PATH="$(brew --prefix qt)" \
+                -DGJ_ENABLE_ASAN=OFF \
+                ..
+
+      - name: Build GrooveJr
+        run: cmake --build src/build --config Release
+
+      - name: Package app bundle
+        run: macdeployqt src/build/GrooveJr.app
+
+      - name: Start Squish server
+        env:
+          SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
+        run: |
+          "${SQUISH_PREFIX}/bin/squishserver" > /tmp/groovejr-squishserver.log 2>&1 &
+          echo "SQUISHSERVER_PID=$!" >> "$GITHUB_ENV"
+          sleep 5
+
+      - name: Run Squish suite
+        env:
+          SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
+        run: |
+          ./lifecycle/squish.sh -y \
+            --build-dir "${{ github.workspace }}/src/build" \
+            --suite-dir "${{ github.workspace }}/tests/squish/suite_groovejr" \
+            --testcase tst_template
+
+      - name: Upload Squish server log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: squishserver-log
+          path: /tmp/groovejr-squishserver.log
+
+      - name: Stop Squish server
+        if: always()
+        run: |
+          if [[ -n "${SQUISHSERVER_PID:-}" ]]; then
+            kill "${SQUISHSERVER_PID}"
+          fi
