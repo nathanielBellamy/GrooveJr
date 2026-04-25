@@ -55,6 +55,9 @@ struct AudioPlayer {
 
   Mixer::ChannelProcessData mixerChannelsProcessData[MAX_MIXER_CHANNELS]{};
 
+  DeckIndex currentDeckIndex = 0;
+  DeckIndex prevDeckIndex = 0;
+
   AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer::Core* mixer, State::Core* stateCore)
   : actorSystem(actorSystem)
     , audioCore(audioCore)
@@ -298,12 +301,14 @@ struct AudioPlayer {
 
     // read playbackSettingsFromAudioThread ring buffer
     if (jack_ringbuffer_read_space(audioCore->playbackSettingsFromAudioThreadRB) >
-        BfrIdx::PSFAT::RB_SIZE - 2)
+        BfrIdx::PSFAT::RB_SIZE - 2) {
       jack_ringbuffer_read(
         audioCore->playbackSettingsFromAudioThreadRB,
         reinterpret_cast<char*>(playbackSettingsFromAudioThread),
         BfrIdx::PSFAT::RB_SIZE
       );
+      currentDeckIndex = playbackSettingsFromAudioThread[BfrIdx::PSFAT::AUDIO_CORE_DECK_INDEX];
+    }
 
     if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > BfrIdx::MixerChannel::ProcessData::RB_SIZE
         - 2)
@@ -476,8 +481,8 @@ struct AudioPlayer {
     audioCore->decks[audioCore->deckIndex].playState = PLAY;
     auto audioCoreShadow = stateCore->audioCoreShadow.load();
     audioCoreShadow.decks[audioCore->deckIndex].playState = PLAY;
-    audioCoreShadow.deckIndex = audioCore->deckIndex;
-    audioCoreShadow.deckIndexNext = audioCore->deckIndexNext;
+    // audioCoreShadow.deckIndex = audioCore->deckIndex;
+    // audioCoreShadow.deckIndexNext = audioCore->deckIndexNext;
     stateCore->audioCoreShadow.store(audioCoreShadow);
     stateCore->setAudioRunning(true);
 
@@ -499,28 +504,16 @@ struct AudioPlayer {
       // std::cout << "audioplayer run proce " << audioCore->processBuffers[0][100] << std::endl << std::endl;
       // std::cout << "audioplayer run fxcha " << audioCore->mixerChannelsChannelsWriteOut[1][0][50] << std::endl << std::endl;
 
-      const bool audioCoreNeededtoUpdateDeckIndex = audioCoreShouldUpdateDeckIndex();
-      if (audioCoreNeededtoUpdateDeckIndex) {
-        Logging::write(
-          Info,
-          "XXXXXXXXXXXXXXXXXXXXXXXXXX",
-          "audioCoreShouldUpdateDeckIndex"
-        );
-        jackClient->deactivate();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // let jack cleanup
-        jackClientIsActive = false;
-        audioCore->updateDeckIndexToNext();
-        jackClient->activate(audioCore);
-        jackClientIsActive = true;
+      if (prevDeckIndex != currentDeckIndex) {
+        prevDeckIndex = currentDeckIndex;
+        auto audioCoreShadow = stateCore->audioCoreShadow.load();
+        audioCoreShadow.deckIndex = currentDeckIndex;
+        stateCore->setCurrentlyPlaying(audioCoreShadow.decks[currentDeckIndex].decoratedAudioFile.value());
+        stateCore->audioCoreShadow.store(audioCoreShadow);
       }
 
       bool stateCoreWasRequestingUpdate = stateCore->requestingDeckUpdate.load();
       if (stateCoreWasRequestingUpdate) {
-        Logging::write(
-          Info,
-          "XXXXXXXXXXXXXXXXXXXXXXXXXX",
-          "stateCoreREquestingDeckUpdate"
-        );
         jackClient->deactivate();
         std::this_thread::sleep_for(std::chrono::milliseconds(100)); // let jack cleanup
         jackClientIsActive = false;
@@ -537,7 +530,7 @@ struct AudioPlayer {
                                                                       std::memory_order_relaxed));
       }
 
-      if (stateCoreWasRequestingUpdate || audioCoreNeededtoUpdateDeckIndex) {
+      if (stateCoreWasRequestingUpdate) {
         const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
         if (!appStateManagerPtr) {
           Logging::write(Error, "Audio::AudioPlayer", "AppStateManager actor is not available.");

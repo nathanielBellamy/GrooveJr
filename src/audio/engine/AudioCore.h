@@ -355,22 +355,13 @@ struct AudioCore {
       "Updating deckIndex " + std::to_string(deckIndex) + " to next deckIndexNext " + std::to_string(deckIndexNext)
     );
 
-    auto audioCoreShadow = stateCore->audioCoreShadow.load();
-
     decks[deckIndex].playState = STOP;
-    audioCoreShadow.decks[deckIndex].playState = STOP;
     if (decks[deckIndexNext].decoratedAudioFile) {
-      stateCore->setCurrentlyPlaying(decks[deckIndexNext].decoratedAudioFile.value());
       decks[deckIndexNext].playState = PLAY;
-      audioCoreShadow.decks[deckIndexNext].playState = PLAY;
     } else {
       decks[deckIndexNext].playState = STOP;
-      audioCoreShadow.decks[deckIndexNext].playState = STOP;
     }
     deckIndex = deckIndexNext;
-    audioCoreShadow.deckIndex = deckIndex;
-    audioCoreShadow.deckIndexNext = deckIndex;
-    stateCore->audioCoreShadow.store(audioCoreShadow);
 
     return OK;
   }

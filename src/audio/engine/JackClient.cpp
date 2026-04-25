@@ -458,6 +458,8 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
       audioCore->deckIndexNext = prevDeckIndex;
   }
 
+  audioCore->updateDeckIndexToNext();
+
   audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::AUDIO_CORE_DECK_INDEX] = audioCore->deckIndex;
   audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::AUDIO_CORE_DECK_INDEX_NEXT] = audioCore->deckIndexNext;
 
