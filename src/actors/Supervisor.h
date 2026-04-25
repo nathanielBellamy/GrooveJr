@@ -12,6 +12,7 @@
 #include "caf/event_based_actor.hpp"
 
 #include "QApplication"
+#include "QIcon"
 
 #include "../Logging.h"
 #include "./ActorIds.h"
@@ -75,6 +76,7 @@ struct SupervisorState {
     int argc = arg;
     char* argv[0] = {};
     auto qtApp = new QApplication{argc, argv};
+    qtApp->setWindowIcon(QIcon(":/icons/GrooveJr.png"));
     auto display = self->system().spawn(
       actor_from_state<DisplayState>,
       actor_cast<strong_actor_ptr>(self),
