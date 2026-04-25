@@ -11,7 +11,8 @@ if [[ -z "${GITHUB_ENV:-}" ]]; then
     exit 1
 fi
 
-LOG_FILE="${1:-/tmp/groovejr-squishserver.log}"
+DEFAULT_LOG_DIR="${RUNNER_TEMP:-${TMPDIR:-/tmp}}"
+LOG_FILE="${1:-${DEFAULT_LOG_DIR}/groovejr-squishserver.log}"
 SQUISH_SERVER_PORT="${SQUISH_SERVER_PORT:-4322}"
 
 "${SQUISH_PREFIX}/bin/squishserver" > "${LOG_FILE}" 2>&1 &

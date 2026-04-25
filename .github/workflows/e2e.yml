@@ -22,6 +22,8 @@ jobs:
     runs-on:
       - self-hosted
       - macOS
+    env:
+      SQUISH_SERVER_LOG: ${{ runner.temp }}/groovejr-squishserver.log
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,7 +37,7 @@ jobs:
       - name: Start Squish server
         env:
           SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
-        run: ./lifecycle/_start_squish_server.sh
+        run: ./lifecycle/_start_squish_server.sh "${SQUISH_SERVER_LOG}"
 
       - name: Run Squish suite
         env:
@@ -51,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: squishserver-log
-          path: /tmp/groovejr-squishserver.log
+          path: ${{ env.SQUISH_SERVER_LOG }}
 
       - name: Stop Squish server
         if: always()
@@ -65,6 +67,8 @@ jobs:
     runs-on:
       - self-hosted
       - macOS
+    env:
+      SQUISH_SERVER_LOG: ${{ runner.temp }}/groovejr-squishserver.log
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -115,7 +119,7 @@ jobs:
       - name: Start Squish server
         env:
           SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
-        run: ./lifecycle/_start_squish_server.sh
+        run: ./lifecycle/_start_squish_server.sh "${SQUISH_SERVER_LOG}"
 
       - name: Run Squish suite
         env:
@@ -131,7 +135,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: squishserver-log
-          path: /tmp/groovejr-squishserver.log
+          path: ${{ env.SQUISH_SERVER_LOG }}
 
       - name: Stop Squish server
         if: always()
