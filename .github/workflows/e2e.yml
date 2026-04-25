@@ -52,7 +52,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: squishserver-log
+          name: squishserver-log-artifact
           path: ${{ env.SQUISH_SERVER_LOG }}
 
       - name: Stop Squish server
@@ -82,7 +82,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: deps/vst3sdk
-          key: vst3sdk-macos-14-${{ env.VST3_SDK_VERSION }}
+          key: vst3sdk-${{ runner.os }}-${{ runner.arch }}-${{ env.VST3_SDK_VERSION }}
 
       - name: Clone and build VST3 SDK
         if: steps.cache-vst3.outputs.cache-hit != 'true'
@@ -134,7 +134,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: squishserver-log
+          name: squishserver-log-pr
           path: ${{ env.SQUISH_SERVER_LOG }}
 
       - name: Stop Squish server
