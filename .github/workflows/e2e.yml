@@ -13,6 +13,9 @@ on:
 env:
   VST3_SDK_VERSION: "v3.7.12_build_20"
 
+permissions:
+  contents: read
+
 jobs:
   e2e-macos-artifact:
     if: ${{ github.event_name == 'workflow_call' && vars.SQUISH_PREFIX != '' }}
@@ -32,10 +35,7 @@ jobs:
       - name: Start Squish server
         env:
           SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
-        run: |
-          "${SQUISH_PREFIX}/bin/squishserver" > /tmp/groovejr-squishserver.log 2>&1 &
-          echo "SQUISHSERVER_PID=$!" >> "$GITHUB_ENV"
-          sleep 5
+        run: ./lifecycle/_start_squish_server.sh
 
       - name: Run Squish suite
         env:
@@ -115,10 +115,7 @@ jobs:
       - name: Start Squish server
         env:
           SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
-        run: |
-          "${SQUISH_PREFIX}/bin/squishserver" > /tmp/groovejr-squishserver.log 2>&1 &
-          echo "SQUISHSERVER_PID=$!" >> "$GITHUB_ENV"
-          sleep 5
+        run: ./lifecycle/_start_squish_server.sh
 
       - name: Run Squish suite
         env:

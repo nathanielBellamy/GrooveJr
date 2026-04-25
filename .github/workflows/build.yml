@@ -3,6 +3,9 @@ name: Build
 on:
   push:
 
+permissions:
+  contents: read
+
 env:
   # Update to match the VST3 SDK version your project targets
   VST3_SDK_VERSION: "v3.7.12_build_20"
