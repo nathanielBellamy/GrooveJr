@@ -1,0 +1,40 @@
+# Squish scaffolding
+
+This directory holds the starter Squish suite for GrooveJr's Qt UI.
+
+## Prerequisites
+
+- A local GrooveJr build in `./src/build` or another CMake build directory
+- A local Squish for Qt installation with `squishrunner` available on `PATH`, via `SQUISH_PREFIX`, or passed to `./lifecycle/squish.sh --runner`
+
+## Layout
+
+- `suite_groovejr/` — the starter Squish suite
+- `suite_groovejr/shared/scripts/common.py` — shared helpers for resolving and launching the app under test
+- `suite_groovejr/shared/scripts/names.py` — starter symbolic selectors for GrooveJr widgets
+- `suite_groovejr/tst_template/` — a copyable placeholder testcase
+
+## Run the scaffolded suite
+
+```bash
+./lifecycle/build.sh -y
+./lifecycle/squish.sh -y
+```
+
+You can override the defaults when needed:
+
+```bash
+./lifecycle/squish.sh \
+  --build-dir ./src/build \
+  --suite-dir ./tests/squish/suite_groovejr \
+  --testcase tst_template
+```
+
+## Adding real tests
+
+1. Copy `suite_groovejr/tst_template` to a new `tst_<name>` directory
+2. Update `suite_groovejr/suite.conf` so the new testcase is listed in `TEST_CASES`
+3. Add shared selectors to `shared/scripts/names.py`
+4. Add shared launch and synchronization helpers to `shared/scripts/common.py` as the suite grows
+
+Use the Squish IDE to record new interactions if you want to build out the object map and selectors visually.

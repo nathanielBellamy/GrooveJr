@@ -8,3 +8,4 @@
 
 deps/
 build-test/
+tests/squish/results/
