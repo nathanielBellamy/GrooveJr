@@ -69,6 +69,23 @@ add_subdirectory(db)
 add_subdirectory(scanner)
 add_definitions(-DQT_NO_VERSION_TAGGING)
 
+set(GJ_APP_ICON_ICNS "${CMAKE_CURRENT_SOURCE_DIR}/resource/icons/GrooveJr.icns")
+
+set(GJ_PLATFORM_SOURCES
+        resource/resources.qrc
+)
+
+if(WIN32)
+    list(APPEND GJ_PLATFORM_SOURCES resource/GrooveJr.rc)
+endif()
+
+if(APPLE)
+    set_source_files_properties("${GJ_APP_ICON_ICNS}" PROPERTIES
+        MACOSX_PACKAGE_LOCATION "Resources"
+    )
+    list(APPEND GJ_PLATFORM_SOURCES "${GJ_APP_ICON_ICNS}")
+endif()
+
 add_executable(GrooveJr
         main.h
         main.cpp
@@ -97,6 +114,7 @@ add_executable(GrooveJr
         gui/MainToolBar/transport/TransportControl.cpp
         gui/MainToolBar/transport/TransportControl.h
         types/AtomicStr.h
+        ${GJ_PLATFORM_SOURCES}
 )
 target_link_libraries(GrooveJr
         PUBLIC
@@ -121,6 +139,7 @@ if(APPLE)
     set_target_properties(GrooveJr PROPERTIES
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resource/Info.plist.in"
+        MACOSX_BUNDLE_ICON_FILE "GrooveJr.icns"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
         MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
         MACOSX_BUNDLE_GUI_IDENTIFIER "com.nathanielbellamy.groovejr"
