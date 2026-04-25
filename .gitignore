@@ -9,3 +9,4 @@
 deps/
 build-test/
 tests/squish/results/
+tests/squish/**/__pycache__/
