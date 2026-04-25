@@ -126,6 +126,7 @@ resolve_aut_path() {
     esac
 }
 
+# Resolve the local build and Squish runner, then execute the selected suite.
 main() {
     banner "Squish"
     detect_platform

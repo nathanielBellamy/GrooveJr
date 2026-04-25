@@ -46,5 +46,5 @@ def start_groovejr():
     return wait_for_main_window()
 
 
-def wait_for_main_window(timeout=20000):
-    return waitForObject(main_window(), timeout)
+def wait_for_main_window(timeout_ms=20000):
+    return waitForObject(main_window(), timeout_ms)
