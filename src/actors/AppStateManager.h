@@ -472,7 +472,9 @@ struct AppStateManagerState {
         );
     }
     setStateAudioCoreShadow(decksState, decoratedAudioFiles);
-    stateCore->requestingDeckUpdate = true;
+    auto requestedDeckUpdate = false;
+    while (!stateCore->requestingDeckUpdate.compare_exchange_weak(requestedDeckUpdate, true, std::memory_order_release,
+                                                                  std::memory_order_relaxed));
   }
 
   Result directDeckUpdate(

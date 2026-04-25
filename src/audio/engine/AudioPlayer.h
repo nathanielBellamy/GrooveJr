@@ -514,9 +514,8 @@ struct AudioPlayer {
         jackClientIsActive = true;
       }
 
-      const bool stateCoreWasRequestingUpdate = stateCore->requestingDeckUpdate.load();
+      bool stateCoreWasRequestingUpdate = stateCore->requestingDeckUpdate.load();
       if (stateCoreWasRequestingUpdate) {
-        stateCore->requestingDeckUpdate = false;
         Logging::write(
           Info,
           "XXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -533,6 +532,9 @@ struct AudioPlayer {
           jackClient->activate(audioCore);
           jackClientIsActive = true;
         }
+        while (!stateCore->requestingDeckUpdate.compare_exchange_weak(stateCoreWasRequestingUpdate, false,
+                                                                      std::memory_order_release,
+                                                                      std::memory_order_relaxed));
       }
 
       if (stateCoreWasRequestingUpdate || audioCoreNeededtoUpdateDeckIndex) {
