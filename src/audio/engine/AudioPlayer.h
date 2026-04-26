@@ -98,18 +98,10 @@ struct AudioPlayer {
   }
 
   ~AudioPlayer() {
-    if (jackClientIsActive) {
-      if (jackClient->deactivate() != OK) {
-        Logging::write(
-          Error,
-          "Audio::AudioPlayer::cleanup",
-          "Unable to deactivate jackClient"
-        );
-      }
-    }
+    if (jackClientIsActive)
+      deactivateJackClient();
     jack_ringbuffer_free(vu_ring_buffer_out);
     jack_ringbuffer_free(fft_eq_ring_buffer_out);
-    jackClientIsActive = false;
   }
 
   int setupAudioCore() {
@@ -449,7 +441,11 @@ struct AudioPlayer {
 
     if (playState == STOP) {
       stateCore->setFrameId(0);
+      jackClient->deactivate();
+      std::this_thread::sleep_for(std::chrono::milliseconds(100)); // let jack cleanup
+      jackClientIsActive = false;
       audioCore->setFrameIdAllDecks(0);
+      return false;
     }
 
     if (!audioCore->currentDeck().hasValidCassetteLoaded())
@@ -515,9 +511,7 @@ struct AudioPlayer {
 
       bool stateCoreWasRequestingUpdate = stateCore->requestingDeckUpdate.load();
       if (stateCoreWasRequestingUpdate) {
-        jackClient->deactivate();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // let jack cleanup
-        jackClientIsActive = false;
+        deactivateJackClient();
         const auto audioCoreShadow = stateCore->audioCoreShadow.load();
         if (const auto decoratedAudioFile = audioCoreShadow.decks[audioCoreShadow.deckIndex].decoratedAudioFile) {
           audioCore->deckIndex = audioCoreShadow.deckIndex;
@@ -555,16 +549,8 @@ struct AudioPlayer {
       "Exited while loop."
     );
 
-    if (jackClientIsActive) {
-      if (jackClient->deactivate() != OK) {
-        Logging::write(
-          Error,
-          "Audio::AudioPlayer::run",
-          "An error occurred deactivating the JackClient"
-        );
-        return ERROR;
-      }
-    }
+    if (jackClientIsActive)
+      deactivateJackClient();
 
     stateCore->setAudioRunning(false);
     jackClientIsActive = false;
@@ -583,6 +569,19 @@ struct AudioPlayer {
 
     return OK;
   };
+
+  void deactivateJackClient() {
+    if (jackClient->deactivate() != OK) {
+      Logging::write(
+        Error,
+        "Audio::AudioPlayer::deactivateJackClient",
+        "An error occurred deactivating the JackClient"
+      );
+      return;
+    }
+    jackClientIsActive = false;
+    std::this_thread::sleep_for(std::chrono::milliseconds(50)); // let jack cleanup
+  }
 };
 } // Audio
 } // gj
