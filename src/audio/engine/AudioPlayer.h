@@ -504,7 +504,8 @@ struct AudioPlayer {
       // std::cout << "audioplayer run proce " << audioCore->processBuffers[0][100] << std::endl << std::endl;
       // std::cout << "audioplayer run fxcha " << audioCore->mixerChannelsChannelsWriteOut[1][0][50] << std::endl << std::endl;
 
-      if (prevDeckIndex != currentDeckIndex) {
+      const bool audioCoreUpdatedDeckIndex = prevDeckIndex != currentDeckIndex;
+      if (audioCoreUpdatedDeckIndex) {
         prevDeckIndex = currentDeckIndex;
         auto audioCoreShadow = stateCore->audioCoreShadow.load();
         audioCoreShadow.deckIndex = currentDeckIndex;
@@ -530,7 +531,7 @@ struct AudioPlayer {
                                                                       std::memory_order_relaxed));
       }
 
-      if (stateCoreWasRequestingUpdate) {
+      if (stateCoreWasRequestingUpdate || audioCoreUpdatedDeckIndex) {
         const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
         if (!appStateManagerPtr) {
           Logging::write(Error, "Audio::AudioPlayer", "AppStateManager actor is not available.");
@@ -582,11 +583,6 @@ struct AudioPlayer {
 
     return OK;
   };
-
-  bool audioCoreShouldUpdateDeckIndex() const {
-    return playbackSettingsFromAudioThread[BfrIdx::PSFAT::AUDIO_CORE_DECK_INDEX] != playbackSettingsFromAudioThread[
-             BfrIdx::PSFAT::AUDIO_CORE_DECK_INDEX_NEXT];
-  }
 };
 } // Audio
 } // gj
