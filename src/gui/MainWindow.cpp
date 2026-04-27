@@ -149,13 +149,12 @@ void MainWindow::connectActions() {
       } else {
         stateCore->requestSceneLoadById(sceneDbId_ToLoad);
         int counter = 0;
-        while (!stateCore->sceneIdLoaded.load() != sceneDbId_ToLoad && counter < 10) {
+        while (!stateCore->sceneIdToLoad.load() != 0 && counter < 10) {
           std::cout << "loading scene " << std::endl;
           std::this_thread::sleep_for(std::chrono::milliseconds(10));
           counter++;
         }
       }
-      std::cout << "scene loaded: " << stateCore->sceneIdLoaded.load() << std::endl;
       std::cout << "state scene: " << stateCore->scene.load().id << std::endl;
       setChannels();
 
