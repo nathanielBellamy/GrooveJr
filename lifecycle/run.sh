@@ -104,7 +104,9 @@ main() {
             # Open a new Terminal.app window so std::cout is visible.
             # .command files are opened by Terminal.app automatically.
             local tmp_cmd
-            tmp_cmd="$(mktemp "${TMPDIR:-/tmp}/gj_run_XXXXXX.command")"
+            tmp_cmd="$(mktemp -t gj_run)"
+            mv -- "$tmp_cmd" "$tmp_cmd.command"
+            tmp_cmd="${tmp_cmd}.command"
             printf '#!/usr/bin/env bash\n"%s"\necho\nread -rp "Press Enter to close..." _\nrm -f -- "$0"\n' \
                 "${app_bundle}/Contents/MacOS/GrooveJr" > "$tmp_cmd"
             chmod +x "$tmp_cmd"
