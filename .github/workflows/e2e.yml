@@ -7,6 +7,10 @@ on:
         description: Name of the uploaded GrooveJr app bundle artifact
         required: true
         type: string
+    secrets:
+      squish_archive_url:
+        description: Download URL for a Squish archive containing bin/squishserver and bin/squishrunner
+        required: false
 
 env:
   VST3_SDK_VERSION: "v3.7.12_build_20"
@@ -38,17 +42,19 @@ jobs:
           name: ${{ inputs.build_artifact_name }}
           path: src/build
 
-      - name: Start Squish server
+      - name: Prepare Squish tools
         env:
           SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
+          SQUISH_ARCHIVE_URL: ${{ secrets.squish_archive_url }}
+        run: ./lifecycle/_prepare_squish_tools.sh
+
+      - name: Start Squish server
         run: ./lifecycle/_start_squish_server.sh "${{ steps.squish-log.outputs.path }}"
 
       - name: Start Squish screen recording
         run: ./lifecycle/_capture_squish_recording.sh start "${{ steps.squish-recording.outputs.dir }}"
 
       - name: Run Squish suite
-        env:
-          SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
         run: |
           ./lifecycle/squish.sh -y \
             --build-dir "${{ github.workspace }}/src/build" \
