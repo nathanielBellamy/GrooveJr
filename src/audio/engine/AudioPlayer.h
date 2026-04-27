@@ -502,11 +502,16 @@ struct AudioPlayer {
       const ID sceneIdToLoad = stateCore->sceneIdToLoad.load();
       const bool stateCoreWasRequestingUpdate_Scene = sceneIdToLoad != 0;
       if (stateCoreWasRequestingUpdate_Scene) {
+        std::cout << "stateCoreWasRequestingUpdate_Scene, sceneIdToLoad: " << sceneIdToLoad << std::endl;
         deactivateJackClient();
         if (mixer->loadScene(sceneIdToLoad) != OK)
           Logging::write(Info, "Audio::AudioPlayer::run", "Unable to Load Scene " + std::to_string(sceneIdToLoad));
+        setupAudioCore();
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
         stateCore->sceneIdToLoad.store(0);
         activateJackClient();
+        std::cout << "reactivated jackclient" << std::endl;
       }
 
       bool stateCoreWasRequestingUpdate_Deck = stateCore->requestingDeckUpdate.load();

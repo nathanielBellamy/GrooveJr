@@ -144,18 +144,21 @@ void MainWindow::connectActions() {
         "Loading sceneId: " + std::to_string(sceneDbId_ToLoad)
       );
 
+      std::cout << "state scene before: " << stateCore->scene.load().id << std::endl;
       if (!stateCore->audioRunning.load()) {
         mixer->loadScene(sceneDbId_ToLoad);
       } else {
+        std::cout << "audio running" << std::endl;
         stateCore->requestSceneLoadById(sceneDbId_ToLoad);
-        int counter = 0;
-        while (!stateCore->sceneIdToLoad.load() != 0 && counter < 10) {
-          std::cout << "loading scene " << std::endl;
-          std::this_thread::sleep_for(std::chrono::milliseconds(10));
-          counter++;
+        std::cout << "request load scene byId" << std::endl;
+        std::cout << "scneIdToLoad:  " << stateCore->sceneIdToLoad.load() << std::endl;
+        while (stateCore->sceneIdToLoad.load() != 0) {
+          std::cout << "scneIdToLoadloop: " << stateCore->sceneIdToLoad.load() << std::endl;
+          std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         }
       }
-      std::cout << "state scene: " << stateCore->scene.load().id << std::endl;
+      std::cout << "main window sceneId to load after: " << stateCore->sceneIdToLoad.load() << std::endl;
+      std::cout << "main window state scene after: " << stateCore->scene.load().id << std::endl;
       setChannels();
 
       Logging::write(
