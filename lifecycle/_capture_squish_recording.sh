@@ -6,6 +6,11 @@ CAPTURE_DIR="${2:-}"
 VIDEO_FILE="${3:-}"
 FRAME_DELAY_SECONDS="${SQUISH_RECORDING_FRAME_DELAY_SECONDS:-1}"
 FRAME_RATE="${SQUISH_RECORDING_FRAME_RATE:-2}"
+CONTROL_FILE=""
+
+control_file() {
+    printf "%s/.recording-active" "${CAPTURE_DIR}"
+}
 
 require_capture_dir() {
     if [[ -z "${CAPTURE_DIR}" ]]; then
@@ -17,8 +22,12 @@ require_capture_dir() {
 write_metadata() {
     local message="$1"
     mkdir -p "${CAPTURE_DIR}"
-    cat > "${CAPTURE_DIR}/README.txt" <<EOF
+    if [[ ! -f "${CAPTURE_DIR}/README.txt" ]]; then
+        cat > "${CAPTURE_DIR}/README.txt" <<EOF
 Squish screen recording artifact
+EOF
+    fi
+    cat >> "${CAPTURE_DIR}/README.txt" <<EOF
 
 ${message}
 EOF
@@ -38,13 +47,18 @@ start_recording() {
     fi
 
     mkdir -p "${CAPTURE_DIR}"
-    write_metadata "Frames are captured as PNG files. A MP4 is added when ffmpeg is available on the runner."
+    CONTROL_FILE="$(control_file)"
+    : > "${CONTROL_FILE}"
+    write_metadata "Frames are captured as PNG files. An MP4 is added when ffmpeg is available on the runner."
 
     (
         frame=0
-        while true; do
+        while [[ -f "${CONTROL_FILE}" ]]; do
             printf -v frame_file "%s/frame-%06d.png" "${CAPTURE_DIR}" "${frame}"
-            screencapture -x "${frame_file}" || rm -f "${frame_file}"
+            screencapture -x "${frame_file}" || {
+                echo "Failed to capture frame ${frame}; continuing the recording loop." >&2
+                rm -f "${frame_file}"
+            }
             frame=$((frame + 1))
             sleep "${FRAME_DELAY_SECONDS}"
         done
@@ -57,24 +71,34 @@ stop_recording() {
     require_capture_dir
 
     mkdir -p "${CAPTURE_DIR}"
+    CONTROL_FILE="$(control_file)"
+    rm -f "${CONTROL_FILE}"
+    VIDEO_FILE="${VIDEO_FILE:-${CAPTURE_DIR}/squish-screen-recording.mp4}"
 
     if [[ -n "${SQUISH_RECORDING_PID:-}" ]]; then
         kill "${SQUISH_RECORDING_PID}" 2>/dev/null || true
+        wait "${SQUISH_RECORDING_PID}" 2>/dev/null || true
     fi
 
-    if ! compgen -G "${CAPTURE_DIR}/frame-*.png" > /dev/null; then
+    if [[ -z "$(find "${CAPTURE_DIR}" -maxdepth 1 -name 'frame-*.png' -print -quit)" ]]; then
         write_metadata "No screenshots were captured during the Squish run."
         exit 0
     fi
 
     if [[ -n "${VIDEO_FILE}" ]] && command -v ffmpeg >/dev/null 2>&1; then
-        ffmpeg -y \
+        # H.264/yuv420p output expects even frame dimensions, so pad odd-sized captures before encoding.
+        if ffmpeg -y \
             -framerate "${FRAME_RATE}" \
-            -pattern_type glob \
-            -i "${CAPTURE_DIR}/frame-*.png" \
+            -start_number 0 \
+            -i "${CAPTURE_DIR}/frame-%06d.png" \
             -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2,format=yuv420p" \
-            "${VIDEO_FILE}"
-        write_metadata "The PNG frame sequence and squish-screen-recording.mp4 were captured during the Squish run."
+            "${VIDEO_FILE}" \
+            > "${CAPTURE_DIR}/ffmpeg.log" 2>&1; then
+            write_metadata "The PNG frame sequence and squish-screen-recording.mp4 were captured during the Squish run."
+            exit 0
+        fi
+
+        write_metadata "ffmpeg was available, but MP4 encoding failed. See ffmpeg.log in this artifact for details."
         exit 0
     fi
 
