@@ -16,7 +16,6 @@ permissions:
 
 jobs:
   e2e-macos-artifact:
-    if: ${{ github.event_name == 'workflow_call' }}
     runs-on:
       - self-hosted
       - macOS
@@ -27,6 +26,13 @@ jobs:
       - name: Resolve Squish log path
         id: squish-log
         run: echo "path=${RUNNER_TEMP}/groovejr-squishserver.log" >> "${GITHUB_OUTPUT}"
+
+      - name: Resolve Squish recording paths
+        id: squish-recording
+        run: |
+          dir="${RUNNER_TEMP}/squish-screen-recording"
+          echo "dir=${dir}" >> "${GITHUB_OUTPUT}"
+          echo "video=${dir}/squish-screen-recording.mp4" >> "${GITHUB_OUTPUT}"
 
       - name: Download GrooveJr app bundle
         uses: actions/download-artifact@v4
@@ -39,6 +45,9 @@ jobs:
           SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
         run: ./lifecycle/_start_squish_server.sh "${{ steps.squish-log.outputs.path }}"
 
+      - name: Start Squish screen recording
+        run: ./lifecycle/_capture_squish_recording.sh start "${{ steps.squish-recording.outputs.dir }}"
+
       - name: Run Squish suite
         env:
           SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
@@ -48,12 +57,27 @@ jobs:
             --suite-dir "${{ github.workspace }}/tests/squish/suite_groovejr" \
             --testcase tst_template
 
+      - name: Finalize Squish screen recording
+        if: always()
+        run: |
+          ./lifecycle/_capture_squish_recording.sh stop \
+            "${{ steps.squish-recording.outputs.dir }}" \
+            "${{ steps.squish-recording.outputs.video }}"
+
       - name: Upload Squish server log
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: squishserver-log-artifact
           path: ${{ steps.squish-log.outputs.path }}
+
+      - name: Upload Squish screen recording
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: squish-screen-recording-artifact
+          if-no-files-found: warn
+          path: ${{ steps.squish-recording.outputs.dir }}
 
       - name: Stop Squish server
         if: always()

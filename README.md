@@ -87,6 +87,8 @@ prompting.
 - GitHub Actions E2E runs expect a self-hosted macOS runner with Squish for Qt installed, with `squishserver` and
   `squishrunner` available either on `PATH` or via a repo/org `SQUISH_PREFIX` variable that points at the Squish
   installation root
+- The E2E workflow uploads a `squish-screen-recording-artifact` with captured UI frames and, when `ffmpeg` is
+  installed on the runner, a `squish-screen-recording.mp4`
 
 ___
 
