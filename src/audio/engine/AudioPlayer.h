@@ -205,6 +205,11 @@ struct AudioPlayer {
     return res;
   }
 
+  void clearMixerChannelsProcessData() {
+    for (auto& channelProcessData: mixerChannelsProcessData)
+      channelProcessData = Mixer::ChannelProcessData{};
+  }
+
   IAudioClient::Buffers getPluginBuffers(
     const std::unique_ptr<Mixer::Channel>& channel,
     const PluginIndex pluginIdx
@@ -502,8 +507,8 @@ struct AudioPlayer {
       const ID sceneIdToLoad = stateCore->sceneIdToLoad.load();
       const bool stateCoreWasRequestingUpdate_Scene = sceneIdToLoad != 0;
       if (stateCoreWasRequestingUpdate_Scene) {
-        std::cout << "stateCoreWasRequestingUpdate_Scene, sceneIdToLoad: " << sceneIdToLoad << std::endl;
         deactivateJackClient();
+        clearMixerChannelsProcessData();
         if (mixer->loadScene(sceneIdToLoad) != OK)
           Logging::write(Info, "Audio::AudioPlayer::run", "Unable to Load Scene " + std::to_string(sceneIdToLoad));
         setupAudioCore();
@@ -511,7 +516,6 @@ struct AudioPlayer {
 
         stateCore->sceneIdToLoad.store(0);
         activateJackClient();
-        std::cout << "reactivated jackclient" << std::endl;
       }
 
       bool stateCoreWasRequestingUpdate_Deck = stateCore->requestingDeckUpdate.load();
