@@ -7,18 +7,38 @@
 # Usage:
 #   ./lifecycle/build.sh              # interactive
 #   ./lifecycle/build.sh -y           # accept all defaults (Debug build, system compiler)
+#   ./lifecycle/build.sh -v           # verbose build output (shows full compiler commands / std::cout)
+#   ./lifecycle/build.sh -yv          # non-interactive + verbose
 
 # ─── Setup ───────────────────────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/_common.sh"
 
+GJ_VERBOSE=0
+
+# Expand combined short flags (e.g. -yv → -y -v) before main parsing
+_expanded_args=()
+for _arg in "$@"; do
+    if [[ "$_arg" =~ ^-[^-][a-zA-Z]+$ ]]; then
+        for (( _i=1; _i<${#_arg}; _i++ )); do
+            _expanded_args+=("-${_arg:$_i:1}")
+        done
+    else
+        _expanded_args+=("$_arg")
+    fi
+done
+set -- "${_expanded_args[@]+"${_expanded_args[@]}"}"
+unset _expanded_args _arg _i
+
 for arg in "$@"; do
     case "$arg" in
-        -y|--yes) GJ_AUTO_YES=1 ;;
+        -y|--yes)     GJ_AUTO_YES=1 ;;
+        -v|--verbose) GJ_VERBOSE=1 ;;
         -h|--help)
-            echo "Usage: $0 [-y|--yes] [-h|--help]"
-            echo "  -y, --yes    Accept all defaults without prompting"
+            echo "Usage: $0 [-y|--yes] [-v|--verbose] [-h|--help]"
+            echo "  -y, --yes      Accept all defaults without prompting"
+            echo "  -v, --verbose  Enable verbose build output (full compiler commands / std::cout)"
             exit 0
             ;;
     esac
@@ -337,7 +357,10 @@ run_cmake_build() {
     step "Compiling with $jobs parallel job(s)..."
     echo ""
 
-    cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" --parallel "$jobs"
+    local build_cmd=(cmake --build "$BUILD_DIR" --config "$BUILD_TYPE" --parallel "$jobs")
+    [[ "$GJ_VERBOSE" == "1" ]] && build_cmd+=(--verbose)
+
+    "${build_cmd[@]}"
 
     success "Build complete!"
 }

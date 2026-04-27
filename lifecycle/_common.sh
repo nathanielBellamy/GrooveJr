@@ -13,7 +13,7 @@ LIFECYCLE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$LIFECYCLE_DIR/.." && pwd)"
 DEPS_DIR="${REPO_ROOT}/deps"
 SRC_DIR="${REPO_ROOT}/src"
-DEFAULT_BUILD_DIR="${SRC_DIR}/build"
+DEFAULT_BUILD_DIR="${REPO_ROOT}/build"
 
 # ─── Terminal Colors ─────────────────────────────────────────────────
 
