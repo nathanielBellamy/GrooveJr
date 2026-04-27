@@ -134,46 +134,35 @@ void MainWindow::setChannels() {
   );
 }
 
-// void MainWindow::setPlugins() {
-//   Logging::write(
-//     Info,
-//     "Gui::MainWindow::setPlugins",
-//     "Setting plugins."
-//   );
-//
-//   // mixerWindow.setPlugins();
-//
-//   const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-//   const scoped_actor self{actorSystem};
-//   self->anon_send(
-//     actor_cast<actor>(appStateManagerPtr),
-//     hydrate_display_a_v
-//   );
-//
-//   Logging::write(
-//     Info,
-//     "Gui::MainWindow::setPlugins",
-//     "Done setting plugins."
-//   );
-// }
-
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(sceneLoadAction, &QAction::triggered, [&] {
-    if (const int sceneDbId = sceneLoadAction->data().toULongLong(); stateCore->getSceneDbId() != sceneDbId) {
+    if (const ID sceneDbId_ToLoad = sceneLoadAction->data().toULongLong();
+      stateCore->getSceneDbId() != sceneDbId_ToLoad) {
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",
-        "Loading sceneId: " + std::to_string(sceneDbId)
+        "Loading sceneId: " + std::to_string(sceneDbId_ToLoad)
       );
 
-      mixer->loadScene(sceneDbId);
+      if (!stateCore->audioRunning.load()) {
+        mixer->loadScene(sceneDbId_ToLoad);
+      } else {
+        stateCore->requestSceneLoadById(sceneDbId_ToLoad);
+        int counter = 0;
+        while (!stateCore->sceneIdLoaded.load() != sceneDbId_ToLoad && counter < 10) {
+          std::cout << "loading scene " << std::endl;
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
+          counter++;
+        }
+      }
+      std::cout << "scene loaded: " << stateCore->sceneIdLoaded.load() << std::endl;
+      std::cout << "state scene: " << stateCore->scene.load().id << std::endl;
       setChannels();
-      // setPlugins();
 
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",
-        "Done loading sceneId: " + std::to_string(sceneDbId)
+        "Done loading sceneId: " + std::to_string(sceneDbId_ToLoad)
       );
     }
   });

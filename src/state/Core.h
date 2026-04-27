@@ -38,8 +38,11 @@ struct Core {
   std::atomic<bool> userSettingFrameId = false;
   std::atomic<sf_count_t> frameId = 0;
   std::atomic<Audio::CoreShadow> audioCoreShadow;
-
   std::atomic<bool> requestingDeckUpdate = false;
+  std::atomic<bool> requestingSceneUpdate = false;
+  std::atomic<ID> sceneIdToLoad = 0;
+  std::atomic<ID> sceneIdLoaded = 0;
+
 
   Core();
 
@@ -152,6 +155,17 @@ struct Core {
 
   sf_count_t getFrameId() const {
     return frameId.load();
+  }
+
+  Result requestSceneLoadById(const ID sceneDbId) {
+    ID empty = 0;
+    while (!sceneIdToLoad.compare_exchange_weak(empty, sceneDbId, std::memory_order_release,
+                                                std::memory_order_relaxed)) {
+    };
+    bool expected = false;
+    while (!requestingSceneUpdate.compare_exchange_weak(expected, true, std::memory_order_release,
+                                                        std::memory_order_relaxed)) {
+    };
   }
 };
 } // State

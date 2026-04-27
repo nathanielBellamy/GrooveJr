@@ -154,8 +154,8 @@ struct AudioPlayer {
           ProcessDataChangeFlag::ACKNOWLEDGE;
 
       // we must re-activate our jackClient so that it can pick up any new plugin processing
-      jackClient->deactivate();
-      jackClient->activate(audioCore);
+      deactivateJackClient();
+      activateJackClient();
     }
 
     if (playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] == ProcessDataChangeFlag::ROGER) {
@@ -482,18 +482,8 @@ struct AudioPlayer {
     stateCore->audioCoreShadow.store(audioCoreShadow);
     stateCore->setAudioRunning(true);
 
-    if (jackClient->activate(audioCore) != OK) {
-      Logging::write(
-        Error,
-        "Audio::AudioPlayer::run",
-        "Unable to activate Jack"
-      );
-      jackClientIsActive = false;
-      throw std::runtime_error(
-        "Unable to instantiate AudioPlayer"
-      );
-    }
-    jackClientIsActive = true;
+    activateJackClient();
+
 
     while (continueRun()) {
       // std::cout << "audioplayer run playb " << audioCore->playbackBuffers[0][100] << std::endl;
@@ -509,23 +499,35 @@ struct AudioPlayer {
         stateCore->audioCoreShadow.store(audioCoreShadow);
       }
 
-      bool stateCoreWasRequestingUpdate = stateCore->requestingDeckUpdate.load();
-      if (stateCoreWasRequestingUpdate) {
+      const bool stateCoreWasRequestingUpdate_Scene = stateCore->requestingSceneUpdate.load();
+      if (stateCoreWasRequestingUpdate_Scene) {
+        deactivateJackClient();
+        const auto sceneIdToLoad = stateCore->sceneIdToLoad.load();
+        if (mixer->loadScene(sceneIdToLoad) != OK) {
+          Logging::write(Info, "Audio::AudioPlayer::run", "Unable to Load Scene " + std::to_string(sceneIdToLoad));
+          stateCore->sceneIdLoaded.store(0);
+        } else {
+          stateCore->sceneIdLoaded.store(sceneIdToLoad);
+        }
+        stateCore->requestingSceneUpdate.store(false);
+      }
+
+      bool stateCoreWasRequestingUpdate_Deck = stateCore->requestingDeckUpdate.load();
+      if (stateCoreWasRequestingUpdate_Deck) {
         deactivateJackClient();
         const auto audioCoreShadow = stateCore->audioCoreShadow.load();
         if (const auto decoratedAudioFile = audioCoreShadow.decks[audioCoreShadow.deckIndex].decoratedAudioFile) {
           audioCore->deckIndex = audioCoreShadow.deckIndex;
           audioCore->deckIndexNext = audioCoreShadow.deckIndexNext;
           audioCore->addCassetteFromDecoratedAudioFile(decoratedAudioFile.value());
-          jackClient->activate(audioCore);
-          jackClientIsActive = true;
+          activateJackClient();
         }
-        while (!stateCore->requestingDeckUpdate.compare_exchange_weak(stateCoreWasRequestingUpdate, false,
+        while (!stateCore->requestingDeckUpdate.compare_exchange_weak(stateCoreWasRequestingUpdate_Deck, false,
                                                                       std::memory_order_release,
                                                                       std::memory_order_relaxed));
       }
 
-      if (stateCoreWasRequestingUpdate || audioCoreUpdatedDeckIndex) {
+      if (stateCoreWasRequestingUpdate_Deck || stateCoreWasRequestingUpdate_Scene || audioCoreUpdatedDeckIndex) {
         const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
         if (!appStateManagerPtr) {
           Logging::write(Error, "Audio::AudioPlayer", "AppStateManager actor is not available.");
@@ -549,11 +551,8 @@ struct AudioPlayer {
       "Exited while loop."
     );
 
-    if (jackClientIsActive)
-      deactivateJackClient();
-
+    deactivateJackClient();
     stateCore->setAudioRunning(false);
-    jackClientIsActive = false;
 
     if (stateCore->getPlayState() == STOP) {
       mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, 0);
@@ -569,6 +568,21 @@ struct AudioPlayer {
 
     return OK;
   };
+
+  void activateJackClient() {
+    if (jackClient->activate(audioCore) != OK) {
+      Logging::write(
+        Error,
+        "Audio::AudioPlayer::run",
+        "Unable to activate Jack"
+      );
+      jackClientIsActive = false;
+      throw std::runtime_error(
+        "Unable to instantiate AudioPlayer"
+      );
+    }
+    jackClientIsActive = true;
+  }
 
   void deactivateJackClient() {
     if (jackClient->deactivate() != OK) {
