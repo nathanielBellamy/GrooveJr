@@ -6,7 +6,7 @@
 # Usage:
 #   ./lifecycle/run.sh                     # interactive (prompts for build dir)
 #   ./lifecycle/run.sh -y                  # accept defaults
-#   ./lifecycle/run.sh -v                  # verbose: run in terminal so std::cout is visible
+#   ./lifecycle/run.sh -v                  # verbose: opens a new terminal window showing std::cout
 #   ./lifecycle/run.sh -yv                 # non-interactive + verbose
 #   ./lifecycle/run.sh --build-dir <path>  # specify build directory explicitly
 
@@ -55,7 +55,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Options:"
             echo "  -y, --yes              Accept all defaults without prompting"
-            echo "  -v, --verbose          Run in terminal so std::cout output is visible"
+            echo "  -v, --verbose          Open a new terminal window to view std::cout output"
             echo "  --build-dir <path>     Path to the CMake build directory"
             echo "  -h, --help             Show this help"
             exit 0
@@ -101,7 +101,14 @@ main() {
         info "Launching ${BOLD}${app_bundle}${RESET}"
         echo ""
         if [[ "$GJ_VERBOSE" == "1" ]]; then
-            exec "${app_bundle}/Contents/MacOS/GrooveJr"
+            # Open a new Terminal.app window so std::cout is visible.
+            # .command files are opened by Terminal.app automatically.
+            local tmp_cmd
+            tmp_cmd="$(mktemp /tmp/gj_run_XXXXXX.command)"
+            printf '#!/usr/bin/env bash\n"%s"\necho\nread -rp "Press Enter to close..." _\n' \
+                "${app_bundle}/Contents/MacOS/GrooveJr" > "$tmp_cmd"
+            chmod +x "$tmp_cmd"
+            open "$tmp_cmd"
         else
             open "$app_bundle"
         fi

@@ -55,7 +55,7 @@ prompting.
 ### Default Paths
 
 - Source dependencies are placed in `./deps/`
-- App builds default to `./src/build`
+- App builds default to `./build`
 - Test builds default to `./build-test`
 - App icon assets live in `./src/resource/icons/`; CMake bundles the macOS `.icns`, uses the Windows `.ico`, and the Qt app loads the shared PNG at runtime.
 
@@ -64,7 +64,7 @@ prompting.
 ```bash
 ./lifecycle/install.sh -y
 ./lifecycle/build.sh -y
-./lifecycle/run.sh --build-dir ./src/build
+./lifecycle/run.sh --build-dir ./build
 ./lifecycle/test.sh -y --filter '*Math*' --verbose
 ```
 
