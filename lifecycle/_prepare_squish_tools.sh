@@ -43,16 +43,47 @@ download_squish_archive() {
     mkdir -p "${work_dir}"
 
     archive_name="$(basename "${SQUISH_ARCHIVE_URL%%\?*}")"
-    archive_name="${archive_name:-squish-tools.zip}"
+    case "${archive_name}" in
+        ""|"/"|"."|".."|*/*|*\\*|*..*)
+            echo "Squish archive URL must include a filename." >&2
+            return 1
+            ;;
+    esac
     archive_path="${work_dir}/${archive_name}"
     extract_dir="${work_dir}/extract"
     mkdir -p "${extract_dir}"
 
-    curl -LfsS "${SQUISH_ARCHIVE_URL}" -o "${archive_path}"
+    case "${SQUISH_ARCHIVE_URL}" in
+        https://*)
+            curl --proto '=https' --proto-redir '=https' --tlsv1.2 -LfsS "${SQUISH_ARCHIVE_URL}" -o "${archive_path}"
+            ;;
+        *)
+            echo "Unsupported Squish archive URL scheme. Use https://." >&2
+            return 1
+            ;;
+    esac
 
     case "${archive_path}" in
         *.zip)
-            ditto -x -k "${archive_path}" "${extract_dir}"
+            python3 - <<'PY' "${archive_path}" "${extract_dir}"
+import pathlib
+import sys
+import zipfile
+
+archive_path = pathlib.Path(sys.argv[1]).resolve()
+extract_dir = pathlib.Path(sys.argv[2]).resolve()
+
+try:
+    with zipfile.ZipFile(archive_path) as archive:
+        for member in archive.infolist():
+            member_path = extract_dir / member.filename
+            resolved_path = member_path.resolve()
+            if not resolved_path.is_relative_to(extract_dir):
+                raise ValueError(f"Unsafe zip entry detected: {member.filename}")
+        archive.extractall(extract_dir)
+except Exception as exc:
+    raise SystemExit(f"Unable to extract Squish zip archive: {exc}")
+PY
             ;;
         *.tar.gz|*.tgz)
             tar -xzf "${archive_path}" -C "${extract_dir}"
@@ -66,12 +97,12 @@ download_squish_archive() {
             ;;
     esac
 
-    resolved_prefix="$(
-        find "${extract_dir}" -type f -path '*/bin/squishserver' -print -quit |
-        while IFS= read -r server_bin; do
-            dirname "$(dirname "${server_bin}")"
-        done
-    )"
+    local server_bin=""
+    server_bin="$(find "${extract_dir}" -type f -path '*/bin/squishserver' -print -quit)"
+    resolved_prefix=""
+    if [[ -n "${server_bin}" ]]; then
+        resolved_prefix="$(dirname "$(dirname "${server_bin}")")"
+    fi
 
     if [[ -z "${resolved_prefix}" ]] || [[ ! -x "${resolved_prefix}/bin/squishrunner" ]]; then
         echo "Downloaded Squish archive does not contain bin/squishserver and bin/squishrunner." >&2
