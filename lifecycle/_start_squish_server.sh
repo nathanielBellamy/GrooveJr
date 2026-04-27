@@ -22,10 +22,12 @@ find_squish_server() {
     fi
 
     echo "Unable to find squishserver. Set SQUISH_PREFIX or add squishserver to PATH." >&2
-    exit 1
+    return 1
 }
 
-SQUISH_SERVER_BIN="$(find_squish_server)"
+if ! SQUISH_SERVER_BIN="$(find_squish_server)"; then
+    exit 1
+fi
 
 "${SQUISH_SERVER_BIN}" > "${LOG_FILE}" 2>&1 &
 SQUISHSERVER_PID=$!
