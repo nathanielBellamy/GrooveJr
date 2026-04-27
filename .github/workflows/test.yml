@@ -2,7 +2,7 @@ name: Test
 
 on:
   workflow_call:   # called by build.yml as a prerequisite
-  pull_request:    # standalone PR checks
+  workflow_dispatch:
 
 env:
   VST3_SDK_VERSION: "v3.7.12_build_20"

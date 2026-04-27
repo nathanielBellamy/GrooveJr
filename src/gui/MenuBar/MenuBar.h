@@ -25,7 +25,7 @@ namespace Gj {
 namespace Gui {
 using namespace caf;
 
-class MenuBar final : QMenuBar {
+class MenuBar final : public QMenuBar {
   actor_system& actorSystem;
   FileMenu* fileMenu;
   MusicMenu* musicMenu;

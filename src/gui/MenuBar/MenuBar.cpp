@@ -11,6 +11,9 @@ MenuBar::MenuBar(actor_system& actorSystem, QWidget* parent)
   , actorSystem(actorSystem)
   , fileMenu(new FileMenu(actorSystem, this))
   , musicMenu(new MusicMenu(actorSystem, this)) {
+  setObjectName("mainMenuBar");
+  fileMenu->setObjectName("fileMenu");
+  musicMenu->setObjectName("musicMenu");
   addMenu(fileMenu);
   addMenu(musicMenu);
 }

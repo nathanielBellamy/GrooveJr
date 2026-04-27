@@ -48,3 +48,30 @@ def start_groovejr():
 
 def wait_for_main_window(timeout_ms=20000):
     return waitForObject(main_window(), timeout_ms)
+
+
+def wait_for_named_object(selector, timeout_ms=20000):
+    return waitForObjectExists(selector, timeout_ms)
+
+
+def verify_visible(selector, description):
+    widget = wait_for_named_object(selector)
+    test.verify(widget.visible, description)
+    return widget
+
+
+def verify_hidden(selector, description):
+    widget = wait_for_named_object(selector)
+    test.verify(not widget.visible, description)
+    return widget
+
+
+def click_named_button(selector):
+    button = waitForObject(selector)
+    clickButton(button)
+    return button
+
+
+def menu_action_titles(selector):
+    menu = wait_for_named_object(selector)
+    return [str(action.text).replace("&", "") for action in menu.actions() if str(action.text).strip()]

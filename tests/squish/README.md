@@ -13,6 +13,8 @@ This directory holds the starter Squish suite for GrooveJr's Qt UI.
 - `suite_groovejr/shared/scripts/common.py` — shared helpers for resolving and launching the app under test
 - `suite_groovejr/shared/scripts/names.py` — starter symbolic selectors for GrooveJr widgets
 - `suite_groovejr/tst_template/` — a copyable placeholder testcase
+- `suite_groovejr/tst_menu_structure/` — verifies the File and Music menus expose the expected starter actions
+- `suite_groovejr/tst_music_library_sections/` — verifies the music-library headers are visible and the Files/Queue/Cache views toggle correctly
 
 ## Run the scaffolded suite
 
@@ -47,3 +49,4 @@ GitHub Actions E2E runs use `.github/workflows/e2e.yml`.
 - Push builds reuse the app bundle produced by `.github/workflows/build.yml`
 - The Squish job expects a self-hosted macOS runner with Squish for Qt installed
 - Set the repo or org variable `SQUISH_PREFIX` to the Squish installation root so the workflow can start `squishserver` and `squishrunner`
+- For future audio-output validation on macOS runners, `blackhole-2ch` is the most likely path for giving JACK stable virtual input/output ports when no physical audio hardware is available

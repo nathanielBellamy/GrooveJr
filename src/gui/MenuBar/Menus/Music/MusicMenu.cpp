@@ -12,6 +12,8 @@ MusicMenu::MusicMenu(actor_system& actorSystem, QWidget* parent)
   , addFolderToLibraryAction(new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Add Folder To Library"),
                                          this))
   , folderSelect(new FolderSelect(this)) {
+  addFolderToLibraryAction->setObjectName("addFolderToLibraryAction");
+  folderSelect->setObjectName("folderSelect");
   addFolderToLibraryAction->setStatusTip(tr("Add Folder To Library"));
   addAction(addFolderToLibraryAction);
 
