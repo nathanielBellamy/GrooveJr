@@ -148,9 +148,8 @@ void MainWindow::connectActions() {
         mixer->loadScene(sceneDbId_ToLoad);
       } else {
         stateCore->requestSceneLoadById(sceneDbId_ToLoad);
-        while (stateCore->sceneIdToLoad.load() != 0) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-        }
+        while (stateCore->sceneIdToLoad.load() != 0)
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
       }
       setChannels();
 

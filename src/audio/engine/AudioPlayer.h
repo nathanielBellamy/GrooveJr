@@ -512,7 +512,7 @@ struct AudioPlayer {
         if (mixer->loadScene(sceneIdToLoad) != OK)
           Logging::write(Info, "Audio::AudioPlayer::run", "Unable to Load Scene " + std::to_string(sceneIdToLoad));
         setupAudioCore();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
         stateCore->sceneIdToLoad.store(0);
         activateJackClient();
