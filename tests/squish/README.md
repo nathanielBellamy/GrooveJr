@@ -47,7 +47,7 @@ GitHub Actions E2E runs use `.github/workflows/e2e.yml`.
 
 - PR runs build GrooveJr and then execute the Squish suite
 - Push builds reuse the app bundle produced by `.github/workflows/build.yml`
-- The Squish job expects a self-hosted macOS runner with Squish for Qt installed
-- Make `squishserver` and `squishrunner` available on the self-hosted runner either via `PATH` or by setting the repo/org variable `SQUISH_PREFIX`
+- The Squish job runs on a GitHub-hosted macOS runner and still requires Squish for Qt to be installed there
+- Make `squishserver` and `squishrunner` available on the runner either via `PATH` or by setting the repo/org variable `SQUISH_PREFIX`
 - E2E uploads a `squish-screen-recording-artifact` containing PNG capture frames and, when `ffmpeg` is available on the runner, a `squish-screen-recording.mp4`
 - For future audio-output validation on macOS runners, `blackhole-2ch` is the most likely path for giving JACK stable virtual input/output ports when no physical audio hardware is available

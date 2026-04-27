@@ -84,9 +84,9 @@ prompting.
   `suite.conf`
 - Squish itself is not installed by the lifecycle scripts; install it separately and point `./lifecycle/squish.sh` at
   `squishrunner` with `SQUISH_PREFIX`, `SQUISH_RUNNER`, or `--runner`
-- GitHub Actions E2E runs expect a self-hosted macOS runner with Squish for Qt installed, with `squishserver` and
-  `squishrunner` available either on `PATH` or via a repo/org `SQUISH_PREFIX` variable that points at the Squish
-  installation root
+- GitHub Actions E2E runs use a GitHub-hosted macOS runner and still require Squish for Qt to be available there, with
+  `squishserver` and `squishrunner` available either on `PATH` or via a repo/org `SQUISH_PREFIX` variable that points
+  at the Squish installation root
 - The E2E workflow uploads a `squish-screen-recording-artifact` with captured UI frames and, when `ffmpeg` is
   installed on the runner, a `squish-screen-recording.mp4`
 
