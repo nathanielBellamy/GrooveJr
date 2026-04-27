@@ -8,6 +8,7 @@
 #   ./lifecycle/build.sh              # interactive
 #   ./lifecycle/build.sh -y           # accept all defaults (Debug build, system compiler)
 #   ./lifecycle/build.sh -v           # verbose build output (shows full compiler commands / std::cout)
+#   ./lifecycle/build.sh -yv          # non-interactive + verbose
 
 # ─── Setup ───────────────────────────────────────────────────────────
 
@@ -15,6 +16,20 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/_common.sh"
 
 GJ_VERBOSE=0
+
+# Expand combined short flags (e.g. -yv → -y -v) before main parsing
+_expanded_args=()
+for _arg in "$@"; do
+    if [[ "$_arg" =~ ^-[a-zA-Z]{2,}$ ]]; then
+        for (( _i=1; _i<${#_arg}; _i++ )); do
+            _expanded_args+=("-${_arg:$_i:1}")
+        done
+    else
+        _expanded_args+=("$_arg")
+    fi
+done
+set -- "${_expanded_args[@]+"${_expanded_args[@]}"}"
+unset _expanded_args _arg _i
 
 for arg in "$@"; do
     case "$arg" in

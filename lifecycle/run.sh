@@ -6,6 +6,8 @@
 # Usage:
 #   ./lifecycle/run.sh                     # interactive (prompts for build dir)
 #   ./lifecycle/run.sh -y                  # accept defaults
+#   ./lifecycle/run.sh -v                  # verbose: run in terminal so std::cout is visible
+#   ./lifecycle/run.sh -yv                 # non-interactive + verbose
 #   ./lifecycle/run.sh --build-dir <path>  # specify build directory explicitly
 
 # ─── Setup ───────────────────────────────────────────────────────────
@@ -14,11 +16,30 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/_common.sh"
 
 BUILD_DIR_OVERRIDE=""
+GJ_VERBOSE=0
+
+# Expand combined short flags (e.g. -yv → -y -v) before main parsing
+_expanded_args=()
+for _arg in "$@"; do
+    if [[ "$_arg" =~ ^-[a-zA-Z]{2,}$ ]]; then
+        for (( _i=1; _i<${#_arg}; _i++ )); do
+            _expanded_args+=("-${_arg:$_i:1}")
+        done
+    else
+        _expanded_args+=("$_arg")
+    fi
+done
+set -- "${_expanded_args[@]+"${_expanded_args[@]}"}"
+unset _expanded_args _arg _i
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -y|--yes)
             GJ_AUTO_YES=1
+            shift
+            ;;
+        -v|--verbose)
+            GJ_VERBOSE=1
             shift
             ;;
         --build-dir)
@@ -34,6 +55,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Options:"
             echo "  -y, --yes              Accept all defaults without prompting"
+            echo "  -v, --verbose          Run in terminal so std::cout output is visible"
             echo "  --build-dir <path>     Path to the CMake build directory"
             echo "  -h, --help             Show this help"
             exit 0
@@ -78,7 +100,11 @@ main() {
         fi
         info "Launching ${BOLD}${app_bundle}${RESET}"
         echo ""
-        open "$app_bundle"
+        if [[ "$GJ_VERBOSE" == "1" ]]; then
+            exec "${app_bundle}/Contents/MacOS/GrooveJr"
+        else
+            open "$app_bundle"
+        fi
     else
         local binary="${build_dir}/GrooveJr"
         if [[ ! -f "$binary" ]]; then
