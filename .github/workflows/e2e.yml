@@ -16,15 +16,17 @@ permissions:
 
 jobs:
   e2e-macos-artifact:
-    if: ${{ vars.SQUISH_PREFIX != '' }}
+    if: ${{ github.event_name == 'workflow_call' && vars.SQUISH_PREFIX != '' }}
     runs-on:
       - self-hosted
       - macOS
-    env:
-      SQUISH_SERVER_LOG: ${{ github.workspace }}/groovejr-squishserver.log
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Resolve Squish log path
+        id: squish-log
+        run: echo "path=${RUNNER_TEMP}/groovejr-squishserver.log" >> "${GITHUB_OUTPUT}"
 
       - name: Download GrooveJr app bundle
         uses: actions/download-artifact@v4
@@ -35,7 +37,7 @@ jobs:
       - name: Start Squish server
         env:
           SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
-        run: ./lifecycle/_start_squish_server.sh "${SQUISH_SERVER_LOG}"
+        run: ./lifecycle/_start_squish_server.sh "${{ steps.squish-log.outputs.path }}"
 
       - name: Run Squish suite
         env:
@@ -51,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: squishserver-log-artifact
-          path: ${{ env.SQUISH_SERVER_LOG }}
+          path: ${{ steps.squish-log.outputs.path }}
 
       - name: Stop Squish server
         if: always()
