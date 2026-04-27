@@ -16,7 +16,6 @@ permissions:
 
 jobs:
   e2e-macos-artifact:
-    if: ${{ github.event_name == 'workflow_call' && vars.SQUISH_PREFIX != '' }}
     runs-on:
       - self-hosted
       - macOS

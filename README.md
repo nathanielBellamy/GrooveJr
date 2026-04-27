@@ -84,8 +84,9 @@ prompting.
   `suite.conf`
 - Squish itself is not installed by the lifecycle scripts; install it separately and point `./lifecycle/squish.sh` at
   `squishrunner` with `SQUISH_PREFIX`, `SQUISH_RUNNER`, or `--runner`
-- GitHub Actions E2E runs expect a self-hosted macOS runner with Squish for Qt installed and a repo/org variable named
-  `SQUISH_PREFIX` that points at the Squish installation root
+- GitHub Actions E2E runs expect a self-hosted macOS runner with Squish for Qt installed, with `squishserver` and
+  `squishrunner` available either on `PATH` or via a repo/org `SQUISH_PREFIX` variable that points at the Squish
+  installation root
 
 ___
 
