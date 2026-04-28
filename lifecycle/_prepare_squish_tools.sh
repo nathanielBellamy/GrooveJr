@@ -33,7 +33,7 @@ resolve_squish_prefix() {
 
 download_squish_archive() {
     if [[ -z "${SQUISH_ARCHIVE_URL:-}" ]]; then
-        echo "Unable to find Squish tools. Set SQUISH_PREFIX, add squishserver/squishrunner to PATH, or set the squish_archive_url secret." >&2
+        echo "Unable to find Squish tools. Set SQUISH_PREFIX, add squishserver/squishrunner to PATH, or set the SQUISH_ARCHIVE_URL repository/organization variable." >&2
         return 1
     fi
 

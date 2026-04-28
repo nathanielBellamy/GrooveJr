@@ -179,4 +179,3 @@ jobs:
     uses: ./.github/workflows/e2e.yml
     with:
       build_artifact_name: GrooveJr-macos-app-bundle
-    secrets: inherit
