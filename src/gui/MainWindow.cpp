@@ -34,6 +34,7 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer::Core* mixer, Sta
 
   container->setMinimumSize(QSize(1300, 700));
   setCentralWidget(container);
+  setMenuBar(menuBar);
   setupGrid();
   setStyleSheet(
     "font-weight: 900;"

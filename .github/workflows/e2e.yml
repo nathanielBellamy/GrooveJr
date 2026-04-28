@@ -1,0 +1,88 @@
+name: E2E
+
+on:
+  workflow_call:
+    inputs:
+      build_artifact_name:
+        description: Name of the uploaded GrooveJr app bundle artifact
+        required: true
+        type: string
+
+env:
+  VST3_SDK_VERSION: "v3.7.12_build_20"
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-macos-squish:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve Squish log path
+        id: squish-log
+        run: echo "path=${RUNNER_TEMP}/groovejr-squishserver.log" >> "${GITHUB_OUTPUT}"
+
+      - name: Resolve Squish recording paths
+        id: squish-recording
+        run: |
+          dir="${RUNNER_TEMP}/squish-screen-recording"
+          echo "dir=${dir}" >> "${GITHUB_OUTPUT}"
+          echo "video=${dir}/squish-screen-recording.mp4" >> "${GITHUB_OUTPUT}"
+
+      - name: Download GrooveJr app bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.build_artifact_name }}
+          path: src/build
+
+      - name: Prepare Squish tools
+        env:
+          SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
+          # Prefer the canonical variable name, while keeping the legacy lowercase name working.
+          SQUISH_ARCHIVE_URL: ${{ vars.SQUISH_ARCHIVE_URL || vars.squish_archive_url }}
+        run: ./lifecycle/_prepare_squish_tools.sh
+
+      - name: Start Squish server
+        run: ./lifecycle/_start_squish_server.sh "${{ steps.squish-log.outputs.path }}"
+
+      - name: Start Squish screen recording
+        run: ./lifecycle/_capture_squish_recording.sh start "${{ steps.squish-recording.outputs.dir }}"
+
+      - name: Run Squish suite
+        run: |
+          ./lifecycle/squish.sh -y \
+            --build-dir "${{ github.workspace }}/src/build" \
+            --suite-dir "${{ github.workspace }}/tests/squish/suite_groovejr" \
+            --testcase tst_template
+
+      - name: Finalize Squish screen recording
+        if: always()
+        run: |
+          ./lifecycle/_capture_squish_recording.sh stop \
+            "${{ steps.squish-recording.outputs.dir }}" \
+            "${{ steps.squish-recording.outputs.video }}"
+
+      - name: Upload Squish server log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: squishserver-log-artifact
+          path: ${{ steps.squish-log.outputs.path }}
+
+      - name: Upload Squish screen recording
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: squish-screen-recording-artifact
+          if-no-files-found: warn
+          path: ${{ steps.squish-recording.outputs.dir }}
+
+      - name: Stop Squish server
+        if: always()
+        run: |
+          if [[ -n "${SQUISHSERVER_PID:-}" ]]; then
+            kill "${SQUISHSERVER_PID}"
+          fi
