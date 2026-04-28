@@ -78,15 +78,15 @@ public:
 private:
   actor_system& actorSystem;
   Audio::Mixer::Core* mixer;
-  QGridLayout grid;
-  QWidget spacer;
-  QWidget channelsWidget;
-  QScrollArea channelsScrollArea;
-  QGridLayout channelsGrid;
+  QGridLayout* grid;
+  QWidget* spacer;
+  QWidget* channelsWidget;
+  QScrollArea* channelsScrollArea;
+  QGridLayout* channelsGrid;
   std::vector<Channel*> channels;
-  QAction addChannelAction;
-  QAction removeChannelAction;
-  AddChannelButton addChannelButton;
+  QAction* addChannelAction;
+  QAction* removeChannelAction;
+  AddChannelButton* addChannelButton;
   QAction* muteChannelAction;
   QAction* muteLChannelAction;
   QAction* muteRChannelAction;

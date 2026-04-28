@@ -30,6 +30,7 @@ prompting.
 | `./lifecycle/install.sh` | Install system dependencies and build source dependencies | Detects `brew`, `apt`, `dnf`, or `pacman`; installs packages; installs CAF from a package manager when possible; clones and builds the VST3 SDK in `./deps/` |
 | `./lifecycle/build.sh`   | Configure and build GrooveJr                              | Checks dependencies first, offers to run `install.sh`, then configures CMake and builds the app                                                              |
 | `./lifecycle/run.sh`     | Launch an existing build                                  | Starts `GrooveJr.app` on macOS or the `GrooveJr` binary on Linux/WSL                                                                                         |
+| `./lifecycle/squish.sh`  | Run the Squish UI suite scaffold                          | Resolves the local Squish install, points the suite at a local GrooveJr build, and optionally runs a single testcase                                         |
 | `./lifecycle/test.sh`    | Build and run the test suite                              | Configures a separate `./build-test/` tree with `-DGJ_BUILD_TESTS=ON` and runs tests through CTest                                                           |
 | `./lifecycle/_common.sh` | Shared helpers for the lifecycle scripts                  | Not intended to be run directly                                                                                                                              |
 
@@ -47,9 +48,13 @@ prompting.
    ```bash
    ./lifecycle/run.sh
    ```
-4. Run tests:
+4. Run unit tests:
    ```bash
    ./lifecycle/test.sh
+   ```
+5. Run Squish UI scaffolding:
+   ```bash
+   ./lifecycle/squish.sh
    ```
 
 ### Default Paths
@@ -57,16 +62,30 @@ prompting.
 - Source dependencies are placed in `./deps/`
 - App builds default to `./build`
 - Test builds default to `./build-test`
-- App icon assets live in `./src/resource/icons/`; CMake bundles the macOS `.icns`, uses the Windows `.ico`, and the Qt app loads the shared PNG at runtime.
+- App icon assets live in `./src/resource/icons/`; CMake bundles the macOS `.icns`, uses the Windows `.ico`, and the Qt
+  app loads the shared PNG at runtime.
 
 ### Useful Non-Interactive Examples
 
 ```bash
 ./lifecycle/install.sh -y
 ./lifecycle/build.sh -y
-./lifecycle/run.sh --build-dir ./build
+./lifecycle/run.sh --build-dir ./src/build
+./lifecycle/squish.sh -y --testcase tst_template
 ./lifecycle/test.sh -y --filter '*Math*' --verbose
 ```
+
+### Squish UI Test Scaffolding
+
+- Starter Squish assets live in `./tests/squish/`
+- The default suite is `./tests/squish/suite_groovejr/`
+- Shared helpers for launching GrooveJr and resolving selectors live in `./tests/squish/suite_groovejr/shared/scripts/`
+- Copy `./tests/squish/suite_groovejr/tst_template/` when creating new UI tests, then add the new testcase name to
+  `suite.conf`
+- Squish itself is not installed by the lifecycle scripts; install it separately and point `./lifecycle/squish.sh` at
+  `squishrunner` with `SQUISH_PREFIX`, `SQUISH_RUNNER`, or `--runner`
+- GitHub Actions E2E runs expect a self-hosted macOS runner with Squish for Qt installed and a repo/org variable named
+  `SQUISH_PREFIX` that points at the Squish installation root
 
 ___
 

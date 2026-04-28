@@ -43,5 +43,42 @@ target_link_libraries(gj_test_db PRIVATE GTest::gtest_main GjDb)
 
 # Register tests with CTest
 include(GoogleTest)
+# ── gj_test_e2e: e2e test using QTest ──
+find_package(Qt6 REQUIRED COMPONENTS Test)
+
+set(GJ_PLATFORM_SOURCES
+        ../resource/resources.qrc
+)
+if(WIN32)
+    list(APPEND GJ_PLATFORM_SOURCES ../resource/GrooveJr.rc)
+endif()
+if(APPLE)
+    list(APPEND GJ_PLATFORM_SOURCES "${GJ_APP_ICON_ICNS}")
+endif()
+
+add_executable(gj_test_e2e
+    e2e/tst_e2e.cpp
+    ../state/Core.h
+    ../state/Core.cpp
+    ../Logging.h
+    ../Logging.cpp
+    ../gui/MainToolBar/transport/TransportControl.cpp
+    ../gui/MainToolBar/transport/TransportControl.h
+    ${GJ_PLATFORM_SOURCES}
+)
+
+target_include_directories(gj_test_e2e PRIVATE ${GJ_SRC_ROOT})
+if(SNDFILE_INCLUDE_DIR)
+    target_include_directories(gj_test_e2e PRIVATE ${SNDFILE_INCLUDE_DIR})
+endif()
+if(JACK_INCLUDE_DIR)
+    target_include_directories(gj_test_e2e PRIVATE ${JACK_INCLUDE_DIR})
+endif()
+target_link_libraries(gj_test_e2e PRIVATE 
+    Qt6::Test Qt6::Widgets Qt6::Gui Qt6::Core Qt6::OpenGLWidgets
+    CAF::core GjAudio GjDb GjGui GjScanner 
+    Boost::log ${Boost_LIBRARIES} SQLite::SQLite3
+)
 gtest_discover_tests(gj_test_pure)
 gtest_discover_tests(gj_test_db)
+add_test(NAME gj_test_e2e COMMAND gj_test_e2e)

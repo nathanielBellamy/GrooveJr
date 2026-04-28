@@ -12,6 +12,7 @@ FileMenu::FileMenu(actor_system& actorSystem, QWidget* parent)
 : QMenu("&File", parent)
   , actorSystem(actorSystem)
   , renderAction(new QAction(QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpen), tr("&Render"), this)) {
+  renderAction->setObjectName("renderAction");
   renderAction->setStatusTip(tr("Render Audio"));
 
   addAction(renderAction);

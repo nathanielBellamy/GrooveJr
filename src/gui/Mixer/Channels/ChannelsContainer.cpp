@@ -24,14 +24,14 @@ ChannelsContainer::ChannelsContainer(
 : QWidget(parent)
   , actorSystem(actorSystem)
   , mixer(mixer)
-  , grid(this)
-  , spacer(this)
-  , channelsWidget(this)
-  , channelsScrollArea(this)
-  , channelsGrid(&channelsWidget)
-  , addChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListAdd), tr("&AddChannel"), this)
-  , removeChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListRemove), tr("&RemoveChannel"), this)
-  , addChannelButton(this, &addChannelAction)
+  , grid(new QGridLayout(this))
+  , spacer(new QWidget(this))
+  , channelsWidget(new QWidget(this))
+  , channelsScrollArea(new QScrollArea(this))
+  , channelsGrid(new QGridLayout(channelsWidget))
+  , addChannelAction(new QAction(QIcon::fromTheme(QIcon::ThemeIcon::ListAdd), tr("&AddChannel"), this))
+  , removeChannelAction(new QAction(QIcon::fromTheme(QIcon::ThemeIcon::ListRemove), tr("&RemoveChannel"), this))
+  , addChannelButton(new AddChannelButton(this, addChannelAction))
   , muteChannelAction(muteChannelAction)
   , muteLChannelAction(muteLChannelAction)
   , muteRChannelAction(muteRChannelAction)
@@ -61,9 +61,9 @@ void ChannelsContainer::hydrateState(const State::Packet& appState) {
 
   // TODO: can we always enable this too?
   if (appState.playState == PLAY || appState.playState == FF || appState.playState == RW)
-    addChannelButton.setEnabled(false);
+    addChannelButton->setEnabled(false);
   else
-    addChannelButton.setEnabled(true);
+    addChannelButton->setEnabled(true);
 
   for (int i = 0; i < channels.size(); i++)
     channels.at(i)->hydrateState(appState, i + 1);
@@ -79,7 +79,7 @@ void ChannelsContainer::addChannel() {
   const ChannelIndex channelIndex = channels.size() + 1;
 
   const auto channel = new Channel(
-    this, actorSystem, mixer, channelIndex, &removeChannelAction,
+    this, actorSystem, mixer, channelIndex, removeChannelAction,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction,
     &vuPtr[Audio::BfrIdx::VU::left(channelIndex)]
@@ -196,7 +196,7 @@ void ChannelsContainer::setChannels() {
 // }
 
 void ChannelsContainer::connectActions() {
-  auto addChannelConnection = connect(&addChannelAction, &QAction::triggered, [&]() {
+  auto addChannelConnection = connect(addChannelAction, &QAction::triggered, [&]() {
     Logging::write(
       Info,
       "Gui::ChannelsContainer::addChannelAction trig",
@@ -219,8 +219,8 @@ void ChannelsContainer::connectActions() {
     update();
   });
 
-  auto removeChannelConnection = connect(&removeChannelAction, &QAction::triggered, [&]() {
-    const int channelIdx = removeChannelAction.data().toInt();
+  auto removeChannelConnection = connect(removeChannelAction, &QAction::triggered, [&]() {
+    const int channelIdx = removeChannelAction->data().toInt();
     Logging::write(
       Info,
       "Gui::ChannelsContainer::removeChannelAction trig",
@@ -248,31 +248,31 @@ void ChannelsContainer::setStyle() {
   setStyleSheet(
     ("border-radius: 5px; background-color: " + Color::toHex(GjC::LIGHT_200)).data()
   );
-  channelsWidget.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
+  channelsWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
 }
 
 void ChannelsContainer::setupGrid() {
   setupChannelsScrollArea();
-  grid.addWidget(&addChannelButton, 0, 1, -1, 1);
+  grid->addWidget(addChannelButton, 0, 1, -1, 1);
   int col = 0;
   for (const auto& channel: channels) {
-    channelsGrid.addWidget(channel, 0, col, -1, 1);
+    channelsGrid->addWidget(channel, 0, col, -1, 1);
     col++;
   }
 }
 
 void ChannelsContainer::setupChannelsScrollArea() {
-  channelsScrollArea.setMinimumWidth(500);
-  channelsScrollArea.setMaximumWidth(1000);
-  grid.addWidget(&channelsScrollArea, 0, 0, -1, 1);
-  channelsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-  channelsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-  channelsScrollArea.setWidgetResizable(true);
-  channelsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  channelsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  channelsScrollArea.setLayoutDirection(Qt::LeftToRight);
-  channelsScrollArea.setWidget(&channelsWidget);
-  channelsWidget.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  channelsScrollArea->setMinimumWidth(500);
+  channelsScrollArea->setMaximumWidth(1000);
+  grid->addWidget(channelsScrollArea, 0, 0, -1, 1);
+  channelsScrollArea->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  channelsScrollArea->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  channelsScrollArea->setWidgetResizable(true);
+  channelsScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  channelsScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  channelsScrollArea->setLayoutDirection(Qt::LeftToRight);
+  channelsScrollArea->setWidget(channelsWidget);
+  channelsWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 }
 
 void ChannelsContainer::setMute(const ChannelIndex channelIdx, const float val) const {
@@ -319,3 +319,4 @@ void ChannelsContainer::setSoloR(const ChannelIndex channelIdx, const float val)
 } // Mixer
 } // Gui
 } // Gj
+ // Gj

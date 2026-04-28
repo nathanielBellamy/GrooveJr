@@ -1,14 +1,22 @@
-name: Test
+name: E2E
 
 on:
-  workflow_call:   # called by build.yml as a prerequisite
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      build_artifact_name:
+        description: Name of the uploaded GrooveJr app bundle artifact
+        required: true
+        type: string
 
 env:
   VST3_SDK_VERSION: "v3.7.12_build_20"
 
+permissions:
+  contents: read
+
 jobs:
-  test-macos:
+  e2e-macos-artifact:
+    if: ${{ github.event_name == 'workflow_call' }}
     runs-on: macos-14
     steps:
       - name: Checkout
@@ -42,7 +50,7 @@ jobs:
       - name: Configure CMake (tests enabled)
         run: |
           cd src && mkdir -p build && cd build
-          cmake -DCMAKE_BUILD_TYPE=Debug \
+          cmake -DCMAKE_BUILD_TYPE=Release \
                 -DGJ_BUILD_TESTS=ON \
                 -DGJ_ENABLE_ASAN=OFF \
                 -DGJ_BASE_DIR=${{ github.workspace }}/deps \
@@ -50,8 +58,9 @@ jobs:
                 -DCMAKE_PREFIX_PATH="$(brew --prefix qt)" \
                 ..
 
-      - name: Build test targets
-        run: cmake --build src/build --target gj_test_pure gj_test_db
+      - name: Build and Run E2E tests
+        run: |
+          cd src/build
+          cmake --build . --target gj_test_e2e
+          ctest -R gj_test_e2e --output-on-failure
 
-      - name: Run tests
-        run: cd src/build && ctest --output-on-failure

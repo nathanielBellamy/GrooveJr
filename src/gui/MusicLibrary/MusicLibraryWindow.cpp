@@ -31,8 +31,23 @@ MusicLibraryWindow::MusicLibraryWindow(
   , genreClearFilterButton(new QPushButton(this))
   , playlistHeader(new QLabel(this))
   , playlistClearFilterButton(new QPushButton(this)) {
+  setObjectName("musicLibraryWindow");
   createAndConnectTableViews(sqlWorkerPool);
   showAsMainSection(AUDIO_FILES_VIEW);
+
+  cacheButton->setObjectName("cacheButton");
+  filesButton->setObjectName("filesButton");
+  queueButton->setObjectName("queueButton");
+  filtersHeader->setObjectName("filtersHeader");
+  clearFiltersButton->setObjectName("clearFiltersButton");
+  albumHeader->setObjectName("albumHeader");
+  albumClearFilterButton->setObjectName("albumClearFilterButton");
+  artistHeader->setObjectName("artistHeader");
+  artistClearFilterButton->setObjectName("artistClearFilterButton");
+  genreHeader->setObjectName("genreHeader");
+  genreClearFilterButton->setObjectName("genreClearFilterButton");
+  playlistHeader->setObjectName("playlistHeader");
+  playlistClearFilterButton->setObjectName("playlistClearFilterButton");
 
   cacheButton->setCursor(Qt::PointingHandCursor);
   filesButton->setCursor(Qt::PointingHandCursor);
@@ -86,6 +101,14 @@ Result MusicLibraryWindow::createAndConnectTableViews(SqlWorkerPool* sqlWorkerPo
   playlistTableView = new PlaylistTableView(this, actorSystem, dao, stateCore, &filters, sqlWorkerPool);
   queueTableView = new QueueTableView(this, actorSystem, dao, stateCore, &filters, sqlWorkerPool);
 
+  albumTableView->setObjectName("albumTableView");
+  artistTableView->setObjectName("artistTableView");
+  audioFileTableView->setObjectName("audioFileTableView");
+  cacheTableView->setObjectName("cacheTableView");
+  genreTableView->setObjectName("genreTableView");
+  playlistTableView->setObjectName("playlistTableView");
+  queueTableView->setObjectName("queueTableView");
+
   sqlWorkerPool->connectClient(albumTableView->getModel());
   sqlWorkerPool->connectClient(artistTableView->getModel());
   sqlWorkerPool->connectClient(audioFileTableView->getModel());
@@ -103,14 +126,6 @@ MusicLibraryWindow::~MusicLibraryWindow() {
     "Gui::MusicLibraryWindow::~MusicLibraryWindow()",
     "Deleting MusicLibraryWindow"
   );
-
-  delete albumTableView;
-  delete artistTableView;
-  delete audioFileTableView;
-  delete cacheTableView;
-  delete genreTableView;
-  delete playlistTableView;
-  delete queueTableView;
 
   Logging::write(
     Info,

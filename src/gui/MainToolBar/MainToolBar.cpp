@@ -45,10 +45,6 @@ MainToolBar::MainToolBar(QWidget* parent, actor_system& sys, State::Core* stateC
 }
 
 MainToolBar::~MainToolBar() {
-  delete title;
-  delete currentlyPlaying;
-  delete transportControl;
-  delete eqGraph;
 }
 
 Result MainToolBar::hydrateState(const State::Packet& statePacket) const {
