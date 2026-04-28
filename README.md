@@ -88,7 +88,8 @@ prompting.
   `squishserver` and `squishrunner` available either on `PATH` or via a repo/org `SQUISH_PREFIX` variable that points
   at the Squish installation root
 - If the hosted runner does not already have Squish installed, the reusable E2E workflow can also download a
-  pre-extracted Squish archive when the caller inherits a `squish_archive_url` secret
+  pre-extracted Squish archive when the caller provides `SQUISH_ARCHIVE_URL` (preferred) or legacy
+  `squish_archive_url` as a secret or repo/org variable
 - The E2E workflow uploads a `squish-screen-recording-artifact` with captured UI frames and, when `ffmpeg` is
   installed on the runner, a `squish-screen-recording.mp4`
 

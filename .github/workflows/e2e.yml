@@ -8,6 +8,9 @@ on:
         required: true
         type: string
     secrets:
+      SQUISH_ARCHIVE_URL:
+        description: Download URL for a Squish archive containing bin/squishserver and bin/squishrunner
+        required: false
       squish_archive_url:
         description: Download URL for a Squish archive containing bin/squishserver and bin/squishrunner
         required: false
@@ -45,7 +48,8 @@ jobs:
       - name: Prepare Squish tools
         env:
           SQUISH_PREFIX: ${{ vars.SQUISH_PREFIX }}
-          SQUISH_ARCHIVE_URL: ${{ secrets.squish_archive_url }}
+          # Prefer explicit secrets first, then fall back to repo/org variables, while keeping the legacy lowercase name working.
+          SQUISH_ARCHIVE_URL: ${{ secrets.SQUISH_ARCHIVE_URL || secrets.squish_archive_url || vars.SQUISH_ARCHIVE_URL || vars.squish_archive_url }}
         run: ./lifecycle/_prepare_squish_tools.sh
 
       - name: Start Squish server
