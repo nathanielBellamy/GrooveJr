@@ -53,9 +53,9 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer::Core* mixer, Sta
 
 MainWindow::~MainWindow() {
   sqlWorkerPoolThread->quit();
-  sqlWorkerPoolThread->wait();
-  delete sqlWorkerPool;
-  delete sqlWorkerPoolThread;
+  // sqlWorkerPoolThread->wait();
+  // delete sqlWorkerPool;
+  // delete sqlWorkerPoolThread;
 }
 
 SqlWorkerPool* MainWindow::initQSql() {

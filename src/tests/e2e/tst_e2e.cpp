@@ -117,19 +117,6 @@ private slots:
   }
 
   void cleanupTestCase() {
-    delete mainWindow;
-    delete sys; // This destroys the actor system
-
-    delete Gj::mixer;
-    delete Gj::stateCore;
-    delete Gj::dao;
-    delete Gj::audioCore;
-
-    if (Gj::pluginContext) {
-      Gj::pluginContext->terminate();
-      PluginContextFactory::instance().setPluginContext(nullptr);
-      delete Gj::pluginContext;
-    }
   }
 
   void testMenuStructure() {

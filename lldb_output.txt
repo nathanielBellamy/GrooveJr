@@ -1,0 +1,10 @@
+(lldb) target create "./build/tests/gj_test_e2e"
+Current executable set to '/Users/ns/code/GrooveJr/build/tests/gj_test_e2e' (arm64).
+(lldb) run
+2026-04-28 08:32:20.499667-0700 gj_test_e2e[54605:13465399] [qt.test.enter] E2ETest::initTestCase()
+2026-04-28 08:32:21.281991-0700 gj_test_e2e[54605:13465399] [qt.test.pass] E2ETest::initTestCase()
+2026-04-28 08:32:21.282059-0700 gj_test_e2e[54605:13465399] [qt.test.enter] E2ETest::testMenuStructure()
+2026-04-28 08:32:21.282111-0700 gj_test_e2e[54605:13465399] [qt.test.pass] E2ETest::testMenuStructure()
+2026-04-28 08:32:21.282134-0700 gj_test_e2e[54605:13465399] [qt.test.enter] E2ETest::testMusicLibrarySections()
+2026-04-28 08:32:21.282192-0700 gj_test_e2e[54605:13465399] [qt.test.pass] E2ETest::testMusicLibrarySections()
+2026-04-28 08:32:21.282219-0700 gj_test_e2e[54605:13465399] [qt.test.enter] E2ETest::cleanupTestCase()
