@@ -127,14 +127,6 @@ MusicLibraryWindow::~MusicLibraryWindow() {
     "Deleting MusicLibraryWindow"
   );
 
-  delete albumTableView;
-  delete artistTableView;
-  delete audioFileTableView;
-  delete cacheTableView;
-  delete genreTableView;
-  delete playlistTableView;
-  delete queueTableView;
-
   Logging::write(
     Info,
     "Gui::MusicLibraryWindow::~MusicLibraryWindow()",

@@ -45,13 +45,6 @@ CurrentlyPlaying::CurrentlyPlaying(QWidget* parent, actor_system& actorSystem, A
 }
 
 CurrentlyPlaying::~CurrentlyPlaying() {
-  delete grid;
-  delete artistScrollArea;
-  delete artist;
-  delete albumScrollArea;
-  delete album;
-  delete trackScrollArea;
-  delete track;
 }
 
 

@@ -44,10 +44,7 @@ public:
     SqlQueryModel* model
   );
 
-  ~SqlTableView() override {
-    delete model;
-    QTableView::~QTableView();
-  }
+  ~SqlTableView() override {}
 
   SqlQueryModel* getModel() const {
     return model;

@@ -55,17 +55,6 @@ Body::Body(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer
 
 Body::~Body() {
   vuWorkerStop();
-
-  delete channelsContainer;
-  delete mainChannelContainer;
-  delete title;
-  delete grid;
-  delete soloRChannelAction;
-  delete soloLChannelAction;
-  delete soloChannelAction;
-  delete muteRChannelAction;
-  delete muteLChannelAction;
-  delete muteChannelAction;
 }
 
 Result Body::vuWorkerStart() {
@@ -73,8 +62,10 @@ Result Body::vuWorkerStart() {
   vuWorker = std::thread([this]() {
     vuWorkerRunning = true;
     while (!stopVuWorker) {
-      if (vuRingBuffer == nullptr)
+      if (vuRingBuffer == nullptr) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         continue;
+      }
 
       if (jack_ringbuffer_read_space(vuRingBuffer) > Audio::VU_RING_BUFFER_SIZE - 2) {
         jack_ringbuffer_read(
@@ -109,6 +100,9 @@ Result Body::vuWorkerStart() {
 
 Result Body::vuWorkerStop() {
   stopVuWorker.store(true);
+  if (vuWorker.joinable()) {
+    vuWorker.join();
+  }
   return OK;
 }
 

@@ -52,15 +52,8 @@ MainWindow::MainWindow(actor_system& actorSystem, Audio::Mixer::Core* mixer, Sta
 }
 
 MainWindow::~MainWindow() {
-  delete mixerBody;
-  delete musicLibraryWindow;
-  delete grid;
-  delete mainToolBar;
-  delete sceneLoadAction;
-  delete menuBar;
-  delete container;
-
   sqlWorkerPoolThread->quit();
+  sqlWorkerPoolThread->wait();
   delete sqlWorkerPool;
   delete sqlWorkerPoolThread;
 }

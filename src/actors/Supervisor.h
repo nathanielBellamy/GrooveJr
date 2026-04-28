@@ -72,10 +72,15 @@ struct SupervisorState {
     );
     appStateManagerPtr = actor_cast<strong_actor_ptr>(appStateManager);
 
-    constexpr int arg = 0;
-    int argc = arg;
-    char* argv[0] = {};
-    auto qtApp = new QApplication{argc, argv};
+    QApplication* qtApp = qobject_cast<QApplication*>(QApplication::instance());
+    bool createdApp = false;
+    if (!qtApp) {
+      constexpr int arg = 0;
+      static int argc = arg;
+      static char* argv[1] = {nullptr};
+      qtApp = new QApplication{argc, argv};
+      createdApp = true;
+    }
     qtApp->setWindowIcon(QIcon(":/icons/GrooveJr.png"));
     auto display = self->system().spawn(
       actor_from_state<DisplayState>,
@@ -99,19 +104,9 @@ struct SupervisorState {
       hydrate_display_a_v
     );
 
-    // NOTE:
-    // - QApplication::exec: Must be called from the main thread
-    // - *** Assertion failure in -[NSMenu _setMenuName:], NSMenu.m:777
-    //    *** Terminating app due to uncaught exception 'NSInternalInconsistencyException',
-    //    reason: 'API misuse: setting the main menu on a non-main thread.
-    //    Main menu contents should only be modified from the main thread.'
-    // - so no starting the QApp in the under the Display Actor
-    // - if ever we need more control:
-    // while (true) {
-    //   qtApp->processEvents();
-    //   std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    // }
-    qtApp->exec();
+    if (createdApp) {
+      qtApp->exec();
+    }
   }
 
   Supervisor::behavior_type make_behavior() {
