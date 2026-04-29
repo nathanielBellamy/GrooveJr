@@ -3,6 +3,7 @@
 //
 
 #include "Scenes.h"
+#include <QApplication>
 
 namespace Gj {
 namespace Gui {
@@ -15,6 +16,7 @@ Scenes::Scenes(
   QAction* sceneLoadAction)
 : QWidget(parent)
   , sys(sys)
+  , stateCore(stateCore)
   , mixer(mixer)
   , grid(new QGridLayout(this))
   , title(new QLabel(this))
@@ -88,9 +90,15 @@ void Scenes::connectActions() {
     if (!stateCore->audioRunning.load()) {
       mixer->saveScene();
     } else {
+      bool expected = false;
+      std::cout << "will save sceneId: " << stateCore->scene.load().id << std::endl;
       stateCore->requestingSceneSave.store(true);
-      while (stateCore->requestingSceneSave.load())
+      while (stateCore->requestingSceneSave.load()) {
+        std::cout << "waiting for scene save... " << std::endl;
+        QApplication::processEvents();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      }
+      std::cout << "scene saved: " << stateCore->scene.load().id << std::endl;
     }
     Logging::write(
       Info,

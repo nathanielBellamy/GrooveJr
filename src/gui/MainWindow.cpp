@@ -118,7 +118,7 @@ void MainWindow::closeEvent(QCloseEvent* e) {
   shutdown_handler(3);
 }
 
-void MainWindow::setChannels() {
+void MainWindow::setChannels() const {
   Logging::write(
     Info,
     "Gui::MainWindow::setChannels",
@@ -148,10 +148,13 @@ void MainWindow::connectActions() {
         mixer->loadScene(sceneDbId_ToLoad);
       } else {
         stateCore->requestSceneLoadById(sceneDbId_ToLoad);
-        while (stateCore->sceneIdToLoad.load() != 0)
+        while (stateCore->sceneIdToLoad.load() != 0) {
+          QApplication::processEvents();
           std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
       }
       setChannels();
+      hydrateState(stateCore->toPacket(mixer->toPacket()));
 
       Logging::write(
         Info,

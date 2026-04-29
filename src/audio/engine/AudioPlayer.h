@@ -610,7 +610,7 @@ struct AudioPlayer {
       return;
     }
     jackClientIsActive = false;
-    std::this_thread::sleep_for(std::chrono::milliseconds(50)); // let jack cleanup
+    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // let jack cleanup
   }
 };
 } // Audio
