@@ -40,6 +40,7 @@ struct Core {
   std::atomic<Audio::CoreShadow> audioCoreShadow;
   std::atomic<bool> requestingDeckUpdate = false;
   std::atomic<ID> sceneIdToLoad = 0;
+  std::atomic<bool> requestingSceneSave = false;
 
 
   Core();

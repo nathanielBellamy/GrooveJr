@@ -85,11 +85,17 @@ void Scenes::connectActions() {
   });
 
   const auto saveSceneConnection = connect(sceneSaveAction, &QAction::triggered, [&] {
-    const auto sceneDbId = mixer->saveScene();
+    if (!stateCore->audioRunning.load()) {
+      mixer->saveScene();
+    } else {
+      stateCore->requestingSceneSave.store(true);
+      while (stateCore->requestingSceneSave.load())
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
     Logging::write(
       Info,
       "Gui::Scenes::sceneSaveAction",
-      "Saved scene id: " + std::to_string(sceneDbId)
+      "Saved scene"
     );
     tableView->refresh(true);
   });

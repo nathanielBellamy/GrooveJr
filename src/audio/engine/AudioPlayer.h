@@ -504,16 +504,25 @@ struct AudioPlayer {
         stateCore->audioCoreShadow.store(audioCoreShadow);
       }
 
+      const bool stateCoreWasRequestingSceneSave = stateCore->requestingSceneSave.load();
+      if (stateCoreWasRequestingSceneSave) {
+        deactivateJackClient();
+        clearMixerChannelsProcessData();
+        if (mixer->saveScene() != OK)
+          Logging::write(Error, "Audio::AudioPlayer::run", "Unable to save scene.");
+        setupAudioCore();
+        stateCore->requestingSceneSave.store(false);
+        activateJackClient();
+      }
+
       const ID sceneIdToLoad = stateCore->sceneIdToLoad.load();
       const bool stateCoreWasRequestingUpdate_Scene = sceneIdToLoad != 0;
       if (stateCoreWasRequestingUpdate_Scene) {
         deactivateJackClient();
         clearMixerChannelsProcessData();
         if (mixer->loadScene(sceneIdToLoad) != OK)
-          Logging::write(Info, "Audio::AudioPlayer::run", "Unable to Load Scene " + std::to_string(sceneIdToLoad));
+          Logging::write(Error, "Audio::AudioPlayer::run", "Unable to Load Scene " + std::to_string(sceneIdToLoad));
         setupAudioCore();
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
         stateCore->sceneIdToLoad.store(0);
         activateJackClient();
       }
@@ -533,7 +542,8 @@ struct AudioPlayer {
                                                                       std::memory_order_relaxed));
       }
 
-      if (stateCoreWasRequestingUpdate_Deck || stateCoreWasRequestingUpdate_Scene || audioCoreUpdatedDeckIndex) {
+      if (stateCoreWasRequestingUpdate_Deck || stateCoreWasRequestingUpdate_Scene || stateCoreWasRequestingSceneSave ||
+          audioCoreUpdatedDeckIndex) {
         const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
         if (!appStateManagerPtr) {
           Logging::write(Error, "Audio::AudioPlayer", "AppStateManager actor is not available.");
