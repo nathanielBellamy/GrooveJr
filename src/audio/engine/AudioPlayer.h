@@ -491,10 +491,6 @@ struct AudioPlayer {
 
 
     while (continueRun()) {
-      // std::cout << "audioplayer run playb " << audioCore->playbackBuffers[0][100] << std::endl;
-      // std::cout << "audioplayer run proce " << audioCore->processBuffers[0][100] << std::endl << std::endl;
-      // std::cout << "audioplayer run fxcha " << audioCore->mixerChannelsChannelsWriteOut[1][0][50] << std::endl << std::endl;
-
       const bool audioCoreUpdatedDeckIndex = prevDeckIndex != currentDeckIndex;
       if (audioCoreUpdatedDeckIndex) {
         prevDeckIndex = currentDeckIndex;

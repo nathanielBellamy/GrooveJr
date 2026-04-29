@@ -61,7 +61,6 @@ struct Core {
   void setFromEntityAndScene(const Db::AppStateEntity& appStateEntity, const Db::Scene& newScene) {
     id.store(appStateEntity.id);
     audioFramesPerBuffer.store(appStateEntity.audioFramesPerBuffer);
-    playState.store(STOP);
     crossfade.store(appStateEntity.crossfade);
     scene.store(newScene);
   };
