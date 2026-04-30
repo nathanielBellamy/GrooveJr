@@ -19,7 +19,7 @@ void AddPluginButton::mousePressEvent(QMouseEvent* event) {
 
 void AddPluginButton::setStyle() {
   setCursor(Qt::PointingHandCursor);
-  setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
   setStyleSheet(
     ("min-width: 20px; min-height: 20px; max-height: 20px; background-color: " + Color::toHex(GjC::DARK_400)).data()
   );
