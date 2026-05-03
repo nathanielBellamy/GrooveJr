@@ -411,7 +411,7 @@ struct AppStateManagerState {
 
         stateCore->queuePlay = queuePlay;
         std::optional<Db::DecoratedAudioFile> decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT];
-        for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
+        for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; ++i) {
           const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
               dao->audioFileRepository.findDecoratedAudioFileById(decksState.audioFileIds[i]);
           if (!decoratedAudioFile)
@@ -429,7 +429,6 @@ struct AppStateManagerState {
         } else {
           directDeckUpdate(decksState, decoratedAudioFiles);
         }
-
 
         self->anon_send(
           actor_cast<actor>(playback),
@@ -451,6 +450,7 @@ struct AppStateManagerState {
       audioCoreShadow.decks[deckIndex] = {
         deckIndex,
         deckIndex == decksState.currentDeckIdx ? PLAY : STOP,
+        0,
         decoratedAudioFiles[deckIndex]
       };
     }

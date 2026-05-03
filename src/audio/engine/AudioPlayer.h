@@ -501,16 +501,8 @@ struct AudioPlayer {
 
     activateJackClient();
 
-
     while (continueRun()) {
-      const bool audioCoreUpdatedDeckIndex = prevDeckIndex != currentDeckIndex;
-      if (audioCoreUpdatedDeckIndex) {
-        prevDeckIndex = currentDeckIndex;
-        auto audioCoreShadow = stateCore->audioCoreShadow.load();
-        audioCoreShadow.deckIndex = currentDeckIndex;
-        stateCore->setCurrentlyPlaying(audioCoreShadow.decks[currentDeckIndex].decoratedAudioFile.value());
-        stateCore->audioCoreShadow.store(audioCoreShadow);
-      }
+      const bool audioCoreUpdatedDeckIndex = updateStateCoreAudioCoreShadow();
 
       const bool stateCoreWasRequestingSceneSave = stateCore->requestingSceneSave.load();
       if (stateCoreWasRequestingSceneSave) {
@@ -592,6 +584,41 @@ struct AudioPlayer {
 
     return OK;
   };
+
+  bool updateStateCoreAudioCoreShadow() {
+    if (const bool audioCoreUpdatedDeckIndex = prevDeckIndex != currentDeckIndex; !audioCoreUpdatedDeckIndex)
+      return false;
+    auto audioCoreShadow = stateCore->audioCoreShadow.load();
+    audioCoreShadow.deckIndex = currentDeckIndex;
+
+    for (int i = 0; i < AUDIO_CORE_DECK_COUNT; ++i) {
+      audioCoreShadow.decks[i].playState = intToPs(decksStateBuffer[BfrIdx::DecksState::deckPlayState(i)]);
+      audioCoreShadow.decks[i].frameId = decksStateBuffer[BfrIdx::DecksState::deckCurrentFrameId(i)];
+    }
+
+    const auto distantDeckIndex = getDistantDeckIndex();
+
+    // audioCore->updateDistantDeckIndex(distantDeckIndex);
+
+
+    stateCore->setCurrentlyPlaying(audioCoreShadow.decks[currentDeckIndex].decoratedAudioFile.value());
+    stateCore->audioCoreShadow.store(audioCoreShadow);
+
+    prevDeckIndex = currentDeckIndex;
+    return true;
+  }
+
+  DeckIndex getDistantDeckIndex() {
+    // TODO: generalize this
+    if (prevDeckIndex == 1 && currentDeckIndex == 2)
+      return 0;
+    if (prevDeckIndex == 2 && currentDeckIndex == 0)
+      return 1;
+    if (prevDeckIndex == 0 && currentDeckIndex == 1)
+      return 2;
+
+    return 0;
+  }
 
   void activateJackClient() {
     if (jackClient->activate(audioCore) != OK) {

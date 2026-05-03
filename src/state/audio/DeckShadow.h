@@ -18,6 +18,7 @@ namespace Audio {
 struct DeckShadow {
   DeckIndex deckIndex = 0;
   PlayState playState = STOP;
+  FrameID frameId = 0;
   std::optional<Db::DecoratedAudioFile> decoratedAudioFile;
 };
 } // Audio

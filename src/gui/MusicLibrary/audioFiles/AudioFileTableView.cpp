@@ -76,14 +76,14 @@ void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent* event) {
     const SqlQueryModel* model = getModel();
     const int clickedRow = clickedIndex.row();
     DecksState decksState;
-    if (clickedRow < 1) {
-      decksState.currentDeckIdx = 0;
-      for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++)
-        decksState.audioFileIds[i] = model->index(clickedRow + i, AUDIO_FILE_COL_ID).data().toULongLong();
-    } else {
-      decksState.currentDeckIdx = 1;
-      for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++)
-        decksState.audioFileIds[i] = model->index(clickedRow + i - 1, AUDIO_FILE_COL_ID).data().toULongLong();
+    decksState.currentDeckIdx = 1;
+    for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; ++i) {
+      const auto index = clickedRow + i - 1;
+      QModelIndex modelIndex = model->index(index, AUDIO_FILE_COL_ID);
+      if (!modelIndex.isValid())
+        decksState.audioFileIds[i] = 0;
+      else
+        decksState.audioFileIds[i] = modelIndex.data().toULongLong();
     }
 
     if (saveCache() == ERROR) {
