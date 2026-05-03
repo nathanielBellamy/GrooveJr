@@ -45,6 +45,8 @@ struct AudioPlayer {
 
   sf_count_t playbackSettingsFromAudioThread[BfrIdx::PSFAT::SIZE]{};
 
+  DeckIndex decksStateBuffer[BfrIdx::DecksState::BUFFER_SIZE]{};
+
   float fft_eq_buffer[FFT_EQ_RING_BUFFER_SIZE]{};
 
   jack_ringbuffer_t* fft_eq_ring_buffer_out;
@@ -304,7 +306,16 @@ struct AudioPlayer {
         reinterpret_cast<char*>(playbackSettingsFromAudioThread),
         BfrIdx::PSFAT::RB_SIZE
       );
-      currentDeckIndex = playbackSettingsFromAudioThread[BfrIdx::PSFAT::AUDIO_CORE_DECK_INDEX];
+    }
+
+    // read decksStateRB
+    if (jack_ringbuffer_read_space(audioCore->decksStateRB) > BfrIdx::DecksState::RING_BUFFER_SIZE - 2) {
+      jack_ringbuffer_read(
+        audioCore->decksStateRB,
+        reinterpret_cast<char*>(decksStateBuffer),
+        BfrIdx::DecksState::RING_BUFFER_SIZE
+      );
+      currentDeckIndex = decksStateBuffer[BfrIdx::DecksState::DECK_INDEX];
     }
 
     if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > BfrIdx::MixerChannel::ProcessData::RB_SIZE
@@ -317,7 +328,7 @@ struct AudioPlayer {
 
     // std::cout << " DEBUG VALUE FROM AUDIO THREAD " << playbackSettingsFromAudioThread[BfrIdx::PSFAT::DEBUG_VALUE] <<
     //     std::endl;
-    const sf_count_t currentFrameId = playbackSettingsFromAudioThread[BfrIdx::PSFAT::CURRENT_FRAME_ID];
+    const auto currentFrameId = decksStateBuffer[BfrIdx::DecksState::deckCurrentFrameId(currentDeckIndex)];
     mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, currentFrameId);
 
     playbackSettingsToAudioThread[BfrIdx::PSTAT::USER_SETTING_FRAME_ID_FLAG] = 0;
@@ -469,6 +480,7 @@ struct AudioPlayer {
     vu_ring_buffer_out = jack_ringbuffer_create(VU_RING_BUFFER_SIZE);
     mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
 
+
     return OK;
   }
 
@@ -531,8 +543,8 @@ struct AudioPlayer {
           audioCore->deckIndex = audioCoreShadow.deckIndex;
           audioCore->deckIndexNext = audioCoreShadow.deckIndexNext;
           audioCore->addCassetteFromDecoratedAudioFile(decoratedAudioFile.value());
-          activateJackClient();
         }
+        activateJackClient();
         while (!stateCore->requestingDeckUpdate.compare_exchange_weak(stateCoreWasRequestingUpdate_Deck, false,
                                                                       std::memory_order_release,
                                                                       std::memory_order_relaxed));

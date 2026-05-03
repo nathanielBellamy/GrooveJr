@@ -460,8 +460,20 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
 
   audioCore->updateDeckIndexToNext();
 
-  audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::AUDIO_CORE_DECK_INDEX] = audioCore->deckIndex;
-  audioCore->playbackSettingsFromAudioThread[BfrIdx::PSFAT::AUDIO_CORE_DECK_INDEX_NEXT] = audioCore->deckIndexNext;
+  audioCore->decksStateBuffer[BfrIdx::DecksState::DECK_INDEX] = audioCore->deckIndex;
+  audioCore->decksStateBuffer[BfrIdx::DecksState::DECK_INDEX_NEXT] = audioCore->deckIndexNext;
+  for (int i = 0; i < AUDIO_CORE_DECK_COUNT; ++i) {
+    audioCore->decksStateBuffer[BfrIdx::DecksState::deckPlayState(i)] = audioCore->decks[i].playState;
+    audioCore->decksStateBuffer[BfrIdx::DecksState::deckCurrentFrameId(i)] = audioCore->decks[i].frameId;
+  }
+
+  if (jack_ringbuffer_write_space(audioCore->decksStateRB) > BfrIdx::DecksState::RING_BUFFER_SIZE - 2) {
+    jack_ringbuffer_write(
+      audioCore->decksStateRB,
+      reinterpret_cast<char*>(audioCore->decksStateBuffer),
+      BfrIdx::DecksState::RING_BUFFER_SIZE
+    );
+  }
 
   return 0;
 }
@@ -692,7 +704,6 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
       FFT_EQ_RING_BUFFER_SIZE
     );
   }
-
 
   return kJackSuccess;
 }

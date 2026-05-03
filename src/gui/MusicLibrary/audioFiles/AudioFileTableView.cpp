@@ -6,7 +6,6 @@
 
 namespace Gj {
 namespace Gui {
-
 void AudioFileTableView::mousePressEvent(QMouseEvent* event) {
   if (event->button() == Qt::RightButton) {
     if (const QModelIndex index = indexAt(event->pos()); index.isValid()) {
@@ -72,21 +71,19 @@ Result AudioFileTableView::saveCache() const {
   return OK;
 }
 
-void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent *event) {
+void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent* event) {
   if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {
     const SqlQueryModel* model = getModel();
     const int clickedRow = clickedIndex.row();
     DecksState decksState;
     if (clickedRow < 1) {
       decksState.currentDeckIdx = 0;
-      for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
+      for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++)
         decksState.audioFileIds[i] = model->index(clickedRow + i, AUDIO_FILE_COL_ID).data().toULongLong();
-      }
     } else {
       decksState.currentDeckIdx = 1;
-      for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
+      for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++)
         decksState.audioFileIds[i] = model->index(clickedRow + i - 1, AUDIO_FILE_COL_ID).data().toULongLong();
-      }
     }
 
     if (saveCache() == ERROR) {
@@ -99,7 +96,7 @@ void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent *event) {
     }
 
     if (stateCore->getCurrentlyPlaying().audioFile.id == decksState.audioFileIds[decksState.currentDeckIdx]
-          && !stateCore->queuePlay)
+        && !stateCore->queuePlay)
       return;
 
     const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
@@ -111,15 +108,14 @@ void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent *event) {
       );
       return;
     }
-    const scoped_actor self{ actorSystem };
+    const scoped_actor self{actorSystem};
     self->anon_send(
-        actor_cast<actor>(appStateManagerPtr),
-        false, // queuePlay
-        decksState,
-        tc_trig_play_file_a_v
+      actor_cast<actor>(appStateManagerPtr),
+      false, // queuePlay
+      decksState,
+      tc_trig_play_file_a_v
     );
   }
 };
-
 } // Gui
 } // Gj
