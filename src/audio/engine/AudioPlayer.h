@@ -598,7 +598,7 @@ struct AudioPlayer {
 
     const auto distantDeckIndex = getDistantDeckIndex();
 
-    const auto oldCacheTrackNumber = stateCore->cacheIndex.load();
+    const auto oldCacheTrackNumber = stateCore->cacheTrackNumber.load();
     const auto newCacheTrackNumber = oldCacheTrackNumber + 1; // TODO: handle reverse
     const auto cacheSize = stateCore->cacheSize.load();
 
@@ -632,15 +632,13 @@ struct AudioPlayer {
           );
         } else {
           audioCore->addCassetteFromDecoratedAudioFileAtIdx(decoratedAudioFile.value(), distantDeckIndex);
+          audioCoreShadow.decks[distantDeckIndex].decoratedAudioFile = decoratedAudioFile;
         }
       }
     }
 
-    // audioCore->updateDistantDeckIndex(distantDeckIndex);
-
-    stateCore->cacheIndex.store(stateCore->cacheIndex.load() + 1);
-
     stateCore->setCurrentlyPlaying(audioCoreShadow.decks[currentDeckIndex].decoratedAudioFile.value());
+    stateCore->cacheTrackNumber.store(newCacheTrackNumber);
     stateCore->audioCoreShadow.store(audioCoreShadow);
 
     prevDeckIndex = currentDeckIndex;
