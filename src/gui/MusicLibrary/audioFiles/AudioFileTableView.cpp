@@ -46,10 +46,10 @@ void AudioFileTableView::mousePressEvent(QMouseEvent* event) {
 
 Result AudioFileTableView::saveCache() const {
   std::vector<Db::Cache> caches;
-  int i = 0;
+  TrackNumber i = 0;
   while (model->index(i, AUDIO_FILE_COL_ID).isValid()) {
     const auto audioFileId = model->index(i, AUDIO_FILE_COL_ID).data().toULongLong();
-    const Db::Cache cache(audioFileId);
+    const Db::Cache cache(i, audioFileId);
     caches.push_back(cache);
     i++;
   }

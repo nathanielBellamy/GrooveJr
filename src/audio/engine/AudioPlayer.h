@@ -598,8 +598,47 @@ struct AudioPlayer {
 
     const auto distantDeckIndex = getDistantDeckIndex();
 
+    const auto oldCacheTrackNumber = stateCore->cacheIndex.load();
+    const auto newCacheTrackNumber = oldCacheTrackNumber + 1; // TODO: handle reverse
+    const auto cacheSize = stateCore->cacheSize.load();
+
+    if (newCacheTrackNumber == cacheSize) {
+      stateCore->playState = STOP;
+    } else {
+      const std::optional<ID> newAudioFileIdForDistantDeckIndex = mixer->dao->cacheRepository.
+          findAudioFileIdByTrackNumber(
+            newCacheTrackNumber + 1);
+      if (decksStateBuffer[BfrIdx::DecksState::deckPlayState(distantDeckIndex)] != STOP) {
+        Logging::write(
+          Error,
+          "Audio::AudioPlayer::updateStateCoreAudioCoreShadow",
+          "Attempting to update deck still in use."
+        );
+      } else if (!newAudioFileIdForDistantDeckIndex) {
+        Logging::write(
+          Error,
+          "Audio::AudioPlayer::updateStateCoreAudioCoreShadow",
+          "Unable to find AudioFileID for cache trackNumber: " + std::to_string(newCacheTrackNumber)
+        );
+      } else {
+        const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
+            mixer->dao->audioFileRepository.findDecoratedAudioFileById(newAudioFileIdForDistantDeckIndex.value());
+        if (!decoratedAudioFile) {
+          Logging::write(
+            Error,
+            "Audio::AudioPlayer::updateStateCoreAudioCoreShadow",
+            "Unable to load DecoratedAudioFile for AudioFileID: " + std::to_string(
+              newAudioFileIdForDistantDeckIndex.value())
+          );
+        } else {
+          audioCore->addCassetteFromDecoratedAudioFileAtIdx(decoratedAudioFile.value(), distantDeckIndex);
+        }
+      }
+    }
+
     // audioCore->updateDistantDeckIndex(distantDeckIndex);
 
+    stateCore->cacheIndex.store(stateCore->cacheIndex.load() + 1);
 
     stateCore->setCurrentlyPlaying(audioCoreShadow.decks[currentDeckIndex].decoratedAudioFile.value());
     stateCore->audioCoreShadow.store(audioCoreShadow);

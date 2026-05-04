@@ -9,22 +9,27 @@
 
 namespace Gj {
 namespace Db {
-
 struct Cache {
   ID id;
+  TrackNumber trackNumber;
   ID audioFileId;
 
   Cache(const ID id, const ID audioFileId)
-    : id(id)
+  : id(id)
+    , audioFileId(audioFileId) {
+  }
+
+  Cache(const ID id, const ID audioFileId, const TrackNumber trackNumber)
+  : id(id)
     , audioFileId(audioFileId)
-    {}
+    , trackNumber(trackNumber) {
+  }
 
   Cache(const ID audioFileId)
-    : id(0)
-    , audioFileId(audioFileId)
-    {}
+  : id(0)
+    , audioFileId(audioFileId) {
+  }
 };
-
 } // Db
 } // Gj
 

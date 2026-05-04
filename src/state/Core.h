@@ -35,6 +35,8 @@ struct Core {
   std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
   std::atomic<bool> queuePlay = false;
   std::atomic<TrackNumber> queueIndex = 0;
+  std::atomic<TrackNumber> cacheIndex = 0;
+  std::atomic<TrackNumber> cacheSize = 0;
   std::atomic<bool> userSettingFrameId = false;
   std::atomic<sf_count_t> frameId = 0;
   std::atomic<Audio::CoreShadow> audioCoreShadow;
