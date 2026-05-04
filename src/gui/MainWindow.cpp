@@ -118,7 +118,7 @@ void MainWindow::closeEvent(QCloseEvent* e) {
   shutdown_handler(3);
 }
 
-void MainWindow::setChannels() {
+void MainWindow::setChannels() const {
   Logging::write(
     Info,
     "Gui::MainWindow::setChannels",
@@ -134,46 +134,32 @@ void MainWindow::setChannels() {
   );
 }
 
-// void MainWindow::setPlugins() {
-//   Logging::write(
-//     Info,
-//     "Gui::MainWindow::setPlugins",
-//     "Setting plugins."
-//   );
-//
-//   // mixerWindow.setPlugins();
-//
-//   const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-//   const scoped_actor self{actorSystem};
-//   self->anon_send(
-//     actor_cast<actor>(appStateManagerPtr),
-//     hydrate_display_a_v
-//   );
-//
-//   Logging::write(
-//     Info,
-//     "Gui::MainWindow::setPlugins",
-//     "Done setting plugins."
-//   );
-// }
-
 void MainWindow::connectActions() {
   const auto sceneLoadConnection = connect(sceneLoadAction, &QAction::triggered, [&] {
-    if (const int sceneDbId = sceneLoadAction->data().toULongLong(); stateCore->getSceneDbId() != sceneDbId) {
+    if (const ID sceneDbId_ToLoad = sceneLoadAction->data().toULongLong();
+      stateCore->getSceneDbId() != sceneDbId_ToLoad) {
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",
-        "Loading sceneId: " + std::to_string(sceneDbId)
+        "Loading sceneId: " + std::to_string(sceneDbId_ToLoad)
       );
 
-      mixer->loadScene(sceneDbId);
+      if (!stateCore->audioRunning.load()) {
+        mixer->loadScene(sceneDbId_ToLoad);
+      } else {
+        stateCore->requestSceneLoadById(sceneDbId_ToLoad);
+        while (stateCore->sceneIdToLoad.load() != 0) {
+          QApplication::processEvents();
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+      }
       setChannels();
-      // setPlugins();
+      hydrateState(stateCore->toPacket(mixer->toPacket()));
 
       Logging::write(
         Info,
         "Gui::MainWindow::sceneLoadAction",
-        "Done loading sceneId: " + std::to_string(sceneDbId)
+        "Done loading sceneId: " + std::to_string(sceneDbId_ToLoad)
       );
     }
   });

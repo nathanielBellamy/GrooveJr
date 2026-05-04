@@ -291,7 +291,7 @@ Result JackClient::activateAndConnectPorts() const {
   // connect ports after activating client!
   if (
     const int connectStatusL = jack_connect(jackClient, jack_port_name(outPortL), "system:playback_1");
-    connectStatusL != 0
+    connectStatusL != 0 && connectStatusL != EEXIST
   ) {
     Logging::write(
       Error,
@@ -303,7 +303,7 @@ Result JackClient::activateAndConnectPorts() const {
 
   if (
     const int connectStatusR = jack_connect(jackClient, jack_port_name(outPortR), "system:playback_2");
-    connectStatusR != 0
+    connectStatusR != 0 && connectStatusR != EEXIST
   ) {
     Logging::write(
       Error,
@@ -456,6 +456,23 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
     }
     if (currentDeck.frameId < 4 * nframes)
       audioCore->deckIndexNext = prevDeckIndex;
+  }
+
+  audioCore->updateDeckIndexToNext();
+
+  audioCore->decksStateBuffer[BfrIdx::DecksState::DECK_INDEX] = audioCore->deckIndex;
+  audioCore->decksStateBuffer[BfrIdx::DecksState::DECK_INDEX_NEXT] = audioCore->deckIndexNext;
+  for (int i = 0; i < AUDIO_CORE_DECK_COUNT; ++i) {
+    audioCore->decksStateBuffer[BfrIdx::DecksState::deckPlayState(i)] = audioCore->decks[i].playState;
+    audioCore->decksStateBuffer[BfrIdx::DecksState::deckCurrentFrameId(i)] = audioCore->decks[i].frameId;
+  }
+
+  if (jack_ringbuffer_write_space(audioCore->decksStateRB) > BfrIdx::DecksState::RING_BUFFER_SIZE - 2) {
+    jack_ringbuffer_write(
+      audioCore->decksStateRB,
+      reinterpret_cast<char*>(audioCore->decksStateBuffer),
+      BfrIdx::DecksState::RING_BUFFER_SIZE
+    );
   }
 
   return 0;
@@ -687,7 +704,6 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
       FFT_EQ_RING_BUFFER_SIZE
     );
   }
-
 
   return kJackSuccess;
 }

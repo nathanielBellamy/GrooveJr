@@ -23,7 +23,6 @@
 namespace Gj {
 namespace Audio {
 struct AudioCore {
-  long threadId;
   State::Core* stateCore;
   sf_count_t crossfade = 0;
   AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0, stateCore), AudioDeck(1, stateCore), AudioDeck(2, stateCore)};
@@ -69,14 +68,18 @@ struct AudioCore {
   float mixerChannelsWriteOutBuffer[AUDIO_CHANNEL_COUNT * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_MIXER_CHANNELS]{};
   float* mixerChannelsWriteOut[MAX_MIXER_CHANNELS][AUDIO_CHANNEL_COUNT]{};
 
-  AudioCore(State::Core* stateCore)
+  DeckIndex decksStateBuffer[BfrIdx::DecksState::BUFFER_SIZE];
+  jack_ringbuffer_t* decksStateRB{nullptr};
+
+  explicit AudioCore(State::Core* stateCore)
   : stateCore(stateCore)
     , fft_eq_ring_buffer(jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE))
     , vu_ring_buffer(jack_ringbuffer_create(VU_RING_BUFFER_SIZE))
     , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(BfrIdx::PSTAT::RB_SIZE))
     , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(BfrIdx::PSFAT::RB_SIZE))
     , mixerChannelsProcessDataRB(jack_ringbuffer_create(BfrIdx::MixerChannel::ProcessData::RB_SIZE))
-    , mixerChannelsSettingsRB(jack_ringbuffer_create(BfrIdx::MixerChannel::Settings::RB_SIZE)) {
+    , mixerChannelsSettingsRB(jack_ringbuffer_create(BfrIdx::MixerChannel::Settings::RB_SIZE))
+    , decksStateRB(jack_ringbuffer_create(BfrIdx::DecksState::RING_BUFFER_SIZE)) {
     Logging::write(
       Info,
       "Audio::AudioCore::AudioCore()",
@@ -98,11 +101,13 @@ struct AudioCore {
     fftwf_destroy_plan(fft_pv_plan_r2c);
     fftwf_destroy_plan(fft_pv_plan_c2r);
 
-    jack_ringbuffer_free(fft_eq_ring_buffer);
-    jack_ringbuffer_free(vu_ring_buffer);
+    jack_ringbuffer_free(decksStateRB);
     jack_ringbuffer_free(mixerChannelsSettingsRB);
-    jack_ringbuffer_free(playbackSettingsToAudioThreadRB);
+    jack_ringbuffer_free(mixerChannelsProcessDataRB);
     jack_ringbuffer_free(playbackSettingsFromAudioThreadRB);
+    jack_ringbuffer_free(playbackSettingsToAudioThreadRB);
+    jack_ringbuffer_free(vu_ring_buffer);
+    jack_ringbuffer_free(fft_eq_ring_buffer);
 
     Logging::write(
       Info,
@@ -286,9 +291,9 @@ struct AudioCore {
       "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
       filePath
     );
-    const DeckIndex nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
-    deckIndex = nextDeckIndex;
-    deckIndexNext = nextDeckIndex;
+    // const DeckIndex nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    // deckIndex = nextDeckIndex;
+    // deckIndexNext = nextDeckIndex;
     if (decks[deckIndex].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
       Logging::write(
         Error,
@@ -345,7 +350,7 @@ struct AudioCore {
     return OK;
   }
 
-  bool shouldUpdateDeckIndex() {
+  bool shouldUpdateDeckIndex() const {
     return deckIndex != deckIndexNext;
   }
 
@@ -358,12 +363,12 @@ struct AudioCore {
 
     decks[deckIndex].playState = STOP;
     if (decks[deckIndexNext].decoratedAudioFile) {
-      stateCore->setCurrentlyPlaying(decks[deckIndexNext].decoratedAudioFile.value());
       decks[deckIndexNext].playState = PLAY;
     } else {
       decks[deckIndexNext].playState = STOP;
     }
     deckIndex = deckIndexNext;
+
     return OK;
   }
 

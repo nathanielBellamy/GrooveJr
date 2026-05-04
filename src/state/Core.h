@@ -18,6 +18,7 @@
 #include "../db/dto/musicLibrary/DecoratedAudioFile.h"
 #include "../types/Types.h"
 #include "../types/AtomicStr.h"
+#include "./audio/CoreShadow.h"
 
 #include "Packet.h"
 #include "mixer/Packet.h"
@@ -34,8 +35,15 @@ struct Core {
   std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
   std::atomic<bool> queuePlay = false;
   std::atomic<TrackNumber> queueIndex = 0;
+  std::atomic<TrackNumber> cacheTrackNumber = 0;
+  std::atomic<TrackNumber> cacheSize = 0;
   std::atomic<bool> userSettingFrameId = false;
   std::atomic<sf_count_t> frameId = 0;
+  std::atomic<Audio::CoreShadow> audioCoreShadow;
+  std::atomic<bool> requestingDeckUpdate = false;
+  std::atomic<ID> sceneIdToLoad = 0;
+  std::atomic<bool> requestingSceneSave = false;
+
 
   Core();
 
@@ -55,7 +63,6 @@ struct Core {
   void setFromEntityAndScene(const Db::AppStateEntity& appStateEntity, const Db::Scene& newScene) {
     id.store(appStateEntity.id);
     audioFramesPerBuffer.store(appStateEntity.audioFramesPerBuffer);
-    playState.store(STOP);
     crossfade.store(appStateEntity.crossfade);
     scene.store(newScene);
   };
@@ -148,6 +155,11 @@ struct Core {
 
   sf_count_t getFrameId() const {
     return frameId.load();
+  }
+
+  Result requestSceneLoadById(const ID sceneDbId) {
+    sceneIdToLoad.store(sceneDbId);
+    return OK;
   }
 };
 } // State

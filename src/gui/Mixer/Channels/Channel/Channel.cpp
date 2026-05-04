@@ -142,8 +142,7 @@ void Channel::updateShowRemoveChannelButton(const bool val) {
 }
 
 void Channel::setStyle() {
-  setFixedHeight(340);
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setStyleSheet(
     ("background-color: " + Color::toHex(GjC::LIGHT_300)).data()
   );
@@ -156,23 +155,23 @@ void Channel::setupGrid() {
   grid.addWidget(&title, 0, 0, 1, 1);
 
   // can't delete main, must have at least one non-main channel
-  grid.addWidget(&removeChannelButton, 0, 4, 1, 1);
-  grid.addWidget(&vuMeter, 1, 0, 3, 1);
-  grid.addWidget(&gainSlider, 1, 1, 3, 1);
-  grid.addWidget(&gainLabel, 4, 1, 1, 1);
-  grid.addWidget(&gainLSlider, 1, 2, 3, 1);
-  grid.addWidget(&gainLLabel, 4, 2, 1, 1);
-  grid.addWidget(&gainRSlider, 1, 3, 3, 1);
-  grid.addWidget(&gainRLabel, 4, 3, 1, 1);
-  grid.addWidget(&pluginSlotsScrollArea, 1, 4, 1, 1);
-  grid.addWidget(&addPluginButton, 1, 5, 1, 1);
-  // grid.addWidget(&panSlider, 2, 3, 1, 1);
-  // grid.addWidget(&panLabel, 2, 4, 1, 1);
-  grid.addWidget(&panLSlider, 2, 4, 1, 1);
-  grid.addWidget(&panLLabel, 2, 5, 1, 1);
-  grid.addWidget(&panRSlider, 3, 4, 1, 1);
-  grid.addWidget(&panRLabel, 3, 5, 1, 1);
-  grid.addWidget(&muteSoloContainer, 4, 0, 1, -1);
+  grid.addWidget(&removeChannelButton, 0, 4, 1, 2, Qt::AlignRight);
+  grid.addWidget(&vuMeter, 1, 0, 4, 1);
+  grid.addWidget(&gainSlider, 1, 1, 4, 1);
+  grid.addWidget(&gainLabel, 5, 1, 1, 1);
+  grid.addWidget(&gainLSlider, 1, 2, 4, 1);
+  grid.addWidget(&gainLLabel, 5, 2, 1, 1);
+  grid.addWidget(&gainRSlider, 1, 3, 4, 1);
+  grid.addWidget(&gainRLabel, 5, 3, 1, 1);
+  grid.addWidget(&pluginSlotsScrollArea, 1, 4, 1, 2);
+  grid.addWidget(&addPluginButton, 2, 4, 1, 2, Qt::AlignCenter);
+  // grid.addWidget(&panSlider, 3, 3, 1, 1);
+  // grid.addWidget(&panLabel, 3, 4, 1, 1);
+  grid.addWidget(&panLSlider, 3, 4, 1, 1);
+  grid.addWidget(&panLLabel, 3, 5, 1, 1);
+  grid.addWidget(&panRSlider, 4, 4, 1, 1);
+  grid.addWidget(&panRLabel, 4, 5, 1, 1);
+  grid.addWidget(&muteSoloContainer, 6, 0, 1, -1);
 
   grid.setVerticalSpacing(2);
   grid.setHorizontalSpacing(2);
@@ -187,15 +186,16 @@ void Channel::setupGrid() {
 }
 
 void Channel::setupPluginSlotsScrollArea() {
-  pluginSlotsScrollArea.setFixedSize(QSize(200, 175));
-  pluginSlotsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  pluginSlotsScrollArea.setMinimumWidth(200);
+  pluginSlotsScrollArea.setMaximumWidth(200);
+  pluginSlotsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
   pluginSlotsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   pluginSlotsScrollArea.setWidgetResizable(true);
   pluginSlotsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   pluginSlotsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   pluginSlotsScrollArea.setLayoutDirection(Qt::LeftToRight);
   pluginSlotsScrollArea.setWidget(&pluginSlots);
-  pluginSlots.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  pluginSlots.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
 }
 
 void Channel::setupTitle() {

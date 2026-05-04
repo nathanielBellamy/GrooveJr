@@ -2,8 +2,8 @@
 // Created by ns on 9/18/25.
 //
 
-#ifndef AUDIODECK_H
-#define AUDIODECK_H
+#ifndef GJAUDIOAUDIODECK_H
+#define GJAUDIOAUDIODECK_H
 
 #include <optional>
 
@@ -29,7 +29,7 @@ struct AudioDeck {
   State::Core* stateCore;
   mutable sf_count_t frameId = 0;
   sf_count_t frames = 0; // total # of frames
-  sf_count_t frameAdvance;
+  sf_count_t frameAdvance = 0;
   float gain = 1.0f;
   float* inputBuffers[2]{nullptr, nullptr};
   Cassette* cassette;
@@ -57,6 +57,7 @@ struct AudioDeck {
   }
 
   Result setCassetteFromDecoratedAudioFile(const Db::DecoratedAudioFile& newDecoratedAudioFile) {
+    frameId = 0;
     decoratedAudioFile = std::optional(newDecoratedAudioFile);
 
     Cassette* newCassette;
@@ -125,4 +126,4 @@ struct AudioDeck {
 } // Audio
 } // Gj
 
-#endif //AUDIODECK_H
+#endif //GJAUDIOAUDIODECK_H

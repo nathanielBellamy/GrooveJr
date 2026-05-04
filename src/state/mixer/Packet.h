@@ -15,10 +15,10 @@ namespace Gj {
 namespace State {
 namespace Mixer {
 struct Packet {
-  ChannelPacket channels[Audio::MAX_MIXER_CHANNELS]{};
+  ChannelPacket channels[Gj::Audio::MAX_MIXER_CHANNELS]{};
 
   Packet() {
-    std::fill_n(channels, Audio::MAX_MIXER_CHANNELS, ChannelPacket());
+    std::fill_n(channels, Gj::Audio::MAX_MIXER_CHANNELS, ChannelPacket());
   }
 
   std::string std_str() const {

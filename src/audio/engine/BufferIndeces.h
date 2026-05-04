@@ -16,7 +16,7 @@ namespace BfrIdx {
 
 // playbackSettingsFromAudioThread
 namespace PSFAT {
-constexpr size_t SIZE = 3;
+constexpr size_t SIZE = 5;
 constexpr size_t RB_SIZE = sizeof(sf_count_t) * SIZE;
 static constexpr size_t DEBUG_VALUE = 0;
 
@@ -89,6 +89,23 @@ static constexpr ChannelIndex right(const ChannelIndex channelIndex) {
   return AUDIO_CHANNEL_COUNT * channelIndex + 1;
 }
 } // FFT
+
+namespace DecksState {
+static constexpr DeckIndex DECK_INDEX = 0;
+static constexpr DeckIndex DECK_INDEX_NEXT = 1;
+static constexpr size_t DECKS_OFFSET = 2;
+static constexpr size_t DECK_WIDTH = 2;
+static constexpr size_t BUFFER_SIZE = DECKS_OFFSET + (AUDIO_CORE_DECK_COUNT * DECK_WIDTH);
+static constexpr size_t RING_BUFFER_SIZE = sizeof(DeckIndex) * BUFFER_SIZE;
+
+static constexpr size_t deckPlayState(const DeckIndex deckIndex) {
+  return DECKS_OFFSET + (deckIndex * DECK_WIDTH);
+}
+
+static constexpr sf_count_t deckCurrentFrameId(const DeckIndex deckIndex) {
+  return DECKS_OFFSET + (deckIndex * DECK_WIDTH) + 1;
+}
+} // DecksState
 } // BfrIdx
 } // Audio
 } // Gj

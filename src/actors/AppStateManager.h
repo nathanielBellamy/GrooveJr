@@ -23,9 +23,9 @@
 #include "../messaging/DecksState.h"
 #include "../enums/PlayState.h"
 #include "../state/Core.h"
-#include "../state/mixer/Packet.h"
 #include "../audio/engine/AudioCore.h"
 #include "../audio/mixer/Core.h"
+#include "../types/Types.h"
 
 using namespace caf;
 
@@ -100,7 +100,7 @@ struct AppStateManagerState {
 
   AppStateManagerState(
     AppStateManager::pointer self,
-    strong_actor_ptr supervisor,
+    const strong_actor_ptr& supervisor,
     State::Core* stateCore,
     Audio::Mixer::Core* mixer,
     Db::Dao* dao,
@@ -146,7 +146,7 @@ struct AppStateManagerState {
         mixer->removeChannel(channelIdx);
         hydrateStateToDisplay();
       },
-      [this](const ChannelIndex channelIdx, PluginPath pluginPath, mix_add_plugin_to_channel_a) {
+      [this](const ChannelIndex channelIdx, const PluginPath& pluginPath, mix_add_plugin_to_channel_a) {
         Logging::write(
           Info,
           "Act::AppStateManager::mix_add_plugin_to_channel_a",
@@ -177,7 +177,7 @@ struct AppStateManagerState {
         }
         hydrateStateToDisplay();
       },
-      [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, PluginPath pluginPath,
+      [this](const ChannelIndex channelIdx, const PluginIndex pluginIdx, const PluginPath& pluginPath,
              mix_replace_plugin_on_channel_a) {
         Logging::write(
           Info,
@@ -220,7 +220,7 @@ struct AppStateManagerState {
         }
         hydrateStateToDisplay();
       },
-      [this](strong_actor_ptr replyTo, read_state_a) {
+      [this](const strong_actor_ptr& replyTo, read_state_a) {
         Logging::write(
           Info,
           "Act::AppStateManager::read_state_a",
@@ -246,7 +246,7 @@ struct AppStateManagerState {
           tc_trig_play_a_v
         );
       },
-      [this](strong_actor_ptr, const bool success, tc_trig_play_ar) {
+      [this](const strong_actor_ptr&, const bool success, tc_trig_play_ar) {
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_play_ar",
@@ -282,7 +282,7 @@ struct AppStateManagerState {
           tc_trig_pause_a_v
         );
       },
-      [this](strong_actor_ptr, const bool success, tc_trig_pause_ar) {
+      [this](const strong_actor_ptr&, const bool success, tc_trig_pause_ar) {
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_pause_a",
@@ -316,7 +316,7 @@ struct AppStateManagerState {
           tc_trig_stop_a_v
         );
       },
-      [this](strong_actor_ptr, const bool success, tc_trig_stop_ar) {
+      [this](const strong_actor_ptr&, const bool success, tc_trig_stop_ar) {
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_stop_ar",
@@ -346,7 +346,7 @@ struct AppStateManagerState {
           tc_trig_rw_a_v
         );
       },
-      [this](strong_actor_ptr, const bool success, tc_trig_rw_ar) {
+      [this](const strong_actor_ptr&, const bool success, tc_trig_rw_ar) {
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_rw_a",
@@ -380,7 +380,7 @@ struct AppStateManagerState {
           tc_trig_ff_a_v
         );
       },
-      [this](strong_actor_ptr, const bool success, tc_trig_ff_ar) {
+      [this](const strong_actor_ptr&, const bool success, tc_trig_ff_ar) {
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_ff_a",
@@ -401,8 +401,8 @@ struct AppStateManagerState {
 
         hydrateStateToDisplay();
       },
-      [this](const bool queuePlay, const DecksState decksState, tc_trig_play_file_a) {
-        const int audioFileId = decksState.audioFileIds[decksState.currentDeckIdx];
+      [this](const bool queuePlay, const DecksState& decksState, tc_trig_play_file_a) {
+        const ID audioFileId = decksState.audioFileIds[decksState.currentDeckIdx];
         Logging::write(
           Info,
           "Act::AppStateManager::tc_trig_play_file_a",
@@ -410,40 +410,25 @@ struct AppStateManagerState {
         );
 
         stateCore->queuePlay = queuePlay;
-        Db::DecoratedAudioFile decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT];
-        for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
+        std::optional<Db::DecoratedAudioFile> decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT];
+        for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; ++i) {
           const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
               dao->audioFileRepository.findDecoratedAudioFileById(decksState.audioFileIds[i]);
-          if (decoratedAudioFile) {
-            decoratedAudioFiles[i] = decoratedAudioFile.value();
-          } else {
+          if (!decoratedAudioFile)
             Logging::write(
               Error,
               "Act::AppStateManager::tc_trig_play_file_a",
               "Unable to load DecoratedAudioFile Id: " + std::to_string(audioFileId)
             );
-          }
+
+          decoratedAudioFiles[i] = decoratedAudioFile;
         }
 
-        for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; i++) {
-          if (audioCore->addCassetteFromDecoratedAudioFileAtIdx(decoratedAudioFiles[i], i) == ERROR) {
-            Logging::write(
-              Error,
-              "Act::AppStateManager::tc_trig_play_file_a",
-              "Unable to addCassette from DecoratedAudioFile filePath: " + decoratedAudioFiles[i].audioFile.filePath
-            );
-            return;
-          }
+        if (stateCore->isAudioRunning()) {
+          requestDeckUpdate(decksState, decoratedAudioFiles);
+        } else {
+          directDeckUpdate(decksState, decoratedAudioFiles);
         }
-        audioCore->deckIndex = decksState.currentDeckIdx;
-        audioCore->deckIndexNext = decksState.currentDeckIdx;
-        stateCore->setCurrentlyPlaying(audioCore->currentDeck().decoratedAudioFile.value());
-
-        Logging::write(
-          Info,
-          "Act::AppStateManager::tc_trig_play_file_a",
-          "Initiated file play. Will HydrateStateToDisplay"
-        );
 
         self->anon_send(
           actor_cast<actor>(playback),
@@ -455,6 +440,85 @@ struct AppStateManagerState {
       }
     };
   };
+
+  Result setStateAudioCoreShadow(
+    const DecksState& decksState,
+    std::optional<Db::DecoratedAudioFile> decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT]
+  ) const {
+    State::Audio::CoreShadow audioCoreShadow{};
+    for (DeckIndex deckIndex = 0; deckIndex < Audio::AUDIO_CORE_DECK_COUNT; deckIndex++) {
+      audioCoreShadow.decks[deckIndex] = {
+        deckIndex,
+        deckIndex == decksState.currentDeckIdx ? PLAY : STOP,
+        0,
+        decoratedAudioFiles[deckIndex]
+      };
+    }
+    audioCoreShadow.deckIndex = decksState.currentDeckIdx;
+    audioCoreShadow.deckIndexNext = decksState.currentDeckIdx;
+    stateCore->audioCoreShadow = audioCoreShadow;
+
+    return OK;
+  }
+
+  Result requestDeckUpdate(
+    const DecksState& decksState,
+    std::optional<Db::DecoratedAudioFile> decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT]
+  ) const {
+    for (DeckIndex deckIndex = 0; deckIndex < Audio::AUDIO_CORE_DECK_COUNT; ++deckIndex) {
+      if (!decoratedAudioFiles[deckIndex])
+        Logging::write(
+          Warning,
+          "Act::AppStateManager::tc_trig_play_file_a",
+          "Empty decoratedAudioFile for deckIndex: " + std::to_string(deckIndex)
+        );
+    }
+    setStateAudioCoreShadow(decksState, decoratedAudioFiles);
+    auto requestedDeckUpdate = false;
+    while (!stateCore->requestingDeckUpdate.compare_exchange_weak(requestedDeckUpdate, true, std::memory_order_release,
+                                                                  std::memory_order_relaxed)) {
+    };
+
+    return OK;
+  }
+
+  Result directDeckUpdate(
+    const DecksState& decksState,
+    std::optional<Db::DecoratedAudioFile> decoratedAudioFiles[Audio::AUDIO_CORE_DECK_COUNT]
+  ) const {
+    for (DeckIndex deckIndex = 0; deckIndex < Audio::AUDIO_CORE_DECK_COUNT; deckIndex++) {
+      if (!decoratedAudioFiles[deckIndex]) {
+        Logging::write(
+          Error,
+          "Act::AppStateManager::tc_trig_play_file_a",
+          "Empty decoratedAudioFile for deckIndex: " + std::to_string(deckIndex)
+        );
+        continue;
+      }
+      if (audioCore->addCassetteFromDecoratedAudioFileAtIdx(decoratedAudioFiles[deckIndex].value(), deckIndex) ==
+          ERROR) {
+        Logging::write(
+          Error,
+          "Act::AppStateManager::tc_trig_play_file_a",
+          "Unable to addCassette from DecoratedAudioFile filePath: " + decoratedAudioFiles[deckIndex].value().
+          audioFile.filePath
+        );
+        return ERROR;
+      }
+    }
+    audioCore->deckIndex = decksState.currentDeckIdx;
+    audioCore->deckIndexNext = decksState.currentDeckIdx;
+    setStateAudioCoreShadow(decksState, decoratedAudioFiles);
+    stateCore->setCurrentlyPlaying(audioCore->currentDeck().decoratedAudioFile.value());
+
+    Logging::write(
+      Info,
+      "Act::AppStateManager::tc_trig_play_file_a",
+      "Initiated file play. Will HydrateStateToDisplay"
+    );
+
+    return OK;
+  }
 };
 } // Act
 } // Gj
