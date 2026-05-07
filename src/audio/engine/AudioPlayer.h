@@ -9,6 +9,7 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <optional>
 
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
@@ -597,18 +598,20 @@ struct AudioPlayer {
     }
 
     const auto distantDeckIndex = getDistantDeckIndex();
-
-    const auto oldCacheTrackNumber = stateCore->cacheTrackNumber.load();
-    const auto newCacheTrackNumber = oldCacheTrackNumber + 1; // TODO: handle reverse
+    const auto newCacheTrackNumber = stateCore->updateCacheTrackNumber();
+    const auto playbackSpeed = stateCore->scene.load().playbackSpeed;
     const auto cacheSize = stateCore->cacheSize.load();
 
-    if (newCacheTrackNumber == cacheSize) {
+    if (const auto cacheSize = stateCore->cacheSize.load(); newCacheTrackNumber == cacheSize - 1) {
       stateCore->playState = STOP;
     } else {
-      const std::optional<ID> newAudioFileIdForDistantDeckIndex = mixer->dao->cacheRepository.
-          findAudioFileIdByTrackNumber(
-            newCacheTrackNumber + 1);
-      if (decksStateBuffer[BfrIdx::DecksState::deckPlayState(distantDeckIndex)] != STOP) {
+      const std::optional<ID> newAudioFileIdForDistantDeckIndex =
+          playbackSpeed == 0
+            ? std::nullopt
+            : mixer->dao->cacheRepository.findAudioFileIdByTrackNumber(
+              (newCacheTrackNumber + (playbackSpeed > 0 ? 1 : cacheSize - 1)) % cacheSize
+            );
+      if (!distantDeckIndex || decksStateBuffer[BfrIdx::DecksState::deckPlayState(distantDeckIndex.value())] != STOP) {
         Logging::write(
           Error,
           "Audio::AudioPlayer::updateStateCoreAudioCoreShadow",
@@ -631,8 +634,8 @@ struct AudioPlayer {
               newAudioFileIdForDistantDeckIndex.value())
           );
         } else {
-          audioCore->addCassetteFromDecoratedAudioFileAtIdx(decoratedAudioFile.value(), distantDeckIndex);
-          audioCoreShadow.decks[distantDeckIndex].decoratedAudioFile = decoratedAudioFile;
+          audioCore->addCassetteFromDecoratedAudioFileAtIdx(decoratedAudioFile.value(), distantDeckIndex.value());
+          audioCoreShadow.decks[distantDeckIndex.value()].decoratedAudioFile = decoratedAudioFile;
         }
       }
     }
@@ -645,16 +648,43 @@ struct AudioPlayer {
     return true;
   }
 
-  DeckIndex getDistantDeckIndex() {
-    // TODO: generalize this
-    if (prevDeckIndex == 1 && currentDeckIndex == 2)
-      return 0;
-    if (prevDeckIndex == 2 && currentDeckIndex == 0)
-      return 1;
-    if (prevDeckIndex == 0 && currentDeckIndex == 1)
-      return 2;
+  /*
+   * getDistantDeckIndex
+   * "distant" in the sense that it is far away from the current_deck
+   * for example,
+   *   - if AUDIO_CORE_DECK_COUNT = 3
+   *   -    and assuming track length is significantly longer than crossfade for all tracks involved
+   *   - then deck PlayState transitions take the form
+   *     - when playbackSpeed > 0
+   *       - x _ _ => x x _ => _ x _
+   *       - _ x _ => _ x x => _ _ x
+   *       - _ _ x => x _ x => x _ _
+   *     - when playbackSpeed < 0
+   *       - x _ _ => x _ x => _ _ x
+   *       - _ x _ => x x _ => x _ _
+   *       - _ _ x => _ x x => _ x _    key: (x, PLAY), (_, STOP)
+   *  - note:
+   *    - since the user may set playback speed as either positive or negative
+   *      we may transition in either direction
+   *    - as a result, when playback begins (user double clicks a song) we set the current_deck
+   *      as the middle deck: _ x _
+   *    - this way both previous and next track are loaded in memory and ready for smooth crossfade
+   *
+   *  - in each transition shown, there is a unique deck that is never active (always PlayState STOP)
+   *  - this is the "distant" deck
+   *  - it is safe to update the audio data in this deck as it is not being actively accessed by the JackClient (rt-thread)
+   *
+   */
+  std::optional<DeckIndex> getDistantDeckIndex() {
+    const auto playbackSpeed = stateCore->getScene().playbackSpeed;
 
-    return 0;
+    if (playbackSpeed > 0)
+      return std::optional((currentDeckIndex + 1) % AUDIO_CORE_DECK_COUNT);
+
+    if (playbackSpeed < 0)
+      return std::optional((currentDeckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT);
+
+    return std::nullopt;
   }
 
   void activateJackClient() {

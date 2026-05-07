@@ -355,12 +355,6 @@ struct AudioCore {
   }
 
   Result updateDeckIndexToNext() {
-    Logging::write(
-      Info,
-      "Audio::AudioCore::updateDeckIndexToNext",
-      "Updating deckIndex " + std::to_string(deckIndex) + " to next deckIndexNext " + std::to_string(deckIndexNext)
-    );
-
     decks[deckIndex].playState = STOP;
     if (decks[deckIndexNext].decoratedAudioFile) {
       decks[deckIndexNext].playState = PLAY;

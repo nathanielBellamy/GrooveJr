@@ -161,6 +161,24 @@ struct Core {
     sceneIdToLoad.store(sceneDbId);
     return OK;
   }
+
+  TrackNumber updateCacheTrackNumber() {
+    const auto playbackSpeed = scene.load().playbackSpeed;
+    const auto cTrackNumber = cacheTrackNumber.load();
+    const auto cSize = cacheSize.load();
+
+    TrackNumber result;
+
+    if (playbackSpeed < 0)
+      result = (cTrackNumber + (cSize - 1)) % cSize;
+    else if (playbackSpeed > 0)
+      result = (cTrackNumber + 1) % cSize;
+    else // do nothing;
+      result = cTrackNumber;
+
+    cacheTrackNumber.store(result);
+    return result;
+  }
 };
 } // State
 } // Gj
