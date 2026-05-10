@@ -398,7 +398,7 @@ struct AudioCore {
       return 0.0f;
     }
 
-    if (di == (deckIndex - 1) % AUDIO_CORE_DECK_COUNT) {
+    if (di == (deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT) {
       if (deck.frameId >= deck.frames - stateCore->getCrossfade())
         return (framesF - frameIdF) / crossfadeF;
 
