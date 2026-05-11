@@ -429,9 +429,14 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
     for (jack_nframes_t i = 0; i < nframes; i++) {
       playbackPosTrunc = std::trunc(playbackPos);
       idx = static_cast<int>(playbackPosTrunc);
+      const bool leftUnderflow = deck.frameId + idx < 0;
       const float frac = playbackPos - playbackPosTrunc;
-      const auto valL = ((1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx + 1]) * deck.gain;
-      const auto valR = ((1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx + 1]) * deck.gain;
+      const auto valL = leftUnderflow
+                          ? 0.0f
+                          : ((1.0f - frac) * processHeadL[idx] + frac * processHeadL[idx + 1]) * deck.gain;
+      const auto valR = leftUnderflow
+                          ? 0.0f
+                          : ((1.0f - frac) * processHeadR[idx] + frac * processHeadR[idx + 1]) * deck.gain;
       audioCore->playbackBuffers[BfrIdx::AudCh::LEFT][i] += std::isnan(valL) ? 0.0f : valL;
       audioCore->playbackBuffers[BfrIdx::AudCh::RIGHT][i] += std::isnan(valR) ? 0.0f : valR;
       playbackPos += playbackSpeedF;

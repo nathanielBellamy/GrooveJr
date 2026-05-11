@@ -318,7 +318,8 @@ struct AudioCore {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromDecoratedAudioFileAtIdx",
-      "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
+      "Adding cassette to deckIndex " + std::to_string(deckIndexToSet) + " for filePath " + decoratedAudioFile.audioFile
+      .
       filePath
     );
     if (decks[deckIndexToSet].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
@@ -334,7 +335,7 @@ struct AudioCore {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromDecoratedAudioFileAtIdx",
-      "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
+      "Added cassette to deckIndex " + std::to_string(deckIndexToSet) + " for filePath " + decoratedAudioFile.audioFile.
       filePath
     );
     return OK;
