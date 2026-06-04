@@ -26,7 +26,6 @@ constexpr sf_count_t MIN_FADE_OUT = 500;
 struct AudioDeck {
   DeckIndex deckIndex;
   PlayState playState = STOP;
-  State::Core* stateCore;
   mutable sf_count_t frameId = 0;
   sf_count_t frames = 0; // total # of frames
   sf_count_t frameAdvance = 0;
@@ -35,9 +34,8 @@ struct AudioDeck {
   Cassette* cassette;
   std::optional<Db::DecoratedAudioFile> decoratedAudioFile;
 
-  AudioDeck(const DeckIndex deckIndex, State::Core* stateCore)
+  AudioDeck(const DeckIndex deckIndex)
   : deckIndex(deckIndex)
-    , stateCore(stateCore)
     , cassette(new Cassette())
     , decoratedAudioFile(std::optional<Db::DecoratedAudioFile>()) {
   }
@@ -84,22 +82,6 @@ struct AudioDeck {
       "Added Cassette to deck : " + std::to_string(deckIndex) + ". Identified deck and cassette inputBuffers."
     );
     return OK;
-  }
-
-  bool isCrossfadeStart() const {
-    return frameId < stateCore->getCrossfade();
-  }
-
-  bool isCrossfadeEnd() const {
-    return frameId > frames - stateCore->getCrossfade();
-  }
-
-  bool isFadeIn() const {
-    return frameId < std::max(stateCore->getCrossfade(), MIN_FADE_IN);
-  }
-
-  bool isFadeOut() const {
-    return frameId > std::min(frames - stateCore->getCrossfade(), frames - MIN_FADE_OUT);
   }
 
   bool hasValidCassetteLoaded() const {

@@ -310,6 +310,9 @@ struct AppStateManagerState {
           "Received TC Stop Trig"
         );
 
+        if (!playback)
+          stateCore->setPlayState(STOP);
+
         self->anon_send(
           actor_cast<actor>(playback),
           actor_cast<strong_actor_ptr>(self),

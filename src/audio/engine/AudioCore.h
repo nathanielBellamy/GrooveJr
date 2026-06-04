@@ -24,10 +24,10 @@ namespace Gj {
 namespace Audio {
 struct AudioCore {
   State::Core* stateCore;
-  sf_count_t crossfade = 0;
-  AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0, stateCore), AudioDeck(1, stateCore), AudioDeck(2, stateCore)};
-  DeckIndex deckIndex = 0;
-  DeckIndex deckIndexNext = 0;
+  sf_count_t crossfade = 100000;
+  AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0), AudioDeck(1), AudioDeck(2)};
+  DeckIndex deckIndex = 1;
+  DeckIndex deckIndexNext = 1;
   sf_count_t frameAdvance;
   float fft_eq_time[AUDIO_CHANNEL_COUNT][FFT_EQ_TIME_SIZE]{};
   fftwf_complex fft_eq_freq[AUDIO_CHANNEL_COUNT][FFT_EQ_FREQ_SIZE]{};
@@ -346,11 +346,6 @@ struct AudioCore {
     return OK;
   }
 
-  Result setDeckIndex(const DeckIndex val) {
-    deckIndex = val;
-    return OK;
-  }
-
   bool shouldUpdateDeckIndex() const {
     return deckIndex != deckIndexNext;
   }
@@ -367,11 +362,6 @@ struct AudioCore {
 
     deckIndex = deckIndexNext;
 
-    return OK;
-  }
-
-  Result incrDeckIndex() {
-    deckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
     return OK;
   }
 

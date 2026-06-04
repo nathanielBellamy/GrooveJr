@@ -58,9 +58,9 @@ struct AudioPlayer {
 
   Mixer::ChannelProcessData mixerChannelsProcessData[MAX_MIXER_CHANNELS]{};
 
-  DeckIndex currentDeckIndex = 0;
-  DeckIndex prevDeckIndex = 0;
-  DeckIndex nextDeckIndex = 0;
+  DeckIndex currentDeckIndex = 1;
+  DeckIndex prevDeckIndex = 1;
+  DeckIndex nextDeckIndex = 1;
 
   AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer::Core* mixer, State::Core* stateCore)
   : actorSystem(actorSystem)
@@ -699,10 +699,10 @@ struct AudioPlayer {
     const auto playbackSpeed = stateCore->getScene().playbackSpeed;
 
     if (playbackSpeed > 0)
-      return std::optional((currentDeckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT);
+      return std::optional((currentDeckIndex + AUDIO_CORE_DECK_COUNT - 2) % AUDIO_CORE_DECK_COUNT);
 
     if (playbackSpeed < 0)
-      return std::optional((currentDeckIndex + 1) % AUDIO_CORE_DECK_COUNT);
+      return std::optional((currentDeckIndex + 2) % AUDIO_CORE_DECK_COUNT);
 
     return std::nullopt;
   }
