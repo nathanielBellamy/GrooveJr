@@ -60,6 +60,7 @@ struct AudioPlayer {
 
   DeckIndex currentDeckIndex = 0;
   DeckIndex prevDeckIndex = 0;
+  DeckIndex nextDeckIndex = 0;
 
   AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer::Core* mixer, State::Core* stateCore)
   : actorSystem(actorSystem)
@@ -316,7 +317,9 @@ struct AudioPlayer {
         reinterpret_cast<char*>(decksStateBuffer),
         BfrIdx::DecksState::RING_BUFFER_SIZE
       );
+      prevDeckIndex = currentDeckIndex;
       currentDeckIndex = decksStateBuffer[BfrIdx::DecksState::DECK_INDEX];
+      nextDeckIndex = decksStateBuffer[BfrIdx::DecksState::DECK_INDEX_NEXT];
     }
 
     if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > BfrIdx::MixerChannel::ProcessData::RB_SIZE
@@ -602,6 +605,14 @@ struct AudioPlayer {
     const auto playbackSpeed = stateCore->scene.load().playbackSpeed;
     const auto cacheSize = stateCore->cacheSize.load();
 
+    std::cout << " previousDeckIndex: " << prevDeckIndex << std::endl;
+    std::cout << " currentDeckIndex: " << currentDeckIndex << std::endl;
+    std::cout << " nextDeckIndex: " << nextDeckIndex << std::endl;
+    std::cout << " distantDeckIndex : " << distantDeckIndex.value() << std::endl;
+    std::cout << " newCacheTrackNumber : " << newCacheTrackNumber << std::endl;
+    std::cout << "  playbackSpeed : " << playbackSpeed << std::endl;
+    std::cout << "  cacheSize : " << cacheSize << std::endl << std::endl;
+
     if (const auto cacheSize = stateCore->cacheSize.load(); newCacheTrackNumber == cacheSize - 1) {
       stateCore->playState = STOP;
     } else {
@@ -679,10 +690,10 @@ struct AudioPlayer {
     const auto playbackSpeed = stateCore->getScene().playbackSpeed;
 
     if (playbackSpeed > 0)
-      return std::optional((currentDeckIndex + 1) % AUDIO_CORE_DECK_COUNT);
+      return std::optional((currentDeckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT);
 
     if (playbackSpeed < 0)
-      return std::optional((currentDeckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT);
+      return std::optional((currentDeckIndex + 1) % AUDIO_CORE_DECK_COUNT);
 
     return std::nullopt;
   }

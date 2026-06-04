@@ -447,20 +447,20 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
   }
 
   const auto& currentDeck = audioCore->currentDeck();
-  const DeckIndex nextDeckIndex = (audioCore->deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
-  const DeckIndex prevDeckIndex = (audioCore->deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT;
+  const DeckIndex lhDeckIndex = (audioCore->deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+  const DeckIndex rhDeckIndex = (audioCore->deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT;
   if (playbackSpeed > 0) {
     if (currentDeck.frameId >= currentDeck.frames - audioCore->crossfade)
-      audioCore->decks[nextDeckIndex].playState = PLAY;
+      audioCore->decks[lhDeckIndex].playState = PLAY;
     if (currentDeck.frameId >= currentDeck.frames - 4 * nframes)
-      audioCore->deckIndexNext = nextDeckIndex;
-  } else {
+      audioCore->deckIndexNext = lhDeckIndex;
+  } else if (playbackSpeed < 0) {
     if (currentDeck.frameId < audioCore->crossfade) {
-      audioCore->decks[prevDeckIndex].frameId = audioCore->decks[prevDeckIndex].frames - 2;
-      audioCore->decks[prevDeckIndex].playState = PLAY;
+      audioCore->decks[rhDeckIndex].frameId = audioCore->decks[rhDeckIndex].frames - 2;
+      audioCore->decks[rhDeckIndex].playState = PLAY;
     }
     if (currentDeck.frameId < 4 * nframes)
-      audioCore->deckIndexNext = prevDeckIndex;
+      audioCore->deckIndexNext = rhDeckIndex;
   }
 
   audioCore->updateDeckIndexToNext();

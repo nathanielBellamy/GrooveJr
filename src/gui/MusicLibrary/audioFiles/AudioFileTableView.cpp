@@ -95,6 +95,8 @@ void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent* event) {
       return;
     }
 
+    stateCore->cacheTrackNumber.store(clickedRow);
+
     if (stateCore->getCurrentlyPlaying().audioFile.id == decksState.audioFileIds[decksState.currentDeckIdx]
         && !stateCore->queuePlay)
       return;

@@ -356,12 +356,15 @@ struct AudioCore {
   }
 
   Result updateDeckIndexToNext() {
+    if (deckIndex == deckIndexNext)
+      return OK;
+
     decks[deckIndex].playState = STOP;
-    if (decks[deckIndexNext].decoratedAudioFile) {
+    if (decks[deckIndexNext].decoratedAudioFile)
       decks[deckIndexNext].playState = PLAY;
-    } else {
+    else
       decks[deckIndexNext].playState = STOP;
-    }
+
     deckIndex = deckIndexNext;
 
     return OK;
