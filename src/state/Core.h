@@ -6,6 +6,7 @@
 #define APPSTATE_H
 
 #include <atomic>
+#include <sstream>
 #include <string>
 
 #include <sndfile.h>
@@ -121,13 +122,62 @@ struct Core {
   }
 
   std::string toString() const {
-    return
-        " Gj::AppState { "
-        "  id: " + std::to_string(id) +
-        "  audioFramesPerBuffer: " + std::to_string(audioFramesPerBuffer) +
-        "  playState: " + std::to_string(playState) +
-        "  sceneId: " + std::to_string(scene.load().id) +
-        " } ";
+    const auto playStateToString = [](const PlayState value) {
+      switch (value) {
+        case STOP:
+          return std::string("STOP");
+        case PLAY:
+          return std::string("PLAY");
+        case PAUSE:
+          return std::string("PAUSE");
+        case RW:
+          return std::string("RW");
+        case FF:
+          return std::string("FF");
+      }
+      return std::string("UNKNOWN");
+    };
+
+    const auto currentId = id.load();
+    const auto currentAudioFramesPerBuffer = audioFramesPerBuffer.load();
+    const auto currentPlayState = playState.load();
+    const auto currentAudioRunning = audioRunning.load();
+    const auto currentScene = scene.load();
+    const auto currentCrossfade = crossfade.load();
+    const auto currentCurrentlyPlaying = currentlyPlaying.load();
+    const auto currentQueuePlay = queuePlay.load();
+    const auto currentQueueIndex = queueIndex.load();
+    const auto currentCacheTrackNumber = cacheTrackNumber.load();
+    const auto currentCacheSize = cacheSize.load();
+    const auto currentUserSettingFrameId = userSettingFrameId.load();
+    const auto currentFrameId = frameId.load();
+    const auto currentAudioCoreShadow = audioCoreShadow.load();
+    const auto currentRequestingDeckUpdate = requestingDeckUpdate.load();
+    const auto currentSceneIdToLoad = sceneIdToLoad.load();
+    const auto currentRequestingSceneSave = requestingSceneSave.load();
+
+    std::ostringstream stream;
+    stream << std::boolalpha
+        << "Gj::State::Core { " << std::endl
+        << "id: " << currentId << std::endl
+        << ", audioFramesPerBuffer: " << currentAudioFramesPerBuffer << std::endl
+        << ", playState: " << playStateToString(currentPlayState) << std::endl
+        << ", audioRunning: " << currentAudioRunning << std::endl
+        << ", scene: " << currentScene.toString() << std::endl
+        << ", crossfade: " << currentCrossfade << std::endl
+        << ", currentlyPlaying: " << currentCurrentlyPlaying.toString() << std::endl
+        << ", queuePlay: " << currentQueuePlay << std::endl
+        << ", queueIndex: " << currentQueueIndex << std::endl
+        << ", cacheTrackNumber: " << currentCacheTrackNumber << std::endl
+        << ", cacheSize: " << currentCacheSize << std::endl
+        << ", userSettingFrameId: " << currentUserSettingFrameId << std::endl
+        << ", frameId: " << currentFrameId << std::endl
+        << ", audioCoreShadow: " << currentAudioCoreShadow.toString() << std::endl
+        << ", requestingDeckUpdate: " << currentRequestingDeckUpdate << std::endl
+        << ", sceneIdToLoad: " << currentSceneIdToLoad << std::endl
+        << ", requestingSceneSave: " << currentRequestingSceneSave << std::endl
+        << " }";
+    return stream.str();
   };
 
   Result setCurrentlyPlaying(const Db::DecoratedAudioFile& decoratedAudioFile) {

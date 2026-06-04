@@ -6,6 +6,7 @@
 #define GJSTATEAUDIOCORESHADOW_H
 
 #include <optional>
+#include <sstream>
 
 #include <sndfile.h>
 
@@ -23,6 +24,24 @@ struct CoreShadow {
   };
   DeckIndex deckIndex = 0;
   DeckIndex deckIndexNext = 0;
+
+  std::string toString() const {
+    std::ostringstream stream;
+    stream << "CoreShadow { decks: [";
+
+    for (int i = 0; i < Gj::Audio::AUDIO_CORE_DECK_COUNT; i++) {
+      if (i > 0)
+        stream << ", ";
+
+      stream << decks[i].toString();
+    }
+
+    stream
+        << "], deckIndex: " << deckIndex << std::endl
+        << ", deckIndexNext: " << deckIndexNext << std::endl
+        << " }";
+    return stream.str();
+  }
 };
 } // Audio
 } // State

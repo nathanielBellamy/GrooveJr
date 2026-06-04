@@ -592,6 +592,10 @@ struct AudioPlayer {
   bool updateStateCoreAudioCoreShadow() {
     if (const bool audioCoreUpdatedDeckIndex = prevDeckIndex != currentDeckIndex; !audioCoreUpdatedDeckIndex)
       return false;
+
+    std::cout << " xxxxxxxxx BEFORE xxxxxxxxxx" << std::endl;
+    std::cout << stateCore->toString() << std::endl;
+    std::cout << " xxxxxxxxx BEFORE xxxxxxxxxx" << std::endl;
     auto audioCoreShadow = stateCore->audioCoreShadow.load();
     audioCoreShadow.deckIndex = currentDeckIndex;
 
@@ -656,6 +660,11 @@ struct AudioPlayer {
     stateCore->audioCoreShadow.store(audioCoreShadow);
 
     prevDeckIndex = currentDeckIndex;
+
+
+    std::cout << " xxxxxxxxx AFTER xxxxxxxxxx" << std::endl;
+    std::cout << stateCore->toString() << std::endl;
+    std::cout << " xxxxxxxxx AFTER xxxxxxxxxx" << std::endl;
     return true;
   }
 

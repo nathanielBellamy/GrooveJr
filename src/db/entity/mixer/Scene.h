@@ -5,6 +5,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <sstream>
 #include <string>
 
 #include <sqlite3.h>
@@ -32,12 +33,21 @@ struct Scene {
     };
   }
 
+  std::string toString() const {
+    std::ostringstream stream;
+    stream
+      << "Scene { "
+      << "dbId: " << id
+      << ", sceneId: " << sceneId
+      << ", name: " << name.std_str()
+      << ", playbackSpeed: " << playbackSpeed
+      << ", version: " << version
+      << " }";
+    return stream.str();
+  }
+
   std::string toStdString() const {
-    return std::string(" Scene { ") +
-      "  dbId: " + std::to_string(id) +
-      ", sceneId: " + std::to_string(sceneId) +
-      ", name: " + name +
-      ", playbackSpeed: " + std::to_string(playbackSpeed) + " }";
+    return toString();
   };
 };
 
