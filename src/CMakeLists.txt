@@ -34,6 +34,9 @@ find_package(Boost REQUIRED COMPONENTS log_setup log)
 
 # setup Qt
 list(APPEND CMAKE_PREFIX_PATH "${GJ_BASE_DIR}/qt6-build/qtbase/lib/cmake")
+if (APPLE)
+    list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew/opt/qt" "/usr/local/opt/qt" "/opt/homebrew/opt/qtbase" "/usr/local/opt/qtbase")
+endif()
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGLWidgets gui)
 if (Qt6_FOUND)
     message(INFO " --Qt6--FOUND--")

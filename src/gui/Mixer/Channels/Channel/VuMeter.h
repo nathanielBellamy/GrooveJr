@@ -42,6 +42,19 @@ constexpr auto VU_METER_YELLOW_TR = QColor(75, 75, 0, 100);
 constexpr auto VU_METER_RED = QColor(255, 0, 0, 255);
 constexpr auto VU_METER_RED_TR = QColor(75, 0, 0, 100);
 
+constexpr std::array<int, VU_METER_BLOCK_COUNT> generateVULimits() {
+  std::array<int, VU_METER_BLOCK_COUNT> arr{};
+
+  for (std::size_t i = 0; i < VU_METER_BLOCK_COUNT; ++i) {
+    arr[i] = -99.0f
+             + 89.0f * (static_cast<float>(i) / static_cast<float>(VU_METER_BLOCK_COUNT));
+  }
+
+  return arr;
+}
+
+constexpr auto VU_METER_LIMIT_ARR = generateVULimits();
+
 class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
 public:
   VuMeter(QWidget* parent, Audio::Mixer::Core* mixer, std::atomic<float>* vuPtr, ChannelIndex channelIndex);
