@@ -23,20 +23,20 @@ message(INFO " Compiling GrooveJr with CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPIL
 
 # GJ_BASE_DIR: parent directory containing GrooveJr/, vst3sdk/, actor-framework/, qt6-build/.
 # Override via: cmake -DGJ_BASE_DIR=/path/to/parent ..
-if(NOT DEFINED GJ_BASE_DIR)
+if (NOT DEFINED GJ_BASE_DIR)
     get_filename_component(GJ_BASE_DIR "${CMAKE_SOURCE_DIR}/../.." ABSOLUTE)
-endif()
+endif ()
 
 set(VST3SDK_HOME "${GJ_BASE_DIR}/vst3sdk")
 
 # logging
-find_package(Boost REQUIRED COMPONENTS log_setup log)
+find_package(Boost REQUIRED COMPONENTS headers log_setup log)
 
 # setup Qt
 list(APPEND CMAKE_PREFIX_PATH "${GJ_BASE_DIR}/qt6-build/qtbase/lib/cmake")
 if (APPLE)
     list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew/opt/qt" "/usr/local/opt/qt" "/opt/homebrew/opt/qtbase" "/usr/local/opt/qtbase")
-endif()
+endif ()
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets OpenGLWidgets gui)
 if (Qt6_FOUND)
     message(INFO " --Qt6--FOUND--")
@@ -57,9 +57,9 @@ list(APPEND CMAKE_MODULE_PATH "${VST3SDK_HOME}/cmake/modules")
 include(SMTG_DetectPlatform)
 
 # setup CAF — override via: cmake -DCAF_ROOT=/path/to/caf ..
-if(NOT DEFINED CAF_ROOT)
+if (NOT DEFINED CAF_ROOT)
     set(CAF_ROOT ${GJ_BASE_DIR}/actor-framework/build)
-endif()
+endif ()
 find_package(CAF REQUIRED)
 
 # setup SQLite
@@ -78,16 +78,16 @@ set(GJ_PLATFORM_SOURCES
         resource/resources.qrc
 )
 
-if(WIN32)
+if (WIN32)
     list(APPEND GJ_PLATFORM_SOURCES resource/GrooveJr.rc)
-endif()
+endif ()
 
-if(APPLE)
+if (APPLE)
     set_source_files_properties("${GJ_APP_ICON_ICNS}" PROPERTIES
-        MACOSX_PACKAGE_LOCATION "Resources"
+            MACOSX_PACKAGE_LOCATION "Resources"
     )
     list(APPEND GJ_PLATFORM_SOURCES "${GJ_APP_ICON_ICNS}")
-endif()
+endif ()
 
 add_executable(GrooveJr
         main.h
@@ -131,6 +131,7 @@ target_link_libraries(GrooveJr
         Qt6::Gui
         Qt6::OpenGLWidgets
         Boost::log
+        Boost::headers
         ${Boost_LIBRARIES}
         SQLite::SQLite3
 )
@@ -138,33 +139,33 @@ target_compile_options(GrooveJr PRIVATE ${INCLUDE_FLAGS})
 set_target_properties(GrooveJr PROPERTIES LINKER_LANGUAGE CXX)
 
 # macOS app bundle: embed project shared libraries in Frameworks
-if(APPLE)
+if (APPLE)
     set_target_properties(GrooveJr PROPERTIES
-        MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resource/Info.plist.in"
-        MACOSX_BUNDLE_ICON_FILE "GrooveJr.icns"
-        MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
-        MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
-        MACOSX_BUNDLE_GUI_IDENTIFIER "com.nathanielbellamy.groovejr"
+            MACOSX_BUNDLE TRUE
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resource/Info.plist.in"
+            MACOSX_BUNDLE_ICON_FILE "GrooveJr.icns"
+            MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
+            MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
+            MACOSX_BUNDLE_GUI_IDENTIFIER "com.nathanielbellamy.groovejr"
     )
     add_custom_command(TARGET GrooveJr POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
+            COMMAND ${CMAKE_COMMAND} -E make_directory
             "$<TARGET_BUNDLE_DIR:GrooveJr>/Contents/Frameworks"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "$<TARGET_FILE:GjAudio>"
             "$<TARGET_BUNDLE_DIR:GrooveJr>/Contents/Frameworks/"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "$<TARGET_FILE:GjDb>"
             "$<TARGET_BUNDLE_DIR:GrooveJr>/Contents/Frameworks/"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "$<TARGET_FILE:GjScanner>"
             "$<TARGET_BUNDLE_DIR:GrooveJr>/Contents/Frameworks/"
     )
-endif()
+endif ()
 
 # Testing
 option(GJ_BUILD_TESTS "Build the test suite" OFF)
-if(GJ_BUILD_TESTS)
+if (GJ_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
-endif()
+endif ()
