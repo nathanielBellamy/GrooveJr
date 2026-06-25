@@ -32,7 +32,7 @@ struct Core {
   std::atomic<PlayState> playState; // TODO: remove
   std::atomic<bool> audioRunning = false;
   std::atomic<Db::Scene> scene;
-  std::atomic<sf_count_t> crossfade{0};
+  std::atomic<sf_count_t> crossfade{10000LL};
   std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
   std::atomic<bool> queuePlay = false;
   std::atomic<TrackNumber> queueIndex = 0;

@@ -127,7 +127,11 @@ struct AudioPlayer {
       );
 
     audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
-    audioCore->crossfade = stateCore->getCrossfade();
+    // TODO:
+    // - crossfade working just getting override to 0 here
+    // - move crossfade to scene
+    // - provide user slider
+    // audioCore->crossfade = stateCore->getCrossfade();
 
     Logging::write(
       Info,
@@ -459,15 +463,16 @@ struct AudioPlayer {
     const PlayState playState = stateCore->getPlayState();
     if (playState == STOP || playState == PAUSE) {
       std::cout << "will not continue run setting play state all decks" << std::endl;
-      audioCore->setPlayStateAllDecks(playState);
-    }
-
-    if (playState == STOP) {
-      stateCore->setFrameId(0);
       jackClient->deactivate();
       std::this_thread::sleep_for(std::chrono::milliseconds(100)); // let jack cleanup
-      jackClientIsActive = false;
-      audioCore->setFrameIdAllDecks(0);
+      audioCore->setPlayStateAllDecks(playState);
+
+      if (playState == STOP) {
+        stateCore->setFrameId(0);
+        jackClientIsActive = false;
+        audioCore->setFrameIdAllDecks(0);
+      }
+
       return false;
     }
 
@@ -506,6 +511,7 @@ struct AudioPlayer {
     stateCore->audioCoreShadow.store(audioCoreShadow);
     stateCore->setAudioRunning(true);
 
+    std::cout << " crossfade right before run " << audioCore->crossfade << std::endl;
     activateJackClient();
     while (continueRun()) {
       const bool audioCoreUpdatedDeckIndex = updateStateCoreAudioCoreShadow();
