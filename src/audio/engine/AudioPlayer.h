@@ -320,6 +320,7 @@ struct AudioPlayer {
       prevDeckIndex = currentDeckIndex;
       currentDeckIndex = decksStateBuffer[BfrIdx::DecksState::DECK_INDEX];
       nextDeckIndex = decksStateBuffer[BfrIdx::DecksState::DECK_INDEX_NEXT];
+      std::cout << " decks playing sum " << nextDeckIndex << std::endl;
     }
 
     if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > BfrIdx::MixerChannel::ProcessData::RB_SIZE
@@ -456,8 +457,10 @@ struct AudioPlayer {
 
   bool continueRun() {
     const PlayState playState = stateCore->getPlayState();
-    if (playState == STOP || playState == PAUSE)
+    if (playState == STOP || playState == PAUSE) {
+      std::cout << "will not continue run setting play state all decks" << std::endl;
       audioCore->setPlayStateAllDecks(playState);
+    }
 
     if (playState == STOP) {
       stateCore->setFrameId(0);
@@ -504,7 +507,6 @@ struct AudioPlayer {
     stateCore->setAudioRunning(true);
 
     activateJackClient();
-
     while (continueRun()) {
       const bool audioCoreUpdatedDeckIndex = updateStateCoreAudioCoreShadow();
 
@@ -602,6 +604,10 @@ struct AudioPlayer {
     for (int i = 0; i < AUDIO_CORE_DECK_COUNT; ++i) {
       audioCoreShadow.decks[i].playState = intToPs(decksStateBuffer[BfrIdx::DecksState::deckPlayState(i)]);
       audioCoreShadow.decks[i].frameId = decksStateBuffer[BfrIdx::DecksState::deckCurrentFrameId(i)];
+
+      std::cout << " Deck " << i << std::endl;
+      std::cout << " Deck playState " << audioCoreShadow.decks[i].playState << std::endl;
+      std::cout << " Deck frameId " << audioCoreShadow.decks[i].frameId << std::endl;
     }
 
     const auto distantDeckIndex = getDistantDeckIndex();
@@ -660,7 +666,6 @@ struct AudioPlayer {
     stateCore->audioCoreShadow.store(audioCoreShadow);
 
     prevDeckIndex = currentDeckIndex;
-
 
     std::cout << " xxxxxxxxx AFTER xxxxxxxxxx" << std::endl;
     std::cout << stateCore->toString() << std::endl;

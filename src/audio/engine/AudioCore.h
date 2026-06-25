@@ -24,7 +24,7 @@ namespace Gj {
 namespace Audio {
 struct AudioCore {
   State::Core* stateCore;
-  sf_count_t crossfade = 100000;
+  sf_count_t crossfade = static_cast<sf_count_t>(100000);
   AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0), AudioDeck(1), AudioDeck(2)};
   DeckIndex deckIndex = 1;
   DeckIndex deckIndexNext = 1;
@@ -350,15 +350,35 @@ struct AudioCore {
     return deckIndex != deckIndexNext;
   }
 
-  Result updateDeckIndexToNext() {
+  Result updatePlayStateDeckIndexes(const sf_count_t nframes, const float playbackSpeed) {
+    const auto& cd = currentDeck();
+    const DeckIndex rhDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    const DeckIndex lhDeckIndex = (deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT;
+
+    if (playbackSpeed > 0.0f) {
+      if (decks[rhDeckIndex].playState != PLAY)
+        decks[rhDeckIndex].frameId = 0;
+      if (cd.frameId > cd.frames - crossfade)
+        decks[rhDeckIndex].playState = PLAY;
+      if (cd.frameId > cd.frames - 4LL * nframes)
+        deckIndexNext = rhDeckIndex;
+    } else if (playbackSpeed < 0.0f) {
+      if (decks[lhDeckIndex].playState != PLAY)
+        decks[lhDeckIndex].frameId = decks[lhDeckIndex].frames - 2;
+      if (cd.frameId < crossfade)
+        decks[lhDeckIndex].playState = PLAY;
+      if (cd.frameId < 2LL * nframes)
+        deckIndexNext = lhDeckIndex;
+    }
+
     if (deckIndex == deckIndexNext)
       return OK;
 
     decks[deckIndex].playState = STOP;
     if (decks[deckIndexNext].decoratedAudioFile)
       decks[deckIndexNext].playState = PLAY;
-    else
-      decks[deckIndexNext].playState = STOP;
+    // else
+    // decks[deckIndexNext].playState = STOP;
 
     deckIndex = deckIndexNext;
 
@@ -373,33 +393,33 @@ struct AudioCore {
     const auto& deck = decks[di];
     const float frameIdF = static_cast<float>(deck.frameId);
     const float framesF = static_cast<float>(deck.frames);
-    const float crossfadeF = static_cast<float>(stateCore->getCrossfade());
+    const float crossfadeF = static_cast<float>(crossfade);
     // TODO: log, exp transition funcs
-    if (deckIndex == di) {
-      if (deck.frameId >= deck.frames - stateCore->getCrossfade())
-        return (framesF - frameIdF) / crossfadeF;
+    // if (deckIndex == di) {
+    if (deck.frameId > deck.frames - crossfade)
+      return (framesF - frameIdF) / crossfadeF;
 
-      if (deck.frameId <= stateCore->getCrossfade())
-        return frameIdF / crossfadeF;
+    if (deck.frameId < crossfade)
+      return frameIdF / crossfadeF;
 
-      return 1.0f;
-    }
+    return 1.0f;
+    // }
+    //
+    // if (di == (deckIndex + 1) % AUDIO_CORE_DECK_COUNT) {
+    //   if (deck.frameId < crossfade)
+    //     return frameIdF / crossfadeF;
+    //
+    //   return 0.0f;
+    // }
+    //
+    // if (di == (deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT) {
+    //   if (deck.frameId > deck.frames - crossfade)
+    //     return (framesF - frameIdF) / crossfadeF;
+    //
+    //   return 0.0f;
+    // }
 
-    if (di == (deckIndex + 1) % AUDIO_CORE_DECK_COUNT) {
-      if (deck.frameId <= stateCore->getCrossfade())
-        return frameIdF / crossfadeF;
-
-      return 0.0f;
-    }
-
-    if (di == (deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT) {
-      if (deck.frameId >= deck.frames - stateCore->getCrossfade())
-        return (framesF - frameIdF) / crossfadeF;
-
-      return 0.0f;
-    }
-
-    return 0.0f;
+    // return 0.0f;
   }
 
   Result setPlayStateAllDecks(const PlayState playState) {
