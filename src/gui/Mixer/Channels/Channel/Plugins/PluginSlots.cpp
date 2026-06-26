@@ -67,11 +67,9 @@ Result PluginSlots::hydrateState(const State::Packet& statePacket, const Channel
     }
   }
 
-  PluginIndex i = 0;
   for (PluginIndex plugIdx = 0; plugIdx < Audio::MAX_PLUGINS_PER_CHANNEL; ++plugIdx) {
     if (pluginSlots[plugIdx] == nullptr) continue;
-    pluginSlots[plugIdx]->hydrateState(statePacket, channelIndex, i);
-    ++i;
+    pluginSlots[plugIdx]->hydrateState(statePacket, channelIndex, plugIdx);
   }
 
   setupGrid();

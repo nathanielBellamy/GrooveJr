@@ -48,6 +48,10 @@ void PluginSlot::hydrateState(const State::Packet& statePacket, const ChannelInd
                               const PluginIndex newPluginIndex) {
   channelIndex = newChannelIndex;
   pluginIndex = newPluginIndex;
+  std::cout << "PluginSlot::hydrateState: channelIndex = " << channelIndex
+      << " pluginName = "
+      << statePacket.mixerPacket.channels[channelIndex].plugins[pluginIndex].name.c_str()
+      << std::endl;
   pluginName.setText(statePacket.mixerPacket.channels[channelIndex].plugins[pluginIndex].name.c_str());
 
   togglePluginButton.hydrateState(statePacket, newChannelIndex);

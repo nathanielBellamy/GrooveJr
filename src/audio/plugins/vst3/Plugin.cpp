@@ -38,7 +38,18 @@ Plugin::Plugin(const AtomicStr& path, State::Core* stateCore, std::shared_ptr<Ja
 	}
 
 	const auto moduleName = module->getName();
-	name = moduleName.substr(0, moduleName.find_last_of('.'));
+	if (moduleName.empty()) {
+		std::string p = path.std_str();
+		while (!p.empty() && p.back() == '/') p.pop_back();
+		auto pos = p.find_last_of('/');
+		auto basename = (pos != std::string::npos) ? p.substr(pos + 1) : p;
+		auto dot = basename.find_last_of('.');
+		name = AtomicStr(dot != std::string::npos ? basename.substr(0, dot) : basename);
+	} else {
+		name = AtomicStr(moduleName.substr(0, moduleName.find_last_of('.')));
+	}
+
+	std::cout << " my name is " << name.std_str() << std::endl;
 
 	const auto& cmdArgs = std::vector{path.std_str()};
 
@@ -87,7 +98,16 @@ Plugin::Plugin(const Db::Plugin& pluginEntity, State::Core* stateCore, std::shar
 	}
 
 	const auto moduleName = module->getName();
-	name = AtomicStr(moduleName.substr(0, moduleName.find_last_of('.')));
+	if (moduleName.empty()) {
+		std::string p = path.std_str();
+		while (!p.empty() && p.back() == '/') p.pop_back();
+		auto pos = p.find_last_of('/');
+		auto basename = (pos != std::string::npos) ? p.substr(pos + 1) : p;
+		auto dot = basename.find_last_of('.');
+		name = AtomicStr(dot != std::string::npos ? basename.substr(0, dot) : basename);
+	} else {
+		name = AtomicStr(moduleName.substr(0, moduleName.find_last_of('.')));
+	}
 
 	const auto& cmdArgs = std::vector{path.std_str()};
 

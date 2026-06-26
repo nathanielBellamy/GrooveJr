@@ -416,7 +416,7 @@ void Channel::connectActions() {
 
   auto addPluginConnection = connect(&addPluginAction, &QAction::triggered, [&]() {
     if (vstSelect.exec() == QDialog::Accepted) {
-      const PluginPath pluginPath = vstUrl.toDisplayString().toStdString().substr(7);
+      const PluginPath pluginPath = vstUrl.toLocalFile().toStdString();
       Logging::write(
         Info,
         "Gui::Channel::addPluginAction",
@@ -458,7 +458,7 @@ void Channel::connectActions() {
   auto replacePluginConnection = connect(&replacePluginAction, &QAction::triggered, [&]() {
     const PluginIndex pluginIdx = replacePluginAction.data().toULongLong();
     if (vstSelect.exec() == QDialog::Accepted) {
-      const auto pluginPath = vstUrl.toDisplayString().toStdString().substr(7);
+      const auto pluginPath = vstUrl.toLocalFile().toStdString();
       Logging::write(
         Info,
         "Gui::Channel::replacePluginAction",

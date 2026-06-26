@@ -78,6 +78,8 @@ Result Channel::addReplacePlugin(const std::optional<PluginIndex> pluginIdxOpt, 
 		jackClient
 	);
 
+	std::cout << "Channel::addReplacePlugin plugin name " << plugin->getName().c_str() << std::endl;
+
 	Logging::write(
 		Info,
 		"Audio::Mixer::Channel::addReplacePlugin",
