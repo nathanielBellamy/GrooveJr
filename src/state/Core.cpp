@@ -56,7 +56,7 @@ Packet Core::toPacket(const Mixer::Packet& mixerPacket) {
 }
 
 Core Core::fromAppStateEntity(const Db::AppStateEntity& appStateEntity) {
-  Db::Scene scene("My Scene", 1.0f);
+  Db::Scene scene("My Scene", 1.0f, 0LL);
   return {
     appStateEntity.id,
     appStateEntity.audioFramesPerBuffer,

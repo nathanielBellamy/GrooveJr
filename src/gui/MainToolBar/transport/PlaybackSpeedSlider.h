@@ -5,6 +5,7 @@
 #ifndef PLAYBACKSPEEDSLIDER_H
 #define PLAYBACKSPEEDSLIDER_H
 
+#include <QLabel>
 #include <QSlider>
 
 #include "../../../audio/mixer/Core.h"
@@ -15,7 +16,7 @@ class PlaybackSpeedSlider final : public QSlider {
   Audio::Mixer::Core* mixer;
 
 public:
-  PlaybackSpeedSlider(QWidget* parent, Audio::Mixer::Core* mixer);
+  PlaybackSpeedSlider(QWidget* parent, Audio::Mixer::Core* mixer, QLabel* label);
 
   void mouseDoubleClickEvent(QMouseEvent* event) override;
 };

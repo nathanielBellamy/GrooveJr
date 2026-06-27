@@ -8,6 +8,8 @@
 #include <atomic>
 #include <cmath>
 
+#include <boost/math/ccmath/ccmath.hpp>
+
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QtOpenGL/QOpenGLShaderProgram>
@@ -28,6 +30,7 @@ namespace Gui {
 namespace Mixer {
 constexpr int VU_METER_AVG_SIZE = 8;
 constexpr int VU_METER_BLOCK_COUNT = 16;
+constexpr float VU_METER_BLOCK_COUNT_F = 16.0f;
 constexpr float VU_METER_BLOCK_HEIGHT = 1.3f / static_cast<float>(VU_METER_BLOCK_COUNT);
 constexpr float VU_METER_GAP = 0.7f / static_cast<float>(VU_METER_BLOCK_COUNT + 1);
 constexpr float VU_METER_X_LEFT_LEFT = -0.9f;
@@ -41,6 +44,19 @@ constexpr auto VU_METER_YELLOW = QColor(255, 255, 0, 255);
 constexpr auto VU_METER_YELLOW_TR = QColor(75, 75, 0, 100);
 constexpr auto VU_METER_RED = QColor(255, 0, 0, 255);
 constexpr auto VU_METER_RED_TR = QColor(75, 0, 0, 100);
+
+constexpr std::array<int, VU_METER_BLOCK_COUNT> generateVULimits() {
+  std::array<int, VU_METER_BLOCK_COUNT> arr{};
+
+  for (std::size_t i = 0; i < VU_METER_BLOCK_COUNT; ++i) {
+    arr[i] = -99.0f
+             + 90.0f * boost::math::ccmath::sqrt(static_cast<float>(i) / VU_METER_BLOCK_COUNT_F);
+  }
+
+  return arr;
+}
+
+constexpr auto VU_METER_LIMIT_ARR = generateVULimits();
 
 class VuMeter final : public QOpenGLWidget, private QOpenGLFunctions {
 public:

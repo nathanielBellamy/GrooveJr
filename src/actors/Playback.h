@@ -84,6 +84,9 @@ struct PlaybackState {
           "Received TC Trig Play"
         );
 
+        if (stateCore->isAudioRunning())
+          return;
+
         if (!audioCore->currentDeck().hasValidCassetteLoaded()) {
           Logging::write(
             Warning,

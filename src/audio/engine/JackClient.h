@@ -58,7 +58,8 @@ public:
 
   bool registerMidiClient(IMidiClient* client) override;
 
-  static int fillPlaybackBuffer(AudioCore* audioData, sf_count_t playbackSpeed, jack_nframes_t nframes);
+  static int fillPlaybackBuffer(AudioCore* audioData, sf_count_t playbackSpeed, sf_count_t crossfade,
+                                jack_nframes_t nframes);
 
   //--------------------------------------------------------------------
 private:

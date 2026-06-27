@@ -32,7 +32,7 @@ TEST(SceneTest, Base_Name) {
 }
 
 TEST(SceneTest, Constructor_Full) {
-    Scene scene(42, 7, AtomicStr("My Scene"), 1.5f, 3);
+    Scene scene(42, 7, AtomicStr("My Scene"), 1.5f, 0LL, 3);
     EXPECT_EQ(scene.id, 42u);
     EXPECT_EQ(scene.sceneId, 7u);
     EXPECT_FLOAT_EQ(scene.playbackSpeed, 1.5f);
@@ -40,14 +40,14 @@ TEST(SceneTest, Constructor_Full) {
 }
 
 TEST(SceneTest, Constructor_Minimal) {
-    Scene scene(AtomicStr("Quick Scene"), 0.75f);
+    Scene scene(AtomicStr("Quick Scene"), 0.75f, 0LL);
     EXPECT_EQ(scene.id, 0u);
     EXPECT_EQ(scene.sceneId, 0u);
     EXPECT_FLOAT_EQ(scene.playbackSpeed, 0.75f);
 }
 
 TEST(SceneTest, ToStdString_ContainsFields) {
-    Scene scene(1, 2, AtomicStr("Test"), 1.0f, 0);
+    Scene scene(1, 2, AtomicStr("Test"), 1.0f, 0LL, 0);
     std::string str = scene.toStdString();
     EXPECT_NE(str.find("Scene"), std::string::npos);
     EXPECT_NE(str.find("dbId: 1"), std::string::npos);

@@ -5,6 +5,7 @@
 #ifndef TRACKDECORATE_H
 #define TRACKDECORATE_H
 
+#include <sstream>
 #include <sndfile.h>
 #include <sqlite3.h>
 
@@ -48,6 +49,41 @@ struct DecoratedAudioFile final {
 
   bool isValid() const {
     return audioFile.valid;
+  }
+
+  std::string toString() const {
+    std::ostringstream stream;
+    stream << std::boolalpha
+      << "DecoratedAudioFile { "
+      << "album: { "
+      << "id: " << album.id
+      << ", title: " << album.title.std_str()
+      << ", year: " << album.year
+      << " }, artist: { "
+      << "id: " << artist.id
+      << ", name: " << artist.name.std_str()
+      << " }, audioFile: { "
+      << "id: " << audioFile.id
+      << ", trackId: " << audioFile.trackId
+      << ", filePath: " << audioFile.filePath.std_str()
+      << ", sfInfo: { "
+      << "frames: " << audioFile.sfInfo.frames
+      << ", samplerate: " << audioFile.sfInfo.samplerate
+      << ", channels: " << audioFile.sfInfo.channels
+      << ", format: " << audioFile.sfInfo.format
+      << ", sections: " << audioFile.sfInfo.sections
+      << ", seekable: " << audioFile.sfInfo.seekable
+      << " }, valid: " << audioFile.valid
+      << " }, genre: { "
+      << "id: " << genre.id
+      << ", name: " << genre.name.std_str()
+      << " }, track: { "
+      << "id: " << track.id
+      << ", albumId: " << track.albumId
+      << ", title: " << track.title.std_str()
+      << ", trackNumber: " << track.trackNumber
+      << " } }";
+    return stream.str();
   }
 };
 

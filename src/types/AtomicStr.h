@@ -5,6 +5,7 @@
 #ifndef GJATOMICSTR_H
 #define GJATOMICSTR_H
 
+#include <algorithm>
 #include <string>
 
 namespace Gj {
@@ -17,15 +18,11 @@ struct AtomicStr {
   AtomicStr() {}
 
   AtomicStr(const char* str) {
-    for (int i = 0; str[i] != '\0' && i < ATOMIC_STR_SIZE; i++) {
-      value[i] = str[i];
-    }
+    assign(str);
   }
 
   AtomicStr(const std::string& str) {
-    for (int i = 0; i < str.size() && i < ATOMIC_STR_SIZE; i++) {
-      value[i] = str[i];
-    }
+    assign(str.c_str(), str.size());
   }
 
   const char* c_str() const {
@@ -33,7 +30,26 @@ struct AtomicStr {
   }
 
   std::string std_str() const {
-    return std::string(value);
+    const auto* end = std::find(value, value + ATOMIC_STR_SIZE, '\0');
+    return std::string(value, end);
+  }
+
+private:
+  void assign(const char* str) {
+    size_t length = 0;
+    while (length < ATOMIC_STR_SIZE - 1 && str[length] != '\0') {
+      value[length] = str[length];
+      length++;
+    }
+    value[length] = '\0';
+  }
+
+  void assign(const char* str, const size_t length) {
+    const auto copyLength = std::min(length, ATOMIC_STR_SIZE - 1);
+    for (size_t i = 0; i < copyLength; i++) {
+      value[i] = str[i];
+    }
+    value[copyLength] = '\0';
   }
 };
 

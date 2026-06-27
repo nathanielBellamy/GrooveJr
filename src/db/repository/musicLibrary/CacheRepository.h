@@ -6,6 +6,7 @@
 #define CACHEREPOSITORY_H
 
 #include <vector>
+#include <optional>
 
 #include "MusicLibraryRepository.h"
 
@@ -14,19 +15,18 @@
 
 namespace Gj {
 namespace Db {
-
 class CacheRepository final : public MusicLibraryRepository {
+public:
+  CacheRepository(sqlite3** db, State::Core* stateCore)
+  : MusicLibraryRepository(db, stateCore) {
+  };
 
-  public:
-    CacheRepository(sqlite3** db, State::Core* stateCore)
-      : MusicLibraryRepository(db, stateCore)
-      {};
+  Result save(const std::vector<Cache>& caches) const;
 
-    Result save(const std::vector<Cache>& caches) const;
-    Result clear() const;
+  Result clear() const;
+
+  std::optional<ID> findAudioFileIdByTrackNumber(TrackNumber trackNumber) const;
 };
-
-
 } // Db
 } // Gj
 

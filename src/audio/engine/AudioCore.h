@@ -23,12 +23,10 @@
 namespace Gj {
 namespace Audio {
 struct AudioCore {
-  long threadId;
   State::Core* stateCore;
-  sf_count_t crossfade = 0;
-  AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0, stateCore), AudioDeck(1, stateCore), AudioDeck(2, stateCore)};
-  DeckIndex deckIndex = 0;
-  DeckIndex deckIndexNext = 0;
+  AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0), AudioDeck(1), AudioDeck(2)};
+  DeckIndex deckIndex = 1;
+  DeckIndex deckIndexNext = 1;
   sf_count_t frameAdvance;
   float fft_eq_time[AUDIO_CHANNEL_COUNT][FFT_EQ_TIME_SIZE]{};
   fftwf_complex fft_eq_freq[AUDIO_CHANNEL_COUNT][FFT_EQ_FREQ_SIZE]{};
@@ -59,7 +57,7 @@ struct AudioCore {
 
   sf_count_t playbackSettingsFromAudioThread[BfrIdx::PSFAT::SIZE]{};
   jack_ringbuffer_t* playbackSettingsFromAudioThreadRB{nullptr};
-  std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
+  std::function<int(AudioCore*, sf_count_t, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
   size_t mixerChannelCount;
   jack_ringbuffer_t* mixerChannelsProcessDataRB{};
@@ -69,14 +67,18 @@ struct AudioCore {
   float mixerChannelsWriteOutBuffer[AUDIO_CHANNEL_COUNT * AUDIO_FRAMES_PER_BUFFER_MAX * MAX_MIXER_CHANNELS]{};
   float* mixerChannelsWriteOut[MAX_MIXER_CHANNELS][AUDIO_CHANNEL_COUNT]{};
 
-  AudioCore(State::Core* stateCore)
+  DeckIndex decksStateBuffer[BfrIdx::DecksState::BUFFER_SIZE];
+  jack_ringbuffer_t* decksStateRB{nullptr};
+
+  explicit AudioCore(State::Core* stateCore)
   : stateCore(stateCore)
     , fft_eq_ring_buffer(jack_ringbuffer_create(FFT_EQ_RING_BUFFER_SIZE))
     , vu_ring_buffer(jack_ringbuffer_create(VU_RING_BUFFER_SIZE))
     , playbackSettingsToAudioThreadRB(jack_ringbuffer_create(BfrIdx::PSTAT::RB_SIZE))
     , playbackSettingsFromAudioThreadRB(jack_ringbuffer_create(BfrIdx::PSFAT::RB_SIZE))
     , mixerChannelsProcessDataRB(jack_ringbuffer_create(BfrIdx::MixerChannel::ProcessData::RB_SIZE))
-    , mixerChannelsSettingsRB(jack_ringbuffer_create(BfrIdx::MixerChannel::Settings::RB_SIZE)) {
+    , mixerChannelsSettingsRB(jack_ringbuffer_create(BfrIdx::MixerChannel::Settings::RB_SIZE))
+    , decksStateRB(jack_ringbuffer_create(BfrIdx::DecksState::RING_BUFFER_SIZE)) {
     Logging::write(
       Info,
       "Audio::AudioCore::AudioCore()",
@@ -98,11 +100,13 @@ struct AudioCore {
     fftwf_destroy_plan(fft_pv_plan_r2c);
     fftwf_destroy_plan(fft_pv_plan_c2r);
 
-    jack_ringbuffer_free(fft_eq_ring_buffer);
-    jack_ringbuffer_free(vu_ring_buffer);
+    jack_ringbuffer_free(decksStateRB);
     jack_ringbuffer_free(mixerChannelsSettingsRB);
-    jack_ringbuffer_free(playbackSettingsToAudioThreadRB);
+    jack_ringbuffer_free(mixerChannelsProcessDataRB);
     jack_ringbuffer_free(playbackSettingsFromAudioThreadRB);
+    jack_ringbuffer_free(playbackSettingsToAudioThreadRB);
+    jack_ringbuffer_free(vu_ring_buffer);
+    jack_ringbuffer_free(fft_eq_ring_buffer);
 
     Logging::write(
       Info,
@@ -286,9 +290,9 @@ struct AudioCore {
       "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
       filePath
     );
-    const DeckIndex nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
-    deckIndex = nextDeckIndex;
-    deckIndexNext = nextDeckIndex;
+    // const DeckIndex nextDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    // deckIndex = nextDeckIndex;
+    // deckIndexNext = nextDeckIndex;
     if (decks[deckIndex].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
       Logging::write(
         Error,
@@ -313,7 +317,8 @@ struct AudioCore {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromDecoratedAudioFileAtIdx",
-      "Adding cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
+      "Adding cassette to deckIndex " + std::to_string(deckIndexToSet) + " for filePath " + decoratedAudioFile.audioFile
+      .
       filePath
     );
     if (decks[deckIndexToSet].setCassetteFromDecoratedAudioFile(decoratedAudioFile) == ERROR) {
@@ -329,7 +334,7 @@ struct AudioCore {
     Logging::write(
       Info,
       "Audio::AudioCore::addCassetteFromDecoratedAudioFileAtIdx",
-      "Added cassette to deckIndex " + std::to_string(deckIndex) + " for filePath " + decoratedAudioFile.audioFile.
+      "Added cassette to deckIndex " + std::to_string(deckIndexToSet) + " for filePath " + decoratedAudioFile.audioFile.
       filePath
     );
     return OK;
@@ -340,35 +345,41 @@ struct AudioCore {
     return OK;
   }
 
-  Result setDeckIndex(const DeckIndex val) {
-    deckIndex = val;
-    return OK;
-  }
-
-  bool shouldUpdateDeckIndex() {
+  bool shouldUpdateDeckIndex() const {
     return deckIndex != deckIndexNext;
   }
 
-  Result updateDeckIndexToNext() {
-    Logging::write(
-      Info,
-      "Audio::AudioCore::updateDeckIndexToNext",
-      "Updating deckIndex " + std::to_string(deckIndex) + " to next deckIndexNext " + std::to_string(deckIndexNext)
-    );
+  Result updatePlayStateDeckIndexes(const sf_count_t nframes, const float playbackSpeed, const sf_count_t crossfade) {
+    const auto& cd = currentDeck();
+    const DeckIndex rhDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    const DeckIndex lhDeckIndex = (deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT;
+
+    const sf_count_t updateDeckIndexFactor = 2LL;
+    if (playbackSpeed > 0.0f) {
+      if (decks[rhDeckIndex].playState != PLAY)
+        decks[rhDeckIndex].frameId = 0;
+      if (cd.frameId > cd.frames - crossfade)
+        decks[rhDeckIndex].playState = PLAY;
+      if (cd.frameId > cd.frames - updateDeckIndexFactor * nframes)
+        deckIndexNext = rhDeckIndex;
+    } else if (playbackSpeed < 0.0f) {
+      if (decks[lhDeckIndex].playState != PLAY)
+        decks[lhDeckIndex].frameId = decks[lhDeckIndex].frames - 2;
+      if (cd.frameId < crossfade)
+        decks[lhDeckIndex].playState = PLAY;
+      if (cd.frameId < updateDeckIndexFactor * nframes)
+        deckIndexNext = lhDeckIndex;
+    }
+
+    if (deckIndex == deckIndexNext)
+      return OK;
 
     decks[deckIndex].playState = STOP;
-    if (decks[deckIndexNext].decoratedAudioFile) {
-      stateCore->setCurrentlyPlaying(decks[deckIndexNext].decoratedAudioFile.value());
+    if (decks[deckIndexNext].decoratedAudioFile)
       decks[deckIndexNext].playState = PLAY;
-    } else {
-      decks[deckIndexNext].playState = STOP;
-    }
-    deckIndex = deckIndexNext;
-    return OK;
-  }
 
-  Result incrDeckIndex() {
-    deckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
+    deckIndex = deckIndexNext;
+
     return OK;
   }
 
@@ -376,37 +387,20 @@ struct AudioCore {
     return decks[deckIndex];
   }
 
-  float getDeckGain(const DeckIndex di) const {
+  float getDeckGain(const DeckIndex di, const sf_count_t crossfade) const {
     const auto& deck = decks[di];
     const float frameIdF = static_cast<float>(deck.frameId);
     const float framesF = static_cast<float>(deck.frames);
-    const float crossfadeF = static_cast<float>(stateCore->getCrossfade());
+    const float crossfadeF = static_cast<float>(crossfade);
     // TODO: log, exp transition funcs
-    if (deckIndex == di) {
-      if (deck.frameId >= deck.frames - stateCore->getCrossfade())
-        return (framesF - frameIdF) / crossfadeF;
+    // if (deckIndex == di) {
+    if (deck.frameId > deck.frames - crossfade)
+      return (framesF - frameIdF) / crossfadeF;
 
-      if (deck.frameId <= stateCore->getCrossfade())
-        return frameIdF / crossfadeF;
+    if (deck.frameId < crossfade)
+      return frameIdF / crossfadeF;
 
-      return 1.0f;
-    }
-
-    if (di == (deckIndex + 1) % AUDIO_CORE_DECK_COUNT) {
-      if (deck.frameId <= stateCore->getCrossfade())
-        return frameIdF / crossfadeF;
-
-      return 0.0f;
-    }
-
-    if (di == (deckIndex - 1) % AUDIO_CORE_DECK_COUNT) {
-      if (deck.frameId >= deck.frames - stateCore->getCrossfade())
-        return (framesF - frameIdF) / crossfadeF;
-
-      return 0.0f;
-    }
-
-    return 0.0f;
+    return 1.0f;
   }
 
   Result setPlayStateAllDecks(const PlayState playState) {

@@ -13,7 +13,10 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mi
   , sys(sys)
   , grid(new QGridLayout(this))
   , progressBar(new ProgressBar(this, mixer, 0))
-  , playbackSpeedSlider(new PlaybackSpeedSlider(this, mixer))
+  , playbackSpeedLabel(new QLabel(this))
+  , playbackSpeedSlider(new PlaybackSpeedSlider(this, mixer, playbackSpeedLabel))
+  , crossfadeLabel(new QLabel(this))
+  , crossfadeSlider(new CrossfadeSlider(this, mixer, crossfadeLabel))
   , playTrigAction(new QAction(style()->standardIcon(QStyle::StandardPixmap::SP_MediaPlay), "", this))
   , pauseTrigAction(new QAction(style()->standardIcon(QStyle::StandardPixmap::SP_MediaPause), "", this))
   , stopTrigAction(new QAction(style()->standardIcon(QStyle::StandardPixmap::SP_MediaStop), "", this))
@@ -30,6 +33,17 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mi
   , ffButton(new TransportControlButton(this, ffTrigAction, style()->standardIcon(QStyle::StandardPixmap::SP_MediaSkipForward))) {
   connectActions();
   setupGrid();
+
+  const auto playbackSpeed = mixer->getPlaybackSpeed();
+  const auto playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
+  playbackSpeedLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+  playbackSpeedLabel->setText(QString("Playback speed: %1 %").arg(playbackSpeedF));
+  playbackSpeedLabel->setFont({playbackSpeedLabel->font().family(), 12});
+
+  const auto crossfade = mixer->getCrossfade();
+  crossfadeLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+  crossfadeLabel->setText(QString("Crossfade (frames): %1 frames").arg(crossfade));
+  crossfadeLabel->setFont({crossfadeLabel->font().family(), 12});
 
   Logging::write(
     Info,
@@ -49,7 +63,10 @@ TransportControl::~TransportControl() {
   delete stopTrigAction;
   delete pauseTrigAction;
   delete playTrigAction;
+  delete crossfadeSlider;
+  delete crossfadeLabel;
   delete playbackSpeedSlider;
+  delete playbackSpeedLabel;
   delete progressBar;
   delete grid;
 }
@@ -175,6 +192,9 @@ void TransportControl::setupGrid() {
   grid->addWidget(ffButton, 0, 4, 1, 1);
   grid->addWidget(progressBar, 1, 0, 1, -1);
   grid->addWidget(playbackSpeedSlider, 2, 0, 1, -1);
+  grid->addWidget(playbackSpeedLabel, 3, 1, 1, -1);
+  grid->addWidget(crossfadeSlider, 4, 0, 1, -1);
+  grid->addWidget(crossfadeLabel, 5, 1, 1, -1);
 
   setLayout(grid);
 }

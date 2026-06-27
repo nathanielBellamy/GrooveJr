@@ -83,6 +83,7 @@ int Dao::initSchema() const {
       sceneId integer not null,
       name text not null,
       playbackSpeed real not null default 1.0,
+      crossfade integer not null default 0,
       version integer not null,
       createdAt datetime default current_timestamp,
       unique (sceneId, version)
@@ -207,6 +208,7 @@ int Dao::initSchema() const {
 
     create table if not exists cache (
       id integer primary key autoincrement,
+      trackNumber integer not null unique,
       audioFileId integer not null,
       createdAt datetime default current_timestamp,
       foreign key (audioFileId) references audioFiles(id) on delete cascade

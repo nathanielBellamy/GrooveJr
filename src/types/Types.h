@@ -7,21 +7,21 @@
 
 #include <stdint.h>
 #include <string>
+#include <sndfile.h>
 
 #include "./AtomicStr.h"
 
 namespace Gj {
-
-typedef uint64_t         ID;
-typedef uint64_t         SceneID;
-typedef uint64_t         Version;
-typedef uint16_t         TrackNumber;
-typedef size_t           ChannelIndex;
-typedef size_t           PluginIndex;
-typedef AtomicStr        PluginPath;
-typedef size_t           DeckIndex;
-typedef unsigned int     Year;
-
+typedef uint64_t ID;
+typedef uint64_t SceneID;
+typedef uint64_t Version;
+typedef uint16_t TrackNumber;
+typedef size_t ChannelIndex;
+typedef size_t PluginIndex;
+typedef AtomicStr PluginPath;
+typedef size_t DeckIndex;
+typedef sf_count_t FrameID;
+typedef unsigned int Year;
 } // Gj
 
 #endif //TYPES_H

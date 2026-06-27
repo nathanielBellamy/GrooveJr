@@ -6,6 +6,7 @@
 #define APPSTATE_H
 
 #include <atomic>
+#include <sstream>
 #include <string>
 
 #include <sndfile.h>
@@ -18,6 +19,7 @@
 #include "../db/dto/musicLibrary/DecoratedAudioFile.h"
 #include "../types/Types.h"
 #include "../types/AtomicStr.h"
+#include "./audio/CoreShadow.h"
 
 #include "Packet.h"
 #include "mixer/Packet.h"
@@ -30,12 +32,19 @@ struct Core {
   std::atomic<PlayState> playState; // TODO: remove
   std::atomic<bool> audioRunning = false;
   std::atomic<Db::Scene> scene;
-  std::atomic<sf_count_t> crossfade{0};
+  std::atomic<sf_count_t> crossfade{10000LL};
   std::atomic<Db::DecoratedAudioFile> currentlyPlaying;
   std::atomic<bool> queuePlay = false;
   std::atomic<TrackNumber> queueIndex = 0;
+  std::atomic<TrackNumber> cacheTrackNumber = 0;
+  std::atomic<TrackNumber> cacheSize = 0;
   std::atomic<bool> userSettingFrameId = false;
   std::atomic<sf_count_t> frameId = 0;
+  std::atomic<Audio::CoreShadow> audioCoreShadow;
+  std::atomic<bool> requestingDeckUpdate = false;
+  std::atomic<ID> sceneIdToLoad = 0;
+  std::atomic<bool> requestingSceneSave = false;
+
 
   Core();
 
@@ -55,7 +64,6 @@ struct Core {
   void setFromEntityAndScene(const Db::AppStateEntity& appStateEntity, const Db::Scene& newScene) {
     id.store(appStateEntity.id);
     audioFramesPerBuffer.store(appStateEntity.audioFramesPerBuffer);
-    playState.store(STOP);
     crossfade.store(appStateEntity.crossfade);
     scene.store(newScene);
   };
@@ -114,13 +122,62 @@ struct Core {
   }
 
   std::string toString() const {
-    return
-        " Gj::AppState { "
-        "  id: " + std::to_string(id) +
-        "  audioFramesPerBuffer: " + std::to_string(audioFramesPerBuffer) +
-        "  playState: " + std::to_string(playState) +
-        "  sceneId: " + std::to_string(scene.load().id) +
-        " } ";
+    const auto playStateToString = [](const PlayState value) {
+      switch (value) {
+        case STOP:
+          return std::string("STOP");
+        case PLAY:
+          return std::string("PLAY");
+        case PAUSE:
+          return std::string("PAUSE");
+        case RW:
+          return std::string("RW");
+        case FF:
+          return std::string("FF");
+      }
+      return std::string("UNKNOWN");
+    };
+
+    const auto currentId = id.load();
+    const auto currentAudioFramesPerBuffer = audioFramesPerBuffer.load();
+    const auto currentPlayState = playState.load();
+    const auto currentAudioRunning = audioRunning.load();
+    const auto currentScene = scene.load();
+    const auto currentCrossfade = crossfade.load();
+    const auto currentCurrentlyPlaying = currentlyPlaying.load();
+    const auto currentQueuePlay = queuePlay.load();
+    const auto currentQueueIndex = queueIndex.load();
+    const auto currentCacheTrackNumber = cacheTrackNumber.load();
+    const auto currentCacheSize = cacheSize.load();
+    const auto currentUserSettingFrameId = userSettingFrameId.load();
+    const auto currentFrameId = frameId.load();
+    const auto currentAudioCoreShadow = audioCoreShadow.load();
+    const auto currentRequestingDeckUpdate = requestingDeckUpdate.load();
+    const auto currentSceneIdToLoad = sceneIdToLoad.load();
+    const auto currentRequestingSceneSave = requestingSceneSave.load();
+
+    std::ostringstream stream;
+    stream << std::boolalpha
+        << "Gj::State::Core { " << std::endl
+        << "id: " << currentId << std::endl
+        << ", audioFramesPerBuffer: " << currentAudioFramesPerBuffer << std::endl
+        << ", playState: " << playStateToString(currentPlayState) << std::endl
+        << ", audioRunning: " << currentAudioRunning << std::endl
+        << ", scene: " << currentScene.toString() << std::endl
+        << ", crossfade: " << currentCrossfade << std::endl
+        << ", currentlyPlaying: " << currentCurrentlyPlaying.toString() << std::endl
+        << ", queuePlay: " << currentQueuePlay << std::endl
+        << ", queueIndex: " << currentQueueIndex << std::endl
+        << ", cacheTrackNumber: " << currentCacheTrackNumber << std::endl
+        << ", cacheSize: " << currentCacheSize << std::endl
+        << ", userSettingFrameId: " << currentUserSettingFrameId << std::endl
+        << ", frameId: " << currentFrameId << std::endl
+        << ", audioCoreShadow: " << currentAudioCoreShadow.toString() << std::endl
+        << ", requestingDeckUpdate: " << currentRequestingDeckUpdate << std::endl
+        << ", sceneIdToLoad: " << currentSceneIdToLoad << std::endl
+        << ", requestingSceneSave: " << currentRequestingSceneSave << std::endl
+        << " }";
+    return stream.str();
   };
 
   Result setCurrentlyPlaying(const Db::DecoratedAudioFile& decoratedAudioFile) {
@@ -148,6 +205,29 @@ struct Core {
 
   sf_count_t getFrameId() const {
     return frameId.load();
+  }
+
+  Result requestSceneLoadById(const ID sceneDbId) {
+    sceneIdToLoad.store(sceneDbId);
+    return OK;
+  }
+
+  TrackNumber updateCacheTrackNumber() {
+    const auto playbackSpeed = scene.load().playbackSpeed;
+    const auto cTrackNumber = cacheTrackNumber.load();
+    const auto cSize = cacheSize.load();
+
+    TrackNumber result;
+
+    if (playbackSpeed < 0)
+      result = (cTrackNumber + (cSize - 1)) % cSize;
+    else if (playbackSpeed > 0)
+      result = (cTrackNumber + 1) % cSize;
+    else // do nothing;
+      result = cTrackNumber;
+
+    cacheTrackNumber.store(result);
+    return result;
   }
 };
 } // State

@@ -53,7 +53,7 @@ public:
 
   void closeEvent(QCloseEvent* event) override;
 
-  void setChannels();
+  void setChannels() const;
 
   // void setPlugins();
 

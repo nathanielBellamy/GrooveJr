@@ -89,8 +89,8 @@ std::optional<SceneID> SceneRepository::nextSceneId() const {
 
 ID SceneRepository::create(const Scene& scene) const {
   const std::string query = R"sql(
-    insert into scenes (sceneId, version, name, playbackSpeed)
-    values (?, ?, ?, ?)
+    insert into scenes (sceneId, version, name, playbackSpeed, crossfade)
+    values (?, ?, ?, ?, ?)
   )sql";
 
   sqlite3_stmt* stmt;
@@ -121,6 +121,7 @@ ID SceneRepository::create(const Scene& scene) const {
   sqlite3_bind_int(stmt, 2, scene.version);
   sqlite3_bind_text(stmt, 3, scene.name.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_double(stmt, 4, scene.playbackSpeed);
+  sqlite3_bind_double(stmt, 5, scene.crossfade);
 
   if (sqlite3_step(stmt) != SQLITE_DONE)
     Logging::write(
@@ -220,7 +221,6 @@ std::vector<Plugin> SceneRepository::getPlugins(const ID sceneId) const {
 }
 
 std::optional<Scene> SceneRepository::find(const ID dbId) const {
-  // find
   const std::string query = R"sql(
     select *
     from scenes
@@ -270,7 +270,6 @@ Scene SceneRepository::findOrCreate(const ID dbId) const {
 }
 
 std::optional<Scene> SceneRepository::findBySceneId(const SceneID sceneId) const {
-  // find
   const std::string query = R"sql(
     select *
     from scenes s

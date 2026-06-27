@@ -6,7 +6,6 @@
 
 namespace Gj {
 namespace Db {
-
 Result CacheRepository::clear() const {
   const std::string query = R"sql(
     delete from cache
@@ -43,17 +42,17 @@ Result CacheRepository::clear() const {
 Result CacheRepository::save(const std::vector<Cache>& caches) const {
   if (clear() == ERROR) {
     Logging::write(
-        Error,
-        "Db::CacheRepository::save",
-        "Failed to clear Cache"
+      Error,
+      "Db::CacheRepository::save",
+      "Failed to clear Cache"
     );
     return ERROR;
   }
 
-  std::string query = "insert into cache (audioFileId) values ";
+  std::string query = "insert into cache (trackNumber, audioFileId) values ";
 
   for (int i = 0; i < caches.size(); i++) {
-    query += "(" + std::to_string(caches.at(i).audioFileId) + ")";
+    query += "(" + std::to_string(i) + ", " + std::to_string(caches.at(i).audioFileId) + ")";
     if (i < caches.size() - 1)
       query += ", ";
   }
@@ -73,11 +72,12 @@ Result CacheRepository::save(const std::vector<Cache>& caches) const {
       Error,
       "Db::CacheRepository::save",
       "Failed to save Cache : "
-        " Message: " + std::string(sqlite3_errmsg(*db))
+      " Message: " + std::string(sqlite3_errmsg(*db))
     );
     return ERROR;
   }
 
+  stateCore->cacheSize.store(caches.size());
   Logging::write(
     Info,
     "Db::CacheRepository::save",
@@ -86,5 +86,31 @@ Result CacheRepository::save(const std::vector<Cache>& caches) const {
   return OK;
 }
 
+std::optional<ID> CacheRepository::findAudioFileIdByTrackNumber(const TrackNumber trackNumber) const {
+  const std::string query = R"sql(
+    select audioFileId
+    from cache
+    where trackNumber = ?
+  )sql";
+
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(*db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    Logging::write(
+      Error,
+      "Db::CacheRepository::findAudioFileIdByTrackNumber",
+      "Failed to prepare statement. Message: " + std::string(sqlite3_errmsg(*db))
+    );
+    return 0;
+  }
+
+  sqlite3_bind_int(stmt, 1, trackNumber);
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    const ID id = sqlite3_column_int(stmt, 0);
+    return std::optional(id);
+  }
+
+  return std::nullopt;
+}
 } // Db
 } // Gj

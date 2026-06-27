@@ -9,6 +9,7 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <optional>
 
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
@@ -45,6 +46,8 @@ struct AudioPlayer {
 
   sf_count_t playbackSettingsFromAudioThread[BfrIdx::PSFAT::SIZE]{};
 
+  DeckIndex decksStateBuffer[BfrIdx::DecksState::BUFFER_SIZE]{};
+
   float fft_eq_buffer[FFT_EQ_RING_BUFFER_SIZE]{};
 
   jack_ringbuffer_t* fft_eq_ring_buffer_out;
@@ -54,6 +57,10 @@ struct AudioPlayer {
   jack_ringbuffer_t* vu_ring_buffer_out;
 
   Mixer::ChannelProcessData mixerChannelsProcessData[MAX_MIXER_CHANNELS]{};
+
+  DeckIndex currentDeckIndex = 1;
+  DeckIndex prevDeckIndex = 1;
+  DeckIndex nextDeckIndex = 1;
 
   AudioPlayer(actor_system& actorSystem, AudioCore* audioCore, Mixer::Core* mixer, State::Core* stateCore)
   : actorSystem(actorSystem)
@@ -86,18 +93,6 @@ struct AudioPlayer {
       );
     }
 
-    if (jackClient->activate(audioCore) != OK) {
-      Logging::write(
-        Error,
-        "Audio::AudioPlayer::AudioPlayer",
-        "Unable to activate Jack"
-      );
-      throw std::runtime_error(
-        "Unable to instantiate AudioPlayer"
-      );
-    }
-
-    jackClientIsActive = true;
 
     Logging::write(
       Info,
@@ -107,18 +102,10 @@ struct AudioPlayer {
   }
 
   ~AudioPlayer() {
-    if (jackClientIsActive) {
-      if (jackClient->deactivate() != OK) {
-        Logging::write(
-          Error,
-          "Audio::AudioPlayer::cleanup",
-          "Unable to deactivate jackClient"
-        );
-      }
-    }
+    if (jackClientIsActive)
+      deactivateJackClient();
     jack_ringbuffer_free(vu_ring_buffer_out);
     jack_ringbuffer_free(fft_eq_ring_buffer_out);
-    jackClientIsActive = false;
   }
 
   int setupAudioCore() {
@@ -140,7 +127,6 @@ struct AudioPlayer {
       );
 
     audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
-    audioCore->crossfade = stateCore->getCrossfade();
 
     Logging::write(
       Info,
@@ -171,8 +157,8 @@ struct AudioPlayer {
           ProcessDataChangeFlag::ACKNOWLEDGE;
 
       // we must re-activate our jackClient so that it can pick up any new plugin processing
-      jackClient->deactivate();
-      jackClient->activate(audioCore);
+      deactivateJackClient();
+      activateJackClient();
     }
 
     if (playbackSettingsFromAudioThread[BfrIdx::PSFAT::PROCESS_DATA_CHANGE_FLAG] == ProcessDataChangeFlag::ROGER) {
@@ -220,6 +206,11 @@ struct AudioPlayer {
     });
 
     return res;
+  }
+
+  void clearMixerChannelsProcessData() {
+    for (auto& channelProcessData: mixerChannelsProcessData)
+      channelProcessData = Mixer::ChannelProcessData{};
   }
 
   IAudioClient::Buffers getPluginBuffers(
@@ -310,12 +301,25 @@ struct AudioPlayer {
 
     // read playbackSettingsFromAudioThread ring buffer
     if (jack_ringbuffer_read_space(audioCore->playbackSettingsFromAudioThreadRB) >
-        BfrIdx::PSFAT::RB_SIZE - 2)
+        BfrIdx::PSFAT::RB_SIZE - 2) {
       jack_ringbuffer_read(
         audioCore->playbackSettingsFromAudioThreadRB,
         reinterpret_cast<char*>(playbackSettingsFromAudioThread),
         BfrIdx::PSFAT::RB_SIZE
       );
+    }
+
+    // read decksStateRB
+    if (jack_ringbuffer_read_space(audioCore->decksStateRB) > BfrIdx::DecksState::RING_BUFFER_SIZE - 2) {
+      jack_ringbuffer_read(
+        audioCore->decksStateRB,
+        reinterpret_cast<char*>(decksStateBuffer),
+        BfrIdx::DecksState::RING_BUFFER_SIZE
+      );
+      prevDeckIndex = currentDeckIndex;
+      currentDeckIndex = decksStateBuffer[BfrIdx::DecksState::DECK_INDEX];
+      nextDeckIndex = decksStateBuffer[BfrIdx::DecksState::DECK_INDEX_NEXT];
+    }
 
     if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > BfrIdx::MixerChannel::ProcessData::RB_SIZE
         - 2)
@@ -327,13 +331,15 @@ struct AudioPlayer {
 
     // std::cout << " DEBUG VALUE FROM AUDIO THREAD " << playbackSettingsFromAudioThread[BfrIdx::PSFAT::DEBUG_VALUE] <<
     //     std::endl;
-    const sf_count_t currentFrameId = playbackSettingsFromAudioThread[BfrIdx::PSFAT::CURRENT_FRAME_ID];
+    const auto currentFrameId = decksStateBuffer[BfrIdx::DecksState::deckCurrentFrameId(currentDeckIndex)];
     mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, currentFrameId);
 
+    const auto scene = stateCore->getScene();
     playbackSettingsToAudioThread[BfrIdx::PSTAT::USER_SETTING_FRAME_ID_FLAG] = 0;
     playbackSettingsToAudioThread[BfrIdx::PSTAT::NEW_FRAME_ID] = 0;
     playbackSettingsToAudioThread[BfrIdx::PSTAT::PLAYBACK_SPEED] = static_cast<sf_count_t>(
-      std::floor(stateCore->getScene().playbackSpeed * 100.0f));
+      std::floor(scene.playbackSpeed * 100.0f));
+    playbackSettingsToAudioThread[BfrIdx::PSTAT::CROSSFADE] = scene.crossfade;
 
     if (stateCore->getUserSettingFrameId()) {
       playbackSettingsToAudioThread[BfrIdx::PSTAT::USER_SETTING_FRAME_ID_FLAG] = 1;
@@ -451,12 +457,18 @@ struct AudioPlayer {
 
   bool continueRun() {
     const PlayState playState = stateCore->getPlayState();
-    if (playState == STOP || playState == PAUSE)
+    if (playState == STOP || playState == PAUSE) {
+      jackClient->deactivate();
+      std::this_thread::sleep_for(std::chrono::milliseconds(100)); // let jack cleanup
       audioCore->setPlayStateAllDecks(playState);
 
-    if (playState == STOP) {
-      stateCore->setFrameId(0);
-      audioCore->setFrameIdAllDecks(0);
+      if (playState == STOP) {
+        stateCore->setFrameId(0);
+        jackClientIsActive = false;
+        audioCore->setFrameIdAllDecks(0);
+      }
+
+      return false;
     }
 
     if (!audioCore->currentDeck().hasValidCassetteLoaded())
@@ -475,6 +487,7 @@ struct AudioPlayer {
     vu_ring_buffer_out = jack_ringbuffer_create(VU_RING_BUFFER_SIZE);
     mixer->getSetVuRingBufferFunc()(vu_ring_buffer_out);
 
+
     return OK;
   }
 
@@ -486,16 +499,55 @@ struct AudioPlayer {
     );
 
     audioCore->decks[audioCore->deckIndex].playState = PLAY;
+    auto audioCoreShadow = stateCore->audioCoreShadow.load();
+    audioCoreShadow.decks[audioCore->deckIndex].playState = PLAY;
+    stateCore->audioCoreShadow.store(audioCoreShadow);
     stateCore->setAudioRunning(true);
 
+    activateJackClient();
     while (continueRun()) {
-      // std::cout << "audioplayer run playb " << audioCore->playbackBuffers[0][100] << std::endl;
-      // std::cout << "audioplayer run proce " << audioCore->processBuffers[0][100] << std::endl << std::endl;
-      // std::cout << "audioplayer run fxcha " << audioCore->mixerChannelsChannelsWriteOut[1][0][50] << std::endl << std::endl;
+      const bool audioCoreUpdatedDeckIndex = updateStateCoreAudioCoreShadow();
 
-      if (audioCore->shouldUpdateDeckIndex()) {
-        audioCore->updateDeckIndexToNext();
+      const bool stateCoreWasRequestingSceneSave = stateCore->requestingSceneSave.load();
+      if (stateCoreWasRequestingSceneSave) {
+        deactivateJackClient();
+        clearMixerChannelsProcessData();
+        if (mixer->saveScene() != OK)
+          Logging::write(Error, "Audio::AudioPlayer::run", "Unable to save scene.");
+        setupAudioCore();
+        stateCore->requestingSceneSave.store(false);
+        activateJackClient();
+      }
 
+      const ID sceneIdToLoad = stateCore->sceneIdToLoad.load();
+      const bool stateCoreWasRequestingUpdate_Scene = sceneIdToLoad != 0;
+      if (stateCoreWasRequestingUpdate_Scene) {
+        deactivateJackClient();
+        clearMixerChannelsProcessData();
+        if (mixer->loadScene(sceneIdToLoad) != OK)
+          Logging::write(Error, "Audio::AudioPlayer::run", "Unable to Load Scene " + std::to_string(sceneIdToLoad));
+        setupAudioCore();
+        stateCore->sceneIdToLoad.store(0);
+        activateJackClient();
+      }
+
+      bool stateCoreWasRequestingUpdate_Deck = stateCore->requestingDeckUpdate.load();
+      if (stateCoreWasRequestingUpdate_Deck) {
+        deactivateJackClient();
+        const auto audioCoreShadow = stateCore->audioCoreShadow.load();
+        if (const auto decoratedAudioFile = audioCoreShadow.decks[audioCoreShadow.deckIndex].decoratedAudioFile) {
+          audioCore->deckIndex = audioCoreShadow.deckIndex;
+          audioCore->deckIndexNext = audioCoreShadow.deckIndexNext;
+          audioCore->addCassetteFromDecoratedAudioFile(decoratedAudioFile.value());
+        }
+        activateJackClient();
+        while (!stateCore->requestingDeckUpdate.compare_exchange_weak(stateCoreWasRequestingUpdate_Deck, false,
+                                                                      std::memory_order_release,
+                                                                      std::memory_order_relaxed));
+      }
+
+      if (stateCoreWasRequestingUpdate_Deck || stateCoreWasRequestingUpdate_Scene || stateCoreWasRequestingSceneSave ||
+          audioCoreUpdatedDeckIndex) {
         const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
         if (!appStateManagerPtr) {
           Logging::write(Error, "Audio::AudioPlayer", "AppStateManager actor is not available.");
@@ -519,19 +571,8 @@ struct AudioPlayer {
       "Exited while loop."
     );
 
-    if (jackClientIsActive) {
-      if (jackClient->deactivate() != OK) {
-        Logging::write(
-          Error,
-          "Audio::AudioPlayer::run",
-          "An error occurred deactivating the JackClient"
-        );
-        return ERROR;
-      }
-    }
-
+    deactivateJackClient();
     stateCore->setAudioRunning(false);
-    jackClientIsActive = false;
 
     if (stateCore->getPlayState() == STOP) {
       mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, 0);
@@ -547,6 +588,136 @@ struct AudioPlayer {
 
     return OK;
   };
+
+  bool updateStateCoreAudioCoreShadow() {
+    if (const bool audioCoreUpdatedDeckIndex = prevDeckIndex != currentDeckIndex; !audioCoreUpdatedDeckIndex)
+      return false;
+
+    auto audioCoreShadow = stateCore->audioCoreShadow.load();
+    audioCoreShadow.deckIndex = currentDeckIndex;
+
+    for (int i = 0; i < AUDIO_CORE_DECK_COUNT; ++i) {
+      audioCoreShadow.decks[i].playState = intToPs(decksStateBuffer[BfrIdx::DecksState::deckPlayState(i)]);
+      audioCoreShadow.decks[i].frameId = decksStateBuffer[BfrIdx::DecksState::deckCurrentFrameId(i)];
+    }
+
+    const auto distantDeckIndex = getDistantDeckIndex();
+    const auto newCacheTrackNumber = stateCore->updateCacheTrackNumber();
+    const auto playbackSpeed = stateCore->scene.load().playbackSpeed;
+    const auto cacheSize = stateCore->cacheSize.load();
+
+    if (const auto cacheSize = stateCore->cacheSize.load(); newCacheTrackNumber == cacheSize - 1) {
+      stateCore->playState = STOP;
+    } else {
+      const std::optional<ID> newAudioFileIdForDistantDeckIndex =
+          playbackSpeed == 0
+            ? std::nullopt
+            : mixer->dao->cacheRepository.findAudioFileIdByTrackNumber(
+              (newCacheTrackNumber + (playbackSpeed > 0 ? 1 : cacheSize - 1)) % cacheSize
+            );
+      if (!distantDeckIndex || decksStateBuffer[BfrIdx::DecksState::deckPlayState(distantDeckIndex.value())] != STOP) {
+        Logging::write(
+          Error,
+          "Audio::AudioPlayer::updateStateCoreAudioCoreShadow",
+          "Attempting to update deck still in use."
+        );
+      } else if (!newAudioFileIdForDistantDeckIndex) {
+        Logging::write(
+          Error,
+          "Audio::AudioPlayer::updateStateCoreAudioCoreShadow",
+          "Unable to find AudioFileID for cache trackNumber: " + std::to_string(newCacheTrackNumber)
+        );
+      } else {
+        const std::optional<Db::DecoratedAudioFile> decoratedAudioFile =
+            mixer->dao->audioFileRepository.findDecoratedAudioFileById(newAudioFileIdForDistantDeckIndex.value());
+        if (!decoratedAudioFile) {
+          Logging::write(
+            Error,
+            "Audio::AudioPlayer::updateStateCoreAudioCoreShadow",
+            "Unable to load DecoratedAudioFile for AudioFileID: " + std::to_string(
+              newAudioFileIdForDistantDeckIndex.value())
+          );
+        } else {
+          audioCore->addCassetteFromDecoratedAudioFileAtIdx(decoratedAudioFile.value(), distantDeckIndex.value());
+          audioCoreShadow.decks[distantDeckIndex.value()].decoratedAudioFile = decoratedAudioFile;
+        }
+      }
+    }
+
+    stateCore->setCurrentlyPlaying(audioCoreShadow.decks[currentDeckIndex].decoratedAudioFile.value());
+    stateCore->cacheTrackNumber.store(newCacheTrackNumber);
+    stateCore->audioCoreShadow.store(audioCoreShadow);
+
+    prevDeckIndex = currentDeckIndex;
+    return true;
+  }
+
+  /*
+   * getDistantDeckIndex
+   * "distant" in the sense that it is far away from the current_deck
+   * for example,
+   *   - if AUDIO_CORE_DECK_COUNT = 3
+   *   -    and assuming track length is significantly longer than crossfade for all tracks involved
+   *   - then deck PlayState transitions take the form
+   *     - when playbackSpeed > 0
+   *       - x _ _ => x x _ => _ x _
+   *       - _ x _ => _ x x => _ _ x
+   *       - _ _ x => x _ x => x _ _
+   *     - when playbackSpeed < 0
+   *       - x _ _ => x _ x => _ _ x
+   *       - _ x _ => x x _ => x _ _
+   *       - _ _ x => _ x x => _ x _    key: (x, PLAY), (_, STOP)
+   *  - note:
+   *    - since the user may set playback speed as either positive or negative
+   *      we may transition in either direction
+   *    - as a result, when playback begins (user double clicks a song) we set the current_deck
+   *      as the middle deck: _ x _
+   *    - this way both previous and next track are loaded in memory and ready for smooth crossfade
+   *
+   *  - in each transition shown, there is a unique deck that is never active (always PlayState STOP)
+   *  - this is the "distant" deck
+   *  - it is safe to update the audio data in this deck as it is not being actively accessed by the JackClient (rt-thread)
+   *
+   */
+  std::optional<DeckIndex> getDistantDeckIndex() {
+    const auto playbackSpeed = stateCore->getScene().playbackSpeed;
+
+    if (playbackSpeed > 0)
+      return std::optional((currentDeckIndex + AUDIO_CORE_DECK_COUNT - 2) % AUDIO_CORE_DECK_COUNT);
+
+    if (playbackSpeed < 0)
+      return std::optional((currentDeckIndex + 2) % AUDIO_CORE_DECK_COUNT);
+
+    return std::nullopt;
+  }
+
+  void activateJackClient() {
+    if (jackClient->activate(audioCore) != OK) {
+      Logging::write(
+        Error,
+        "Audio::AudioPlayer::run",
+        "Unable to activate Jack"
+      );
+      jackClientIsActive = false;
+      throw std::runtime_error(
+        "Unable to instantiate AudioPlayer"
+      );
+    }
+    jackClientIsActive = true;
+  }
+
+  void deactivateJackClient() {
+    if (jackClient->deactivate() != OK) {
+      Logging::write(
+        Error,
+        "Audio::AudioPlayer::deactivateJackClient",
+        "An error occurred deactivating the JackClient"
+      );
+      return;
+    }
+    jackClientIsActive = false;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // let jack cleanup
+  }
 };
 } // Audio
 } // gj

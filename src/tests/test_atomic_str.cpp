@@ -25,8 +25,8 @@ TEST(AtomicStrTest, StdStringConstructor) {
 
 TEST(AtomicStrTest, EmptyString) {
     AtomicStr s("");
-    // Default-initialized value[0] is ' '
-    EXPECT_EQ(s.value[0], ' ');
+    EXPECT_EQ(s.value[0], '\0');
+    EXPECT_TRUE(s.std_str().empty());
 }
 
 // ── Accessors ──
@@ -40,6 +40,16 @@ TEST(AtomicStrTest, StdStr_ContainsContent) {
     AtomicStr s("foobar");
     std::string result = s.std_str();
     EXPECT_TRUE(result.find("foobar") == 0);
+}
+
+TEST(AtomicStrTest, StdStr_BoundsUnterminatedBuffers) {
+    AtomicStr s;
+    for (size_t i = 0; i < ATOMIC_STR_SIZE; ++i) {
+        s.value[i] = 'z';
+    }
+
+    EXPECT_EQ(s.std_str().size(), ATOMIC_STR_SIZE);
+    EXPECT_EQ(s.std_str(), std::string(ATOMIC_STR_SIZE, 'z'));
 }
 
 // ── Operators ──
@@ -63,18 +73,21 @@ TEST(AtomicStrTest, OperatorPlus_StringRight) {
 TEST(AtomicStrTest, Truncation_CStr) {
     std::string longStr(ATOMIC_STR_SIZE + 100, 'x');
     AtomicStr s(longStr.c_str());
-    // Only first ATOMIC_STR_SIZE chars should be stored
-    for (size_t i = 0; i < ATOMIC_STR_SIZE; ++i) {
+    for (size_t i = 0; i < ATOMIC_STR_SIZE - 1; ++i) {
         EXPECT_EQ(s.value[i], 'x') << "Mismatch at index " << i;
     }
+    EXPECT_EQ(s.value[ATOMIC_STR_SIZE - 1], '\0');
+    EXPECT_EQ(s.std_str().size(), ATOMIC_STR_SIZE - 1);
 }
 
 TEST(AtomicStrTest, Truncation_StdString) {
     std::string longStr(ATOMIC_STR_SIZE + 100, 'y');
     AtomicStr s(longStr);
-    for (size_t i = 0; i < ATOMIC_STR_SIZE; ++i) {
+    for (size_t i = 0; i < ATOMIC_STR_SIZE - 1; ++i) {
         EXPECT_EQ(s.value[i], 'y') << "Mismatch at index " << i;
     }
+    EXPECT_EQ(s.value[ATOMIC_STR_SIZE - 1], '\0');
+    EXPECT_EQ(s.std_str().size(), ATOMIC_STR_SIZE - 1);
 }
 
 // ── Size constant ──

@@ -82,8 +82,6 @@ void VuMeter::paintGL() {
   program->bind();
 
   for (int i = 0; i < VU_METER_BLOCK_COUNT; i++) {
-    const float lim = -99.0f + 95.0f * (static_cast<float>(i) / static_cast<float>(VU_METER_BLOCK_COUNT));
-
     for (int chan = 0; chan < 2; chan++) {
       const float vuVal = vuVals[chan];
       const float val =
@@ -93,9 +91,7 @@ void VuMeter::paintGL() {
                 ? 0.0f
                 : vuVal;
 
-      bool opaque = false;
-      if (val > lim)
-        opaque = true;
+      const bool opaque = val > VU_METER_LIMIT_ARR[i];
 
       if (i == VU_METER_BLOCK_COUNT - 1 || i == VU_METER_BLOCK_COUNT - 2)
         program->setUniformValue(colorLocation, opaque ? VU_METER_RED : VU_METER_RED_TR);
