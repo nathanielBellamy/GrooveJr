@@ -162,6 +162,17 @@ public:
     return std::floor(stateCore->scene.load().playbackSpeed * 100.0f);
   }
 
+  sf_count_t getCrossfade() const {
+    return stateCore->scene.load().crossfade;
+  }
+
+  Result setCrossfade(const sf_count_t newCrossfade) const {
+    auto scene = stateCore->scene.load();
+    scene.crossfade = newCrossfade;
+    stateCore->scene.store(scene);
+    return OK;
+  }
+
   [[nodiscard]]
   std::unique_ptr<Channel>* getChannels() {
     return channels;

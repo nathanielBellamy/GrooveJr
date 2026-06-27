@@ -24,7 +24,6 @@ namespace Gj {
 namespace Audio {
 struct AudioCore {
   State::Core* stateCore;
-  sf_count_t crossfade = static_cast<sf_count_t>(100000);
   AudioDeck decks[AUDIO_CORE_DECK_COUNT]{AudioDeck(0), AudioDeck(1), AudioDeck(2)};
   DeckIndex deckIndex = 1;
   DeckIndex deckIndexNext = 1;
@@ -58,7 +57,7 @@ struct AudioCore {
 
   sf_count_t playbackSettingsFromAudioThread[BfrIdx::PSFAT::SIZE]{};
   jack_ringbuffer_t* playbackSettingsFromAudioThreadRB{nullptr};
-  std::function<int(AudioCore*, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
+  std::function<int(AudioCore*, sf_count_t, sf_count_t, jack_nframes_t)> fillPlaybackBuffer;
 
   size_t mixerChannelCount;
   jack_ringbuffer_t* mixerChannelsProcessDataRB{};
@@ -350,7 +349,7 @@ struct AudioCore {
     return deckIndex != deckIndexNext;
   }
 
-  Result updatePlayStateDeckIndexes(const sf_count_t nframes, const float playbackSpeed) {
+  Result updatePlayStateDeckIndexes(const sf_count_t nframes, const float playbackSpeed, const sf_count_t crossfade) {
     const auto& cd = currentDeck();
     const DeckIndex rhDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
     const DeckIndex lhDeckIndex = (deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT;
@@ -389,7 +388,7 @@ struct AudioCore {
     return decks[deckIndex];
   }
 
-  float getDeckGain(const DeckIndex di) const {
+  float getDeckGain(const DeckIndex di, const sf_count_t crossfade) const {
     const auto& deck = decks[di];
     const float frameIdF = static_cast<float>(deck.frameId);
     const float framesF = static_cast<float>(deck.frames);

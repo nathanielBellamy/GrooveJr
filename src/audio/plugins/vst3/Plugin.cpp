@@ -49,8 +49,6 @@ Plugin::Plugin(const AtomicStr& path, State::Core* stateCore, std::shared_ptr<Ja
 		name = AtomicStr(moduleName.substr(0, moduleName.find_last_of('.')));
 	}
 
-	std::cout << " my name is " << name.std_str() << std::endl;
-
 	const auto& cmdArgs = std::vector{path.std_str()};
 
 	try {

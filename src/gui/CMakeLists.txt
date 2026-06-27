@@ -20,9 +20,9 @@ find_package(Boost REQUIRED COMPONENTS log_setup log)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Sql)
 qt_standard_project_setup()
 
-if(NOT DEFINED CAF_ROOT)
+if (NOT DEFINED CAF_ROOT)
     set(CAF_ROOT ${GJ_BASE_DIR}/actor-framework/build)
-endif()
+endif ()
 find_package(CAF REQUIRED)
 
 qt_add_library(GjGui STATIC
@@ -126,6 +126,8 @@ qt_add_library(GjGui STATIC
         MainToolBar/MainToolBar.cpp
         MainToolBar/eq/EqGraph.h
         MainToolBar/eq/EqGraph.cpp
+        MainToolBar/transport/CrossfadeSlider.h
+        MainToolBar/transport/CrossfadeSlider.cpp
         MainToolBar/transport/PlaybackSpeedSlider.h
         MainToolBar/transport/PlaybackSpeedSlider.cpp
         MainToolBar/transport/ProgressBar.h

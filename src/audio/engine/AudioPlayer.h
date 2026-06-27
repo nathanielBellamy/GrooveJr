@@ -127,11 +127,6 @@ struct AudioPlayer {
       );
 
     audioCore->fillPlaybackBuffer = &JackClient::fillPlaybackBuffer;
-    // TODO:
-    // - crossfade working just getting override to 0 here
-    // - move crossfade to scene
-    // - provide user slider
-    // audioCore->crossfade = stateCore->getCrossfade();
 
     Logging::write(
       Info,
@@ -324,7 +319,6 @@ struct AudioPlayer {
       prevDeckIndex = currentDeckIndex;
       currentDeckIndex = decksStateBuffer[BfrIdx::DecksState::DECK_INDEX];
       nextDeckIndex = decksStateBuffer[BfrIdx::DecksState::DECK_INDEX_NEXT];
-      std::cout << " decks playing sum " << nextDeckIndex << std::endl;
     }
 
     if (jack_ringbuffer_write_space(audioCore->mixerChannelsProcessDataRB) > BfrIdx::MixerChannel::ProcessData::RB_SIZE
@@ -340,10 +334,12 @@ struct AudioPlayer {
     const auto currentFrameId = decksStateBuffer[BfrIdx::DecksState::deckCurrentFrameId(currentDeckIndex)];
     mixer->getUpdateProgressBarFunc()(audioCore->currentDeck().frames, currentFrameId);
 
+    const auto scene = stateCore->getScene();
     playbackSettingsToAudioThread[BfrIdx::PSTAT::USER_SETTING_FRAME_ID_FLAG] = 0;
     playbackSettingsToAudioThread[BfrIdx::PSTAT::NEW_FRAME_ID] = 0;
     playbackSettingsToAudioThread[BfrIdx::PSTAT::PLAYBACK_SPEED] = static_cast<sf_count_t>(
-      std::floor(stateCore->getScene().playbackSpeed * 100.0f));
+      std::floor(scene.playbackSpeed * 100.0f));
+    playbackSettingsToAudioThread[BfrIdx::PSTAT::CROSSFADE] = scene.crossfade;
 
     if (stateCore->getUserSettingFrameId()) {
       playbackSettingsToAudioThread[BfrIdx::PSTAT::USER_SETTING_FRAME_ID_FLAG] = 1;
@@ -462,7 +458,6 @@ struct AudioPlayer {
   bool continueRun() {
     const PlayState playState = stateCore->getPlayState();
     if (playState == STOP || playState == PAUSE) {
-      std::cout << "will not continue run setting play state all decks" << std::endl;
       jackClient->deactivate();
       std::this_thread::sleep_for(std::chrono::milliseconds(100)); // let jack cleanup
       audioCore->setPlayStateAllDecks(playState);
@@ -506,12 +501,9 @@ struct AudioPlayer {
     audioCore->decks[audioCore->deckIndex].playState = PLAY;
     auto audioCoreShadow = stateCore->audioCoreShadow.load();
     audioCoreShadow.decks[audioCore->deckIndex].playState = PLAY;
-    // audioCoreShadow.deckIndex = audioCore->deckIndex;
-    // audioCoreShadow.deckIndexNext = audioCore->deckIndexNext;
     stateCore->audioCoreShadow.store(audioCoreShadow);
     stateCore->setAudioRunning(true);
 
-    std::cout << " crossfade right before run " << audioCore->crossfade << std::endl;
     activateJackClient();
     while (continueRun()) {
       const bool audioCoreUpdatedDeckIndex = updateStateCoreAudioCoreShadow();
@@ -601,33 +593,18 @@ struct AudioPlayer {
     if (const bool audioCoreUpdatedDeckIndex = prevDeckIndex != currentDeckIndex; !audioCoreUpdatedDeckIndex)
       return false;
 
-    std::cout << " xxxxxxxxx BEFORE xxxxxxxxxx" << std::endl;
-    std::cout << stateCore->toString() << std::endl;
-    std::cout << " xxxxxxxxx BEFORE xxxxxxxxxx" << std::endl;
     auto audioCoreShadow = stateCore->audioCoreShadow.load();
     audioCoreShadow.deckIndex = currentDeckIndex;
 
     for (int i = 0; i < AUDIO_CORE_DECK_COUNT; ++i) {
       audioCoreShadow.decks[i].playState = intToPs(decksStateBuffer[BfrIdx::DecksState::deckPlayState(i)]);
       audioCoreShadow.decks[i].frameId = decksStateBuffer[BfrIdx::DecksState::deckCurrentFrameId(i)];
-
-      std::cout << " Deck " << i << std::endl;
-      std::cout << " Deck playState " << audioCoreShadow.decks[i].playState << std::endl;
-      std::cout << " Deck frameId " << audioCoreShadow.decks[i].frameId << std::endl;
     }
 
     const auto distantDeckIndex = getDistantDeckIndex();
     const auto newCacheTrackNumber = stateCore->updateCacheTrackNumber();
     const auto playbackSpeed = stateCore->scene.load().playbackSpeed;
     const auto cacheSize = stateCore->cacheSize.load();
-
-    std::cout << " previousDeckIndex: " << prevDeckIndex << std::endl;
-    std::cout << " currentDeckIndex: " << currentDeckIndex << std::endl;
-    std::cout << " nextDeckIndex: " << nextDeckIndex << std::endl;
-    std::cout << " distantDeckIndex : " << distantDeckIndex.value() << std::endl;
-    std::cout << " newCacheTrackNumber : " << newCacheTrackNumber << std::endl;
-    std::cout << "  playbackSpeed : " << playbackSpeed << std::endl;
-    std::cout << "  cacheSize : " << cacheSize << std::endl << std::endl;
 
     if (const auto cacheSize = stateCore->cacheSize.load(); newCacheTrackNumber == cacheSize - 1) {
       stateCore->playState = STOP;
@@ -672,10 +649,6 @@ struct AudioPlayer {
     stateCore->audioCoreShadow.store(audioCoreShadow);
 
     prevDeckIndex = currentDeckIndex;
-
-    std::cout << " xxxxxxxxx AFTER xxxxxxxxxx" << std::endl;
-    std::cout << stateCore->toString() << std::endl;
-    std::cout << " xxxxxxxxx AFTER xxxxxxxxxx" << std::endl;
     return true;
   }
 

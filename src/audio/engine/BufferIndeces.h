@@ -26,13 +26,14 @@ static constexpr size_t PROCESS_DATA_CHANGE_FLAG = 2;
 
 // playbackSettingsToAudioThread
 namespace PSTAT {
-static constexpr size_t SIZE = 4;
+static constexpr size_t SIZE = 5;
 static constexpr size_t RB_SIZE = sizeof(sf_count_t) * SIZE;
 static constexpr size_t USER_SETTING_FRAME_ID_FLAG = 0; // bool
 static constexpr size_t NEW_FRAME_ID = 1;
 
 static constexpr size_t PLAYBACK_SPEED = 2;
-static constexpr size_t PROCESS_DATA_CHANGE_FLAG = 3;
+static constexpr size_t CROSSFADE = 3;
+static constexpr size_t PROCESS_DATA_CHANGE_FLAG = 4;
 }
 
 

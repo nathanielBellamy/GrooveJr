@@ -26,6 +26,7 @@
 #include "TransportControlButton.h"
 #include "ProgressBar.h"
 #include "PlaybackSpeedSlider.h"
+#include "CrossfadeSlider.h"
 
 namespace Gj {
 namespace Gui {
@@ -47,7 +48,10 @@ private:
 
   QGridLayout* grid;
   ProgressBar* progressBar;
+  QLabel* playbackSpeedLabel;
   PlaybackSpeedSlider* playbackSpeedSlider;
+  QLabel* crossfadeLabel;
+  CrossfadeSlider* crossfadeSlider;
 
   QAction* playTrigAction;
   QAction* pauseTrigAction;

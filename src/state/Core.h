@@ -226,11 +226,6 @@ struct Core {
     else // do nothing;
       result = cTrackNumber;
 
-    std::cout << "playbackSpeed: " << playbackSpeed << std::endl;
-    std::cout << "cTrackNumber: " << cTrackNumber << std::endl;
-    std::cout << "cSize: " << cSize << std::endl;
-    std::cout << "result: " << result << std::endl << std::endl;
-
     cacheTrackNumber.store(result);
     return result;
   }

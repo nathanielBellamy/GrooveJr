@@ -6,7 +6,7 @@
 
 namespace Gj {
 namespace Gui {
-PlaybackSpeedSlider::PlaybackSpeedSlider(QWidget* parent, Audio::Mixer::Core* mixer)
+PlaybackSpeedSlider::PlaybackSpeedSlider(QWidget* parent, Audio::Mixer::Core* mixer, QLabel* label)
 : QSlider(Qt::Horizontal, parent)
   , mixer(mixer) {
   setMinimum(-200);
@@ -15,8 +15,12 @@ PlaybackSpeedSlider::PlaybackSpeedSlider(QWidget* parent, Audio::Mixer::Core* mi
   setValue(mixer->getPlaybackSpeed());
   setTickPosition(NoTicks);
 
-  auto connection = connect(this, &QSlider::valueChanged, [this](const int newPlaybackSpeed) {
+  auto connection = connect(this, &QSlider::valueChanged, [this, label](const int newPlaybackSpeed) {
     this->mixer->setPlaybackSpeed(newPlaybackSpeed);
+    if (label) {
+      const auto newPlaybackSpeedF = static_cast<float>(newPlaybackSpeed) / 100.0f;
+      label->setText(QString("Playback Speed : %1 %").arg(newPlaybackSpeedF));
+    }
   });
 }
 

@@ -332,7 +332,8 @@ float JackClient::princArg(const float phaseIn) {
 }
 
 // plabackSpeed in [-2.0, 2.0]
-int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playbackSpeed, const jack_nframes_t nframes) {
+int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playbackSpeed, const sf_count_t crossfade,
+                                   const jack_nframes_t nframes) {
   if constexpr (false) {
     // TODO: fix phase-tracking in phase vocoder
     const int hopAnalysis = FFT_PV_HOP_ANALYSIS;
@@ -412,16 +413,12 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
   }
 
   const float playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
-  audioCore->updatePlayStateDeckIndexes(nframes, playbackSpeedF);
-  sf_count_t ctr = 10;
-  sf_count_t corePlayingSum = 0;
+  audioCore->updatePlayStateDeckIndexes(nframes, playbackSpeedF, crossfade);
   for (auto& deck: audioCore->decks) {
     if (deck.playState != PLAY)
       continue;
 
-    corePlayingSum += ctr * deck.deckIndex;
-    ctr *= 100;
-    deck.gain = audioCore->getDeckGain(deck.deckIndex);
+    deck.gain = audioCore->getDeckGain(deck.deckIndex, crossfade);
 
     // playbackSpeed
     // todo: playbackBuffersPre
@@ -452,7 +449,7 @@ int JackClient::fillPlaybackBuffer(AudioCore* audioCore, const sf_count_t playba
   }
 
   audioCore->decksStateBuffer[BfrIdx::DecksState::DECK_INDEX] = audioCore->deckIndex;
-  audioCore->decksStateBuffer[BfrIdx::DecksState::DECK_INDEX_NEXT] = corePlayingSum;
+  audioCore->decksStateBuffer[BfrIdx::DecksState::DECK_INDEX_NEXT] = audioCore->deckIndexNext;
   for (int i = 0; i < AUDIO_CORE_DECK_COUNT; ++i) {
     audioCore->decksStateBuffer[BfrIdx::DecksState::deckPlayState(i)] = audioCore->decks[i].playState;
     audioCore->decksStateBuffer[BfrIdx::DecksState::deckCurrentFrameId(i)] = audioCore->decks[i].frameId;
@@ -528,6 +525,7 @@ int JackClient::processCallback(jack_nframes_t nframes, void* arg) {
   audioCore->fillPlaybackBuffer(
     audioCore,
     audioCore->playbackSettingsToAudioThread[BfrIdx::PSTAT::PLAYBACK_SPEED],
+    audioCore->playbackSettingsToAudioThread[BfrIdx::PSTAT::CROSSFADE],
     nframes
   );
 

@@ -91,14 +91,11 @@ void Scenes::connectActions() {
       mixer->saveScene();
     } else {
       bool expected = false;
-      std::cout << "will save sceneId: " << stateCore->scene.load().id << std::endl;
       stateCore->requestingSceneSave.store(true);
       while (stateCore->requestingSceneSave.load()) {
-        std::cout << "waiting for scene save... " << std::endl;
         QApplication::processEvents();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
       }
-      std::cout << "scene saved: " << stateCore->scene.load().id << std::endl;
     }
     Logging::write(
       Info,
