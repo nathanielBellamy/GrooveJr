@@ -354,19 +354,20 @@ struct AudioCore {
     const DeckIndex rhDeckIndex = (deckIndex + 1) % AUDIO_CORE_DECK_COUNT;
     const DeckIndex lhDeckIndex = (deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT;
 
+    const sf_count_t updateDeckIndexFactor = 2LL;
     if (playbackSpeed > 0.0f) {
       if (decks[rhDeckIndex].playState != PLAY)
         decks[rhDeckIndex].frameId = 0;
       if (cd.frameId > cd.frames - crossfade)
         decks[rhDeckIndex].playState = PLAY;
-      if (cd.frameId > cd.frames - 4LL * nframes)
+      if (cd.frameId > cd.frames - updateDeckIndexFactor * nframes)
         deckIndexNext = rhDeckIndex;
     } else if (playbackSpeed < 0.0f) {
       if (decks[lhDeckIndex].playState != PLAY)
         decks[lhDeckIndex].frameId = decks[lhDeckIndex].frames - 2;
       if (cd.frameId < crossfade)
         decks[lhDeckIndex].playState = PLAY;
-      if (cd.frameId < 2LL * nframes)
+      if (cd.frameId < updateDeckIndexFactor * nframes)
         deckIndexNext = lhDeckIndex;
     }
 
@@ -376,8 +377,6 @@ struct AudioCore {
     decks[deckIndex].playState = STOP;
     if (decks[deckIndexNext].decoratedAudioFile)
       decks[deckIndexNext].playState = PLAY;
-    // else
-    // decks[deckIndexNext].playState = STOP;
 
     deckIndex = deckIndexNext;
 
@@ -402,23 +401,6 @@ struct AudioCore {
       return frameIdF / crossfadeF;
 
     return 1.0f;
-    // }
-    //
-    // if (di == (deckIndex + 1) % AUDIO_CORE_DECK_COUNT) {
-    //   if (deck.frameId < crossfade)
-    //     return frameIdF / crossfadeF;
-    //
-    //   return 0.0f;
-    // }
-    //
-    // if (di == (deckIndex + AUDIO_CORE_DECK_COUNT - 1) % AUDIO_CORE_DECK_COUNT) {
-    //   if (deck.frameId > deck.frames - crossfade)
-    //     return (framesF - frameIdF) / crossfadeF;
-    //
-    //   return 0.0f;
-    // }
-
-    // return 0.0f;
   }
 
   Result setPlayStateAllDecks(const PlayState playState) {
