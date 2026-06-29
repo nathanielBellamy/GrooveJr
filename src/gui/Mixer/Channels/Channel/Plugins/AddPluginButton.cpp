@@ -19,9 +19,12 @@ void AddPluginButton::mousePressEvent(QMouseEvent* event) {
 
 void AddPluginButton::setStyle() {
   setCursor(Qt::PointingHandCursor);
-  setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
+  setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
   setStyleSheet(
-    ("min-width: 50px; min-height: 20px; max-height: 20px; background-color: " + Color::toHex(GjC::DARK_400)).data()
+    QString(
+      ("width: 100%; min-width: 50px; min-height: 20px; max-height: 20px; background-color: " +
+       Color::toHex(GjC::DARK_400)).data()
+    )
   );
 }
 } // Mixer

@@ -34,10 +34,8 @@ TransportControl::TransportControl(QWidget* parent, actor_system& sys, Audio::Mi
   connectActions();
   setupGrid();
 
-  const auto playbackSpeed = mixer->getPlaybackSpeed();
-  const auto playbackSpeedF = static_cast<float>(playbackSpeed) / 100.0f;
   playbackSpeedLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-  playbackSpeedLabel->setText(QString("Playback speed: %1 %").arg(playbackSpeedF));
+  playbackSpeedLabel->setText(QString("Playback speed: %1 %").arg(mixer->getPlaybackSpeed()));
   playbackSpeedLabel->setFont({playbackSpeedLabel->font().family(), 12});
 
   const auto crossfade = mixer->getCrossfade();
