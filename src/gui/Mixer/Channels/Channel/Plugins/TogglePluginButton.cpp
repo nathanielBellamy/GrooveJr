@@ -37,7 +37,7 @@ void TogglePluginButton::mousePressEvent(QMouseEvent* event) {
 }
 
 std::string TogglePluginButton::styleString() const {
-  std::string styleString = "padding: 2px; border-radius: 5px; border: 2px solid white;";
+  std::string styleString = "padding: 2px; border-radius: 5px;";
   if (enabled) {
     styleString += " background-color: " + Color::toHex(GjC::ENABLED_GREEN) + "; ";
     styleString += " color: " + Color::toHex(GjC::DARK_400) + "; ";

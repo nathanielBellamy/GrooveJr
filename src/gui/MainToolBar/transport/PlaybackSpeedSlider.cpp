@@ -18,7 +18,7 @@ PlaybackSpeedSlider::PlaybackSpeedSlider(QWidget* parent, Audio::Mixer::Core* mi
   auto connection = connect(this, &QSlider::valueChanged, [this, label](const int newPlaybackSpeed) {
     this->mixer->setPlaybackSpeed(newPlaybackSpeed);
     if (label) {
-      const auto newPlaybackSpeedF = static_cast<float>(newPlaybackSpeed) / 100.0f;
+      const auto newPlaybackSpeedF = static_cast<float>(newPlaybackSpeed);
       label->setText(QString("Playback Speed : %1 %").arg(newPlaybackSpeedF));
     }
   });

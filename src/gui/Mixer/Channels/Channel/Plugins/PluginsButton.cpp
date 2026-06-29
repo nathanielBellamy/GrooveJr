@@ -16,7 +16,7 @@ PluginsButton::PluginsButton(QWidget* parent, QAction* openPluginsContainer)
 void PluginsButton::setStyle() {
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setCursor(Qt::PointingHandCursor);
-  std::string styleString = "border-radius: 5px; border: 2px solid white; ";
+  std::string styleString = "border-radius: 5px;";
   styleString += "background-color: " + Color::toHex(GjC::LIGHT_200) + "; ";
   setStyleSheet(styleString.data());
 }

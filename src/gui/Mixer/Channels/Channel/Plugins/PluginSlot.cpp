@@ -54,9 +54,9 @@ void PluginSlot::hydrateState(const State::Packet& statePacket, const ChannelInd
 }
 
 void PluginSlot::setStyle() {
-  setFixedSize(QSize(150, 70));
+  setFixedSize(QSize(150, 55));
   setStyleSheet(
-    ("border: 2px solid white; background-color: " + Color::toHex(GjC::DARK_200) + "; ").data()
+    QString(("background-color: " + Color::toHex(GjC::DARK_500) + "; ").data())
   );
 }
 
@@ -70,8 +70,8 @@ void PluginSlot::setupGrid() {
   grid.setColumnMinimumWidth(1, 30);
   grid.setColumnStretch(1, 10);
 
-  grid.setVerticalSpacing(4);
-  grid.setHorizontalSpacing(4);
+  grid.setVerticalSpacing(2);
+  grid.setHorizontalSpacing(2);
 }
 } // Mixer
 } // Gui
