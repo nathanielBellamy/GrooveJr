@@ -40,7 +40,7 @@ ChannelsContainer::ChannelsContainer(
   , soloRChannelAction(soloRChannelAction)
   , vuPtr(vuPtr) {
   setChannels();
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
   connectActions();
   setStyle();
   setupGrid();
@@ -244,11 +244,11 @@ void ChannelsContainer::connectActions() {
 }
 
 void ChannelsContainer::setStyle() {
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
   setStyleSheet(
     ("border-radius: 5px; background-color: " + Color::toHex(GjC::LIGHT_200)).data()
   );
-  channelsWidget.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+  channelsWidget.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
 }
 
 void ChannelsContainer::setupGrid() {
@@ -273,7 +273,7 @@ void ChannelsContainer::setupChannelsScrollArea() {
   channelsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   channelsScrollArea.setLayoutDirection(Qt::LeftToRight);
   channelsScrollArea.setWidget(&channelsWidget);
-  channelsWidget.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  channelsWidget.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   channelsGrid.setContentsMargins(0, 0, 0, 0);
 }
 

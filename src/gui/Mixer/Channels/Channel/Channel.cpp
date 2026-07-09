@@ -142,7 +142,7 @@ void Channel::updateShowRemoveChannelButton(const bool val) {
 }
 
 void Channel::setStyle() {
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
   setStyleSheet(
     ("background-color: " + Color::toHex(GjC::LIGHT_300)).data()
   );
@@ -178,7 +178,6 @@ void Channel::setupGrid() {
 
   grid.setColumnMinimumWidth(0, 20);
   grid.setRowMinimumHeight(0, 20);
-  grid.setRowMinimumHeight(1, 100);
   grid.setRowStretch(1, 10);
 
   setLayout(&grid);
