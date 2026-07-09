@@ -78,7 +78,7 @@ Result PluginSlots::hydrateState(const State::Packet& statePacket, const Channel
 }
 
 void PluginSlots::setupGrid() {
-  grid.setVerticalSpacing(4);
+  grid.setVerticalSpacing(1);
 
   int row = 0;
   for (PluginIndex plugIdx = 0; plugIdx < Audio::MAX_PLUGINS_PER_CHANNEL; ++plugIdx) {

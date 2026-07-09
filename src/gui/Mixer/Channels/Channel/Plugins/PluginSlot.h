@@ -12,7 +12,8 @@
 #include "caf/scoped_actor.hpp"
 
 #include <QAction>
-#include <QGridLayout>
+#include <QEnterEvent>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QWidget>
 
@@ -53,8 +54,7 @@ private:
   ChannelIndex channelIndex;
   PluginIndex pluginIndex;
   bool occupied;
-  QGridLayout grid;
-  QLabel title;
+  QHBoxLayout layout;
   TogglePluginButton togglePluginButton;
   ReplacePluginButton replacePluginButton;
   RemovePluginButton removePluginButton;
@@ -63,7 +63,11 @@ private:
 
   void setStyle();
 
-  void setupGrid();
+  void setupLayout();
+
+  void enterEvent(QEnterEvent* event) override;
+
+  void leaveEvent(QEvent* event) override;
 };
 } // Mixer
 } // Gui

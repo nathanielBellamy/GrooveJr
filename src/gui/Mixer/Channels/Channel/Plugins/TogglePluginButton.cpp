@@ -19,7 +19,7 @@ TogglePluginButton::TogglePluginButton(
   , pluginIndex(pluginIndex)
   , occupied(occupied)
   , togglePluginAction(action) {
-  setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_DialogYesButton));
+
   setCursor(Qt::PointingHandCursor);
   setStyle();
 }
@@ -37,19 +37,18 @@ void TogglePluginButton::mousePressEvent(QMouseEvent* event) {
 }
 
 std::string TogglePluginButton::styleString() const {
-  std::string styleString = "padding: 2px; border-radius: 5px;";
+  std::string styleString = "border-radius: 5px; border: none;";
   if (enabled) {
-    styleString += " background-color: " + Color::toHex(GjC::ENABLED_GREEN) + "; ";
-    styleString += " color: " + Color::toHex(GjC::DARK_400) + "; ";
+    styleString += " background-color: " + Color::toHex(GjC::ENABLED_GREEN) + ";";
   } else {
-    styleString += " background-color: " + Color::toHex(GjC::DARK_300) + "; ";
+    styleString += " background-color: " + Color::toHex(GjC::DARK_300) + ";";
   }
   return styleString;
 };
 
 void TogglePluginButton::setStyle() {
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  setMinimumSize(QSize(20, 20));
+  setFixedSize(QSize(14, 14));
+  setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   setStyleSheet(styleString().c_str());
 }
 } // Mixer

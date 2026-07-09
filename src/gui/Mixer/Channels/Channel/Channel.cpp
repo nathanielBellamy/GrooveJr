@@ -191,7 +191,7 @@ void Channel::setupPluginSlotsScrollArea() {
   pluginSlotsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
   pluginSlotsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   pluginSlotsScrollArea.setWidgetResizable(true);
-  pluginSlotsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  pluginSlotsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   pluginSlotsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   pluginSlotsScrollArea.setLayoutDirection(Qt::LeftToRight);
   pluginSlotsScrollArea.setWidget(&pluginSlots);

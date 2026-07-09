@@ -22,18 +22,22 @@ PluginSlot::PluginSlot(QWidget* parent,
   , channelIndex(channelIndex)
   , pluginIndex(pluginIndex)
   , occupied(occupied)
-  , grid(this)
-  , title(this)
+  , layout(this)
   , togglePluginButton(this, channelIndex, pluginIndex, occupied, togglePluginAction)
   , replacePluginButton(this, channelIndex, pluginIndex, occupied, replacePluginAction)
   , removePluginButton(this, channelIndex, pluginIndex, occupied, removePluginAction)
   , pluginName(this) {
-  title.setText(QString::number(pluginIndex + 1));
-  title.setFont({title.font().family(), 12});
-  pluginName.setFont({pluginName.font().family(), 12});
+  setContentsMargins(0, 0, 0, 0);
+  pluginName.setFont({pluginName.font().family(), 10});
+  pluginName.setMinimumWidth(0);
+  pluginName.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+  // Hide action buttons by default — revealed on hover
+  replacePluginButton.hide();
+  removePluginButton.hide();
 
   setStyle();
-  setupGrid();
+  setupLayout();
 }
 
 PluginSlot::~PluginSlot() {
@@ -54,24 +58,46 @@ void PluginSlot::hydrateState(const State::Packet& statePacket, const ChannelInd
 }
 
 void PluginSlot::setStyle() {
-  setFixedSize(QSize(150, 55));
+  setFixedHeight(26);
   setStyleSheet(
-    QString(("background-color: " + Color::toHex(GjC::DARK_500) + "; ").data())
+    QString(("background-color: " + Color::toHex(GjC::DARK_500) + "; "
+             "border-bottom: 1px solid " + Color::toHex(GjC::DARK_400) + ";").data())
+  );
+  pluginName.setStyleSheet(
+    QString(("color: " + Color::toHex(GjC::LIGHT_100) + "; "
+             "background: transparent; "
+             "padding-left: 4px;").data())
   );
 }
 
-void PluginSlot::setupGrid() {
-  grid.addWidget(&title, 0, 0, 1, 1);
-  grid.addWidget(&togglePluginButton, 0, 1, 1, 1);
-  grid.addWidget(&replacePluginButton, 0, 2, 1, 1);
-  grid.addWidget(&removePluginButton, 0, 3, 1, 1);
-  grid.addWidget(&pluginName, 1, 0, -1, -1);
+void PluginSlot::setupLayout() {
+  layout.setContentsMargins(2, 0, 2, 0);
+  layout.setSpacing(2);
 
-  grid.setColumnMinimumWidth(1, 30);
-  grid.setColumnStretch(1, 10);
+  layout.addWidget(&togglePluginButton);
+  layout.addWidget(&pluginName, 1); // stretch factor 1 — takes remaining space
+  layout.addWidget(&replacePluginButton);
+  layout.addWidget(&removePluginButton);
+}
 
-  grid.setVerticalSpacing(2);
-  grid.setHorizontalSpacing(2);
+void PluginSlot::enterEvent(QEnterEvent* event) {
+  setStyleSheet(
+    QString(("background-color: " + Color::toHex(GjC::DARK_300) + "; "
+             "border-bottom: 1px solid " + Color::toHex(GjC::DARK_400) + ";").data())
+  );
+  replacePluginButton.show();
+  removePluginButton.show();
+  QWidget::enterEvent(event);
+}
+
+void PluginSlot::leaveEvent(QEvent* event) {
+  setStyleSheet(
+    QString(("background-color: " + Color::toHex(GjC::DARK_500) + "; "
+             "border-bottom: 1px solid " + Color::toHex(GjC::DARK_400) + ";").data())
+  );
+  replacePluginButton.hide();
+  removePluginButton.hide();
+  QWidget::leaveEvent(event);
 }
 } // Mixer
 } // Gui
