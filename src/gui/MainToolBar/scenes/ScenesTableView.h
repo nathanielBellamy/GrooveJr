@@ -6,6 +6,7 @@
 #define SCENESTABLEVIEW_H
 
 #include <QHeaderView>
+#include <QTimer>
 
 #include "../../QSql/SqlTableView.h"
 #include "../../Color.h"
@@ -19,24 +20,19 @@ class ScenesTableView final : public SqlTableView {
   Result setStyle() {
     setMaximumHeight(80);
 
-    // --- Grid & alternating rows ---
     setShowGrid(false);
     setAlternatingRowColors(true);
 
-    // --- Selection behavior ---
     setSelectionBehavior(SelectRows);
     setSelectionMode(SingleSelection);
 
-    // --- Header tweaks ---
     horizontalHeader()->setHighlightSections(false);
     horizontalHeader()->setStretchLastSection(true);
     verticalHeader()->setVisible(false);
     verticalHeader()->setDefaultSectionSize(28);
 
-    // --- Focus rectangle off ---
     setFocusPolicy(Qt::StrongFocus);
 
-    // --- Stylesheet ---
     const std::string dark500 = Color::toHex(GjC::DARK_500);
     const std::string dark400 = Color::toHex(GjC::DARK_400);
     const std::string dark300 = Color::toHex(GjC::DARK_300);
@@ -153,8 +149,12 @@ public:
     , sceneLoadAction(sceneLoadAction) {
     workerPool->connectClient(model);
     setStyle();
+    connect(model, &QAbstractItemModel::modelReset, this, [this]() {
+      QTimer::singleShot(0, this, [this]() {
+        setColumnHidden(SCENES_COL_ID, true);
+      });
+    });
     refresh(true);
-    setColumnHidden(SCENES_COL_ID, true);
   };
 };
 } // Gui

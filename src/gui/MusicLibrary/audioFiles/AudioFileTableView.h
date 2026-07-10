@@ -12,9 +12,12 @@
 #include "caf/actor_system.hpp"
 #include "caf/scoped_actor.hpp"
 
+#include <QTimer>
+
 #include "QObject"
 #include "QThread"
 #include "QStandardItem"
+#include <QTimer>
 
 #include "../../../Logging.h"
 #include "../../../messaging/atoms.h"
@@ -52,8 +55,13 @@ public:
     new AudioFileQueryModel(parent, stateCore, filters, sqlWorkerPool),
     filters
   ) {
+    connect(model, &QAbstractItemModel::modelReset, this, [this]() {
+      QTimer::singleShot(0, this, [this]() {
+        setColumnHidden(AUDIO_FILE_COL_PATH, true);
+        setColumnHidden(AUDIO_FILE_COL_ID, true);
+      });
+    });
     refresh(true);
-    setColumnHidden(AUDIO_FILE_COL_PATH, true);
   };
 
   void mousePressEvent(QMouseEvent* event) override;

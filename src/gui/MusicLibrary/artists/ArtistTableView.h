@@ -7,6 +7,8 @@
 
 #include "caf/actor_system.hpp"
 
+#include <QTimer>
+
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
 #include "../MusicLibraryType.h"
@@ -33,7 +35,11 @@ public:
     filters
   ) {
     refresh(true);
-    setColumnHidden(ARTIST_COL_ID, true);
+    connect(model, &QAbstractItemModel::modelReset, this, [this]() {
+      QTimer::singleShot(0, this, [this]() {
+        setColumnHidden(ARTIST_COL_ID, true);
+      });
+    });
   };
 };
 } // Gui
