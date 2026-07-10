@@ -60,6 +60,7 @@ private:
   RemovePluginButton removePluginButton;
   QUrl vstUrl;
   QLabel pluginName;
+  QString fullPluginName;
 
   void setStyle();
 
@@ -68,6 +69,10 @@ private:
   void enterEvent(QEnterEvent* event) override;
 
   void leaveEvent(QEvent* event) override;
+
+  void resizeEvent(QResizeEvent* event) override;
+
+  void updateElidedName();
 };
 } // Mixer
 } // Gui

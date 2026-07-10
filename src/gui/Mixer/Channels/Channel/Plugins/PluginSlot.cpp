@@ -30,7 +30,7 @@ PluginSlot::PluginSlot(QWidget* parent,
   setContentsMargins(0, 0, 0, 0);
   pluginName.setFont({pluginName.font().family(), 10});
   pluginName.setMinimumWidth(0);
-  pluginName.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  pluginName.setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
 
   // Hide action buttons by default — revealed on hover
   replacePluginButton.hide();
@@ -52,13 +52,15 @@ void PluginSlot::hydrateState(const State::Packet& statePacket, const ChannelInd
                               const PluginIndex newPluginIndex) {
   channelIndex = newChannelIndex;
   pluginIndex = newPluginIndex;
-  pluginName.setText(statePacket.mixerPacket.channels[channelIndex].plugins[pluginIndex].name.c_str());
+  fullPluginName = QString(statePacket.mixerPacket.channels[channelIndex].plugins[pluginIndex].name.c_str());
+  updateElidedName();
 
   togglePluginButton.hydrateState(statePacket, newChannelIndex);
 }
 
 void PluginSlot::setStyle() {
   setFixedHeight(26);
+  setFixedWidth(125);
   setStyleSheet(
     QString(("background-color: " + Color::toHex(GjC::DARK_500) + "; "
              "border-bottom: 1px solid " + Color::toHex(GjC::DARK_400) + ";").data())
@@ -87,6 +89,7 @@ void PluginSlot::enterEvent(QEnterEvent* event) {
   );
   replacePluginButton.show();
   removePluginButton.show();
+  updateElidedName();
   QWidget::enterEvent(event);
 }
 
@@ -97,7 +100,34 @@ void PluginSlot::leaveEvent(QEvent* event) {
   );
   replacePluginButton.hide();
   removePluginButton.hide();
+  updateElidedName();
   QWidget::leaveEvent(event);
+}
+
+void PluginSlot::resizeEvent(QResizeEvent* event) {
+  QWidget::resizeEvent(event);
+  updateElidedName();
+}
+
+void PluginSlot::updateElidedName() {
+  if (fullPluginName.isEmpty()) return;
+
+  // Calculate available width for the name label:
+  // slot width minus layout margins, toggle button, spacings, and label padding
+  int availableWidth = width() - 4 // layout margins (2+2)
+                       - 14 // toggle button
+                       - 2 // spacing after toggle
+                       - 4; // label padding-left
+
+  if (replacePluginButton.isVisible()) {
+    availableWidth -= 16 + 2; // replace button + spacing
+    availableWidth -= 16 + 2; // remove button + spacing
+  }
+
+  if (availableWidth <= 0) availableWidth = 40;
+
+  QFontMetrics fm(pluginName.font());
+  pluginName.setText(fm.elidedText(fullPluginName, Qt::ElideRight, availableWidth));
 }
 } // Mixer
 } // Gui
