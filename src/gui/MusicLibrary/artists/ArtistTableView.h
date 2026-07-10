@@ -33,6 +33,7 @@ public:
     filters
   ) {
     refresh(true);
+    setColumnHidden(ARTIST_COL_ID, true);
   };
 };
 } // Gui

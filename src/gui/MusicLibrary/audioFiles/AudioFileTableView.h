@@ -53,6 +53,7 @@ public:
     filters
   ) {
     refresh(true);
+    setColumnHidden(AUDIO_FILE_COL_PATH, true);
   };
 
   void mousePressEvent(QMouseEvent* event) override;

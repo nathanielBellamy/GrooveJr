@@ -34,6 +34,7 @@ public:
     filters
   ) {
     refresh(true);
+    setColumnHidden(PLAYLIST_COL_ID, true);
   };
 };
 } // Gui

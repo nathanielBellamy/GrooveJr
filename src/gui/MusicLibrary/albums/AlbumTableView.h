@@ -36,6 +36,7 @@ public:
     filters
   ) {
     refresh(true);
+    setColumnHidden(ALBUM_COL_ID, true);
   };
 };
 } // Gui
