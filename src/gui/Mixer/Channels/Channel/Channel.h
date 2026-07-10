@@ -31,6 +31,7 @@
 #include "./Plugins/PluginsContainer.h"
 #include "../../../Shared/VstSelect.h"
 #include "../../../Color.h"
+#include "Plugins/PluginsButton.h"
 
 #include "../../../../Logging.h"
 
@@ -114,6 +115,7 @@ private:
   QScrollArea pluginSlotsScrollArea;
   PluginSlots pluginSlots;
   MuteSoloContainer muteSoloContainer;
+  PluginsButton pluginsButton;
 
   void setStyle();
 

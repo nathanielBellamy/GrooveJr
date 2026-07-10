@@ -42,24 +42,25 @@ Channel::Channel(
   , grid(this)
   , title(this)
   , gainSlider(Qt::Vertical, this)
-  , gainLabel("Gain", this)
+  , gainLabel("", this)
   , gainLSlider(Qt::Vertical, this)
-  , gainLLabel("GainL", this)
+  , gainLLabel("  L", this)
   , gainRSlider(Qt::Vertical, this)
-  , gainRLabel("GainR", this)
+  , gainRLabel("  R", this)
   , panSlider(Qt::Horizontal, this)
-  , panLabel("Pan", this)
+  , panLabel("", this)
   , panLSlider(Qt::Horizontal, this)
-  , panLLabel("PanL", this)
+  , panLLabel("  L", this)
   , panRSlider(Qt::Horizontal, this)
-  , panRLabel("PanR", this)
+  , panRLabel("  R", this)
   , pluginSlotsScrollArea(this)
   , pluginSlots(
     this, actorSystem, mixer, channelIndex,
     &togglePluginAction, &replacePluginAction, &removePluginAction
   )
+  , pluginsButton(this, &openPluginsContainer)
   , muteSoloContainer(
-    this, mixer, channelIndex, &openPluginsContainer,
+    this, mixer, channelIndex,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction
   ) {
@@ -163,15 +164,14 @@ void Channel::setupGrid() {
   grid.addWidget(&gainLLabel, 5, 2, 1, 1);
   grid.addWidget(&gainRSlider, 1, 3, 4, 1);
   grid.addWidget(&gainRLabel, 5, 3, 1, 1);
-  grid.addWidget(&pluginSlotsScrollArea, 1, 4, 1, 2);
-  grid.addWidget(&addPluginButton, 2, 4, 1, 2, Qt::AlignCenter);
-  // grid.addWidget(&panSlider, 3, 3, 1, 1);
-  // grid.addWidget(&panLabel, 3, 4, 1, 1);
-  grid.addWidget(&panLSlider, 3, 4, 1, 1);
-  grid.addWidget(&panLLabel, 3, 5, 1, 1);
-  grid.addWidget(&panRSlider, 4, 4, 1, 1);
-  grid.addWidget(&panRLabel, 4, 5, 1, 1);
-  grid.addWidget(&muteSoloContainer, 6, 0, 1, -1);
+  grid.addWidget(&pluginSlotsScrollArea, 1, 4, 2, -1);
+  grid.addWidget(&addPluginButton, 3, 4, 1, 1, Qt::AlignCenter);
+  grid.addWidget(&pluginsButton, 3, 5, 1, 1, Qt::AlignCenter);
+  grid.addWidget(&panLSlider, 6, 0, 1, 3);
+  grid.addWidget(&panLLabel, 6, 3, 1, 1);
+  grid.addWidget(&panRSlider, 7, 0, 1, 3);
+  grid.addWidget(&panRLabel, 7, 3, 1, 1);
+  grid.addWidget(&muteSoloContainer, 6, 4, 2, -1);
 
   grid.setVerticalSpacing(2);
   grid.setHorizontalSpacing(2);
@@ -186,8 +186,7 @@ void Channel::setupGrid() {
 
 void Channel::setupPluginSlotsScrollArea() {
   pluginSlotsScrollArea.setMinimumWidth(200);
-  pluginSlotsScrollArea.setMaximumWidth(200);
-  pluginSlotsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
+  pluginSlotsScrollArea.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   pluginSlotsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   pluginSlotsScrollArea.setWidgetResizable(true);
   pluginSlotsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);

@@ -14,11 +14,14 @@ PluginsButton::PluginsButton(QWidget* parent, QAction* openPluginsContainer)
 }
 
 void PluginsButton::setStyle() {
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   setCursor(Qt::PointingHandCursor);
-  std::string styleString = "border-radius: 5px;";
-  styleString += "background-color: " + Color::toHex(GjC::LIGHT_200) + "; ";
-  setStyleSheet(styleString.data());
+  setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+  setStyleSheet(
+    QString(
+      ("width: 100%; min-width: 50px; min-height: 20px; max-height: 20px; background-color: " +
+       Color::toHex(GjC::DARK_400)).data()
+    )
+  );
 }
 
 void PluginsButton::mousePressEvent(QMouseEvent* event) {

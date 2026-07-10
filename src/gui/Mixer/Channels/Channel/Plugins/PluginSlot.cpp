@@ -60,7 +60,6 @@ void PluginSlot::hydrateState(const State::Packet& statePacket, const ChannelInd
 
 void PluginSlot::setStyle() {
   setFixedHeight(26);
-  setFixedWidth(125);
   setStyleSheet(
     QString(("background-color: " + Color::toHex(GjC::DARK_500) + "; "
              "border-bottom: 1px solid " + Color::toHex(GjC::DARK_400) + ";").data())
