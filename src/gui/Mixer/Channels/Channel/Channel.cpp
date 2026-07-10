@@ -187,13 +187,13 @@ void Channel::setupGrid() {
 void Channel::setupPluginSlotsScrollArea() {
   pluginSlotsScrollArea.setMinimumWidth(200);
   pluginSlotsScrollArea.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  pluginSlotsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  pluginSlotsScrollArea.setAlignment(Qt::AlignLeft | Qt::AlignTop);
   pluginSlotsScrollArea.setWidgetResizable(true);
   pluginSlotsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   pluginSlotsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   pluginSlotsScrollArea.setLayoutDirection(Qt::LeftToRight);
   pluginSlotsScrollArea.setWidget(&pluginSlots);
-  pluginSlots.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
+  pluginSlots.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 }
 
 void Channel::setupTitle() {

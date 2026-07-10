@@ -22,6 +22,7 @@ PluginSlots::PluginSlots(QWidget* parent,
   , togglePluginAction(togglePluginAction)
   , replacePluginAction(replacePluginAction)
   , removePluginAction(removePluginAction) {
+  setStyle();
   setupGrid();
 }
 
@@ -78,6 +79,7 @@ Result PluginSlots::hydrateState(const State::Packet& statePacket, const Channel
 }
 
 void PluginSlots::setupGrid() {
+  grid.setContentsMargins(8, 4, 8, 4);
   grid.setVerticalSpacing(1);
 
   int row = 0;
@@ -106,6 +108,10 @@ Result PluginSlots::reset() {
     "Done resetting PluginSlots on channel " + std::to_string(channelIndex)
   );
   return OK;
+}
+
+void PluginSlots::setStyle() {
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 }
 } // Mixer
 } // Gui
