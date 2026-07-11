@@ -89,6 +89,9 @@ void PluginSlots::setupGrid() {
     ++row;
   }
 
+  // Pack plugin slots at the top — spacer absorbs remaining vertical space
+  grid.setRowStretch(row, 1);
+
   setLayout(&grid);
 }
 
@@ -111,7 +114,7 @@ Result PluginSlots::reset() {
 }
 
 void PluginSlots::setStyle() {
-  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 } // Mixer
 } // Gui
