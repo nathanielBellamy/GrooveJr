@@ -64,7 +64,7 @@ Channel::Channel(
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction
   ) {
-  if (channelIndex > 1 || mixer->getChannelsCount() > 1) {
+  if (channelIndex > 1 || (channelIndex == 1 && mixer->getChannelsCount() > 1)) {
     // can't remove main, must have at least one non-main channel
     removeChannelButton.show();
   } else {
