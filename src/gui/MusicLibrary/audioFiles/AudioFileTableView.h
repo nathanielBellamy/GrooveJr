@@ -59,6 +59,13 @@ public:
       QTimer::singleShot(0, this, [this]() {
         setColumnHidden(AUDIO_FILE_COL_PATH, true);
         setColumnHidden(AUDIO_FILE_COL_ID, true);
+
+        horizontalHeader()->resizeSection(AUDIO_FILE_COL_TRACK, 200);
+        horizontalHeader()->resizeSection(AUDIO_FILE_COL_ARTIST, 150);
+        horizontalHeader()->resizeSection(AUDIO_FILE_COL_ALBUM, 150);
+        horizontalHeader()->resizeSection(AUDIO_FILE_COL_TRACK_NUMBER, 50);
+        horizontalHeader()->resizeSection(AUDIO_FILE_COL_YEAR, 75);
+        horizontalHeader()->resizeSection(AUDIO_FILE_COL_GENRE, 100);
       });
     });
     refresh(true);

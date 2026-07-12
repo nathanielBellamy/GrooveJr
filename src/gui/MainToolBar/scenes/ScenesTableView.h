@@ -26,8 +26,12 @@ class ScenesTableView final : public SqlTableView {
     setSelectionBehavior(SelectRows);
     setSelectionMode(SingleSelection);
 
+    // Disable horizontal scrolling; allow vertical scrolling as needed
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
     horizontalHeader()->setHighlightSections(false);
-    horizontalHeader()->setStretchLastSection(true);
+    horizontalHeader()->setStretchLastSection(false);
     verticalHeader()->setVisible(false);
     verticalHeader()->setDefaultSectionSize(28);
 
@@ -94,24 +98,6 @@ class ScenesTableView final : public SqlTableView {
       "  height: 0px;"
       "}"
 
-      "QScrollBar:horizontal {"
-      "  background: " + dark500 + ";"
-      "  height: 8px;"
-      "  margin: 0;"
-      "}"
-      "QScrollBar::handle:horizontal {"
-      "  background: " + dark300 + ";"
-      "  min-width: 24px;"
-      "  border-radius: 4px;"
-      "}"
-      "QScrollBar::handle:horizontal:hover {"
-      "  background: " + light400 + ";"
-      "}"
-      "QScrollBar::add-line:horizontal,"
-      "QScrollBar::sub-line:horizontal {"
-      "  width: 0px;"
-      "}"
-
       "QTableCornerButton::section {"
       "  background-color: " + dark400 + ";"
       "  border: none;"
@@ -152,6 +138,12 @@ public:
     connect(model, &QAbstractItemModel::modelReset, this, [this]() {
       QTimer::singleShot(0, this, [this]() {
         setColumnHidden(SCENES_COL_ID, true);
+
+        horizontalHeader()->setSectionResizeMode(SCENES_COL_SCENE_ID, QHeaderView::Fixed);
+        horizontalHeader()->resizeSection(SCENES_COL_SCENE_ID, 50);
+        horizontalHeader()->setSectionResizeMode(SCENES_COL_NAME, QHeaderView::Stretch);
+        horizontalHeader()->setSectionResizeMode(SCENES_COL_VERSION, QHeaderView::Fixed);
+        horizontalHeader()->resizeSection(SCENES_COL_VERSION, 60);
       });
     });
     refresh(true);

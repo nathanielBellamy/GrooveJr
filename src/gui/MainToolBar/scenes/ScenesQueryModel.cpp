@@ -39,7 +39,7 @@ Result ScenesQueryModel::refresh(const bool hard) {
 Result ScenesQueryModel::setHeaders() {
   setHeaderData(SCENES_COL_ID, Qt::Horizontal, QObject::tr("_Id"));
   setHeaderData(SCENES_COL_SCENE_ID, Qt::Horizontal, QObject::tr(""));
-  setHeaderData(SCENES_COL_VERSION, Qt::Horizontal, QObject::tr("Version"));
+  setHeaderData(SCENES_COL_VERSION, Qt::Horizontal, QObject::tr("Ver."));
   setHeaderData(SCENES_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
   return OK;
 }
