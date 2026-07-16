@@ -31,7 +31,7 @@ public:
     actorSystem,
     dao,
     stateCore,
-    new ArtistQueryModel(parent, stateCore, filters, sqlWorkerPool),
+    new ArtistQueryModel(parent, this, stateCore, filters, sqlWorkerPool),
     filters
   ) {
     refresh(true);

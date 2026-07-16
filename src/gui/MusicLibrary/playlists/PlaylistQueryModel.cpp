@@ -7,11 +7,11 @@
 namespace Gj {
 namespace Gui {
 Result PlaylistQueryModel::hydrateState(const State::Packet& statePacket) {
-  Logging::write(
-    Info,
-    "Gui::PlaylistQueryModel::hydrateState",
-    "PlaylistQueryModel::hydrateState"
-  );
+  // Logging::write(
+  //   Info,
+  //   "Gui::PlaylistQueryModel::hydrateState",
+  //   "PlaylistQueryModel::hydrateState"
+  // );
   return OK;
 }
 

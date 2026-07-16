@@ -52,7 +52,7 @@ public:
     actorSystem,
     dao,
     stateCore,
-    new AudioFileQueryModel(parent, stateCore, filters, sqlWorkerPool),
+    new AudioFileQueryModel(parent, this, stateCore, filters, sqlWorkerPool),
     filters
   ) {
     connect(model, &QAbstractItemModel::modelReset, this, [this]() {

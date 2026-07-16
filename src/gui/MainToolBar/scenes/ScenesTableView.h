@@ -130,7 +130,7 @@ public:
       actorSystem,
       dao,
       stateCore,
-      new ScenesQueryModel(parent, stateCore, QString("ScenesQueryModel"), workerPool)
+      new ScenesQueryModel(parent, this, stateCore, QString("ScenesQueryModel"), workerPool)
     )
     , sceneLoadAction(sceneLoadAction) {
     workerPool->connectClient(model);

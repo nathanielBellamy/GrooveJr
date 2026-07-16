@@ -28,7 +28,7 @@ public:
     actorSystem,
     dao,
     stateCore,
-    new QueueQueryModel(parent, stateCore, filters, sqlWorkerPool),
+    new QueueQueryModel(parent, this, stateCore, filters, sqlWorkerPool),
     filters
   ) {
     refresh(true);

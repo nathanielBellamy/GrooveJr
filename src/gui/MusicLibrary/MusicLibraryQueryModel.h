@@ -47,13 +47,14 @@ protected:
 public:
   MusicLibraryQueryModel(
     QObject* parent,
+    QTableView* tableView,
     State::Core* stateCore,
     MusicLibraryFilters* filters,
     const MusicLibraryType type,
     const QString& id,
     SqlWorkerPool* sqlWorkerPool
   )
-  : SqlQueryModel(parent, stateCore, id, sqlWorkerPool)
+  : SqlQueryModel(parent, tableView, stateCore, id, sqlWorkerPool)
     , id(id)
     , stateCore(stateCore)
     , type(type)

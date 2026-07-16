@@ -7,7 +7,9 @@
 
 #include <QMenu>
 #include <QMouseEvent>
+#include <QScrollBar>
 #include <QTableView>
+#include <QTimer>
 
 #include "caf/actor_system.hpp"
 
@@ -24,7 +26,7 @@ using namespace caf;
 class SqlTableView : public QTableView {
   Result setStyle() {
     setStyleSheet(
-      "font-weight: 500; font-size: 12px;"
+      QString("font-weight: 500; font-size: 12px;")
     );
     return OK;
   }
@@ -53,7 +55,7 @@ public:
     return model;
   }
 
-  Result hydrateState(const Gj::State::Packet& statePacket) const {
+  Result hydrateState(const Gj::State::Packet& statePacket) {
     model->hydrateState(statePacket);
     refresh();
     return OK;

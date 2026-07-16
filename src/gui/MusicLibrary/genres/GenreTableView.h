@@ -32,7 +32,7 @@ public:
     actorSystem,
     dao,
     stateCore,
-    new GenreQueryModel(parent, stateCore, filters, sqlWorkerPool),
+    new GenreQueryModel(parent, this, stateCore, filters, sqlWorkerPool),
     filters
   ) {
     refresh(true);

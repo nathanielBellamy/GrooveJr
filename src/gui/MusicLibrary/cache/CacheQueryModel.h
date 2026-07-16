@@ -23,9 +23,22 @@ class CacheQueryModel final : public MusicLibraryQueryModel {
   bool isSelected(const QModelIndex& item) const;
 
 public:
-  explicit CacheQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
-                           SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, stateCore, filters, CACHE, QString("Cache"), sqlWorkerPool) {
+  explicit CacheQueryModel(
+    QObject* parent,
+    QTableView* tableView,
+    State::Core* stateCore,
+    MusicLibraryFilters* filters,
+    SqlWorkerPool* sqlWorkerPool
+  )
+  : MusicLibraryQueryModel(
+    parent,
+    tableView,
+    stateCore,
+    filters,
+    CACHE,
+    QString("Cache"),
+    sqlWorkerPool
+  ) {
     refresh();
   }
 

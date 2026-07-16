@@ -21,9 +21,22 @@ namespace Gj {
 namespace Gui {
 class ArtistQueryModel final : public MusicLibraryQueryModel {
 public:
-  explicit ArtistQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
-                            SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, stateCore, filters, ARTIST, QString("ArtistQueryModel"), sqlWorkerPool) {
+  explicit ArtistQueryModel(
+    QObject* parent,
+    QTableView* tableView,
+    State::Core* stateCore,
+    MusicLibraryFilters* filters,
+    SqlWorkerPool* sqlWorkerPool
+  )
+  : MusicLibraryQueryModel(
+    parent,
+    tableView,
+    stateCore,
+    filters,
+    ARTIST,
+    QString("ArtistQueryModel"),
+    sqlWorkerPool
+  ) {
     refresh();
   }
 

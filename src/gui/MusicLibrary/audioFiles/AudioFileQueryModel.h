@@ -21,9 +21,22 @@ namespace Gj {
 namespace Gui {
 class AudioFileQueryModel final : public MusicLibraryQueryModel {
 public:
-  explicit AudioFileQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
-                               SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, stateCore, filters, AUDIO_FILE, QString("AudioFileQueryModel"), sqlWorkerPool) {
+  explicit AudioFileQueryModel(
+    QObject* parent,
+    QTableView* tableView,
+    State::Core* stateCore,
+    MusicLibraryFilters* filters,
+    SqlWorkerPool* sqlWorkerPool
+  )
+  : MusicLibraryQueryModel(
+    parent,
+    tableView,
+    stateCore,
+    filters,
+    AUDIO_FILE,
+    QString("AudioFileQueryModel"),
+    sqlWorkerPool
+  ) {
     refresh();
   }
 

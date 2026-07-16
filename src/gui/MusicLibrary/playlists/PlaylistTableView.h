@@ -32,7 +32,7 @@ public:
     actorSystem,
     dao,
     stateCore,
-    new PlaylistQueryModel(parent, stateCore, filters, sqlWorkerPool),
+    new PlaylistQueryModel(parent, this, stateCore, filters, sqlWorkerPool),
     filters
   ) {
     refresh(true);

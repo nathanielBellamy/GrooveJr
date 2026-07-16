@@ -7,11 +7,11 @@
 namespace Gj {
 namespace Gui {
 Result CacheQueryModel::hydrateState(const State::Packet& statePacket) {
-  Logging::write(
-    Info,
-    "Gui::CacheQueryModel::hydrateState",
-    "CacheQueryModel::hydrateState"
-  );
+  // Logging::write(
+  //   Info,
+  //   "Gui::CacheQueryModel::hydrateState",
+  //   "CacheQueryModel::hydrateState"
+  // );
   return OK;
 }
 

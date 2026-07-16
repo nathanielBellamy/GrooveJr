@@ -24,9 +24,22 @@ class QueueQueryModel final : public MusicLibraryQueryModel {
   bool isSelected(const QModelIndex& item) const;
 
 public:
-  explicit QueueQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
-                           SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, stateCore, filters, AUDIO_FILE, QString("QueueQueryModel"), sqlWorkerPool) {
+  explicit QueueQueryModel(
+    QObject* parent,
+    QTableView* tableView,
+    State::Core* stateCore,
+    MusicLibraryFilters* filters,
+    SqlWorkerPool* sqlWorkerPool
+  )
+  : MusicLibraryQueryModel(
+    parent,
+    tableView,
+    stateCore,
+    filters,
+    AUDIO_FILE,
+    QString("QueueQueryModel"),
+    sqlWorkerPool
+  ) {
     refresh();
   }
 
