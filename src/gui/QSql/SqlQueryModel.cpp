@@ -28,7 +28,6 @@ Result SqlQueryModel::connectToPool() {
                 if (callerId != id)
                   return;
 
-
                 const QPersistentModelIndex persistentTopIndex = tableView->indexAt(QPoint(0, 0));
                 clear();
                 for (const auto& row: rows) {

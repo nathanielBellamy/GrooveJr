@@ -57,7 +57,6 @@ public:
 
   Result hydrateState(const Gj::State::Packet& statePacket) {
     model->hydrateState(statePacket);
-    refresh();
     return OK;
   }
 
