@@ -12,6 +12,7 @@ Result ArtistQueryModel::hydrateState(const State::Packet& statePacket) {
     "Gui::ArtistQueryModel::hydrateState",
     "ArtistQueryModel::hydrateState"
   );
+  refresh();
   return OK;
 }
 

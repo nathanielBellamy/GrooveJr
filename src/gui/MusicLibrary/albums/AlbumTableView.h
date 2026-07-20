@@ -37,7 +37,6 @@ public:
     new AlbumQueryModel(parent, this, stateCore, filters, sqlWorkerPool),
     filters
   ) {
-    refresh(true);
     connect(model, &QAbstractItemModel::modelReset, this, [this]() {
       QTimer::singleShot(0, this, [this]() {
         setColumnHidden(ALBUM_COL_ID, true);
@@ -45,6 +44,7 @@ public:
         horizontalHeader()->resizeSection(ALBUM_COL_YEAR, 60);
       });
     });
+    refresh(true);
   };
 };
 } // Gui

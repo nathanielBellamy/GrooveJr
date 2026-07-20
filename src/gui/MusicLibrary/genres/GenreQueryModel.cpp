@@ -7,11 +7,12 @@
 namespace Gj {
 namespace Gui {
 Result GenreQueryModel::hydrateState(const State::Packet& statePacket) {
-  // Logging::write(
-  //   Info,
-  //   "Gui::GenreQueryModel::hydrateState",
-  //   "GenreQueryModel::hydrateState"
-  // );
+  Logging::write(
+    Info,
+    "Gui::GenreQueryModel::hydrateState",
+    "GenreQueryModel::hydrateState"
+  );
+  refresh();
   return OK;
 }
 
