@@ -51,6 +51,8 @@ public:
 
   // MusicLibraryQueryModel
   bool isCurrentlyPlaying(const QModelIndex& item) const override;
+
+  size_t idCol() const override { return AUDIO_FILE_COL_ID; }
 };
 } // Gui
 } // Gj

@@ -51,6 +51,15 @@ MusicLibraryWindow::MusicLibraryWindow(
   playlistClearFilterButton->setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
   clearFiltersButton->setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
 
+  // Keep row height stable when clear-filter buttons are hidden
+  for (auto* btn : {albumClearFilterButton, artistClearFilterButton,
+                    genreClearFilterButton, playlistClearFilterButton,
+                    clearFiltersButton}) {
+    QSizePolicy sp = btn->sizePolicy();
+    sp.setRetainSizeWhenHidden(true);
+    btn->setSizePolicy(sp);
+  }
+
   filtersHeader->setText("Filters");
   filtersHeader->setFont({filtersHeader->font().family(), 14});
 

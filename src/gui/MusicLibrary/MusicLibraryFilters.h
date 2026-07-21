@@ -50,6 +50,14 @@ struct MusicLibraryFilters {
 
     return OK;
   }
+
+  bool isActive(const MusicLibraryType type) const {
+    return !filters.at(type).ids.empty();
+  }
+
+  bool anyActive() const {
+    return isActive(ALBUM) || isActive(ARTIST) || isActive(GENRE) || isActive(PLAYLIST);
+  }
 };
 
 } // Gui

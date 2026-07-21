@@ -36,12 +36,14 @@ protected:
   MusicLibraryFilters* filters;
 
   bool isCurrentFilter(const QModelIndex& item, const size_t idCol) const {
-    std::vector<ID> ids = filters->filters.at(type).ids;
-    return std::find(
-             ids.begin(),
-             ids.end(),
-             index(item.row(), idCol).data()
-           ) != ids.end();
+    const auto it = filters->filters.find(type);
+    if (it == filters->filters.end())
+      return false;
+    const std::vector<ID>& ids = it->second.ids;
+    if (ids.empty())
+      return false;
+    const ID rowId = index(item.row(), idCol).data().toULongLong();
+    return std::find(ids.begin(), ids.end(), rowId) != ids.end();
   };
 
 public:
@@ -61,11 +63,16 @@ public:
     , filters(filters) {
   }
 
+  virtual size_t idCol() const = 0;
+
   virtual bool isCurrentlyPlaying(const QModelIndex& item) const = 0;
 
   QVariant data(const QModelIndex& item, const int role) const {
     if (role == Qt::BackgroundRole && isCurrentlyPlaying(item))
       return QVariant::fromValue(QColor(CURRENTLY_PLAYING_COLOR));
+
+    if (role == Qt::BackgroundRole && isCurrentFilter(item, idCol()))
+      return QVariant::fromValue(FILTER_ACTIVE_COLOR);
 
     return {};
   }

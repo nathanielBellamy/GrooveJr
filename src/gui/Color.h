@@ -21,7 +21,8 @@ enum class GjC {
   LIGHT_100,
   MUTE_BLUE,
   SOLO_YELLOW,
-  ENABLED_GREEN
+  ENABLED_GREEN,
+  FILTER_ACTIVE
 };
 
 class Color {
@@ -39,6 +40,7 @@ public:
     {GjC::MUTE_BLUE, "#55A0FE"},
     {GjC::SOLO_YELLOW, "#F7DB69"},
     {GjC::ENABLED_GREEN, "#2BF912"},
+    {GjC::FILTER_ACTIVE, "#B8860B"},
   };
 
   static std::string toHex(const GjC color) {

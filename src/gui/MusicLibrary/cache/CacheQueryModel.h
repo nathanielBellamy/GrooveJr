@@ -50,6 +50,8 @@ public:
 
   bool isCurrentlyPlaying(const QModelIndex& item) const override;
 
+  size_t idCol() const override { return AUDIO_FILE_COL_ID; }
+
   QVariant data(const QModelIndex& item, int role) const override;
 };
 } // Gui
