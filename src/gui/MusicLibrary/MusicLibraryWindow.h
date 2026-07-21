@@ -113,14 +113,14 @@ public:
     return OK;
   };
 
-  Result refresh() const {
-    albumTableView->refresh();
-    artistTableView->refresh();
-    audioFileTableView->refresh();
-    cacheTableView->refresh();
-    genreTableView->refresh();
-    playlistTableView->refresh();
-    queueTableView->refresh();
+  Result refresh(const SqlTableView* skip = nullptr) const {
+    if (skip != albumTableView) albumTableView->refresh();
+    if (skip != artistTableView) artistTableView->refresh();
+    if (skip != audioFileTableView) audioFileTableView->refresh();
+    if (skip != cacheTableView) cacheTableView->refresh();
+    if (skip != genreTableView) genreTableView->refresh();
+    if (skip != playlistTableView) playlistTableView->refresh();
+    if (skip != queueTableView) queueTableView->refresh();
 
     return OK;
   }

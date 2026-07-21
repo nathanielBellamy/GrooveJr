@@ -28,7 +28,8 @@ Result SqlQueryModel::connectToPool() {
                 if (callerId != id)
                   return;
 
-                const QPersistentModelIndex persistentTopIndex = tableView->indexAt(QPoint(0, 0));
+                const QModelIndex topIndex = tableView->indexAt(QPoint(0, 0));
+                const int savedRow = topIndex.isValid() ? topIndex.row() : 0;
                 clear();
                 for (const auto& row: rows) {
                   QList<QStandardItem*> items;
@@ -36,10 +37,11 @@ Result SqlQueryModel::connectToPool() {
                     items << new QStandardItem(val.toString());
                   appendRow(items);
                 }
-                if (persistentTopIndex.isValid())
-                  tableView->scrollTo(persistentTopIndex, QAbstractItemView::PositionAtTop);
-
                 setHeaders();
+                if (savedRow > 0 && savedRow < rowCount()) {
+                  const QModelIndex restoreIndex = index(savedRow, 0);
+                  tableView->scrollTo(restoreIndex, QAbstractItemView::PositionAtTop);
+                }
               });
   const auto errorOccurredConnection =
       connect(sqlWorkerPool, &SqlWorkerPool::errorOccurred, this, [&](const QString& error) {

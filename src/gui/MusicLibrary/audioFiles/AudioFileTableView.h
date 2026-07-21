@@ -55,6 +55,7 @@ public:
     new AudioFileQueryModel(parent, this, stateCore, filters, sqlWorkerPool),
     filters
   ) {
+    refresh(true);
     connect(model, &QAbstractItemModel::modelReset, this, [this]() {
       QTimer::singleShot(0, this, [this]() {
         setColumnHidden(AUDIO_FILE_COL_PATH, true);
@@ -68,7 +69,6 @@ public:
         horizontalHeader()->resizeSection(AUDIO_FILE_COL_GENRE, 50);
       });
     });
-    refresh(true);
   };
 
   void mousePressEvent(QMouseEvent* event) override;

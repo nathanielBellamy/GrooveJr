@@ -236,7 +236,7 @@ Result MusicLibraryWindow::connectActions() {
                                                   index.row(), 2).data();
                                                 filters.set(ALBUM, albumId.toInt());
 
-                                                refresh();
+                                                refresh(albumTableView);
                                               });
 
   const auto artistClickedConnection = connect(artistTableView, &QTableView::clicked, this,
@@ -245,7 +245,7 @@ Result MusicLibraryWindow::connectActions() {
                                                    index.row(), 1).data();
                                                  filters.set(ARTIST, artistId.toLongLong());
 
-                                                 refresh();
+                                                 refresh(artistTableView);
                                                });
 
   const auto genreClickedConnection = connect(genreTableView, &QTableView::clicked, this,
@@ -254,7 +254,7 @@ Result MusicLibraryWindow::connectActions() {
                                                   index.row(), 1).data();
                                                 filters.set(GENRE, genreId.toLongLong());
 
-                                                refresh();
+                                                refresh(genreTableView);
                                               });
 
   const auto playlistClickedConnection = connect(playlistTableView, &QTableView::clicked, this,
@@ -263,7 +263,7 @@ Result MusicLibraryWindow::connectActions() {
                                                      index.row(), 1).data();
                                                    filters.set(PLAYLIST, playlistId.toLongLong());
 
-                                                   refresh();
+                                                   refresh(playlistTableView);
                                                  });
 
   return OK;
