@@ -20,13 +20,15 @@ Channel::Channel(
   QAction* soloChannelAction,
   QAction* soloLChannelAction,
   QAction* soloRChannelAction,
-  std::atomic<float>* vuPtr
+  std::atomic<float>* vuPtr,
+  const bool fillContainer
 )
 : QWidget(parent)
   , channelIndex(channelIndex)
   , actorSystem(actorSystem)
   , appStateManagerPtr(actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER))
   , mixer(mixer)
+  , fillContainer(fillContainer)
   , vuPtr(vuPtr)
   , vuMeter(this, mixer, vuPtr, channelIndex)
   , removeChannelAction(removeChannelAction)
@@ -143,8 +145,13 @@ void Channel::updateShowRemoveChannelButton(const bool val) {
 }
 
 void Channel::setStyle() {
-  setFixedWidth(290);
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+  if (fillContainer) {
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setMinimumWidth(0);
+  } else {
+    setFixedWidth(290);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+  }
   setStyleSheet(
     ("background-color: " + Color::toHex(GjC::LIGHT_300)).data()
   );
