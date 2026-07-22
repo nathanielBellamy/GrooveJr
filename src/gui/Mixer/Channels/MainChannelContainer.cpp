@@ -38,6 +38,8 @@ MainChannelContainer::MainChannelContainer(
   )) {
   setupGrid();
   setStyle();
+  setContentsMargins(0, 0, 0, 0);
+  mainChannel->setContentsMargins(0, 0, 0, 0);
 
   Logging::write(
     Info,

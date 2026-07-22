@@ -143,6 +143,7 @@ void Channel::updateShowRemoveChannelButton(const bool val) {
 }
 
 void Channel::setStyle() {
+  setFixedWidth(290);
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
   setStyleSheet(
     ("background-color: " + Color::toHex(GjC::LIGHT_300)).data()
@@ -200,7 +201,7 @@ void Channel::setupTitle() {
   if (channelIndex == 0) {
     title.setText("Main");
   } else {
-    title.setText("FX " + QString::number(channelIndex));
+    title.setText(QString::number(channelIndex));
   }
   title.setFont({title.font().family(), 16});
 }

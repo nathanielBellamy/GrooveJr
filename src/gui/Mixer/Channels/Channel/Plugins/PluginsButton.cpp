@@ -18,7 +18,7 @@ void PluginsButton::setStyle() {
   setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
   setStyleSheet(
     QString(
-      ("width: 100%; min-width: 50px; min-height: 20px; max-height: 20px; background-color: " +
+      ("width: 100%; min-width: 25px; min-height: 20px; max-height: 20px; background-color: " +
        Color::toHex(GjC::DARK_400)).data()
     )
   );

@@ -28,7 +28,7 @@ ChannelsContainer::ChannelsContainer(
   , spacer(this)
   , channelsWidget(this)
   , channelsScrollArea(this)
-  , channelsGrid(&channelsWidget)
+  , channelsHBoxLayout(&channelsScrollArea)
   , addChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListAdd), tr("&AddChannel"), this)
   , removeChannelAction(QIcon::fromTheme(QIcon::ThemeIcon::ListRemove), tr("&RemoveChannel"), this)
   , addChannelButton(this, &addChannelAction)
@@ -39,6 +39,11 @@ ChannelsContainer::ChannelsContainer(
   , soloLChannelAction(soloLChannelAction)
   , soloRChannelAction(soloRChannelAction)
   , vuPtr(vuPtr) {
+  channelsHBoxLayout.setAlignment(Qt::AlignLeft);
+  channelsHBoxLayout.setContentsMargins(0, 0, 0, 0);
+  channelsHBoxLayout.setSpacing(5);
+
+
   setChannels();
   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
   connectActions();
@@ -85,6 +90,7 @@ void ChannelsContainer::addChannel() {
     &vuPtr[Audio::BfrIdx::VU::left(channelIndex)]
   );
   channels.push_back(channel);
+  channelsHBoxLayout.addWidget(channel);
 
   if (channels.size() > 1)
     channels.front()->updateShowRemoveChannelButton(true);
@@ -109,6 +115,7 @@ void ChannelsContainer::removeChannel(const ChannelIndex channelIdx) {
     );
 
     const int indexToRemove = std::distance(channels.begin(), itrToRemove);
+    channelsHBoxLayout.removeWidget(channels.at(indexToRemove));
     delete channels.at(indexToRemove);
     channels.erase(channels.begin() + indexToRemove);
   } else {
@@ -256,7 +263,7 @@ void ChannelsContainer::setupGrid() {
   grid.addWidget(&addChannelButton, 0, 1, -1, 1);
   int col = 0;
   for (const auto& channel: channels) {
-    channelsGrid.addWidget(channel, 0, col, -1, 1);
+    channelsHBoxLayout.addWidget(channel);
     col++;
   }
 }
@@ -274,7 +281,6 @@ void ChannelsContainer::setupChannelsScrollArea() {
   channelsScrollArea.setLayoutDirection(Qt::LeftToRight);
   channelsScrollArea.setWidget(&channelsWidget);
   channelsWidget.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-  channelsGrid.setContentsMargins(0, 0, 0, 0);
 }
 
 void ChannelsContainer::setMute(const ChannelIndex channelIdx, const float val) const {
