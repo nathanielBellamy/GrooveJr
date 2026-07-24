@@ -72,52 +72,53 @@ Result AudioFileTableView::saveCache() const {
 }
 
 void AudioFileTableView::mouseDoubleClickEvent(QMouseEvent* event) {
-  if (const QModelIndex clickedIndex = indexAt(event->pos()); clickedIndex.isValid()) {
-    const SqlQueryModel* model = getModel();
-    const int clickedRow = clickedIndex.row();
-    DecksState decksState;
-    decksState.currentDeckIdx = 1;
-    for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; ++i) {
-      const auto index = clickedRow + i - 1;
-      QModelIndex modelIndex = model->index(index, AUDIO_FILE_COL_ID);
-      if (!modelIndex.isValid())
-        decksState.audioFileIds[i] = 0;
-      else
-        decksState.audioFileIds[i] = modelIndex.data().toULongLong();
-    }
-
-    if (saveCache() == ERROR) {
-      Logging::write(
-        Error,
-        "Gui::AudioFileTableView::mouseDoubleClickEvent",
-        "Unable to save Caches."
-      );
-      return;
-    }
-
-    stateCore->cacheTrackNumber.store(clickedRow);
-
-    if (stateCore->getCurrentlyPlaying().audioFile.id == decksState.audioFileIds[decksState.currentDeckIdx]
-        && !stateCore->queuePlay)
-      return;
-
-    const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
-    if (!appStateManagerPtr) {
-      Logging::write(
-        Error,
-        "Gui::AudioFileTableView::mouseDoubleClickEvent",
-        "AppStateManager actor is not available."
-      );
-      return;
-    }
-    const scoped_actor self{actorSystem};
-    self->anon_send(
-      actor_cast<actor>(appStateManagerPtr),
-      false, // queuePlay
-      decksState,
-      tc_trig_play_file_a_v
-    );
+  const QModelIndex clickedIndex = indexAt(event->pos());
+  if (!clickedIndex.isValid())
+    return;
+  const SqlQueryModel* model = getModel();
+  const int clickedRow = clickedIndex.row();
+  DecksState decksState;
+  decksState.currentDeckIdx = 1;
+  for (int i = 0; i < Audio::AUDIO_CORE_DECK_COUNT; ++i) {
+    const auto index = clickedRow + i - 1;
+    QModelIndex modelIndex = model->index(index, AUDIO_FILE_COL_ID);
+    if (!modelIndex.isValid())
+      decksState.audioFileIds[i] = 0;
+    else
+      decksState.audioFileIds[i] = modelIndex.data().toULongLong();
   }
+
+  if (saveCache() == ERROR) {
+    Logging::write(
+      Error,
+      "Gui::AudioFileTableView::mouseDoubleClickEvent",
+      "Unable to save Caches."
+    );
+    return;
+  }
+
+  stateCore->cacheTrackNumber.store(clickedRow);
+
+  if (stateCore->getCurrentlyPlaying().audioFile.id == decksState.audioFileIds[decksState.currentDeckIdx]
+      && !stateCore->queuePlay)
+    return;
+
+  const auto appStateManagerPtr = actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER);
+  if (!appStateManagerPtr) {
+    Logging::write(
+      Error,
+      "Gui::AudioFileTableView::mouseDoubleClickEvent",
+      "AppStateManager actor is not available."
+    );
+    return;
+  }
+  const scoped_actor self{actorSystem};
+  self->anon_send(
+    actor_cast<actor>(appStateManagerPtr),
+    false, // queuePlay
+    decksState,
+    tc_trig_play_file_a_v
+  );
 };
 } // Gui
 } // Gj
