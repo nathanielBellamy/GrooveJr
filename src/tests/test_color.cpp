@@ -17,6 +17,7 @@ TEST(ColorTest, ToHex_AllColors) {
     EXPECT_EQ(Color::toHex(GjC::MUTE_BLUE), "#55A0FE");
     EXPECT_EQ(Color::toHex(GjC::SOLO_YELLOW), "#F7DB69");
     EXPECT_EQ(Color::toHex(GjC::ENABLED_GREEN), "#2BF912");
+    EXPECT_EQ(Color::toHex(GjC::FILTER_ACTIVE), "#B8860B");
 }
 
 TEST(ColorTest, HexValues_AreSevenChars) {
@@ -27,5 +28,5 @@ TEST(ColorTest, HexValues_AreSevenChars) {
 }
 
 TEST(ColorTest, MapHas12Entries) {
-    EXPECT_EQ(Color::hexs.size(), 12u);
+    EXPECT_EQ(Color::hexs.size(), 13u);
 }

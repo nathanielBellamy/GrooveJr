@@ -111,19 +111,19 @@ void PluginsContainer::setStyle() {
 }
 
 void PluginsContainer::setupGrid() {
-  grid.setVerticalSpacing(10);
+  grid.setVerticalSpacing(6);
 
   int j = 0;
   for (PluginIndex i = 0; i < Audio::MAX_PLUGINS_PER_CHANNEL; i++) {
     if (!hasPluginAt(i))
       continue;
 
-    grid.setRowMinimumHeight(i, 50);
+    grid.setRowMinimumHeight(i, 30);
     grid.addWidget(vstWindowSelectLabels[i].get(), i, 0, 1, 1);
     grid.addWidget(vstWindowSelectButtons[i].get(), i, 1, 1, 1);
     j++;
   }
-  grid.setRowMinimumHeight(j, 50);
+  grid.setRowMinimumHeight(j, 30);
   grid.addWidget(&addPluginButton, j, 0, 1, -1);
 
   setLayout(&grid);

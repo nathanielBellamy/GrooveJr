@@ -17,7 +17,6 @@
 
 #include "MuteButton.h"
 #include "SoloButton.h"
-#include "Plugins/PluginsButton.h"
 
 namespace Gj {
 namespace Gui {
@@ -28,7 +27,6 @@ public:
     QWidget* parent,
     Audio::Mixer::Core* mixer,
     ChannelIndex channelIndex,
-    QAction* openPluginsContainer,
     QAction* muteChannelAction,
     QAction* muteLChannelAction,
     QAction* muteRChannelAction,
@@ -63,7 +61,6 @@ private:
   SoloButton solo;
   SoloButton soloL;
   SoloButton soloR;
-  PluginsButton plugins;
 
   void setupGrid();
 };

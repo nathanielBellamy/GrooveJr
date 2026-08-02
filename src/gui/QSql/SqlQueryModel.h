@@ -12,6 +12,7 @@
 
 #include "SqlWorkerPool.h"
 #include "SqlWorkerPoolClient.h"
+#include "QTableView"
 
 namespace Gj {
 namespace Gui {
@@ -20,37 +21,12 @@ class SqlWorkerPool;
 class SqlQueryModel : public SqlWorkerPoolClient {
   std::string previousQuery = "";
 
-  Result connectToPool() {
-    const auto queryResultsReadyConnection =
-        connect(sqlWorkerPool, &SqlWorkerPool::queryResultsReady,
-                [&](const QString& callerId, const QList<QVariantList>& rows) {
-                  if (callerId != id)
-                    return;
-
-                  clear();
-                  for (const auto& row: rows) {
-                    QList<QStandardItem*> items;
-                    for (const auto& val: row)
-                      items << new QStandardItem(val.toString());
-                    appendRow(items);
-                  }
-
-                  setHeaders();
-                });
-    const auto errorOccurredConnection =
-        connect(sqlWorkerPool, &SqlWorkerPool::errorOccurred, this, [&](const QString& error) {
-          Logging::write(
-            Error,
-            "Gui::SqlQueryModel::errorOccurred()",
-            "Error: " + error.toStdString()
-          );
-        });
-    return OK;
-  };
+  Result connectToPool();
 
 protected:
   QString id;
   SqlWorkerPool* sqlWorkerPool;
+  QTableView* tableView;
   State::Core* stateCore;
 
   Result setPreviousQuery(std::string newQueryString) {
@@ -73,6 +49,7 @@ protected:
 public:
   SqlQueryModel(
     QObject* parent,
+    QTableView* tableView,
     State::Core* stateCore,
     const QString& id,
     SqlWorkerPool* sqlWorkerPool

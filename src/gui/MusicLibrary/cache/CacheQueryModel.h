@@ -23,9 +23,22 @@ class CacheQueryModel final : public MusicLibraryQueryModel {
   bool isSelected(const QModelIndex& item) const;
 
 public:
-  explicit CacheQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
-                           SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, stateCore, filters, CACHE, QString("Cache"), sqlWorkerPool) {
+  explicit CacheQueryModel(
+    QObject* parent,
+    QTableView* tableView,
+    State::Core* stateCore,
+    MusicLibraryFilters* filters,
+    SqlWorkerPool* sqlWorkerPool
+  )
+  : MusicLibraryQueryModel(
+    parent,
+    tableView,
+    stateCore,
+    filters,
+    CACHE,
+    QString("Cache"),
+    sqlWorkerPool
+  ) {
     refresh();
   }
 
@@ -36,6 +49,8 @@ public:
   Result setHeaders() override;
 
   bool isCurrentlyPlaying(const QModelIndex& item) const override;
+
+  size_t idCol() const override { return AUDIO_FILE_COL_ID; }
 
   QVariant data(const QModelIndex& item, int role) const override;
 };

@@ -7,17 +7,23 @@
 namespace Gj {
 namespace Gui {
 Result QueueQueryModel::hydrateState(const State::Packet& statePacket) {
-  Logging::write(
-    Info,
-    "Gui::QueueQueryModel::hydrateState",
-    "QueueQueryModel::hydrateState"
-  );
+  // Logging::write(
+  //   Info,
+  //   "Gui::QueueQueryModel::hydrateState",
+  //   "QueueQueryModel::hydrateState"
+  // );
   return OK;
 }
 
 QVariant QueueQueryModel::data(const QModelIndex& item, const int role) const {
   if (const QVariant parentData = MusicLibraryQueryModel::data(item, role); !parentData.isNull())
     return parentData;
+
+  if (role == Qt::DisplayRole && static_cast<size_t>(item.column()) == AUDIO_FILE_COL_YEAR) {
+    const QVariant val = QStandardItemModel::data(item, role);
+    if (val.toString() == "0")
+      return QVariant(QString("-"));
+  }
 
   return QStandardItemModel::data(item, role);
 }
@@ -69,7 +75,7 @@ Result QueueQueryModel::setHeaders() {
   setHeaderData(AUDIO_FILE_COL_TRACK, Qt::Horizontal, QObject::tr("Track"));
   setHeaderData(AUDIO_FILE_COL_ARTIST, Qt::Horizontal, QObject::tr("Artist"));
   setHeaderData(AUDIO_FILE_COL_ALBUM, Qt::Horizontal, QObject::tr("Album"));
-  setHeaderData(AUDIO_FILE_COL_TRACK_NUMBER, Qt::Horizontal, QObject::tr("Track Number"));
+  setHeaderData(AUDIO_FILE_COL_TRACK_NUMBER, Qt::Horizontal, QObject::tr("Trk#"));
   setHeaderData(AUDIO_FILE_COL_YEAR, Qt::Horizontal, QObject::tr("Year"));
   setHeaderData(AUDIO_FILE_COL_GENRE, Qt::Horizontal, QObject::tr("Genre"));
   setHeaderData(AUDIO_FILE_COL_PATH, Qt::Horizontal, QObject::tr("Path"));

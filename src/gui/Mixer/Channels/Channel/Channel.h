@@ -31,6 +31,7 @@
 #include "./Plugins/PluginsContainer.h"
 #include "../../../Shared/VstSelect.h"
 #include "../../../Color.h"
+#include "Plugins/PluginsButton.h"
 
 #include "../../../../Logging.h"
 
@@ -53,7 +54,8 @@ public:
     QAction* soloChannelAction,
     QAction* soloLChannelAction,
     QAction* soloRChannelAction,
-    std::atomic<float>* vuPtr
+    std::atomic<float>* vuPtr,
+    bool fillContainer = false
   );
 
   ~Channel() override;
@@ -84,6 +86,7 @@ private:
   actor_system& actorSystem;
   strong_actor_ptr appStateManagerPtr;
   Audio::Mixer::Core* mixer;
+  bool fillContainer;
   std::atomic<float>* vuPtr;
   VuMeter vuMeter;
   QAction* removeChannelAction;
@@ -114,6 +117,7 @@ private:
   QScrollArea pluginSlotsScrollArea;
   PluginSlots pluginSlots;
   MuteSoloContainer muteSoloContainer;
+  PluginsButton pluginsButton;
 
   void setStyle();
 

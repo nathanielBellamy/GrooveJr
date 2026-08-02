@@ -12,6 +12,7 @@ Result PlaylistQueryModel::hydrateState(const State::Packet& statePacket) {
     "Gui::PlaylistQueryModel::hydrateState",
     "PlaylistQueryModel::hydrateState"
   );
+  refresh();
   return OK;
 }
 
@@ -57,8 +58,8 @@ Result PlaylistQueryModel::refresh(const bool hard) {
 }
 
 Result PlaylistQueryModel::setHeaders() {
-  setHeaderData(PLAYLIST_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
-  setHeaderData(PLAYLIST_COL_ID, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(PLAYLIST_COL_NAME, Qt::Horizontal, QObject::tr(""));
+  setHeaderData(PLAYLIST_COL_ID, Qt::Horizontal, QObject::tr(""));
   return OK;
 }
 

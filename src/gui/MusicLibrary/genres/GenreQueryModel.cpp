@@ -12,6 +12,7 @@ Result GenreQueryModel::hydrateState(const State::Packet& statePacket) {
     "Gui::GenreQueryModel::hydrateState",
     "GenreQueryModel::hydrateState"
   );
+  refresh();
   return OK;
 }
 
@@ -57,8 +58,8 @@ Result GenreQueryModel::refresh(const bool hard) {
 }
 
 Result GenreQueryModel::setHeaders() {
-  setHeaderData(GENRE_COL_ID, Qt::Horizontal, QObject::tr("Id"));
-  setHeaderData(GENRE_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
+  setHeaderData(GENRE_COL_ID, Qt::Horizontal, QObject::tr(""));
+  setHeaderData(GENRE_COL_NAME, Qt::Horizontal, QObject::tr(""));
   return OK;
 }
 

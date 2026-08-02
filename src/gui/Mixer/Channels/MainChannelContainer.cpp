@@ -34,10 +34,13 @@ MainChannelContainer::MainChannelContainer(
     this, actorSystem, mixer, 0, nullptr,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction,
-    vuPtr
+    vuPtr,
+    true
   )) {
   setupGrid();
   setStyle();
+  setContentsMargins(0, 0, 0, 0);
+  mainChannel->setContentsMargins(0, 0, 0, 0);
 
   Logging::write(
     Info,
@@ -51,14 +54,19 @@ void MainChannelContainer::hydrateState(const State::Packet& appState) const {
 }
 
 void MainChannelContainer::setStyle() {
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   std::string styleString = "border-radius: 5px; ";
   styleString += "background-color: " + Color::toHex(GjC::LIGHT_200) + "; ";
   setStyleSheet(styleString.data());
 }
 
 void MainChannelContainer::setupGrid() {
-  grid.addWidget(mainChannel.get(), 0, 0, -1, -1);
+  grid.setContentsMargins(0, 0, 0, 0);
+  grid.setHorizontalSpacing(0);
+  grid.setVerticalSpacing(0);
+  grid.addWidget(mainChannel.get(), 0, 0, 1, 1);
+  grid.setColumnStretch(0, 1);
+  grid.setRowStretch(0, 1);
 }
 
 // void MainChannelContainer::setPlugins() const {
@@ -80,8 +88,10 @@ void MainChannelContainer::setChannel() {
   mainChannel = std::make_unique<Channel>(this, actorSystem, mixer, 0, nullptr,
                                           muteChannelAction, muteLChannelAction, muteRChannelAction,
                                           soloChannelAction, soloLChannelAction, soloRChannelAction,
-                                          vuPtr
+                                          vuPtr,
+                                          true
   );
+  mainChannel->setContentsMargins(0, 0, 0, 0);
 
   setupGrid();
   Logging::write(

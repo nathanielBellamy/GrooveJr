@@ -15,9 +15,9 @@ VstWindowSelectButton::VstWindowSelectButton(QWidget* parent, const PluginIndex 
   , selectAction(selectAction) {
   setCursor(Qt::PointingHandCursor);
   setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-  setMinimumHeight(40);
-  setMinimumWidth(200);
-  setStyleSheet("padding: 5px;");
+  setMinimumHeight(28);
+  setMinimumWidth(160);
+  setStyleSheet("padding: 3px; border-radius: 3px;");
 }
 
 void VstWindowSelectButton::mousePressEvent(QMouseEvent* event) {

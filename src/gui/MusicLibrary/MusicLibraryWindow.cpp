@@ -51,6 +51,15 @@ MusicLibraryWindow::MusicLibraryWindow(
   playlistClearFilterButton->setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
   clearFiltersButton->setIcon(style()->standardIcon(QStyle::StandardPixmap::SP_TitleBarCloseButton));
 
+  // Keep row height stable when clear-filter buttons are hidden
+  for (auto* btn : {albumClearFilterButton, artistClearFilterButton,
+                    genreClearFilterButton, playlistClearFilterButton,
+                    clearFiltersButton}) {
+    QSizePolicy sp = btn->sizePolicy();
+    sp.setRetainSizeWhenHidden(true);
+    btn->setSizePolicy(sp);
+  }
+
   filtersHeader->setText("Filters");
   filtersHeader->setFont({filtersHeader->font().family(), 14});
 
@@ -236,7 +245,7 @@ Result MusicLibraryWindow::connectActions() {
                                                   index.row(), 2).data();
                                                 filters.set(ALBUM, albumId.toInt());
 
-                                                refresh();
+                                                refresh(albumTableView);
                                               });
 
   const auto artistClickedConnection = connect(artistTableView, &QTableView::clicked, this,
@@ -245,7 +254,7 @@ Result MusicLibraryWindow::connectActions() {
                                                    index.row(), 1).data();
                                                  filters.set(ARTIST, artistId.toLongLong());
 
-                                                 refresh();
+                                                 refresh(artistTableView);
                                                });
 
   const auto genreClickedConnection = connect(genreTableView, &QTableView::clicked, this,
@@ -254,7 +263,7 @@ Result MusicLibraryWindow::connectActions() {
                                                   index.row(), 1).data();
                                                 filters.set(GENRE, genreId.toLongLong());
 
-                                                refresh();
+                                                refresh(genreTableView);
                                               });
 
   const auto playlistClickedConnection = connect(playlistTableView, &QTableView::clicked, this,
@@ -263,7 +272,7 @@ Result MusicLibraryWindow::connectActions() {
                                                      index.row(), 1).data();
                                                    filters.set(PLAYLIST, playlistId.toLongLong());
 
-                                                   refresh();
+                                                   refresh(playlistTableView);
                                                  });
 
   return OK;

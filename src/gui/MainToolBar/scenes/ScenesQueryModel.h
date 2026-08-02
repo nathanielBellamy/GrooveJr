@@ -20,11 +20,18 @@ class ScenesQueryModel final : public SqlQueryModel {
 public:
   ScenesQueryModel(
     QObject* parent,
+    QTableView* tableView,
     State::Core* stateCore,
     const QString& id,
     SqlWorkerPool* sqlWorkerPool
   )
-  : SqlQueryModel(parent, stateCore, id, sqlWorkerPool) {
+  : SqlQueryModel(
+    parent,
+    tableView,
+    stateCore,
+    id,
+    sqlWorkerPool
+  ) {
     refresh();
   };
 

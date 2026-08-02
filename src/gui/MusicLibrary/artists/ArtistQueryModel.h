@@ -21,9 +21,22 @@ namespace Gj {
 namespace Gui {
 class ArtistQueryModel final : public MusicLibraryQueryModel {
 public:
-  explicit ArtistQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
-                            SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, stateCore, filters, ARTIST, QString("ArtistQueryModel"), sqlWorkerPool) {
+  explicit ArtistQueryModel(
+    QObject* parent,
+    QTableView* tableView,
+    State::Core* stateCore,
+    MusicLibraryFilters* filters,
+    SqlWorkerPool* sqlWorkerPool
+  )
+  : MusicLibraryQueryModel(
+    parent,
+    tableView,
+    stateCore,
+    filters,
+    ARTIST,
+    QString("ArtistQueryModel"),
+    sqlWorkerPool
+  ) {
     refresh();
   }
 
@@ -34,6 +47,8 @@ public:
   Result setHeaders() override;
 
   bool isCurrentlyPlaying(const QModelIndex& item) const override;
+
+  size_t idCol() const override { return ARTIST_COL_ID; }
 
   QVariant data(const QModelIndex& item, int role) const override;
 };

@@ -15,7 +15,7 @@ MuteButton::MuteButton(QWidget* parent, QAction* muteChannelAction, const int ch
 }
 
 std::string MuteButton::styleString(const float muteVal) const {
-  std::string styleString = "border-radius: 5px; border: 2px solid white;";
+  std::string styleString = "border-radius: 5px;";
   if (muteVal == 1.0f) {
     styleString += " background-color: " + Color::toHex(GjC::MUTE_BLUE) + "; color: " + Color::toHex(GjC::DARK_400) +
         "; ";

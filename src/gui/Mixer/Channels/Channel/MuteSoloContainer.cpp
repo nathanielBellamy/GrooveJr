@@ -11,7 +11,6 @@ MuteSoloContainer::MuteSoloContainer(
   QWidget* parent,
   Audio::Mixer::Core* mixer,
   const ChannelIndex channelIndex,
-  QAction* openPluginsContainer,
   QAction* muteChannelAction,
   QAction* muteLChannelAction,
   QAction* muteRChannelAction,
@@ -28,8 +27,7 @@ MuteSoloContainer::MuteSoloContainer(
   , muteR(this, muteRChannelAction, channelIndex)
   , solo(this, soloChannelAction, channelIndex)
   , soloL(this, soloLChannelAction, channelIndex)
-  , soloR(this, soloRChannelAction, channelIndex)
-  , plugins(this, openPluginsContainer) {
+  , soloR(this, soloRChannelAction, channelIndex) {
   const auto res = mixer->runAgainstChannel(
     channelIndex,
     [this, &channelIndex](const std::unique_ptr<Audio::Mixer::Channel>& channel) {
@@ -81,9 +79,6 @@ void MuteSoloContainer::setupGrid() {
     grid.addWidget(&solo, 0, 2, 1, 2);
     grid.addWidget(&soloL, 1, 2, 1, 1);
     grid.addWidget(&soloR, 1, 3, 1, 1);
-    grid.addWidget(&plugins, 0, 4, 2, 1);
-  } else {
-    grid.addWidget(&plugins, 0, 2, 2, 2);
   }
 
   grid.setHorizontalSpacing(4);

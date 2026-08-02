@@ -535,10 +535,14 @@ struct AudioPlayer {
       if (stateCoreWasRequestingUpdate_Deck) {
         deactivateJackClient();
         const auto audioCoreShadow = stateCore->audioCoreShadow.load();
-        if (const auto decoratedAudioFile = audioCoreShadow.decks[audioCoreShadow.deckIndex].decoratedAudioFile) {
-          audioCore->deckIndex = audioCoreShadow.deckIndex;
-          audioCore->deckIndexNext = audioCoreShadow.deckIndexNext;
-          audioCore->addCassetteFromDecoratedAudioFile(decoratedAudioFile.value());
+        audioCore->deckIndex = audioCoreShadow.deckIndex;
+        audioCore->deckIndexNext = audioCoreShadow.deckIndexNext;
+        for (int i = 0; i < AUDIO_CORE_DECK_COUNT; ++i) {
+          if (const auto decoratedAudioFile = audioCoreShadow.decks[i].decoratedAudioFile) {
+            audioCore->addCassetteFromDecoratedAudioFileAtIdx(decoratedAudioFile.value(), i);
+            if (i == audioCore->deckIndex)
+              stateCore->setCurrentlyPlaying(decoratedAudioFile.value());
+          }
         }
         activateJackClient();
         while (!stateCore->requestingDeckUpdate.compare_exchange_weak(stateCoreWasRequestingUpdate_Deck, false,
@@ -604,7 +608,6 @@ struct AudioPlayer {
     const auto distantDeckIndex = getDistantDeckIndex();
     const auto newCacheTrackNumber = stateCore->updateCacheTrackNumber();
     const auto playbackSpeed = stateCore->scene.load().playbackSpeed;
-    const auto cacheSize = stateCore->cacheSize.load();
 
     if (const auto cacheSize = stateCore->cacheSize.load(); newCacheTrackNumber == cacheSize - 1) {
       stateCore->playState = STOP;

@@ -28,7 +28,7 @@ public:
     actorSystem,
     dao,
     stateCore,
-    new CacheQueryModel(parent, stateCore, filters, sqlWorkerPool),
+    new CacheQueryModel(parent, this, stateCore, filters, sqlWorkerPool),
     filters
   ) {
     refresh(true);

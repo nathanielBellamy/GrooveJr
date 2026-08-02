@@ -35,6 +35,9 @@ constexpr size_t PLAYLIST_COL_ID = 1;
 
 constexpr auto CURRENTLY_PLAYING_COLOR = Qt::blue;
 
+// Active filter row highlight — dark goldenrod amber, distinct from currently-playing
+const auto FILTER_ACTIVE_COLOR = QColor("#B8860B");
+
 }
 }
 

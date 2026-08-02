@@ -7,6 +7,8 @@
 
 #include "caf/actor_system.hpp"
 
+#include <QTimer>
+
 #include "../../../state/Core.h"
 #include "../MusicLibraryFilters.h"
 #include "../MusicLibraryTableView.h"
@@ -32,10 +34,17 @@ public:
     actorSystem,
     dao,
     stateCore,
-    new AlbumQueryModel(parent, stateCore, filters, sqlWorkerPool),
+    new AlbumQueryModel(parent, this, stateCore, filters, sqlWorkerPool),
     filters
   ) {
     refresh(true);
+    connect(model, &QAbstractItemModel::modelReset, this, [this]() {
+      QTimer::singleShot(0, this, [this]() {
+        setColumnHidden(ALBUM_COL_ID, true);
+        horizontalHeader()->resizeSection(ALBUM_COL_TITLE, 150);
+        horizontalHeader()->resizeSection(ALBUM_COL_YEAR, 60);
+      });
+    });
   };
 };
 } // Gui

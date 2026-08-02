@@ -12,6 +12,7 @@ Result ArtistQueryModel::hydrateState(const State::Packet& statePacket) {
     "Gui::ArtistQueryModel::hydrateState",
     "ArtistQueryModel::hydrateState"
   );
+  refresh();
   return OK;
 }
 
@@ -58,8 +59,8 @@ Result ArtistQueryModel::refresh(const bool hard) {
 
 
 Result ArtistQueryModel::setHeaders() {
-  setHeaderData(ARTIST_COL_NAME, Qt::Horizontal, QObject::tr("Name"));
-  setHeaderData(ARTIST_COL_ID, Qt::Horizontal, QObject::tr("Id"));
+  setHeaderData(ARTIST_COL_NAME, Qt::Horizontal, QObject::tr(""));
+  setHeaderData(ARTIST_COL_ID, Qt::Horizontal, QObject::tr(""));
   return OK;
 }
 

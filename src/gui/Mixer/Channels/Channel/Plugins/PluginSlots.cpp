@@ -22,6 +22,7 @@ PluginSlots::PluginSlots(QWidget* parent,
   , togglePluginAction(togglePluginAction)
   , replacePluginAction(replacePluginAction)
   , removePluginAction(removePluginAction) {
+  setStyle();
   setupGrid();
 }
 
@@ -78,7 +79,8 @@ Result PluginSlots::hydrateState(const State::Packet& statePacket, const Channel
 }
 
 void PluginSlots::setupGrid() {
-  grid.setVerticalSpacing(4);
+  grid.setContentsMargins(8, 4, 8, 4);
+  grid.setVerticalSpacing(1);
 
   int row = 0;
   for (PluginIndex plugIdx = 0; plugIdx < Audio::MAX_PLUGINS_PER_CHANNEL; ++plugIdx) {
@@ -86,6 +88,9 @@ void PluginSlots::setupGrid() {
     grid.addWidget(pluginSlots[plugIdx], row, 0, 1, 1);
     ++row;
   }
+
+  // Pack plugin slots at the top — spacer absorbs remaining vertical space
+  grid.setRowStretch(row, 1);
 
   setLayout(&grid);
 }
@@ -106,6 +111,10 @@ Result PluginSlots::reset() {
     "Done resetting PluginSlots on channel " + std::to_string(channelIndex)
   );
   return OK;
+}
+
+void PluginSlots::setStyle() {
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 } // Mixer
 } // Gui

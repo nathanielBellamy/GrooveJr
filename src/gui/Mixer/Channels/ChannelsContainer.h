@@ -19,6 +19,7 @@
 #include <QAction>
 #include <QGridLayout>
 #include <QScrollArea>
+#include <QHBoxLayout>
 #include <QWidget>
 
 #include "../../../Logging.h"
@@ -82,7 +83,7 @@ private:
   QWidget spacer;
   QWidget channelsWidget;
   QScrollArea channelsScrollArea;
-  QGridLayout channelsGrid;
+  QHBoxLayout channelsHBoxLayout;
   std::vector<Channel*> channels;
   QAction addChannelAction;
   QAction removeChannelAction;

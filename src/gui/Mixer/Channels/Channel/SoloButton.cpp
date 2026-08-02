@@ -25,7 +25,7 @@ void SoloButton::mousePressEvent(QMouseEvent* event) {
 }
 
 std::string SoloButton::styleString(const float soloVal) const {
-  std::string styleString = "border-radius: 5px; border: 2px solid white; ";
+  std::string styleString = "border-radius: 5px;";
   if (soloVal == 1.0f) {
     styleString += "background-color: " + Color::toHex(GjC::SOLO_YELLOW) + "; color: " + Color::toHex(GjC::DARK_400) +
         "; ";

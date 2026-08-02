@@ -22,18 +22,22 @@ PluginSlot::PluginSlot(QWidget* parent,
   , channelIndex(channelIndex)
   , pluginIndex(pluginIndex)
   , occupied(occupied)
-  , grid(this)
-  , title(this)
+  , layout(this)
   , togglePluginButton(this, channelIndex, pluginIndex, occupied, togglePluginAction)
   , replacePluginButton(this, channelIndex, pluginIndex, occupied, replacePluginAction)
   , removePluginButton(this, channelIndex, pluginIndex, occupied, removePluginAction)
   , pluginName(this) {
-  title.setText(QString::number(pluginIndex + 1));
-  title.setFont({title.font().family(), 12});
-  pluginName.setFont({pluginName.font().family(), 12});
+  setContentsMargins(0, 0, 0, 0);
+  pluginName.setFont({pluginName.font().family(), 10});
+  pluginName.setMinimumWidth(0);
+  pluginName.setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+
+  // Hide action buttons by default — revealed on hover
+  replacePluginButton.hide();
+  removePluginButton.hide();
 
   setStyle();
-  setupGrid();
+  setupLayout();
 }
 
 PluginSlot::~PluginSlot() {
@@ -48,30 +52,81 @@ void PluginSlot::hydrateState(const State::Packet& statePacket, const ChannelInd
                               const PluginIndex newPluginIndex) {
   channelIndex = newChannelIndex;
   pluginIndex = newPluginIndex;
-  pluginName.setText(statePacket.mixerPacket.channels[channelIndex].plugins[pluginIndex].name.c_str());
+  fullPluginName = QString(statePacket.mixerPacket.channels[channelIndex].plugins[pluginIndex].name.c_str());
+  updateElidedName();
 
   togglePluginButton.hydrateState(statePacket, newChannelIndex);
 }
 
 void PluginSlot::setStyle() {
-  setFixedSize(QSize(150, 70));
+  setFixedHeight(26);
   setStyleSheet(
-    ("border: 2px solid white; background-color: " + Color::toHex(GjC::DARK_200) + "; ").data()
+    QString(("background-color: " + Color::toHex(GjC::DARK_500) + "; "
+             "border-bottom: 1px solid " + Color::toHex(GjC::DARK_400) + ";").data())
+  );
+  pluginName.setStyleSheet(
+    QString(("color: " + Color::toHex(GjC::LIGHT_100) + "; "
+             "background: transparent; "
+             "padding-left: 4px;").data())
   );
 }
 
-void PluginSlot::setupGrid() {
-  grid.addWidget(&title, 0, 0, 1, 1);
-  grid.addWidget(&togglePluginButton, 0, 1, 1, 1);
-  grid.addWidget(&replacePluginButton, 0, 2, 1, 1);
-  grid.addWidget(&removePluginButton, 0, 3, 1, 1);
-  grid.addWidget(&pluginName, 1, 0, -1, -1);
+void PluginSlot::setupLayout() {
+  layout.setContentsMargins(2, 0, 2, 0);
+  layout.setSpacing(2);
 
-  grid.setColumnMinimumWidth(1, 30);
-  grid.setColumnStretch(1, 10);
+  layout.addWidget(&togglePluginButton);
+  layout.addWidget(&pluginName, 1); // stretch factor 1 — takes remaining space
+  layout.addWidget(&replacePluginButton);
+  layout.addWidget(&removePluginButton);
+}
 
-  grid.setVerticalSpacing(4);
-  grid.setHorizontalSpacing(4);
+void PluginSlot::enterEvent(QEnterEvent* event) {
+  setStyleSheet(
+    QString(("background-color: " + Color::toHex(GjC::DARK_300) + "; "
+             "border-bottom: 1px solid " + Color::toHex(GjC::DARK_400) + ";").data())
+  );
+  replacePluginButton.show();
+  removePluginButton.show();
+  updateElidedName();
+  QWidget::enterEvent(event);
+}
+
+void PluginSlot::leaveEvent(QEvent* event) {
+  setStyleSheet(
+    QString(("background-color: " + Color::toHex(GjC::DARK_500) + "; "
+             "border-bottom: 1px solid " + Color::toHex(GjC::DARK_400) + ";").data())
+  );
+  replacePluginButton.hide();
+  removePluginButton.hide();
+  updateElidedName();
+  QWidget::leaveEvent(event);
+}
+
+void PluginSlot::resizeEvent(QResizeEvent* event) {
+  QWidget::resizeEvent(event);
+  updateElidedName();
+}
+
+void PluginSlot::updateElidedName() {
+  if (fullPluginName.isEmpty()) return;
+
+  // Calculate available width for the name label:
+  // slot width minus layout margins, toggle button, spacings, and label padding
+  int availableWidth = width() - 4 // layout margins (2+2)
+                       - 14 // toggle button
+                       - 2 // spacing after toggle
+                       - 4; // label padding-left
+
+  if (replacePluginButton.isVisible()) {
+    availableWidth -= 16 + 2; // replace button + spacing
+    availableWidth -= 16 + 2; // remove button + spacing
+  }
+
+  if (availableWidth <= 0) availableWidth = 40;
+
+  QFontMetrics fm(pluginName.font());
+  pluginName.setText(fm.elidedText(fullPluginName, Qt::ElideRight, availableWidth));
 }
 } // Mixer
 } // Gui

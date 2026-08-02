@@ -12,6 +12,7 @@ Result AlbumQueryModel::hydrateState(const State::Packet& statePacket) {
     "Gui::AlbumQueryModel::hydrateState",
     "AlbumQueryModel::hydrateState"
   );
+  refresh();
   return OK;
 }
 
@@ -52,13 +53,18 @@ Result AlbumQueryModel::refresh(const bool hard) {
 Result AlbumQueryModel::setHeaders() {
   setHeaderData(ALBUM_COL_TITLE, Qt::Horizontal, QObject::tr("Title"));
   setHeaderData(ALBUM_COL_YEAR, Qt::Horizontal, QObject::tr("Year"));
-  setHeaderData(ALBUM_COL_ID, Qt::Horizontal, QObject::tr("Id"));
   return OK;
 };
 
 QVariant AlbumQueryModel::data(const QModelIndex& item, const int role) const {
   if (const QVariant parentData = MusicLibraryQueryModel::data(item, role); !parentData.isNull())
     return parentData;
+
+  if (role == Qt::DisplayRole && static_cast<size_t>(item.column()) == ALBUM_COL_YEAR) {
+    const QVariant val = QStandardItemModel::data(item, role);
+    if (val.toString() == "0")
+      return QVariant(QString("-"));
+  }
 
   return QStandardItemModel::data(item, role);
 }

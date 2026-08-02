@@ -34,9 +34,10 @@ void RemovePluginButton::mousePressEvent(QMouseEvent* event) {
 }
 
 void RemovePluginButton::setStyle() {
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  setMinimumSize(QSize(20, 20));
-  setStyleSheet("padding: 2px;");
+  setFixedSize(QSize(16, 16));
+  setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  setIconSize(QSize(12, 12));
+  setStyleSheet("padding: 0px; border: none; background: transparent;");
 }
 } // Mixer
 } // Gui

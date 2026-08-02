@@ -53,6 +53,8 @@ private:
   QAction* removePluginAction;
 
   void setupGrid();
+
+  void setStyle();
 };
 } // Mixer
 } // Gui

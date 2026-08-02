@@ -42,7 +42,7 @@ Body::Body(QWidget* parent, actor_system& actorSystem, Audio::Mixer::Core* mixer
   title->setFont({title->font().family(), 18});
 
   connectActions();
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
   setStyle();
   setupGrid();
 

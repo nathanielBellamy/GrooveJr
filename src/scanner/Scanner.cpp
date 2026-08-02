@@ -74,24 +74,55 @@ Result Scanner::scanDirectoryRecursive(const std::string& dirPath) const {
 
       TagLib::Tag* tag = file.tag();
 
-      Db::Artist artist(tag->artist().to8Bit());
+      // Use to8Bit(true) to force UTF-8 encoding.
+      // The default to8Bit() uses Latin-1, which produces
+      // empty or garbled strings for non-ASCII metadata.
+      std::string artistName = tag->artist().to8Bit(true);
+      if (artistName.empty()) {
+        artistName = "Unknown Artist";
+        Logging::write(
+          Warning,
+          "Scanner::Scanner::runScan()",
+          "Missing artist tag, using fallback for: " + entry.path().string()
+        );
+      }
+      Db::Artist artist(artistName);
       artist.id = dao->artistRepository.save(artist);
 
-      Db::Album album(tag->album().to8Bit(), tag->year());
+      std::string albumTitle = tag->album().to8Bit(true);
+      if (albumTitle.empty()) {
+        albumTitle = "Unknown Album";
+        Logging::write(
+          Warning,
+          "Scanner::Scanner::runScan()",
+          "Missing album tag, using fallback for: " + entry.path().string()
+        );
+      }
+      Db::Album album(albumTitle, tag->year());
       Db::AlbumWithArtist albumWithArtist{
         album,
         artist
       };
       album.id = dao->albumRepository.save(albumWithArtist);
 
-      Db::Track track(album.id, tag->title().to8Bit(), tag->track());
+      std::string trackTitle = tag->title().to8Bit(true);
+      if (trackTitle.empty()) {
+        trackTitle = entry.path().stem().string();
+        Logging::write(
+          Warning,
+          "Scanner::Scanner::runScan()",
+          "Missing title tag, using filename as fallback for: " + entry.path().string()
+        );
+      }
+      Db::Track track(album.id, trackTitle, tag->track());
       track.id = dao->trackRepository.save(track);
       dao->trackRepository.join(track, artist);
 
       Db::AudioFile audioFile(track.id, entry.path().string().c_str());
       audioFile.id = dao->audioFileRepository.save(audioFile);
 
-      Db::Genre genre(tag->genre().to8Bit());
+      std::string genreName = tag->genre().to8Bit(true);
+      Db::Genre genre(genreName);
       Db::GenreWithTrackId genreWithTrackId{genre, track.id};
       dao->genreRepository.save(genreWithTrackId);
     }

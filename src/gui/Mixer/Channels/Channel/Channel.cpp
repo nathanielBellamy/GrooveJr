@@ -20,13 +20,15 @@ Channel::Channel(
   QAction* soloChannelAction,
   QAction* soloLChannelAction,
   QAction* soloRChannelAction,
-  std::atomic<float>* vuPtr
+  std::atomic<float>* vuPtr,
+  const bool fillContainer
 )
 : QWidget(parent)
   , channelIndex(channelIndex)
   , actorSystem(actorSystem)
   , appStateManagerPtr(actorSystem.registry().get(Act::ActorIds::APP_STATE_MANAGER))
   , mixer(mixer)
+  , fillContainer(fillContainer)
   , vuPtr(vuPtr)
   , vuMeter(this, mixer, vuPtr, channelIndex)
   , removeChannelAction(removeChannelAction)
@@ -42,28 +44,29 @@ Channel::Channel(
   , grid(this)
   , title(this)
   , gainSlider(Qt::Vertical, this)
-  , gainLabel("Gain", this)
+  , gainLabel("", this)
   , gainLSlider(Qt::Vertical, this)
-  , gainLLabel("GainL", this)
+  , gainLLabel("  L", this)
   , gainRSlider(Qt::Vertical, this)
-  , gainRLabel("GainR", this)
+  , gainRLabel("  R", this)
   , panSlider(Qt::Horizontal, this)
-  , panLabel("Pan", this)
+  , panLabel("", this)
   , panLSlider(Qt::Horizontal, this)
-  , panLLabel("PanL", this)
+  , panLLabel("  L", this)
   , panRSlider(Qt::Horizontal, this)
-  , panRLabel("PanR", this)
+  , panRLabel("  R", this)
   , pluginSlotsScrollArea(this)
   , pluginSlots(
     this, actorSystem, mixer, channelIndex,
     &togglePluginAction, &replacePluginAction, &removePluginAction
   )
+  , pluginsButton(this, &openPluginsContainer)
   , muteSoloContainer(
-    this, mixer, channelIndex, &openPluginsContainer,
+    this, mixer, channelIndex,
     muteChannelAction, muteLChannelAction, muteRChannelAction,
     soloChannelAction, soloLChannelAction, soloRChannelAction
   ) {
-  if (channelIndex > 1 || mixer->getChannelsCount() > 1) {
+  if (channelIndex > 1 || (channelIndex == 1 && mixer->getChannelsCount() > 1)) {
     // can't remove main, must have at least one non-main channel
     removeChannelButton.show();
   } else {
@@ -142,7 +145,13 @@ void Channel::updateShowRemoveChannelButton(const bool val) {
 }
 
 void Channel::setStyle() {
-  setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+  if (fillContainer) {
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setMinimumWidth(0);
+  } else {
+    setFixedWidth(310);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+  }
   setStyleSheet(
     ("background-color: " + Color::toHex(GjC::LIGHT_300)).data()
   );
@@ -163,22 +172,20 @@ void Channel::setupGrid() {
   grid.addWidget(&gainLLabel, 5, 2, 1, 1);
   grid.addWidget(&gainRSlider, 1, 3, 4, 1);
   grid.addWidget(&gainRLabel, 5, 3, 1, 1);
-  grid.addWidget(&pluginSlotsScrollArea, 1, 4, 1, 2);
-  grid.addWidget(&addPluginButton, 2, 4, 1, 2, Qt::AlignCenter);
-  // grid.addWidget(&panSlider, 3, 3, 1, 1);
-  // grid.addWidget(&panLabel, 3, 4, 1, 1);
-  grid.addWidget(&panLSlider, 3, 4, 1, 1);
-  grid.addWidget(&panLLabel, 3, 5, 1, 1);
-  grid.addWidget(&panRSlider, 4, 4, 1, 1);
-  grid.addWidget(&panRLabel, 4, 5, 1, 1);
-  grid.addWidget(&muteSoloContainer, 6, 0, 1, -1);
+  grid.addWidget(&pluginSlotsScrollArea, 1, 4, 2, -1);
+  grid.addWidget(&addPluginButton, 3, 4, 1, 1, Qt::AlignCenter);
+  grid.addWidget(&pluginsButton, 3, 5, 1, 1, Qt::AlignCenter);
+  grid.addWidget(&panLSlider, 6, 0, 1, 3);
+  grid.addWidget(&panLLabel, 6, 3, 1, 1);
+  grid.addWidget(&panRSlider, 7, 0, 1, 3);
+  grid.addWidget(&panRLabel, 7, 3, 1, 1);
+  grid.addWidget(&muteSoloContainer, 6, 4, 2, -1);
 
   grid.setVerticalSpacing(2);
   grid.setHorizontalSpacing(2);
 
   grid.setColumnMinimumWidth(0, 20);
   grid.setRowMinimumHeight(0, 20);
-  grid.setRowMinimumHeight(1, 100);
   grid.setRowStretch(1, 10);
 
   setLayout(&grid);
@@ -187,22 +194,21 @@ void Channel::setupGrid() {
 
 void Channel::setupPluginSlotsScrollArea() {
   pluginSlotsScrollArea.setMinimumWidth(200);
-  pluginSlotsScrollArea.setMaximumWidth(200);
-  pluginSlotsScrollArea.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
-  pluginSlotsScrollArea.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  pluginSlotsScrollArea.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  pluginSlotsScrollArea.setAlignment(Qt::AlignLeft | Qt::AlignTop);
   pluginSlotsScrollArea.setWidgetResizable(true);
-  pluginSlotsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  pluginSlotsScrollArea.setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   pluginSlotsScrollArea.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   pluginSlotsScrollArea.setLayoutDirection(Qt::LeftToRight);
   pluginSlotsScrollArea.setWidget(&pluginSlots);
-  pluginSlots.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
+  pluginSlots.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 }
 
 void Channel::setupTitle() {
   if (channelIndex == 0) {
     title.setText("Main");
   } else {
-    title.setText("FX " + QString::number(channelIndex));
+    title.setText(QString::number(channelIndex));
   }
   title.setFont({title.font().family(), 16});
 }

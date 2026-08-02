@@ -20,9 +20,22 @@ namespace Gj {
 namespace Gui {
 class GenreQueryModel final : public MusicLibraryQueryModel {
 public:
-  explicit GenreQueryModel(QObject* parent, State::Core* stateCore, MusicLibraryFilters* filters,
-                           SqlWorkerPool* sqlWorkerPool)
-  : MusicLibraryQueryModel(parent, stateCore, filters, GENRE, QString("GenreQueryModel"), sqlWorkerPool) {
+  explicit GenreQueryModel(
+    QObject* parent,
+    QTableView* tableView,
+    State::Core* stateCore,
+    MusicLibraryFilters* filters,
+    SqlWorkerPool* sqlWorkerPool
+  )
+  : MusicLibraryQueryModel(
+    parent,
+    tableView,
+    stateCore,
+    filters,
+    GENRE,
+    QString("GenreQueryModel"),
+    sqlWorkerPool
+  ) {
     refresh();
   }
 
@@ -33,6 +46,8 @@ public:
   Result setHeaders() override;
 
   bool isCurrentlyPlaying(const QModelIndex& item) const override;
+
+  size_t idCol() const override { return GENRE_COL_ID; }
 
   QVariant data(const QModelIndex& item, int role) const override;
 };

@@ -88,6 +88,24 @@ class MusicLibraryWindow final : public QWidget {
     ("background-color: " + Color::toHex(GjC::DARK_400) + " ;").c_str()
   );
 
+  // Filter header label styles
+  const QString STYLE_STR_FILTER_ACTIVE = QString(
+    ("color: " + Color::toHex(GjC::FILTER_ACTIVE) + "; font-weight: bold;").c_str()
+  );
+
+  const QString STYLE_STR_FILTER_INACTIVE = QString(
+    ("color: " + Color::toHex(GjC::LIGHT_100) + "; font-weight: normal;").c_str()
+  );
+
+  // Filters-wide header style when any filter is active
+  const QString STYLE_STR_FILTERS_HEADER_ACTIVE = QString(
+    ("color: " + Color::toHex(GjC::FILTER_ACTIVE) + "; font-weight: bold;").c_str()
+  );
+
+  const QString STYLE_STR_FILTERS_HEADER_INACTIVE = QString(
+    ("color: " + Color::toHex(GjC::LIGHT_100) + "; font-weight: bold;").c_str()
+  );
+
 public:
   MusicLibraryFilters filters;
 
@@ -113,19 +131,39 @@ public:
     return OK;
   };
 
-  Result refresh() const {
-    albumTableView->refresh();
-    artistTableView->refresh();
-    audioFileTableView->refresh();
-    cacheTableView->refresh();
-    genreTableView->refresh();
-    playlistTableView->refresh();
-    queueTableView->refresh();
+  Result refresh(const SqlTableView* skip = nullptr) {
+    if (skip != albumTableView) albumTableView->refresh();
+    if (skip != artistTableView) artistTableView->refresh();
+    if (skip != audioFileTableView) audioFileTableView->refresh();
+    if (skip != cacheTableView) cacheTableView->refresh();
+    if (skip != genreTableView) genreTableView->refresh();
+    if (skip != playlistTableView) playlistTableView->refresh();
+    if (skip != queueTableView) queueTableView->refresh();
 
+    updateFilterStyles();
     return OK;
   }
 
 private:
+  void updateFilterStyles() {
+    // Per-filter header + clear button styling
+    auto styleFilter = [&](QLabel* header, QPushButton* clearBtn, MusicLibraryType type) {
+      const bool active = filters.isActive(type);
+      header->setStyleSheet(active ? STYLE_STR_FILTER_ACTIVE : STYLE_STR_FILTER_INACTIVE);
+      clearBtn->setVisible(active);
+    };
+
+    styleFilter(albumHeader, albumClearFilterButton, ALBUM);
+    styleFilter(artistHeader, artistClearFilterButton, ARTIST);
+    styleFilter(genreHeader, genreClearFilterButton, GENRE);
+    styleFilter(playlistHeader, playlistClearFilterButton, PLAYLIST);
+
+    // Top-level "Filters" header + clear-all button
+    const bool anyActive = filters.anyActive();
+    filtersHeader->setStyleSheet(anyActive ? STYLE_STR_FILTERS_HEADER_ACTIVE : STYLE_STR_FILTERS_HEADER_INACTIVE);
+    clearFiltersButton->setVisible(anyActive);
+  }
+
   Result showAsMainSection(MusicLibraryWindowMainSection newMainSection) {
     mainSection = newMainSection;
     switch (newMainSection) {
