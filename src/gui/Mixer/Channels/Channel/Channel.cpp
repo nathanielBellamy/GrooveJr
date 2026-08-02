@@ -149,7 +149,7 @@ void Channel::setStyle() {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMinimumWidth(0);
   } else {
-    setFixedWidth(290);
+    setFixedWidth(310);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
   }
   setStyleSheet(
