@@ -329,7 +329,6 @@ struct AudioCore {
       );
       return ERROR;
     };
-    stateCore->setCurrentlyPlaying(decoratedAudioFile);
 
     Logging::write(
       Info,
